@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дарья Купцова — дизайн и нейросети</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- версия (светлая или темная) выставляется сразу, чтобы страница не мигала -->
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>
+</head>
+<body>
+<!--
+  КАРКАС СТРАНИЦЫ
+  Тексты здесь не пишутся: атрибут data-text="hero.title" значит
+  «взять текст hero.title из content.js». Править тексты — в content.js,
+  оформление — в style.css.
+-->
+
+<!-- Шапка -->
+<header class="head" id="head">
+  <div class="wrap">
+    <span class="logo" data-text="name"></span>
+    <nav class="nav" id="nav"></nav>
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <i></i><span data-text="switchLeft"></span><span data-text="switchRight"></span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- Первый экран -->
+  <section class="hero" id="hero">
+    <canvas id="dots" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="eyebrow" data-reveal data-text="hero.eyebrow"></div>
+      <h1 class="h1 split" data-text="hero.title"></h1>
+      <p class="hero-sub" data-reveal style="--d:.25s" data-text="hero.subtitle"></p>
+      <div class="hero-row">
+        <p class="lead" data-reveal style="--d:.35s" data-text="hero.lead"></p>
+        <div class="ctas" data-reveal style="--d:.5s">
+          <a class="btn btn-accent tease" data-href="telegram"><span data-text="hero.button"></span><span class="arr">→</span></a>
+          <a class="link hero-link" href="#works" data-text="hero.button2"></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Направления -->
+  <section class="sec" id="directions">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="directions.title"></h2>
+        <p class="sec-note" data-reveal data-text="directions.note"></p>
+      </div>
+      <div class="dirs" id="dirList"></div>
+    </div>
+  </section>
+
+  <!-- Проекты -->
+  <section class="sec" id="works">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="works.title"></h2>
+        <p class="sec-note" data-reveal data-text="works.note"></p>
+      </div>
+      <div class="chips" id="workFilters" data-reveal></div>
+      <div class="works" id="workList"></div>
+    </div>
+  </section>
+
+  <!-- Проекты под NDA -->
+  <section class="sec" id="nda">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="nda.title"></h2>
+        <p class="sec-note" data-reveal data-text="nda.note"></p>
+      </div>
+      <div class="nda" id="ndaList"></div>
+      <div class="ctas nda-cta" data-reveal><a class="btn btn-accent" data-href="telegram"><span data-text="nda.button"></span><span class="arr">→</span></a><a class="btn btn-line" data-href="nda.link"><span data-text="nda.button2"></span><span class="arr">→</span></a></div>
+    </div>
+  </section>
+
+  <!-- Контакт -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <h2 class="h2 center" data-reveal data-text="contact.title"></h2>
+      <p class="lead" data-reveal data-text="contact.lead"></p>
+      <div class="ctas contact-links" id="contactLinks" data-reveal></div>
+      <div class="ttt" id="ttt" data-reveal></div>
+      <footer class="foot">
+        <span data-text="footer.left"></span>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<!-- Кнопка «Связаться», всегда на экране -->
+<!-- Маленькая кнопка «наверх» -->
+<button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
+<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
+
+<!-- Страница кейса: заполняется при клике на проект -->
+<div class="case" id="case" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
+  <div class="case-bar"><div class="wrap">
+    <button class="case-back" id="caseBack">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 10H4M9 5l-5 5 5 5"/></svg>
+      <span data-text="works.back"></span>
+    </button>
+  </div></div>
+  <div id="caseContent"></div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="content.js"></script>
+<script src="app.js"></script>
+<script src="waves.js"></script>
+<script src="fun.js"></script>
+<script src="shimmer.js"></script>
+</body>
+</html>

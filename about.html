@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Обо мне — Дарья Купцова</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- версия (светлая или темная) выставляется сразу, чтобы страница не мигала -->
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>
+</head>
+<body class="page-about">
+<!--
+  КАРКАС СТРАНИЦЫ
+  Тексты здесь не пишутся: атрибут data-text="hero.title" значит
+  «взять текст hero.title из content.js». Править тексты — в content.js,
+  оформление — в style.css.
+-->
+
+<!-- Шапка -->
+<header class="head" id="head">
+  <div class="wrap">
+    <a class="logo" href="index.html" data-text="name"></a>
+    <nav class="nav" id="nav"></nav>
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <i></i><span data-text="switchLeft"></span><span data-text="switchRight"></span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- Обо мне -->
+  <section class="about-page" id="about">
+    <div class="wrap">
+      <h1 class="h1 split" data-text="about.title"></h1>
+      <div class="about">
+        <div class="portrait" data-reveal id="portrait"><img id="photo" alt="Дарья Купцова" loading="lazy"></div>
+        <div>
+          <p class="big" data-reveal data-text="about.big"></p>
+          <p class="txt" data-reveal style="--d:.1s" data-text="about.text"></p>
+          <div class="facts" id="facts"></div>
+          <div class="ctas about-cta" data-reveal><a class="btn btn-line" data-href="about.speakerLink"><span data-text="about.speakerButton"></span><span class="arr">→</span></a></div>
+        </div>
+      </div>
+
+      <!-- Клиенты: все имена сразу, под курсором увеличиваются -->
+      <div class="clients">
+        <h3 class="clients-title" data-reveal data-text="clients.title"></h3>
+        <div class="clients-wall" id="clients"></div>
+        <p class="clients-what" id="clientsWhat" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Фотографии -->
+  <section class="sec" id="photos">
+    <div class="wrap">
+      <div class="sec-head"><h2 class="h2" data-reveal data-text="photos.title"></h2></div>
+      <div class="photo-strip" id="photoStrip"></div>
+    </div>
+  </section>
+
+  <!-- Статьи -->
+  <section class="sec" id="articles">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="articles.title"></h2>
+        <p class="sec-note" data-reveal data-text="articles.note"></p>
+      </div>
+      <div class="articles" id="articleList"></div>
+      <p class="pod-links" data-reveal><a class="link" data-href="articles.all.link" data-text="articles.all.text"></a></p>
+    </div>
+  </section>
+
+  <!-- Подкаст -->
+  <section class="sec" id="podcast">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="podcast.title"></h2>
+        <p class="sec-note" data-reveal data-text="podcast.note"></p>
+      </div>
+      <div class="pod">
+        <div class="pod-player" id="podPlayer" data-reveal></div>
+        <div class="pod-list" id="podList"></div>
+      </div>
+      <p class="pod-links" id="podLinks" data-reveal></p>
+    </div>
+  </section>
+
+  <!-- Контакт -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <h2 class="h2 center" data-reveal data-text="contact.title"></h2>
+      <p class="lead" data-reveal data-text="contact.lead"></p>
+      <div class="ctas contact-links" id="contactLinks" data-reveal></div>
+      <div class="ttt" id="ttt" data-reveal></div>
+      <footer class="foot">
+        <span data-text="footer.left"></span>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<!-- Кнопка «Связаться», всегда на экране -->
+<!-- Маленькая кнопка «наверх» -->
+<button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
+<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="content.js"></script>
+<script src="app.js"></script>
+<script src="waves.js"></script>
+<script src="fun.js"></script>
+</body>
+</html>
