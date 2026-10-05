@@ -53,6 +53,25 @@ const isFun = () => root.dataset.theme === 'dark';
 const isAboutPage = document.body.classList.contains('page-about') || !!document.querySelector('[data-page="about"]');
 const isSpeakerPage = document.body.classList.contains('page-speaker') || !!document.querySelector('[data-page="speaker"]');
 const isNdaPage = document.body.classList.contains('page-nda') || !!document.querySelector('[data-page="nda"]');
+/* Старый блок страницы NDA на Тильде (проекты списком, без окна кейса) достраивается сам:
+   сетка карточек и окно кейса появляются без перевставки блока */
+if (isNdaPage) {
+  const list = document.querySelector('#ndaProjects');
+  if (list && !list.classList.contains('works')) {
+    list.classList.add('works');
+    if (!list.parentElement.classList.contains('wrap')) { const w = document.createElement('div'); w.className = 'wrap'; list.replaceWith(w); w.append(list); }
+  }
+  if (!document.querySelector('#case')) document.body.insertAdjacentHTML('beforeend', `
+<div class="case" id="case" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
+  <div class="case-bar"><div class="wrap">
+    <button class="case-back" id="caseBack">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 10H4M9 5l-5 5 5 5"/></svg>
+      <span data-text="ndaPage.back"></span>
+    </button>
+  </div></div>
+  <div id="caseContent"></div>
+</div>`);
+}
 /* Разделы, которых нет на этой странице (на Тильде у каждой страницы свои тексты), — пустые */
 ['works', 'nda', 'directions', 'clients', 'about'].forEach(k => { SITE[k] = SITE[k] || {}; });
 SITE.works.items = SITE.works.items || []; SITE.nda.items = SITE.nda.items || [];
