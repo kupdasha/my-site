@@ -1388,7 +1388,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
 
      title  — название проекта        year   — маленькая цифра у названия
      short  — описание под названием  story  — абзацы; labels — подписи к ним слева
-     videos — ролики: src — файл mp4 из папки img, poster — обложка до запуска,
+     videos — ролики: video — 'kinescope:ID' (ID — конец ссылки kinescope.io/ID),
               caption — подпись под роликом
   */
   ndaPage: {
@@ -1406,10 +1406,10 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           'Около 80% проектов в роликах — те, в которых я активно участвовала или которые лидировала.',
           'Оформление каждого ролика привязано к ключевому визуалу мероприятия.',
         ],
-        /* копии на Vimeo: 1100053161 и 1100190045 */
+        /* ролики на Kinescope (копии на Vimeo: 1100053161 и 1100190045) */
         videos: [
-          { src: 'img/showreel/vk-2024.mp4', poster: 'img/showreel/vk-2024.jpg', caption: 'шоурил 2024' },
-          { src: 'img/showreel/vk-2025.mp4', poster: 'img/showreel/vk-2025.jpg', caption: 'шоурил 2025' },
+          { video: 'kinescope:p19WBRvZ4TPBW3N9YotBGh', caption: 'шоурил 2024' },
+          { video: 'kinescope:6KDKLAghQy1QEUMoxzvPNK', caption: 'шоурил 2025' },
         ],
       },
     ],

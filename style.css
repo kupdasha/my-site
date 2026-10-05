@@ -1076,5 +1076,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .nda-project .case-head{padding-bottom:0}
 .nda-project .case-body{padding-top:clamp(40px,5vw,72px)}
 .nda-video{background:none}
-.nda-video video{display:block;aspect-ratio:16/9;background:#000}
+.nda-video video,.nda-video .frame{display:block;width:100%;aspect-ratio:16/9;background:#000}
+.nda-video .frame{position:relative}
+.nda-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .nda-video figcaption{margin-top:12px}

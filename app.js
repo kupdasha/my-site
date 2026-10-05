@@ -398,11 +398,16 @@ function renderNdaPage(){
   $('#ndaProjects').innerHTML = (N.items || []).map(p => {
     const story = (Array.isArray((p.story || [])[0]) ? pick(p.story) : p.story) || [];
     const text = story.map((par, i) => `<div class="wrap"><div class="case-text" data-reveal><span class="case-label">${T((p.labels || [])[i] || '')}</span><p>${T(par)}</p></div></div>`).join('');
-    // ролики со звуком: запускаются по нажатию, до этого видна обложка
-    const videos = (p.videos || []).map(v => `<div class="wrap"><figure class="case-shot nda-video" data-reveal>
-        <video src="${v.src}"${v.poster ? ` poster="${v.poster}"` : ''} controls playsinline preload="metadata"></video>
+    // ролики со звуком: плеер площадки (Kinescope, Vimeo) или файл mp4; запускаются по нажатию
+    const videos = (p.videos || []).map(v => {
+      const m = parseMedia(v.video || v.src);
+      const player = m.type === 'file'
+        ? `<video src="${m.src}"${v.poster ? ` poster="${v.poster}"` : ''} controls playsinline preload="metadata"></video>`
+        : `<div class="frame"><iframe src="${embedURL(m, false).replace(/[?&]autoplay=1/, '')}" allow="${FRAME_ALLOW}" allowfullscreen loading="lazy"></iframe></div>`;
+      return `<div class="wrap"><figure class="case-shot nda-video" data-reveal>${player}
         ${v.caption ? `<figcaption class="case-note">${T(v.caption)}</figcaption>` : ''}
-      </figure></div>`).join('');
+      </figure></div>`;
+    }).join('');
     return `<article class="nda-project">
       <div class="wrap case-head">
         <div class="case-ttl"><h2 class="case-title">${T(p.title)}</h2>${yearHTML(p)}</div>
