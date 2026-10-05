@@ -602,7 +602,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
            { spin } — плитки градиентов медленно поворачиваются и масштабируются;
            { float3d } — текст, вокруг левитируют 3D-иконки и разлетаются от курсора;
            { icons2d } — живые 2D-элементы (нарисованы в app.js) и правила, как соединять их с 3D;
-           { head } — просто заголовок слева и текст справа. Картинки лежат в img/school */
+           { head } — просто заголовок слева и текст справа; { reel } — киноленты маленьких превью. Картинки лежат в img/school */
         gallery: [
           { row: ['img/school/before.jpg'], caption: 'до ребрендинга' },
           [
@@ -668,16 +668,13 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               text:  ['Фотостиль делится на два типа. UGC — эмоции и реалистичность, будто снимал сам автор: нестандартные ракурсы, теплая атмосфера, яркий свет без мрачных теней. Экспертный — строгая студийная подача с синими и оранжевыми рефлексами: женщин снимаем на оранжевом фоне, мужчин — на синем. В обоих фирменные цвета живут в одежде и деталях.',
                       'Фото бывают двух видов. UGC — как будто автор снял себя сам: живые эмоции, странные ракурсы, много солнца. Экспертные — студия и цветной свет: женщины на оранжевом, мужчины на синем. И там и там синий с оранжевым прячутся в одежде и деталях'],
             } },
-            { caption: 'UGC', cover: true, narrow: true, collage: { areas: '"a a b c" "a a d e"', cols: '1fr 1fr 1fr 1fr', rows: '1fr 1fr', ratio: '2/1', cells: [
-              { area: 'a', img: 'img/school/photo/ugc-4.jpg' }, { area: 'b', img: 'img/school/photo/ugc-1.jpg' },
-              { area: 'c', img: 'img/school/photo/ugc-3.jpg' }, { area: 'd', img: 'img/school/photo/ugc-2.jpg' },
-              { area: 'e', img: 'img/school/photo/ugc-6.jpg' },
-            ] } },
-            { caption: ['экспертный', 'экспертный'], cover: true, narrow: true, collage: { areas: '"a b c c" "d e c c"', cols: '1fr 1fr 1fr 1fr', rows: '1fr 1fr', ratio: '2/1', cells: [
-              { area: 'a', img: 'img/school/photo/pro-2.jpg' }, { area: 'b', img: 'img/school/photo/pro-3.jpg' },
-              { area: 'c', img: 'img/school/photo/pro-6.jpg' }, { area: 'd', img: 'img/school/photo/pro-5.jpg' },
-              { area: 'e', img: 'img/school/photo/pro-1.jpg' },
-            ] } },
+            /* reel — киноленты из маленьких превью: ряды едут навстречу друг другу, по наведению стоят, по нажатию фото увеличивается */
+            { reel: [
+              { label: 'UGC', items: ['img/school/photo/ugc-1.jpg', 'img/school/photo/ugc-2.jpg', 'img/school/photo/ugc-3.jpg',
+                                      'img/school/photo/ugc-4.jpg', 'img/school/photo/ugc-5.jpg', 'img/school/photo/ugc-6.jpg'] },
+              { label: ['экспертный', 'экспертный'], items: ['img/school/photo/pro-1.jpg', 'img/school/photo/pro-2.jpg', 'img/school/photo/pro-3.jpg',
+                                      'img/school/photo/pro-4.jpg', 'img/school/photo/pro-5.jpg', 'img/school/photo/pro-6.jpg'] },
+            ] },
             { row: ['img/school/photo/post-1.jpg', 'img/school/photo/post-2.jpg'], caption: ['фотостиль в постах', 'как это выглядит в ленте'], narrow: true },
             { row: ['img/school/smm/blog.jpg', 'img/school/smm/cat.jpg', 'img/school/smm/newyear.jpg', 'img/school/smm/smm.jpg'],
               caption: ['макеты для соцсетей', 'посты, которые вышли в сообществе'] },

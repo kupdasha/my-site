@@ -921,7 +921,7 @@ function brandkitHTML(b){
       <div class="bk-tile dark">${brandMark(b)}</div><div class="bk-tile dark">${brandMark(b, true)}</div>
       <div class="bk-tile light">${brandMark(b)}</div><div class="bk-tile light">${brandMark(b, true)}</div>
     </div></div>`;
-  if (b.colors) h += `<div class="wrap bk bk-colors">${head(b.colors)}
+  if (b.colors) h += `<div class="wrap bk bk-colors bk-n${b.colors.items.length}">${head(b.colors)}
     <div class="bk-swatches">${b.colors.items.map((c, i) => `
       <button class="bk-sw${isLight(c.hex) ? ' on-light' : ''}" style="--c:${c.hex};--i:${i};--x3:${i % 3};--y3:${Math.floor(i / 3)};--x2:${i % 2};--y2:${Math.floor(i / 2)}" data-hex="${c.hex}" data-done="${T(b.colors.copied || 'скопировано')}">
         <span class="bk-name">${T(c.name)}</span>
@@ -1043,7 +1043,7 @@ const blockHead = x => `<div class="case-text"><span class="case-label">${T(x.ti
 function blendHTML(b){
   const [c1, c2, c3] = b.items, m = b.between;
   const ph = b.phases || [];
-  return brandkitHTML({ colors: b }) + `<div class="wrap blend">
+  return brandkitHTML({ colors: b }) + `<div class="wrap mix">
     <div class="strip-box" style="--c1:${c1.hex};--c2:${c2.hex};--c3:${c3.hex};--m:${m}" aria-hidden="true">
       <div class="strip-parts">${[c1, c2, c3].map((c, i) => `<i class="p${i + 1}"><span>${T(c.tag || c.name)}</span></i>`).join('')}</div>
       <div class="strip-dirty"></div><i class="strip-drop"></i><div class="strip-clean"></div>
@@ -1056,9 +1056,9 @@ function spinHTML(x){
     `<div class="spin-tile" style="--i:${i}"><img src="${src}" alt="" loading="lazy"></div>`).join('')}</div></div>`;
 }
 function float3dHTML(f){
-  return `<div class="wrap"><div class="fly">${f.icons.map((c, i) =>
+  return `<div class="wrap"><div class="levit">${f.icons.map((c, i) =>
     `<span class="fl" style="--x:${c.x}%;--y:${c.y}%;--mx:${c.mx ?? c.x}%;--my:${c.my ?? c.y}%;--s:${c.s || 120}px;--i:${i}"><img src="${c.src}" alt="" draggable="false"></span>`).join('')}
-    <div class="fly-text"><span class="case-label">${T(f.title)}</span><p>${T(f.text)}</p>${f.hint ? `<p class="camp-cap">${T(f.hint)}</p>` : ''}</div>
+    <div class="levit-text"><span class="case-label">${T(f.title)}</span><p>${T(f.text)}</p>${f.hint ? `<p class="camp-cap">${T(f.hint)}</p>` : ''}</div>
   </div></div>`;
 }
 // 2D-элементы из брендбука, перерисованы вектором: синий и оранжевый, обводка одной толщины
@@ -1110,6 +1110,24 @@ function icons2dHTML(x){
       <svg class="combo-slider" viewBox="0 0 400 60"><line x1="20" y1="30" x2="380" y2="30" stroke="${C2B}" stroke-width="6" stroke-linecap="round"/><circle class="cs-knob" cx="120" cy="30" r="20" fill="${C2B}"/></svg>
     </div>` : ''}
   </div></div></div>`;
+}
+// фотостиль кинолентой: каждый ряд повторен дважды, чтобы ехать без шва; копии не попадают в просмотрщик
+function reelHTML(lanes){
+  const shot = (src, dup, i) => dup
+    ? `<span class="reel-shot dup" data-of="${i}" aria-hidden="true"><img src="${src}" alt=""></span>`
+    : `<button class="camp-shot reel-shot" aria-label="Увеличить"><img src="${src}" alt=""></button>`;
+  return `<div class="wrap reel">${lanes.map((l, k) => `<div class="reel-lane${k % 2 ? ' back' : ''}">
+    <span class="reel-label">${T(l.label)}</span>
+    <div class="reel-window"><div class="reel-track" style="--n:${l.items.length}">${
+      l.items.map((s, i) => shot(s, false, i)).join('') + l.items.map((s, i) => shot(s, true, i)).join('')}</div></div>
+  </div>`).join('')}</div>`;
+}
+function startReel(box){
+  // копия ведет себя как оригинал: по нажатию открывает тот же кадр
+  box.addEventListener('click', e => {
+    const d = e.target.closest('.reel-shot.dup'); if (!d) return;
+    d.closest('.reel-track').querySelectorAll('button.reel-shot')[+d.dataset.of]?.click();
+  });
 }
 // 3D-иконки: качаются сами (CSS), а от курсора разлетаются и плавно возвращаются
 function startFloat(box){
@@ -1396,6 +1414,7 @@ function startMorph(box, list){
 function galleryItem(x){
   if (Array.isArray(x)) return x.map(galleryItem).join('');
   if (x && x.head) return `<div class="wrap">${blockHead(x.head)}</div>`;
+  if (x && x.reel) return reelHTML(x.reel);
   if (x && x.blend) return blendHTML(x.blend);
   if (x && x.spin) return spinHTML(x.spin);
   if (x && x.float3d) return float3dHTML(x.float3d);
@@ -1443,7 +1462,7 @@ function renderCase(k, keepScroll){
   // deckTitle — крупная надпись над презентацией
   if (p.deck && p.deckTitle) body += `<div class="wrap"><h2 class="deck-title">${T(p.deckTitle)}</h2></div>`;
   if (Array.isArray(p.deck)) body += p.deck.map(s => campRow([s])).join('');
-  else if (p.deck) body += `<div class="wrap">${shotHTML(p.deck)}</div>`;
+  else if (p.deck) body += `<div class="wrap case-deck">${shotHTML(p.deck)}</div>`;
   // links: [] — ссылок в конце нет; поле не указано — ссылка на старую страницу
   const links = p.links || [{ text: W.more, link: p.link }];
   if (links.length) body += `<div class="wrap"><div class="case-text case-links" data-reveal>${links.map(l => `<a class="link" href="${l.link}">${T(l.text)}</a>`).join('')}</div></div>`;
@@ -1476,9 +1495,10 @@ function renderCase(k, keepScroll){
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
-  caseContent.querySelectorAll('.fly').forEach(startFloat);
+  caseContent.querySelectorAll('.levit').forEach(startFloat);
+  caseContent.querySelectorAll('.reel').forEach(startReel);
   caseContent.querySelectorAll('.t-counter').forEach(startCounter);
-  caseContent.querySelectorAll('.blend,.spin,.two-grid,.combo').forEach(el => brandWatcher.observe(el));
+  caseContent.querySelectorAll('.mix,.spin,.two-grid,.combo,.reel').forEach(el => brandWatcher.observe(el));
   if (!keepScroll) caseEl.scrollTop = 0;
 }
 

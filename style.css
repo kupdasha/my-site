@@ -336,13 +336,15 @@ img,video{display:block;max-width:100%}
 .morph-list{list-style:none;padding:0;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
 .morph-list li{font-size:clamp(22px,2.3vw,34px);line-height:1;padding:.2em .45em .3em;border-radius:99px;transition:background .45s,color .45s}
 .morph-list li.on{background:var(--c);color:var(--t)}
-@media (max-width:700px){.morph{grid-template-columns:1fr}.morph-art{max-width:320px}}
+@media (max-width:700px){.morph{grid-template-columns:1fr}.morph-art{max-width:320px}.morph-list li{font-size:22px}}
+@media (max-width:480px){.case-team{column-gap:16px}.case-team li{font-size:16px;overflow-wrap:anywhere}}
 .case-team li{font-size:18px;line-height:1.3}
 .case-team span{display:block;font-size:16px;margin-bottom:4px}
 .case-shot{margin-bottom:clamp(56px,7vw,104px);border-radius:0;overflow:hidden;background:var(--soft)}
 .case-shot img,.case-shot video{width:100%;height:auto}
 .case-shot.frame{position:relative;aspect-ratio:16/9}
 .case-shot.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+@media (max-width:760px){.case-deck .case-shot.frame{aspect-ratio:auto;height:min(78dvh,640px)}}   /* презентация на телефоне: окно выше, видно несколько слайдов */
 /* кампании внутри кейса (поле campaigns): заголовок с числом, меню, текст в три колонки, макеты рядами */
 .camps-title{font-weight:500;font-size:clamp(32px,4vw,56px);line-height:1.05;margin-bottom:clamp(24px,3vw,40px)}
 .camps-count{font-size:.36em;font-weight:400;vertical-align:top;margin-left:.3em;position:relative;top:.35em;opacity:.55}
@@ -651,6 +653,13 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .article-source{font-size:17px}
 .article-title{font-size:clamp(20px,1.8vw,26px);font-weight:500;line-height:1.2;transition:transform .5s var(--ease)}
 .article:hover .article-title{transform:translateX(8px)}
+/* телефон: тег над названием, стрелка справа — иначе колонка тега съедает ширину и годы вылезают за экран */
+@media (max-width:760px){
+  .article{grid-template-columns:minmax(0,1fr) 40px;gap:4px 16px;padding:18px 0}
+  .article-source{grid-column:1;grid-row:1;font-size:16px;opacity:.6}
+  .article-title{grid-column:1;grid-row:2}
+  .article .go{grid-column:2;grid-row:1/3;width:40px;height:40px}
+}
 .article .go{width:48px;height:48px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;transition:transform .5s var(--ease),background .3s,color .3s}
 .article:hover .go{transform:rotate(-45deg);background:var(--ink);color:var(--bg)}
 .channel{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px clamp(32px,5vw,88px);align-items:end;margin-top:clamp(40px,5vw,64px)}
@@ -933,29 +942,29 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .thermo-logo{width:68%}
 }
 /* живые блоки брендбука: все анимации ждут, пока блок доедет до экрана (класс in) */
-.blend,.spin,.two-grid,.combo{--run:paused}
-.blend.in,.spin.in,.two-grid.in,.combo.in{--run:running}
+.mix,.spin,.two-grid,.combo{--run:paused}
+.mix.in,.spin.in,.two-grid.in,.combo.in{--run:running}
 /* цвета: три полосы съезжаются в одну. 0–25% сходятся, 30–40% смешиваются напрямую (грязь),
    42–52% сверху падает фиолетовый, 52–62% переход становится чистым, держим, в конце — заново */
-.blend{margin-top:calc(-1 * clamp(32px,4vw,64px));margin-bottom:clamp(56px,7vw,104px)}
+.mix{margin-top:calc(-1 * clamp(32px,4vw,64px));margin-bottom:clamp(56px,7vw,104px)}
 .strip-box{position:relative;height:clamp(88px,10vw,140px);margin-top:clamp(48px,6vw,90px)}
-.strip-parts{position:absolute;inset:0;display:flex;gap:clamp(12px,2vw,28px);border-radius:clamp(18px,2.4vw,36px);overflow:hidden;animation:stripGap 12s var(--ease-io) infinite;animation-play-state:var(--run)}
-.strip-parts i{flex:1;display:flex;align-items:flex-end;padding:clamp(12px,1.6vw,22px);border-radius:clamp(18px,2.4vw,36px);color:#fff;font-style:normal;font-size:16px;line-height:1.2;animation:stripRad 12s var(--ease-io) infinite;animation-play-state:var(--run)}
+.strip-parts{position:absolute;inset:0;display:flex;gap:clamp(12px,2vw,28px);border-radius:clamp(18px,2.4vw,36px);overflow:hidden;animation:stripGap 6s var(--ease-io) infinite;animation-play-state:var(--run)}
+.strip-parts i{flex:1;display:flex;align-items:flex-end;padding:clamp(12px,1.6vw,22px);border-radius:clamp(18px,2.4vw,36px);color:#fff;font-style:normal;font-size:16px;line-height:1.2;animation:stripRad 6s var(--ease-io) infinite;animation-play-state:var(--run)}
 @keyframes stripRad{0%,12%{border-radius:clamp(18px,2.4vw,36px)}24%,88%{border-radius:0}100%{border-radius:clamp(18px,2.4vw,36px)}}
 .strip-parts .p1{background:var(--c1)}.strip-parts .p2{background:var(--c2)}.strip-parts .p3{background:var(--c3)}
-.strip-parts span{animation:stripTxt 12s var(--ease-io) infinite;animation-play-state:var(--run)}
-.strip-dirty,.strip-clean{position:absolute;inset:0;border-radius:clamp(18px,2.4vw,36px);opacity:0;animation:12s var(--ease-io) infinite;animation-play-state:var(--run)}
+.strip-parts span{animation:stripTxt 6s var(--ease-io) infinite;animation-play-state:var(--run)}
+.strip-dirty,.strip-clean{position:absolute;inset:0;border-radius:clamp(18px,2.4vw,36px);opacity:0;animation:6s var(--ease-io) infinite;animation-play-state:var(--run)}
 .strip-dirty{background:linear-gradient(90deg,var(--c1) 8%,var(--c2) 62%,var(--c3) 94%);animation-name:stripDirty}
 .strip-clean{background:linear-gradient(90deg,var(--c1) 8%,var(--m) 36%,var(--c2) 64%,var(--c3) 94%);animation-name:stripClean}
 .strip-drop{position:absolute;z-index:1;left:36%;top:50%;width:clamp(44px,5vw,72px);aspect-ratio:1;margin:calc(clamp(44px,5vw,72px) / -2) 0 0 calc(clamp(44px,5vw,72px) / -2);border-radius:50%;background:var(--m);
-  box-shadow:0 0 0 4px #fff;opacity:0;animation:stripDrop 12s var(--ease-io) infinite;animation-play-state:var(--run)}
+  box-shadow:0 0 0 4px #fff;opacity:0;animation:stripDrop 6s var(--ease-io) infinite;animation-play-state:var(--run)}
 @keyframes stripGap{0%,10%{gap:clamp(12px,2vw,28px)}24%,90%{gap:0}100%{gap:clamp(12px,2vw,28px)}}
 @keyframes stripTxt{0%,22%{opacity:1}28%,92%{opacity:0}100%{opacity:1}}
 @keyframes stripDirty{0%,26%{opacity:0}36%,58%{opacity:1}62%,100%{opacity:0}}
 @keyframes stripDrop{0%,40%{opacity:0;transform:translateY(-190%) scale(.6)}47%{opacity:1;transform:translateY(0) scale(1)}54%{opacity:1;transform:scale(1)}62%,100%{opacity:0;transform:scale(2.4)}}
 @keyframes stripClean{0%,52%{opacity:0}62%,88%{opacity:1}96%,100%{opacity:0}}
 .strip-phases{position:relative;height:1.4em;margin-top:16px;font-size:16px}
-.strip-phases span{position:absolute;left:0;top:0;opacity:0;animation:12s var(--ease-io) infinite;animation-play-state:var(--run)}
+.strip-phases span{position:absolute;left:0;top:0;opacity:0;animation:6s var(--ease-io) infinite;animation-play-state:var(--run)}
 .strip-phases .ph1{animation-name:ph1}.strip-phases .ph2{left:36%;animation-name:ph2}
 @keyframes ph1{0%,28%{opacity:0}36%,52%{opacity:.75}58%,100%{opacity:0}}
 @keyframes ph2{0%,54%{opacity:0}62%,88%{opacity:.75}94%,100%{opacity:0}}
@@ -966,20 +975,20 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   opacity:0;transform:scale(.9);transition:opacity .8s,transform 1.1s var(--ease);transition-delay:calc(var(--i) * .1s)}
 .spin.in .spin-tile{opacity:1;transform:none}
 .spin-tile img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;
-  animation:spinG calc(38s + var(--i) * 7s) linear infinite;animation-direction:var(--dir,normal);animation-play-state:var(--run)}
+  animation:spinG calc(12s + var(--i) * 2.5s) linear infinite;animation-direction:var(--dir,normal);animation-play-state:var(--run)}
 .spin-tile:nth-child(even) img{--dir:reverse}
 @keyframes spinG{0%{transform:rotate(0) scale(1.5)}50%{transform:rotate(180deg) scale(2)}100%{transform:rotate(360deg) scale(1.5)}}
 /* 3D-иконки левитируют вокруг текста */
-.fly{position:relative;display:grid;place-items:center;min-height:clamp(640px,62vw,820px);margin-bottom:clamp(56px,7vw,104px);overflow-x:clip}
-.fly-text{position:relative;z-index:1;max-width:540px;text-align:center}
-.fly-text .case-label{display:block;padding:0;margin-bottom:20px}
-.fly-text>p:not(.camp-cap){font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.38}
-.fly-text .camp-cap{margin-bottom:0}
+.levit{position:relative;display:grid;place-items:center;min-height:clamp(640px,62vw,820px);margin-bottom:clamp(56px,7vw,104px);overflow-x:clip}
+.levit-text{position:relative;z-index:1;max-width:540px;text-align:center}
+.levit-text .case-label{display:block;padding:0;margin-bottom:20px}
+.levit-text>p:not(.camp-cap){font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.38}
+.levit-text .camp-cap{margin-bottom:0}
 .fl{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);pointer-events:none;will-change:transform}
 .fl img{display:block;width:100%;height:100%;object-fit:contain;user-select:none;
   opacity:0;scale:.3;transition:opacity .8s,scale 1.2s var(--ease);transition-delay:calc(var(--i) * 70ms);
   animation:bob calc(4.6s + var(--i) * .41s) ease-in-out calc(var(--i) * -.9s) infinite alternate}
-.fly.in .fl img{opacity:1;scale:1}
+.levit.in .fl img{opacity:1;scale:1}
 @keyframes bob{from{translate:0 -9px;rotate:-6deg}to{translate:0 11px;rotate:5deg}}
 /* 2D-элементы: светлые плитки, на цветную заливку их не ставим */
 .two{margin-bottom:clamp(40px,5vw,72px)}
@@ -1029,6 +1038,32 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .cs-knob{animation:slKnob2 3s var(--ease-io) infinite alternate;animation-play-state:var(--run)}
 @keyframes slKnob2{from{transform:translateX(-60px)}to{transform:translateX(220px)}}
 .deck-title{font-weight:500;font-size:clamp(32px,4vw,56px);line-height:1.05;margin:clamp(24px,3vw,48px) 0 clamp(24px,3vw,40px)}
+/* фотостиль кинолентой: маленькие квадратные превью, ряды едут навстречу, края растворяются */
+.reel{--run:paused;margin-bottom:clamp(40px,5vw,72px)}
+.reel.in{--run:running}
+.reel-lane{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,9fr);column-gap:clamp(16px,2vw,28px);align-items:center}
+.reel-lane+.reel-lane{margin-top:clamp(10px,1.2vw,16px)}
+.reel-label{font-size:19px;line-height:1.3}
+.reel-window{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.reel-track{display:flex;width:max-content;animation:reel calc(var(--n) * 6s) linear infinite;animation-play-state:var(--run)}
+.reel-lane.back .reel-track{animation-direction:reverse}
+.reel-lane:hover .reel-track{animation-play-state:paused}
+@keyframes reel{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.reel-shot{display:block;flex:none;width:clamp(104px,11vw,156px);aspect-ratio:1;margin-right:clamp(8px,1vw,14px);padding:0;border:0;border-radius:clamp(12px,1.4vw,18px);overflow:hidden;background:var(--soft);cursor:zoom-in;
+  transition:transform .5s var(--ease)}
+.camp-shot.reel-shot{height:auto}
+.reel-shot img{display:block;width:100%;height:100%;object-fit:cover}
+.reel-shot:hover{transform:translateY(-6px) scale(1.04)}
+@media (max-width:760px){
+  .reel-lane{grid-template-columns:1fr}
+  .reel-label{margin-bottom:10px}
+  .reel-window{margin:0 calc(-1 * var(--pad))}
+}
+@media (prefers-reduced-motion:reduce){
+  .reel-track{animation:none}
+  .reel-window{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
+  .reel-shot.dup{display:none}
+}
 /* после ряда картинок текстовый блок отступает, чтобы не прилипать к макетам */
 .camp-rowbox+.wrap>.case-text{margin-top:clamp(48px,6vw,96px)}
 /* узкий ряд — по ширине текстовой колонки, для картинок низкого разрешения */
@@ -1041,9 +1076,9 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .spin,.two-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .strip-parts i{padding:10px}
   .strip-phases .ph2{left:0}
-  .fly{min-height:820px}
+  .levit{min-height:820px}
   .fl{left:var(--mx);top:var(--my);width:calc(var(--s) * .55);height:calc(var(--s) * .55);margin:calc(var(--s) * -.275) 0 0 calc(var(--s) * -.275)}
-  .fly-text{max-width:none;padding:0 4px}
+  .levit-text{max-width:none;padding:0 4px}
   .rules-box{grid-column:1 / -1;grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){
@@ -1055,6 +1090,13 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .bk-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .bk-swatches{grid-template-columns:repeat(2,minmax(0,1fr))}
   .bk-sw{transform:translate(calc(-1 * var(--x2) * (100% + var(--gap))),calc(-1 * var(--y2) * (100% + var(--gap)))) rotate(calc((var(--i) - 2.5) * 5deg)) scale(.82)}
+  /* три цвета на телефоне — столбиком, невысокими полосами: название слева, коды справа */
+  .bk-n3 .bk-swatches{grid-template-columns:1fr}
+  .bk-n3 .bk-sw{aspect-ratio:auto;flex-direction:row;align-items:flex-end;gap:16px;padding:18px 20px;min-height:112px;
+    transform:translateY(calc(-1 * var(--i) * (100% + var(--gap)))) rotate(calc((var(--i) - 1) * 4deg)) scale(.9)}
+  .bk-n3 .bk-name{max-width:none;font-size:19px}
+  .bk-n3 .bk-code{text-align:right;flex:none}
+  .bk-n3 .bk-sw::after{left:20px;bottom:18px}
 }
 @media (prefers-reduced-motion:reduce){
   .bk-tile::before,.bk-tile::after,.bk-sw,.bk-mark,.bk-logo path,.bk-name,.bk-code,.bk-film-box,.thermo-box,.thermo-logo{transition:none!important;clip-path:none;transform:none;translate:none;opacity:1;animation:none}
