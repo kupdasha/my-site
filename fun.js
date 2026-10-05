@@ -490,7 +490,11 @@ function updateBug(dt, now){
   const moving = now > bug.pauseUntil;
   bug.t += dt * (moving ? bug.speed / C.speed : 0.25);
   const headScreenY = bug.y - scrollY;
-  const scared = Math.hypot(bug.x - px, headScreenY - py) < 80 && bug.speed < C.speed * 2;
+  // курсор у головы — один резкий разворот; следующий только после того, как курсор отойдет
+  const cursorDist = Math.hypot(bug.x - px, headScreenY - py);
+  if (cursorDist > 160) bug.dodged = false;
+  const scared = cursorDist < 80 && !bug.dodged;
+  if (scared) bug.dodged = true;
 
   if (bug.mode === 'frame') {
     if (scared) { bug.dir = -bug.dir; bug.speed = C.speed * 3.5; }
