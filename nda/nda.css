@@ -73,3 +73,18 @@ h2{font-size:clamp(28px,3.4vw,44px);font-weight:500;line-height:1.1;letter-spaci
 .viewer.on{opacity:1}
 .viewer img{margin:0 auto;max-width:min(1440px,100%)}
 .end{margin-top:110px;padding-top:28px;border-top:1px solid var(--line)}
+
+/* ---------- интерфейс как на основном сайте ----------
+   «назад» вверху — полоска, как в кейсах сайта (липнет к верху, без подчеркивания);
+   «назад» внизу и «открыть на весь экран» — кнопки с заливкой; теги — как на сайте */
+:root{--accent-text:#1D222A}
+.page>.back{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;height:76px;margin:-28px calc(-1 * var(--pad)) 40px;padding:0 var(--pad);background:var(--bg);font-size:18px;text-decoration:none}
+.gate .back{text-decoration:none;font-size:18px}
+.end{border-top:0;padding-top:0}
+.end a,.full,.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:56px;padding:0 28px 4px;border:0;border-radius:99px;background:var(--ink);color:var(--bg);font:500 18px var(--font);text-decoration:none;white-space:nowrap;cursor:pointer;transition:background .4s,color .4s,transform .35s var(--ease)}
+.end a:hover,.full:hover,.btn:hover{background:var(--accent);color:var(--accent-text)}
+.end a:active,.full:active,.btn:active{transform:scale(.97)}
+.full{margin-top:20px}
+.tags span{border:2px solid currentColor;border-radius:99px;padding:6px 12px 9px;font-size:16px;line-height:1}
+.ptabs button{height:44px;padding:0 18px 3px;font-weight:500}
+@media (max-width:520px){.end a,.full{white-space:normal;height:auto;min-height:56px;padding:14px 24px 16px;text-align:center}}

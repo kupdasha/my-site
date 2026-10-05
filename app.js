@@ -1817,6 +1817,8 @@ root.dataset.theme = saved;
 document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', saved === 'dark'));
 renderTexts();
 renderLists();
+/* на страницах NDA кнопки «связаться» нет */
+if (isNdaPage) document.querySelector('#fab')?.remove();
 setTimeout(() => $('#fab').classList.add('in'), 700);   // «связаться» проявляется по буквам
 /* «связаться» прячется на первом экране; в дружеской версии «поболтать» появляется ближе к середине страницы */
 function placeFab(){
