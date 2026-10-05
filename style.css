@@ -926,3 +926,8 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .bk-tile::before,.bk-tile::after,.bk-sw,.bk-mark,.bk-logo path,.bk-name,.bk-code,.bk-film-box{transition:none!important;clip-path:none;transform:none;translate:none;opacity:1;animation:none}
   .bk-tile::before{opacity:0}
 }
+
+/* Белый фон картинок сливается с фоном страницы: умножение делает чистый белый ровно цветом --bg,
+   остальные цвета почти не меняются. Только в светлой версии — на темной умножение затемнило бы картинки */
+:root:not([data-theme="dark"]) :is(.case-shot,.case-hero,.work .media,.case-next .media){background:var(--bg)}
+:root:not([data-theme="dark"]) :is(.case-shot,.case-hero,.work .media,.case-next .media) :is(img,video){mix-blend-mode:multiply}
