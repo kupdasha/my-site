@@ -73,11 +73,14 @@ const FUN = {
 };
 
 (() => {
+if (window.__kdFun) return; window.__kdFun = true;
 'use strict';
 const root = document.documentElement;
 const desktop = matchMedia('(min-width: 901px) and (hover: hover)');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const isActive = () => root.dataset.theme === 'dark' && desktop.matches && !reduced;
+// дружеская версия работает везде, и на телефоне тоже; на сенсорных экранах кнопки не убегают от пальца
+const touchDev = matchMedia('(hover: none)').matches;
+const isActive = () => root.dataset.theme === 'dark' && !reduced;
 const joke = key => dispatchEvent(new CustomEvent('fun:joke', { detail: key }));
 const rand = (a, b) => a + Math.random() * (b - a);
 const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
@@ -192,7 +195,7 @@ function idle(r, dt){
 function stepRun(r, dt, now){
   const b = r.el.getBoundingClientRect();
   const d = Math.hypot(b.left + b.width / 2 - px, b.top + b.height / 2 - py);
-  if (d < FUN.runners.fleeRadius && r.max - r.min > 20) {
+  if (!touchDev && d < FUN.runners.fleeRadius && r.max - r.min > 20) {
     const away = b.left + b.width / 2 > px ? r.max : r.min;
     if (Math.abs(away - r.x) > 4) { r.target = away; r.speed = FUN.runners.fleeSpeed; r.state = 'run'; }
   }

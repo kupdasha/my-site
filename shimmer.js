@@ -36,6 +36,7 @@ const SHIMMER = {
 };
 
 (() => {
+if (window.__kdShimmer) return; window.__kdShimmer = true;
 'use strict';
 const canvas = document.getElementById('dots');
 if (!canvas) return;
@@ -191,7 +192,7 @@ const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
 /* ---------- размер ---------- */
 let W = 0, H = 0, dpr = 1;
 function resize(){
-  dpr = Math.min(2, devicePixelRatio || 1);
+  dpr = Math.min(matchMedia('(hover: none)').matches ? 1.25 : 2, devicePixelRatio || 1);   // на телефоне легче — быстрее грузится
   const r = canvas.getBoundingClientRect();
   W = r.width; H = r.height;
   canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);

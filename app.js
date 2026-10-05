@@ -9,6 +9,8 @@
    ================================================================ */
 (() => {
 'use strict';
+// если на странице Тильды код подключен дважды (старый блок + новый), второй запуск ничего не делает
+if (window.__kdApp) return; window.__kdApp = true;
 
 /* На Тильде тексты (content.js) приходят с GitHub как есть, с адресами прототипа.
    Здесь они переводятся на адреса сайта: index.html → /, about.html → /about,
@@ -514,7 +516,7 @@ document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', e 
   switchSeen = true;
   sw.classList.remove('unseen', 'nudge');
   try { localStorage.setItem('kd-switch-seen', '1'); } catch (e) {}
-  setMode(isFun() ? 'light' : 'dark', s !== sw);
+  setMode(isFun() ? 'light' : 'dark', true);   // после переключения — сразу наверх, к первому экрану
 }));
 
 

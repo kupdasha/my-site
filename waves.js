@@ -17,6 +17,7 @@ const WAVES = {
 };
 
 (() => {
+if (window.__kdWaves) return; window.__kdWaves = true;
 'use strict';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const glc = document.createElement('canvas');
