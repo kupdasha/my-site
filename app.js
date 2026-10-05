@@ -1490,6 +1490,9 @@ function renderCase(k, keepScroll){
     <div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>
     ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
     <div class="case-body">${body}</div>
+    <div class="wrap case-end">
+      <button class="btn btn-line case-to-list"><span class="arr">←</span><span class="spell">${T(isNdaPage ? SITE.ndaPage.back : W.back)}</span></button>
+    </div>
     ${next ? `<div class="wrap">
       <button class="case-next" data-next="${nk}">
         <span class="case-label">${T(W.next)}</span>
@@ -1547,6 +1550,8 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && caseIndex != null) 
 caseContent.addEventListener('click', e => {
   const play = e.target.closest('.hero-play');
   if (play) { play.outerHTML = `<iframe src="${play.dataset.src}" allow="${FRAME_ALLOW}" allowfullscreen></iframe>`; return; }
+  // кнопка внизу кейса — то же, что «назад» в верхней полоске
+  if (e.target.closest('.case-to-list')) { $('#caseBack').click(); return; }
   const n = e.target.closest('.case-next');
   if (n) history.replaceState(null, '', '#case-' + (+n.dataset.next + 1)), openCase(+n.dataset.next);
 });

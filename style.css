@@ -1190,3 +1190,9 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .client{white-space:normal}
   .h2{font-size:clamp(28px,8.4vw,72px)}
 }
+/* кнопка «ко всем проектам» внизу каждого кейса */
+.case-end{padding-bottom:clamp(48px,6vw,88px)}
+.case-end:last-child{padding-bottom:clamp(120px,12vw,160px)}
+/* подпись под роликом или макетом в кейсе ({ src, caption }) — прижата к нему, отступ уходит под подпись */
+.wrap:has(> .shot-note) > .case-shot{margin-bottom:0}
+.shot-note{margin-bottom:clamp(56px,7vw,104px)}
