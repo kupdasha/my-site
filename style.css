@@ -931,3 +931,6 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
    остальные цвета почти не меняются. Только в светлой версии — на темной умножение затемнило бы картинки */
 :root:not([data-theme="dark"]) :is(.case-shot,.case-hero,.work .media,.case-next .media){background:var(--bg)}
 :root:not([data-theme="dark"]) :is(.case-shot,.case-hero,.work .media,.case-next .media) :is(img,video){mix-blend-mode:multiply}
+
+/* в дружеской версии блока «другие работы» нет */
+:root[data-theme="dark"] #otherWorks{display:none!important}
