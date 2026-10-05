@@ -392,32 +392,27 @@ function setupDeck(){
 
 
 /* ================================================================
-   СТРАНИЦА NDA (nda.html): проекты один под другим, каждый — как кейс
+   СТРАНИЦА NDA (nda.html, на Тильде kupdasha.ru/n_d_a под паролем):
+   карточки проектов сеткой, как на главной; карточка открывает кейс.
+   Проекты — в SITE.ndaPage.items, поля те же, что у обычных проектов.
+   page: 'адрес' — карточка ведет на отдельную страницу вместо кейса
    ================================================================ */
 function renderNdaPage(){
   const N = SITE.ndaPage;
   if (!N || !isNdaPage) return;
-  $('#ndaProjects').innerHTML = (N.items || []).map(p => {
-    const story = (Array.isArray((p.story || [])[0]) ? pick(p.story) : p.story) || [];
-    const text = story.map((par, i) => `<div class="wrap"><div class="case-text" data-reveal><span class="case-label">${T((p.labels || [])[i] || '')}</span><p>${T(par)}</p></div></div>`).join('');
-    // ролики со звуком: плеер площадки (Kinescope, Vimeo) или файл mp4; запускаются по нажатию
-    const videos = (p.videos || []).map(v => {
-      const m = parseMedia(v.video || v.src);
-      const player = m.type === 'file'
-        ? `<video src="${m.src}"${v.poster ? ` poster="${v.poster}"` : ''} controls playsinline preload="metadata"></video>`
-        : `<div class="frame"><iframe src="${embedURL(m, false).replace(/[?&]autoplay=1/, '')}" allow="${FRAME_ALLOW}" allowfullscreen loading="lazy"></iframe></div>`;
-      return `<div class="wrap"><figure class="case-shot nda-video" data-reveal>${player}
-        ${v.caption ? `<figcaption class="case-note">${T(v.caption)}</figcaption>` : ''}
-      </figure></div>`;
-    }).join('');
-    return `<article class="nda-project">
-      <div class="wrap case-head">
-        <div class="case-ttl"><h2 class="case-title">${T(p.title)}</h2>${yearHTML(p)}</div>
-        ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
-      </div>
-      <div class="case-body">${text}${videos}</div>
-    </article>`;
+  $('#ndaProjects').innerHTML = (N.items || []).map((p, k) => {
+    const [size, side] = p.size ? [p.size, p.side] : PATTERN[k % PATTERN.length];
+    const ratio = p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');
+    const inner = `
+      <span class="media" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
+      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
+      ${p.short ? `<p>${T(p.short)}</p>` : ''}`;
+    const cls = `work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}`;
+    return p.page
+      ? `<a class="${cls}" href="${p.page}" data-reveal>${inner}</a>`
+      : `<button class="${cls}" data-k="${k}" data-reveal>${inner}</button>`;
   }).join('');
+  $$('#ndaProjects .media').forEach(watchMedia);
 }
 
 
@@ -761,6 +756,10 @@ if (!touch) {
 }
 /* Кейс открывается в новой вкладке; в ней сразу показан кейс, «все работы» ведут на главную */
 const openInTab = k => window.open(location.pathname + location.search + '#case-' + (+k + 1), '_blank');
+$('#ndaProjects').addEventListener('click', e => {
+  const w = e.target.closest('button.work');
+  if (w) openInTab(w.dataset.k);
+});
 $('#workList').addEventListener('click', e => {
   const w = e.target.closest('.work');
   if (w) openInTab(w.dataset.k);
@@ -880,6 +879,8 @@ function renderNda(){
    ================================================================ */
 const caseEl = $('#case'), caseContent = $('#caseContent');
 let caseIndex = null, openedByClick = false;
+/* на странице NDA кейсы берутся из ее списка, на главной — из проектов */
+const caseItems = () => isNdaPage ? SITE.ndaPage.items || [] : SITE.works.items;
 
 function shotHTML(src){
   const m = parseMedia(src);
@@ -1429,10 +1430,16 @@ function galleryItem(x){
   if (x && x.morph) return morphHTML(x);
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   if (x && x.collage) return campCollage(x);
+  // { src: 'kinescope:ID', caption: 'подпись' } — ролик или картинка с подписью под ней
+  if (x && x.src) return `<div class="wrap">${shotHTML(x.src)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   return `<div class="wrap">${shotHTML(x)}</div>`;
 }
 function renderCase(k, keepScroll){
-  const W = SITE.works, p = W.items[k], next = W.items[(k + 1) % W.items.length];
+  // следующий проект — без отдельных страниц (page) и без самого себя
+  const W = SITE.works, items = caseItems(), p = items[k];
+  let nk = (k + 1) % items.length;
+  while (nk !== k && items[nk].page) nk = (nk + 1) % items.length;
+  const next = nk !== k ? items[nk] : null;
   // story: один список абзацев или пара [формальный, дружеский]
   const raw = p.story || [];
   const story = Array.isArray(raw[0]) ? pick(raw) || [] : raw;
@@ -1483,13 +1490,13 @@ function renderCase(k, keepScroll){
     <div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>
     ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
     <div class="case-body">${body}</div>
-    <div class="wrap">
-      <button class="case-next" data-next="${(k + 1) % W.items.length}">
+    ${next ? `<div class="wrap">
+      <button class="case-next" data-next="${nk}">
         <span class="case-label">${T(W.next)}</span>
         <span class="case-title">${T(next.title)}</span>
         <span class="media">${mediaHTML(next)}</span>
       </button>
-    </div>`;
+    </div>` : ''}`;
   spellOut(caseContent);
   splitWords($('#caseTitle'), pick(p.title));
   requestAnimationFrame(() => requestAnimationFrame(() => $('#caseTitle').classList.add('in')));
@@ -1528,7 +1535,7 @@ function closeCase(){
 function readHash(){
   const m = /^#case-(\d+)$/.exec(location.hash);
   const k = m ? +m[1] - 1 : null;
-  if (k != null && SITE.works.items[k]) { openedByClick = openedByClick || false; openCase(k); }
+  if (k != null && caseItems()[k] && !caseItems()[k].page) { openedByClick = openedByClick || false; openCase(k); }
   else closeCase();
 }
 addEventListener('hashchange', () => { openedByClick = true; readHash(); });

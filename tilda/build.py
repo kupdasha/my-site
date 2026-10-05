@@ -108,8 +108,10 @@ sections = {sid: re.search(r'(  <!--[^\n]*-->\n)?  <section class="[^"]*" id="%s
             for sid in ['hero', 'directions', 'works', 'nda', 'contact']}
 # страница NDA (nda.html) — один раздел
 nda_html = read('nda.html')
-nda_section = between('<!-- Проекты под NDA: каждый проект', '<!-- Контакт -->', nda_html)
+nda_section = between('<!-- Проекты под NDA:', '<!-- Контакт -->', nda_html)
 service_html = between('<!-- Кнопка «Связаться»', '<script src=')
+# у страницы NDA свое окно кейса: кнопка «назад» ведет к проектам под NDA
+nda_service_html = between('<!-- Кнопка «Связаться»', '<script src=', nda_html)
 
 
 # ---------- блоки ----------
@@ -160,7 +162,7 @@ BLOCKS = {
     '4 страница NDA': [
         ('1 страница NDA целиком', '\n\n'.join([
             css_block(), shared_block(), nda_section,
-            f'<!-- Кнопки «связаться» и «наверх», сообщения -->\n{service_html}',
+            f'<!-- Кнопки «связаться» и «наверх», окно кейса, сообщения -->\n{nda_service_html}',
             js_block(['app.js', 'waves.js', 'fun.js', 'shimmer.js'], 'КОД САЙТА.')])),
     ],
     '9 подвал': [
