@@ -316,9 +316,11 @@ img,video{display:block;max-width:100%}
 .case-text p{grid-column:5 / -1;font-size:clamp(22px,2.3vw,34px);line-height:1.3;max-width:30ch}
 .case-text p+p{margin-top:.8em}
 .case-text.cols2 p{max-width:none;columns:2;column-gap:clamp(24px,3vw,48px);font-size:clamp(18px,1.5vw,22px)}   /* длинный текст — мельче, в две колонки */
-.case-team{grid-column:5 / -1;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px clamp(16px,2vw,28px);margin-top:clamp(28px,3vw,40px)}   /* команда проекта */
-/* ярлык премии под подписью «результат»: черная лента с вырезом, золотое кольцо, блестки по кругу */
-.award{position:relative;display:block;width:56px;height:88px;margin-top:20px;background:#000;clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%)}
+.case-team{grid-column:5 / -1;list-style:none;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px clamp(16px,2vw,28px);margin-top:clamp(28px,3vw,40px)}   /* команда проекта */
+/* ярлык премии слева от текста результата: черная лента с вырезом, золотое кольцо, блестки по кругу */
+.case-award-row{grid-column:5 / -1;display:flex;align-items:flex-start;gap:clamp(20px,2vw,32px)}
+.case-award-row p{margin:0}
+.award{position:relative;flex:none;display:block;width:56px;height:88px;margin-top:6px;background:#000;clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%)}
 .award img{position:absolute;left:9px;top:16px;width:38px;height:38px}
 .award i{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;background:#FFF3C9;opacity:0;transform:scale(0);
   clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:award-spark 2.8s ease-in-out infinite}
@@ -329,6 +331,12 @@ img,video{display:block;max-width:100%}
 .award i:nth-child(6){left:12px;top:29px;animation-delay:2.3s}
 @keyframes award-spark{0%,100%{opacity:0;transform:scale(0) rotate(0)}12%{opacity:1;transform:scale(1) rotate(45deg)}26%{opacity:0;transform:scale(0) rotate(90deg)}}
 @media (prefers-reduced-motion:reduce){.award i{animation:none}}
+.morph{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:clamp(24px,4vw,64px)}   /* морфинг фигур и подписи */
+.morph-art{width:100%;max-width:520px;justify-self:center;aspect-ratio:1;overflow:visible}
+.morph-list{list-style:none;padding:0;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.morph-list li{font-size:clamp(22px,2.3vw,34px);line-height:1;padding:.2em .45em .3em;border-radius:99px;transition:background .45s,color .45s}
+.morph-list li.on{background:var(--c);color:var(--t)}
+@media (max-width:700px){.morph{grid-template-columns:1fr}.morph-art{max-width:320px}}
 .case-team li{font-size:18px;line-height:1.3}
 .case-team span{display:block;font-size:16px;margin-bottom:4px}
 .case-shot{margin-bottom:clamp(56px,7vw,104px);border-radius:0;overflow:hidden;background:var(--soft)}
@@ -827,6 +835,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .switch-hint::before{right:auto;left:28px}
   .case-label{grid-column:1 / -1;margin-bottom:16px;padding:0}
   .case-text p,.case-more{grid-column:1 / -1}
+  .case-award-row{grid-column:1 / -1}
   .case-team{grid-column:1 / -1;grid-template-columns:repeat(2,minmax(0,1fr))}
   .case-text.cols2 p{columns:1}
 }

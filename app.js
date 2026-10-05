@@ -1038,8 +1038,105 @@ function awardHTML(a){
 function teamHTML(team){
   return `<ul class="case-team">${team.map(([role, name]) => `<li><span>${T(role)}</span>${T(name)}</li>`).join('')}</ul>`;
 }
-// элемент галереи кейса: { row, caption } — ряд макетов одной высоты, { collage } — коллаж, остальное — во всю ширину
+/* ================================================================
+   МОРФИНГ ФИГУР (поле morph в галерее кейса, см. VK Инклюзия)
+   Фигура плавно перетекает в следующую, рядом подсвечивается ее подпись. Рисуется кодом в SVG,
+   поэтому всегда четкая. Числа — в MORPH.
+   ================================================================ */
+const MORPH = {
+  points: 160,     // сколько точек в контуре: больше — глаже
+  hold:   1600,    // сколько мс фигура стоит
+  move:   750,     // сколько мс длится перетекание
+  turn:   24,      // на сколько градусов фигура поворачивается в середине перетекания
+};
+// контуры в квадрате 100 × 100, центр 50,50: каждая фигура — плотный список точек от верха по часовой стрелке
+const MORPH_SHAPES = {
+  // скругленный квадрат как в логотипе VK (суперэллипс)
+  square: () => byAngle(t => { const c = Math.cos(t), s = Math.sin(t), n = 2 / 5;
+    return [50 + 40 * Math.sign(c) * Math.abs(c) ** n, 50 + 40 * Math.sign(s) * Math.abs(s) ** n]; }),
+  circle: () => byAngle(t => [50 + 41 * Math.cos(t), 50 + 41 * Math.sin(t)]),
+  // пятиугольник со скругленными углами
+  pentagon: () => roundedPoly(5, 46, 10),
+  // сердце: классическая кривая, пошире; кончик и выемка скруглены сглаживанием
+  heart: () => smooth(byAngle(t => { const a = t + Math.PI / 2, x = 16 * Math.sin(a) ** 3,
+      y = 13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a);
+    return [50 + x * 2.9, 48 - y * 2.6]; }), 28, 3),
+};
+// сглаживание контура: каждую точку заменяем средним соседей (w — сколько соседей с каждой стороны, n — сколько раз)
+function smooth(pts, w, n){
+  for (let k = 0; k < n; k++) pts = pts.map((_, i) => {
+    let x = 0, y = 0;
+    for (let j = -w; j <= w; j++){ const q = pts[(i + j + pts.length) % pts.length]; x += q[0]; y += q[1]; }
+    return [x / (2 * w + 1), y / (2 * w + 1)];
+  });
+  return pts;
+}
+const byAngle = f => Array.from({ length: 720 }, (_, i) => f(-Math.PI / 2 + i / 720 * 2 * Math.PI));
+// правильный многоугольник вершиной вверх: R — радиус до вершины, r — радиус скругления угла
+function roundedPoly(n, R, r){
+  const pts = [], inner = R - r / Math.cos(Math.PI / n), cy = 50 + (R - R * Math.cos(Math.PI / n)) / 2;
+  for (let i = 0; i < n; i++){
+    const va = -Math.PI / 2 + i * 2 * Math.PI / n, vx = 50 + inner * Math.cos(va), vy = cy + inner * Math.sin(va);
+    // дуга угла: от нормали предыдущей стороны к нормали следующей
+    for (let j = 0; j <= 24; j++){ const q = va - Math.PI / n + j / 24 * 2 * Math.PI / n; pts.push([vx + r * Math.cos(q), vy + r * Math.sin(q)]); }
+  }
+  // начинаем с середины верхнего угла, как у остальных фигур
+  return pts.slice(12).concat(pts.slice(0, 12));
+}
+// контур, разложенный на точки одинаково у всех фигур: равными шагами по длине
+function morphOutline(name){
+  const raw = (MORPH_SHAPES[name] || MORPH_SHAPES.circle)(), N = raw.length, len = [0];
+  for (let i = 1; i <= N; i++){ const a = raw[i - 1], b = raw[i % N]; len.push(len[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
+  const out = [], total = len[N];
+  for (let j = 0, i = 0; j < MORPH.points; j++){
+    const d = j / MORPH.points * total;
+    while (len[i + 1] < d) i++;
+    const a = raw[i], b = raw[(i + 1) % N], u = (d - len[i]) / (len[i + 1] - len[i] || 1);
+    out.push([a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]);
+  }
+  return out;
+}
+function morphHTML(x){
+  const cap = x.caption ? `<p class="camp-cap">${T(x.caption)}</p>` : '';
+  return `<div class="wrap camp-rowbox">${cap}<div class="morph">
+    <svg class="morph-art" viewBox="0 0 100 100" aria-hidden="true"><path/></svg>
+    <ul class="morph-list">${x.morph.map((m, i) => `<li data-i="${i}" style="--c:${m.color};--t:${m.text || '#fff'}">${T(m.label)}</li>`).join('')}</ul>
+  </div></div>`;
+}
+function startMorph(box, list){
+  const path = box.querySelector('path'), items = [...box.querySelectorAll('.morph-list li')];
+  const shapes = list.map(m => morphOutline(m.shape));
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const cols = list.map(m => hex(m.color));
+  const ease = u => u < .5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cycle = MORPH.hold + MORPH.move;
+  let t0 = performance.now(), on = false, raf = 0, last = -1;
+  const draw = now => {
+    const t = (now - t0) % (cycle * list.length), k = Math.floor(t / cycle), u = Math.max(0, (t - k * cycle - MORPH.hold) / MORPH.move);
+    const e = still ? 0 : ease(u), a = shapes[k], b = shapes[(k + 1) % list.length];
+    const turn = Math.sin(e * Math.PI) * MORPH.turn * Math.PI / 180, cs = Math.cos(turn), sn = Math.sin(turn);
+    path.setAttribute('d', a.map((p, i) => {
+      const x = p[0] + (b[i][0] - p[0]) * e - 50, y = p[1] + (b[i][1] - p[1]) * e - 50;
+      return (i ? 'L' : 'M') + (50 + x * cs - y * sn).toFixed(2) + ' ' + (50 + x * sn + y * cs).toFixed(2);
+    }).join('') + 'Z');
+    const c = cols[k].map((v, i) => Math.round(v + (cols[(k + 1) % list.length][i] - v) * e));
+    path.setAttribute('fill', `rgb(${c})`);
+    const cur = e > .5 ? (k + 1) % list.length : k;
+    if (cur !== last){ items.forEach((li, i) => li.classList.toggle('on', i === cur)); last = cur; }
+    if (on) raf = requestAnimationFrame(draw);
+  };
+  draw(t0);
+  // крутится, только пока виден на экране
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !on){ on = true; raf = requestAnimationFrame(draw); }
+    else if (!e.isIntersecting){ on = false; cancelAnimationFrame(raf); }
+  }).observe(box);
+}
+// элемент галереи кейса: { row, caption } — ряд макетов одной высоты, { collage } — коллаж,
+// { morph } — фигуры перетекают друг в друга, остальное — во всю ширину
 function galleryItem(x){
+  if (x && x.morph) return morphHTML(x);
   if (x && x.row) return campRow(x.row, x.caption);
   if (x && x.collage) return campCollage(x);
   return `<div class="wrap">${shotHTML(x)}</div>`;
@@ -1065,9 +1162,9 @@ function renderCase(k, keepScroll){
   // twoCols: ['solution'] — длинный блок схемы набран мельче, в две колонки
   const twoCols = p.twoCols || [];
   blocks.forEach(([label, par, key]) => {
-    // award — ярлык премии под подписью «результат»: черная лента, кольцо и блестки
-    const award = key === 'result' && p.award ? awardHTML(p.award) : '';
-    body += `<div class="wrap"><div class="case-text${twoCols.includes(key) ? ' cols2' : ''}" data-reveal><span class="case-label">${T(label)}${award}</span><p>${T(par)}</p>${
+    // award — ярлык премии слева от текста результата: черная лента, кольцо и блестки
+    const text = key === 'result' && p.award ? `<div class="case-award-row">${awardHTML(p.award)}<p>${T(par)}</p></div>` : `<p>${T(par)}</p>`;
+    body += `<div class="wrap"><div class="case-text${twoCols.includes(key) ? ' cols2' : ''}" data-reveal><span class="case-label">${T(label)}</span>${text}${
       key === 'role' && p.team ? teamHTML(p.team) : ''}</div></div>`;
     if (g < gallery.length) body += galleryItem(gallery[g++]);
     if (p.brandkit && p.brandkit.after === key) body += brandkitHTML(p.brandkit);
@@ -1076,7 +1173,10 @@ function renderCase(k, keepScroll){
   // кампании внутри кейса: меню, у каждой — текст в три колонки (название, задача, решение) и макеты рядами
   if (p.campaigns && p.campaigns.length) body += campaignsHTML(p.campaigns, W.campaigns);
   // презентация — в самом конце, перед ссылками
-  if (p.deck) body += `<div class="wrap">${shotHTML(p.deck)}</div>`;
+  // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
+  // по нажатию увеличиваются и листаются стрелками
+  if (Array.isArray(p.deck)) body += p.deck.map(s => campRow([s])).join('');
+  else if (p.deck) body += `<div class="wrap">${shotHTML(p.deck)}</div>`;
   // links: [] — ссылок в конце нет; поле не указано — ссылка на старую страницу
   const links = p.links || [{ text: W.more, link: p.link }];
   if (links.length) body += `<div class="wrap"><div class="case-text case-links" data-reveal>${links.map(l => `<a class="link" href="${l.link}">${T(l.text)}</a>`).join('')}</div></div>`;
@@ -1106,6 +1206,8 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.bk').forEach(watchBrandkit);
   markArticles(caseContent);
   watchCampaigns(caseContent);
+  const morphs = (p.gallery || []).filter(x => x && x.morph);
+  caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   if (!keepScroll) caseEl.scrollTop = 0;
 }
 
