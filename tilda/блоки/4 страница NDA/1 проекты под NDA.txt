@@ -1,0 +1,8 @@
+<!-- Проекты под NDA: каждый проект — как кейс, тексты в ndaPage (content.js) -->
+  <section class="nda-page" id="ndaPage" data-page="nda">
+    <div class="wrap case-head">
+      <h1 class="case-title split" data-text="ndaPage.title"></h1>
+      <p class="case-sub" data-reveal data-text="ndaPage.lead"></p>
+    </div>
+    <div id="ndaProjects"></div>
+  </section>

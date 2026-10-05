@@ -10,6 +10,26 @@
 (() => {
 'use strict';
 
+/* На Тильде тексты (content.js) приходят с GitHub как есть, с адресами прототипа.
+   Здесь они переводятся на адреса сайта: index.html → /, about.html → /about,
+   а картинки img/… — на тот же GitHub, откуда пришел content.js */
+{
+  const src = document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/app\.js(\?|$)/.test(s)) || '';
+  const onTilda = !document.querySelector('script[src="content.js"]');
+  const base = src.replace(/app\.js(\?.*)?$/, '');
+  if (onTilda && typeof SITE !== 'undefined') {
+    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/about'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/nda']];
+    const fix = s => {
+      if (s.startsWith('img/')) return base + s;
+      for (const [re, to] of PAGES) if (re.test(s)) return s.replace(re, to).replace('/#', '/#').replace(/^\/\/+/, '/');
+      return s;
+    };
+    const walk = o => { for (const k in o) { const v = o[k]; if (typeof v === 'string') o[k] = fix(v); else if (v && typeof v === 'object') walk(v); } };
+    walk(SITE);
+    SITE.homePage = SITE.homePage || '/';
+  }
+}
+
 const TUNE = {
   stringPull:     44,    // на сколько пикселей можно оттянуть струну
   stringStiff:    0.085, // упругость струны: больше — колеблется чаще
@@ -30,6 +50,7 @@ const isFun = () => root.dataset.theme === 'dark';
 /* Какая это страница: в прототипе — класс у body, на Тильде — атрибут data-page у раздела */
 const isAboutPage = document.body.classList.contains('page-about') || !!document.querySelector('[data-page="about"]');
 const isSpeakerPage = document.body.classList.contains('page-speaker') || !!document.querySelector('[data-page="speaker"]');
+const isNdaPage = document.body.classList.contains('page-nda') || !!document.querySelector('[data-page="nda"]');
 /* Разделы, которых нет на этой странице (на Тильде у каждой страницы свои тексты), — пустые */
 ['works', 'nda', 'directions', 'clients', 'about'].forEach(k => { SITE[k] = SITE[k] || {}; });
 SITE.works.items = SITE.works.items || []; SITE.nda.items = SITE.nda.items || [];
@@ -125,7 +146,7 @@ function renderTexts(){
       el.innerHTML = el.innerHTML.replace(SITE.hero.iris, `<span class="iris" data-t="${SITE.hero.iris}">${SITE.hero.iris}</span>`);
   });
   $$('[data-href]').forEach(el => el.href = get(el.dataset.href));
-  document.title = pick(isSpeakerPage ? SITE.speaker.pageTitle : isAboutPage ? SITE.about.pageTitle : SITE.pageTitle);
+  document.title = pick(isNdaPage ? SITE.ndaPage.pageTitle : isSpeakerPage ? SITE.speaker.pageTitle : isAboutPage ? SITE.about.pageTitle : SITE.pageTitle);
   if (SITE.about.photo) $('#photo').src = SITE.about.photo;
 }
 
@@ -160,6 +181,7 @@ function renderLists(){
   renderPodcast();
   renderAboutExtras();
   renderSpeaker();
+  renderNdaPage();
   if (SITE.game) renderGame(gameOver ? $('.ttt-status').textContent : SITE.game.yourTurn);
 
   renderDirections();
@@ -364,6 +386,31 @@ function setupDeck(){
     card.classList.add(b.classList.contains('yes') ? 'like' : 'nope');
     fly(card, b.classList.contains('yes') ? 1 : -1);
   }));
+}
+
+
+/* ================================================================
+   СТРАНИЦА NDA (nda.html): проекты один под другим, каждый — как кейс
+   ================================================================ */
+function renderNdaPage(){
+  const N = SITE.ndaPage;
+  if (!N || !isNdaPage) return;
+  $('#ndaProjects').innerHTML = (N.items || []).map(p => {
+    const story = (Array.isArray((p.story || [])[0]) ? pick(p.story) : p.story) || [];
+    const text = story.map((par, i) => `<div class="wrap"><div class="case-text" data-reveal><span class="case-label">${T((p.labels || [])[i] || '')}</span><p>${T(par)}</p></div></div>`).join('');
+    // ролики со звуком: запускаются по нажатию, до этого видна обложка
+    const videos = (p.videos || []).map(v => `<div class="wrap"><figure class="case-shot nda-video" data-reveal>
+        <video src="${v.src}"${v.poster ? ` poster="${v.poster}"` : ''} controls playsinline preload="metadata"></video>
+        ${v.caption ? `<figcaption class="case-note">${T(v.caption)}</figcaption>` : ''}
+      </figure></div>`).join('');
+    return `<article class="nda-project">
+      <div class="wrap case-head">
+        <div class="case-ttl"><h2 class="case-title">${T(p.title)}</h2>${yearHTML(p)}</div>
+        ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
+      </div>
+      <div class="case-body">${text}${videos}</div>
+    </article>`;
+  }).join('');
 }
 
 
@@ -602,6 +649,8 @@ function mediaHTML(p){
   const img = p.image ? `<img src="${p.image}" alt="" loading="lazy"${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
   // ролик подгружается, только когда до карточки остается экран; до этого видна обложка
   if (m && m.type === 'file') return `<video muted loop playsinline preload="none" ${p.image ? `poster="${p.image}"` : ''} data-src="${m.src}"></video>`;
+  // still: true — в сетке только статичная обложка, без ролика
+  if (p.still && img) return img;
   if (m && (m.type === 'vimeo' || m.type === 'kinescope')) return img + `<iframe data-src="${embedURL(m, true)}"${p.ratio ? ` style="--vr:${p.ratio}"` : ''} allow="autoplay" tabindex="-1" aria-hidden="true"></iframe>`;
   if (img) return img;
   if (m && m.type !== 'image') return `<iframe class="still" data-src="${embedURL(m, true)}" allow="${FRAME_ALLOW}" tabindex="-1" aria-hidden="true"></iframe>`;
@@ -891,6 +940,209 @@ function watchBrandkit(el){
 }
 
 /* ================================================================
+   ТЕПЛОВИЗОР в кейсе (поле thermal у проекта, см. «ребрендинг Школы авторов»)
+   Поле «температуры» из плавающих теплых пятен раскрашивается шкалой ramp,
+   курсор или палец оставляет теплый след. Под полем — палитра, как в brandkit.
+   ================================================================ */
+function thermalHTML(t){
+  const ramp = t.ramp.join(',');
+  let h = `<div class="wrap thermo"><div class="thermo-box" style="--ramp:${ramp}">
+    <canvas aria-hidden="true"></canvas>
+    ${t.logo ? `<img class="thermo-logo" src="${t.logo}" alt="">` : ''}
+  </div>${t.hint ? `<p class="camp-cap thermo-hint">${T(t.hint)}</p>` : ''}</div>`;
+  if (t.colors) h += brandkitHTML({ colors: t.colors });
+  return h;
+}
+const THERMO_FRAG = `precision mediump float;
+uniform vec2 R; uniform float tm; uniform vec3 C[5]; uniform vec3 P[12];
+float blob(vec2 p, vec2 c, float r){ vec2 d = p - c; return exp(-dot(d, d) / (r * r)); }
+float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
+  float a = fract(sin(dot(i, vec2(127.1, 311.7))) * 43758.5), b = fract(sin(dot(i + vec2(1, 0), vec2(127.1, 311.7))) * 43758.5),
+        c = fract(sin(dot(i + vec2(0, 1), vec2(127.1, 311.7))) * 43758.5), d = fract(sin(dot(i + vec2(1, 1), vec2(127.1, 311.7))) * 43758.5);
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y); }
+vec3 ramp(float x){ x = clamp(x, 0., 1.) * 4.;
+  if (x < 1.) return mix(C[0], C[1], x); if (x < 2.) return mix(C[1], C[2], x - 1.);
+  if (x < 3.) return mix(C[2], C[3], x - 2.); return mix(C[3], C[4], x - 3.); }
+void main(){
+  float m = max(R.x, R.y); vec2 F = R / m, p = gl_FragCoord.xy / m;
+  float t = tm * .00012;
+  vec2 w = p + .1 * vec2(n2(p * 2.8 + t * 3.), n2(p * 2.8 - t * 2. + 7.));
+  float h = -.04;
+  h += .82 * blob(w, F * vec2(.78 + .16 * sin(t * 2.1), .3 + .2 * cos(t * 1.7)), .2);
+  h += .5 * blob(w, F * vec2(.24 + .16 * cos(t * 1.3), .85 + .12 * sin(t * 2.4)), .17);
+  h += .36 * blob(w, F * vec2(.52 + .3 * sin(t * .9 + 2.), .5 + .3 * sin(t * 1.1)), .14);
+  for (int i = 0; i < 12; i++) h += P[i].z * blob(p, P[i].xy, .05 + .07 * P[i].z);
+  h += .06 * (n2(p * 16. + t * 20.) - .5);
+  float iso = smoothstep(.04, 0., .5 - abs(fract(h * 6.) - .5)) * .045 * step(.08, h);
+  vec3 col = ramp(h) + iso;
+  col += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233)) + tm) * 43758.5) - .5) * .035;
+  gl_FragColor = vec4(col, 1.);
+}`;
+function startThermal(box, t){
+  const cv = box.querySelector('canvas');
+  const gl = cv.getContext('webgl', { antialias: false, premultipliedAlpha: false });
+  if (!gl) { box.classList.add('flat'); return; }
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+  const pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}'));
+  gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, THERMO_FRAG));
+  gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { box.classList.add('flat'); return; }
+  gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  const U = n => gl.getUniformLocation(pr, n);
+  gl.uniform3fv(U('C'), t.ramp.flatMap(h => hexRGB(h).map(v => v / 255)));
+  // след курсора: 12 точек, каждая остывает сама
+  const trail = Array.from({ length: 12 }, () => [0, 0, 0]);
+  let head = 0, lastX = -1, lastY = -1;
+  box.addEventListener('pointermove', e => {
+    const r = box.getBoundingClientRect(), m = Math.max(r.width, r.height), x = (e.clientX - r.left) / m, y = (r.bottom - e.clientY) / m;
+    if (Math.hypot(x - lastX, y - lastY) < .03) return;
+    lastX = x; lastY = y; trail[head] = [x, y, .34]; head = (head + 1) % trail.length;
+  });
+  const size = () => {
+    const d = Math.min(devicePixelRatio || 1, 1.5);
+    cv.width = Math.round(box.clientWidth * d * .6); cv.height = Math.round(box.clientHeight * d * .6);
+    gl.viewport(0, 0, cv.width, cv.height);
+  };
+  size(); new ResizeObserver(size).observe(box);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let on = false, raf = 0, prev = performance.now();
+  const draw = now => {
+    const dt = Math.min(now - prev, 64) / 1000; prev = now;
+    trail.forEach(p => { p[2] = Math.max(0, p[2] - dt * .35); });
+    gl.uniform2f(U('R'), cv.width, cv.height);
+    gl.uniform1f(U('tm'), still ? 4000 : now);
+    gl.uniform3fv(U('P'), trail.flat());
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (on && !still) raf = requestAnimationFrame(draw);
+  };
+  draw(prev);
+  // крутится, только пока виден на экране
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !on){ on = true; box.classList.add('in'); prev = performance.now(); raf = requestAnimationFrame(draw); }
+    else if (!e.isIntersecting){ on = false; cancelAnimationFrame(raf); }
+  }, { threshold: .15 }).observe(box);
+}
+
+/* ================================================================
+   ЖИВЫЕ БЛОКИ БРЕНДБУКА (элементы gallery, см. «ребрендинг Школы авторов»)
+   { head } — подпись и текст; { blend } — цвета и как они сливаются;
+   { spin } — градиенты поворачиваются; { float3d } — левитирующие 3D-иконки;
+   { icons2d } — анимированные 2D-элементы и правила соединения с 3D
+   ================================================================ */
+const blockHead = x => `<div class="case-text"><span class="case-label">${T(x.title)}</span><p>${T(x.text)}</p></div>`;
+// цвета: три полосы съезжаются в одну, сначала смешиваются напрямую (грязь), потом встает фиолетовый мостик
+function blendHTML(b){
+  const [c1, c2, c3] = b.items, m = b.between;
+  const ph = b.phases || [];
+  return brandkitHTML({ colors: b }) + `<div class="wrap blend">
+    <div class="strip-box" style="--c1:${c1.hex};--c2:${c2.hex};--c3:${c3.hex};--m:${m}" aria-hidden="true">
+      <div class="strip-parts">${[c1, c2, c3].map((c, i) => `<i class="p${i + 1}"><span>${T(c.tag || c.name)}</span></i>`).join('')}</div>
+      <div class="strip-dirty"></div><i class="strip-drop"></i><div class="strip-clean"></div>
+    </div>
+    ${ph.length ? `<div class="strip-phases"><span class="ph1">${T(ph[0])}</span><span class="ph2">${T(ph[1])}</span></div>` : ''}
+    ${b.hint ? `<p class="camp-cap">${T(b.hint)}</p>` : ''}</div>`;
+}
+function spinHTML(x){
+  return `<div class="wrap spin-wrap">${blockHead(x)}<div class="spin">${x.items.map((src, i) =>
+    `<div class="spin-tile" style="--i:${i}"><img src="${src}" alt="" loading="lazy"></div>`).join('')}</div></div>`;
+}
+function float3dHTML(f){
+  return `<div class="wrap"><div class="fly">${f.icons.map((c, i) =>
+    `<span class="fl" style="--x:${c.x}%;--y:${c.y}%;--mx:${c.mx ?? c.x}%;--my:${c.my ?? c.y}%;--s:${c.s || 120}px;--i:${i}"><img src="${c.src}" alt="" draggable="false"></span>`).join('')}
+    <div class="fly-text"><span class="case-label">${T(f.title)}</span><p>${T(f.text)}</p>${f.hint ? `<p class="camp-cap">${T(f.hint)}</p>` : ''}</div>
+  </div></div>`;
+}
+// 2D-элементы из брендбука, перерисованы вектором: синий и оранжевый, обводка одной толщины
+const C2B = '#0077FF', C2O = '#FF7700';
+const TWO_D = {
+  slider: `<svg viewBox="0 0 400 200"><line x1="60" y1="100" x2="340" y2="100" stroke="${C2O}" stroke-width="8" stroke-linecap="round" opacity=".45"/>
+    <line class="sl-fill" x1="60" y1="100" x2="340" y2="100" stroke="${C2B}" stroke-width="8" stroke-linecap="round"/>
+    <circle class="sl-knob" cx="60" cy="100" r="24" fill="${C2B}"/></svg>`,
+  crop: `<svg viewBox="0 0 200 200" fill="none" stroke-width="5"><rect x="34" y="34" width="132" height="132" stroke="${C2O}"/>
+    ${[[34, 34], [166, 34], [34, 166], [166, 166]].map(([x, y]) => `<rect x="${x - 8}" y="${y - 8}" width="16" height="16" fill="${C2B}" stroke="none"/>`).join('')}
+    <g class="crop-in"><rect x="72" y="72" width="56" height="56" stroke="${C2O}"/>
+    ${[[72, 72], [128, 72], [72, 128], [128, 128]].map(([x, y]) => `<rect x="${x - 6}" y="${y - 6}" width="12" height="12" fill="${C2B}" stroke="none"/>`).join('')}
+    <path d="M100 90v20M90 100h20" stroke="${C2B}" stroke-linecap="round"/></g></svg>`,
+  grid: `<svg viewBox="0 0 200 200" fill="none" stroke-linecap="round">
+    ${[58, 86, 114, 142].map((v, i) => `<path class="gl" style="--k:${i}" pathLength="1" d="M${v} 30V170" stroke="${C2O}" stroke-width="3"/><path class="gl" style="--k:${i + 4}" pathLength="1" d="M30 ${v}H170" stroke="${C2O}" stroke-width="3"/>`).join('')}
+    <path class="gl" style="--k:8" pathLength="1" d="M58 30H142M170 58V142M142 170H58M30 142V58" stroke="${C2O}" stroke-width="3"/>
+    <path class="gc" d="M30 58A28 28 0 0 1 58 30M142 30A28 28 0 0 1 170 58M170 142A28 28 0 0 1 142 170M58 170A28 28 0 0 1 30 142" stroke="${C2B}" stroke-width="9"/></svg>`,
+  counter: `<svg viewBox="0 0 400 200"><g class="eye"><path d="M40 100c22-34 50-48 78-48s56 14 78 48c-22 34-50 48-78 48s-56-14-78-48z" fill="${C2O}"/>
+    <circle cx="118" cy="100" r="25" fill="#fff"/><circle cx="118" cy="100" r="13" fill="${C2O}"/></g>
+    <text class="cnt" x="222" y="124" fill="${C2O}" font-size="72" font-weight="500">28,5K</text></svg>`,
+  wave: `<svg viewBox="0 0 200 200">${[34, 58, 82, 106, 130, 154].map((x, i) =>
+    `<rect class="wb" style="--k:${i}" x="${x}" y="${[70, 50, 30, 50, 70, 60][i]}" width="12" height="${[60, 100, 140, 100, 60, 80][i]}" rx="6" fill="${C2B}"/>`).join('')}</svg>`,
+  record: `<svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="62" stroke="${C2O}" stroke-width="9" opacity=".3"/>
+    <circle class="rec-ring" cx="100" cy="100" r="62" stroke="${C2O}" stroke-width="9" pathLength="1" stroke-linecap="round" transform="rotate(-90 100 100)"/>
+    <rect class="rec-dot" x="74" y="74" width="52" height="52" rx="14" fill="${C2O}"/></svg>`,
+  speed: `<svg viewBox="0 0 400 200" fill="none"><rect x="24" y="56" width="352" height="88" rx="44" stroke="${C2O}" stroke-width="4"/>
+    ${['0,5', '1x', '2', '5'].map((t, i) => `<g class="sp" style="--k:${i}"><circle cx="${82 + i * 79}" cy="100" r="30" stroke="${C2O}" stroke-width="4"/>
+    <text x="${82 + i * 79}" y="110" text-anchor="middle" fill="${C2O}" font-size="${i === 1 ? 30 : 26}" font-weight="500">${t}</text></g>`).join('')}</svg>`,
+  react: `<svg viewBox="0 0 200 200" fill="none" stroke="${C2O}" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round">
+    ${['M12 21s-7.5-4.6-9.6-9.2C1 8.6 3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5 19 5 21 8.6 19.6 11.8 17.5 16.4 12 21 12 21z',
+       'M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4 3.5V17H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z',
+       'M14 5l7 6-7 6v-3.5c-5 0-8.5 1.5-11 5 .8-5.5 4-10 11-11z'].map((d, i) =>
+      `<g transform="translate(80 ${16 + i * 58}) scale(1.7)"><path class="rx" style="--k:${i}" d="${d}"/></g>`).join('')}</svg>`,
+  bolt: `<svg viewBox="0 0 200 200" fill="none" stroke="${C2O}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="100" cy="100" r="64"/><path class="bl" pathLength="1" d="M110 58 76 108h26l-10 36 34-52h-26z" fill="${C2O}"/></svg>`,
+};
+function icons2dHTML(x){
+  const tiles = [['slider', 1], ['crop'], ['grid'], ['counter', 1], ['wave'], ['record'], ['speed', 1], ['react'], ['bolt']];
+  const c = x.combo;
+  return `<div class="wrap two">${blockHead(x)}
+    <div class="two-grid">${tiles.map(([k, wide], i) => `<div class="two-tile${wide ? ' wide' : ''} t-${k}" style="--i:${i}">${TWO_D[k]}</div>`).join('')}</div>
+  </div>
+  <div class="wrap"><div class="case-text two-rules"><span class="case-label">${T(x.rulesTitle)}</span><div class="rules-box">
+    <ul class="rules">${x.rules.map(r => `<li>${T(r)}</li>`).join('')}</ul>
+    ${c ? `<div class="combo" aria-hidden="true"><img class="combo-bg" src="${c.bg}" alt=""><img class="combo-3d" src="${c.icon}" alt="">
+      <svg class="combo-frame" viewBox="0 0 100 100" fill="none" stroke="${C2B}" stroke-width="3"><path d="M8 24V8h16M76 8h16v16M92 76v16H76M24 92H8V76"/></svg>
+      <svg class="combo-count" viewBox="30 0 410 200"><path d="M40 100c22-34 50-48 78-48s56 14 78 48c-22 34-50 48-78 48s-56-14-78-48z" fill="${C2B}"/><circle cx="118" cy="100" r="22" fill="${C2O}"/>
+      <text x="222" y="124" fill="${C2B}" font-size="72" font-weight="500">28,5K</text></svg>
+      <svg class="combo-slider" viewBox="0 0 400 60"><line x1="20" y1="30" x2="380" y2="30" stroke="${C2B}" stroke-width="6" stroke-linecap="round"/><circle class="cs-knob" cx="120" cy="30" r="20" fill="${C2B}"/></svg>
+    </div>` : ''}
+  </div></div></div>`;
+}
+// 3D-иконки: качаются сами (CSS), а от курсора разлетаются и плавно возвращаются
+function startFloat(box){
+  const els = [...box.querySelectorAll('.fl')], st = els.map(() => ({ x: 0, y: 0, r: 0 }));
+  let px = -1e4, py = -1e4, on = false, raf = 0;
+  box.addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; });
+  box.addEventListener('pointerdown', e => { px = e.clientX; py = e.clientY; });
+  box.addEventListener('pointerleave', () => { px = py = -1e4; });
+  const tick = () => {
+    const base = els.map((el, i) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2 - st[i].x, r.top + r.height / 2 - st[i].y, r.width]; });
+    els.forEach((el, i) => {
+      const s = st[i], [cx, cy, w] = base[i], dx = cx - px, dy = cy - py, d = Math.hypot(dx, dy) || 1, R = 140 + w;
+      const push = d < R ? (1 - d / R) ** 2 * 120 : 0;
+      s.x += (dx / d * push - s.x) * .07; s.y += (dy / d * push - s.y) * .07; s.r += (Math.sign(dx) * push * .14 - s.r) * .07;
+      el.style.transform = `translate(${s.x.toFixed(1)}px,${s.y.toFixed(1)}px) rotate(${s.r.toFixed(1)}deg)`;
+    });
+    if (on) raf = requestAnimationFrame(tick);
+  };
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !on){ on = true; box.classList.add('in'); raf = requestAnimationFrame(tick); }
+    else if (!e.isIntersecting){ on = false; cancelAnimationFrame(raf); }
+  }, { threshold: .1 }).observe(box);
+}
+// счетчик просмотров: набегает от нуля до 28,5K, когда плитка видна
+function startCounter(el){
+  const txt = el.querySelector('.cnt'); let t0 = 0, raf = 0;
+  const step = now => {
+    const u = ((now - t0) % 6000) / 1800, v = Math.min(u, 1), e = 1 - (1 - v) ** 3;
+    txt.textContent = (28.5 * e).toFixed(1).replace('.', ',') + 'K';
+    raf = requestAnimationFrame(step);
+  };
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting){ t0 = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(step); }
+    else cancelAnimationFrame(raf);
+  }).observe(el);
+}
+
+/* ================================================================
    КАМПАНИИ ВНУТРИ КЕЙСА (поле campaigns у проекта, см. «рекламные кампании VK»)
    ================================================================ */
 // одна ячейка ряда: картинка (увеличивается по нажатию) или ролик
@@ -912,8 +1164,9 @@ function campCell(src){
   // ролик загружается, когда ячейка доезжает до экрана, — тогда Kinescope сам запускается
   return `<div class="camp-shot frame"><iframe data-src="${url}" allow="${FRAME_ALLOW}" allowfullscreen></iframe></div>`;
 }
-function campRow(items, caption){
-  return `<div class="wrap camp-rowbox">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row">${items.map(campCell).join('')}</div></div>`;
+// narrow: true — ряд уже, по ширине текстовой колонки (для картинок низкого разрешения)
+function campRow(items, caption, narrow){
+  return `<div class="wrap camp-rowbox${narrow ? ' narrow' : ''}">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row">${items.map(campCell).join('')}</div></div>`;
 }
 // коллаж: ячейки раскладываются по схеме areas, у каждой подпись сверху; фото увеличиваются по нажатию
 function campCollage(g){
@@ -921,7 +1174,7 @@ function campCollage(g){
   const cap = g.caption ? `<p class="camp-cap">${g.link ? `<a class="link" href="${g.link}">${T(g.caption)}</a>` : T(g.caption)}</p>` : '';
   // несколько картинок в ячейке — стопкой: в ряд (одной высоты) или столбиком (dir: 'column')
   const fill = x => Array.isArray(x.img) ? `<div class="collage-stack${x.dir === 'column' ? ' col' : ''}">${x.img.map(campCell).join('')}</div>` : campCell(x.img);
-  return `<div class="wrap camp-rowbox">${cap}<div class="collage camp-row" style="grid-template-areas:${c.areas.replace(/"/g, '&quot;')};grid-template-columns:${c.cols || ''};grid-template-rows:${c.rows || ''};aspect-ratio:${c.ratio || '16/9'}">${
+  return `<div class="wrap camp-rowbox${g.narrow ? ' narrow' : ''}">${cap}<div class="collage camp-row${g.cover ? ' cover' : ''}" style="grid-template-areas:${c.areas.replace(/"/g, '&quot;')};grid-template-columns:${c.cols || ''};grid-template-rows:${c.rows || ''};aspect-ratio:${c.ratio || '16/9'}">${
     c.cells.map(x => `<div class="collage-cell" style="grid-area:${x.area}">${x.text ? `<span class="collage-txt">${T(x.text)}</span>` : ''}${fill(x)}</div>`).join('')
   }</div></div>`;
 }
@@ -1136,8 +1389,14 @@ function startMorph(box, list){
 // элемент галереи кейса: { row, caption } — ряд макетов одной высоты, { collage } — коллаж,
 // { morph } — фигуры перетекают друг в друга, остальное — во всю ширину
 function galleryItem(x){
+  if (Array.isArray(x)) return x.map(galleryItem).join('');
+  if (x && x.head) return `<div class="wrap">${blockHead(x.head)}</div>`;
+  if (x && x.blend) return blendHTML(x.blend);
+  if (x && x.spin) return spinHTML(x.spin);
+  if (x && x.float3d) return float3dHTML(x.float3d);
+  if (x && x.icons2d) return icons2dHTML(x.icons2d);
   if (x && x.morph) return morphHTML(x);
-  if (x && x.row) return campRow(x.row, x.caption);
+  if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   if (x && x.collage) return campCollage(x);
   return `<div class="wrap">${shotHTML(x)}</div>`;
 }
@@ -1166,6 +1425,7 @@ function renderCase(k, keepScroll){
     const text = key === 'result' && p.award ? `<div class="case-award-row">${awardHTML(p.award)}<p>${T(par)}</p></div>` : `<p>${T(par)}</p>`;
     body += `<div class="wrap"><div class="case-text${twoCols.includes(key) ? ' cols2' : ''}" data-reveal><span class="case-label">${T(label)}</span>${text}${
       key === 'role' && p.team ? teamHTML(p.team) : ''}</div></div>`;
+    if (p.thermal && p.thermal.after === key) body += thermalHTML(p.thermal);
     if (g < gallery.length) body += galleryItem(gallery[g++]);
     if (p.brandkit && p.brandkit.after === key) body += brandkitHTML(p.brandkit);
   });
@@ -1175,6 +1435,8 @@ function renderCase(k, keepScroll){
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
+  // deckTitle — крупная надпись над презентацией
+  if (p.deck && p.deckTitle) body += `<div class="wrap"><h2 class="deck-title">${T(p.deckTitle)}</h2></div>`;
   if (Array.isArray(p.deck)) body += p.deck.map(s => campRow([s])).join('');
   else if (p.deck) body += `<div class="wrap">${shotHTML(p.deck)}</div>`;
   // links: [] — ссылок в конце нет; поле не указано — ссылка на старую страницу
@@ -1208,6 +1470,10 @@ function renderCase(k, keepScroll){
   watchCampaigns(caseContent);
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
+  caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
+  caseContent.querySelectorAll('.fly').forEach(startFloat);
+  caseContent.querySelectorAll('.t-counter').forEach(startCounter);
+  caseContent.querySelectorAll('.blend,.spin,.two-grid,.combo').forEach(el => brandWatcher.observe(el));
   if (!keepScroll) caseEl.scrollTop = 0;
 }
 

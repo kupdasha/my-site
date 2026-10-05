@@ -24,7 +24,7 @@ def read(name):
         return f.read()
 
 # адреса страниц на Тильде
-LINKS = [("'index.html#", "'/#"), ("'index.html'", "'/'"), ("'about.html'", "'/about'"), ("'speaker.html'", "'/speaker'")]
+LINKS = [("'index.html#", "'/#"), ("'index.html'", "'/'"), ("'about.html'", "'/about'"), ("'speaker.html'", "'/speaker'"), ("'nda.html'", "'/nda'")]
 
 # Код, стили, картинки и видео лежат на GitHub (kupdasha/my-site) и раздаются через jsDelivr.
 # Блоки в Тильде на них только ссылаются: обновил файлы на GitHub — сайт подхватил сам.
@@ -92,7 +92,7 @@ def data(group, note):
 SHARED = ['name', 'pageTitle', 'telegram', 'switchLeft', 'switchRight', 'switchHint', 'contactButton', 'nav',
           'contact', 'game', 'footer', 'secret', 'chat', 'jokes']
 missing = [k for _, k in keys if k not in SHARED + ['hero', 'directions', 'works', 'nda', 'about', 'photos',
-           'community', 'articles', 'clients', 'podcast', 'speaker']]
+           'community', 'articles', 'clients', 'podcast', 'speaker', 'ndaPage']]
 assert not missing, f'новые разделы в content.js, их надо распределить по блокам: {missing}'
 
 
@@ -105,6 +105,9 @@ def between(a, b, src=index):
 header_html = between('<!-- Шапка -->', '<main>')
 sections = {sid: re.search(r'(  <!--[^\n]*-->\n)?  <section class="[^"]*" id="%s".*?\n  </section>' % sid, index, re.S).group(0).strip()
             for sid in ['hero', 'directions', 'works', 'nda', 'contact']}
+# страница NDA (nda.html) — один раздел
+nda_html = read('nda.html')
+nda_section = between('<!-- Проекты под NDA: каждый проект', '<!-- Контакт -->', nda_html)
 service_html = between('<!-- Кнопка «Связаться»', '<script src=')
 
 
@@ -122,15 +125,15 @@ def css_block():
             "document.write('<link rel=\"stylesheet\" href=\"'+B+'style.css?v='+v+'\">')})()</script>")
 
 def shared_block():
-    body = '\n\n'.join(regions[k] for k in SHARED)
-    return (f'{header_html}\n\n<script>\n{intro}\n\n'
-            '/* Общие тексты: они видны на всех страницах сайта */\n'
-            'var SITE = window.SITE = window.SITE || {};\n'
-            "SITE.homePage = '/';   // адрес главной страницы\n"
-            f'Object.assign(SITE, {{\n\n{tildify(body)}\n\n}});\n</script>')
+    # тексты и проекты (content.js) тоже приходят с GitHub — блок в Тильде не меняется, когда меняются тексты
+    return (f'{header_html}\n\n'
+            '<!-- ТЕКСТЫ И ПРОЕКТЫ сайта лежат на GitHub в content.js и подключаются отсюда. -->\n'
+            f"<script>(function(){{var B='{CDN}',v=Math.floor(Date.now()/36e5);"
+            "document.write('<script src=\"'+B+'content.js?v='+v+'\"><\\/script>')})()</script>")
 
 def page_block(sid, group, note):
-    return f'{sections[sid]}\n\n' + (data(group, note) if group else '')
+    # в блоке страницы — только разметка раздела; тексты берутся из content.js с GitHub
+    return sections[sid]
 
 def js_block(names, note):
     # файлы кода подключаются с GitHub по порядку; ?v= меняется раз в час
@@ -150,6 +153,9 @@ BLOCKS = {
         ('3 проекты', page_block('works', ['works'], 'Проекты: фильтры, карточки и тексты кейсов.')),
         ('4 проекты под NDA', page_block('nda', ['nda'], 'Проекты под NDA.')),
         ('5 контакт', page_block('contact', [], '')),
+    ],
+    '4 страница NDA': [
+        ('1 проекты под NDA', nda_section),
     ],
     '9 подвал': [
         ('1 служебные кнопки и окно кейса', f'<!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->\n{service_html}'),
