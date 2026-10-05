@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru" data-home="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Новый век — проект под NDA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../nda.css">
+</head>
+<body>
+<!-- Страница проекта «Новый век» внутри раздела NDA. Тексты — в ../nda.js (NDA.novyiVek), прототип — site.html -->
+<div class="page">
+  <a class="back" href="../">← <span data-t="back"></span></a>
+  <h1 data-t="title"></h1>
+  <div class="tags"></div>
+  <p class="lead" data-t="lead"></p>
+  <div class="facts"></div>
+  <div class="story"></div>
+
+  <section class="proto">
+    <div class="head"><h2 data-t="protoTitle"></h2><p class="mute" data-t="protoText"></p></div>
+    <div class="ptabs"></div>
+    <div class="frame"><iframe title="Прототип сайта «Новый век»" loading="lazy"></iframe></div>
+    <a class="full" href="site.html" data-t="full"></a>
+  </section>
+
+  <section class="mocks">
+    <h2 data-t="mockTitle"></h2>
+    <div class="mgrid"></div>
+  </section>
+
+  <div class="end"><a href="../">← <span data-t="back"></span></a></div>
+</div>
+<script src="../nda.js"></script>
+<script>
+ndaGate(function(){
+  var T = NDA.novyiVek, $ = function(s){return document.querySelector(s)};
+  document.querySelectorAll('[data-t]').forEach(function(el){ el.textContent = T[el.dataset.t]; });
+  $('.tags').innerHTML = T.tags.map(function(t){return '<span>'+t+'</span>'}).join('');
+  var facts = T.facts.filter(function(f){return f.value});
+  $('.facts').innerHTML = facts.map(function(f){return '<div><b>'+f.name+'</b>'+f.value+'</div>'}).join('');
+  if(!facts.length) $('.facts').remove();
+  if(T.story.length) $('.story').innerHTML = T.story.map(function(p){return '<p>'+p+'</p>'}).join(''); else $('.story').remove();
+
+  /* прототип: вкладки переключают страницы внутри окна */
+  var frame = $('.frame iframe');
+  frame.src = 'site.html#main';
+  $('.ptabs').innerHTML = T.tabs.map(function(t,i){return '<button data-go="'+t.go+'"'+(i===0?' class="on"':'')+'>'+t.label+'</button>'}).join('');
+  var tabs = document.querySelectorAll('.ptabs button');
+  function mark(go){ tabs.forEach(function(b){ b.classList.toggle('on', b.dataset.go===go); }); }
+  tabs.forEach(function(b){ b.addEventListener('click', function(){
+    mark(b.dataset.go);
+    frame.contentWindow.postMessage({nvGo: b.dataset.go}, '*');
+  }); });
+  window.addEventListener('message', function(e){
+    if(e.source===frame.contentWindow && e.data && e.data.nvPage){
+      var cur = document.querySelector('.ptabs .on');
+      if(!(cur && cur.dataset.go==='services' && e.data.nvPage==='main')) mark(e.data.nvPage);
+    }
+  });
+
+  /* макеты: клик — во весь размер */
+  $('.mgrid').innerHTML = T.mocks.map(function(m){
+    return '<figure'+(m.tall?' class="tall"':'')+'><div class="im"><img src="'+m.src+'" alt="'+m.caption+'" loading="lazy"></div><figcaption>'+m.caption+'</figcaption></figure>';
+  }).join('');
+  document.querySelectorAll('.mgrid figure').forEach(function(f){
+    f.addEventListener('click', function(){
+      var v = document.createElement('div'); v.className = 'viewer';
+      v.innerHTML = '<img src="'+f.querySelector('img').src+'" alt="">';
+      document.body.appendChild(v); requestAnimationFrame(function(){ v.classList.add('on'); });
+      document.body.style.overflow = 'hidden';
+      var close = function(){ v.classList.remove('on'); document.body.style.overflow=''; setTimeout(function(){v.remove()},300); document.removeEventListener('keydown',esc); };
+      var esc = function(e){ if(e.key==='Escape') close(); };
+      v.addEventListener('click', close); document.addEventListener('keydown', esc);
+    });
+  });
+});
+</script>
+</body>
+</html>

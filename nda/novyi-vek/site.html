@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Новый век — прототип сайта</title>
+<script src="../nda.js"></script>
+<script>/* прототип тоже под паролем: без пароля — на страницу проекта, там замок */
+(function(){var ok=false;try{ok=sessionStorage.getItem('nda-pass')===NDA.PASS||localStorage.getItem('nda-pass')===NDA.PASS}catch(e){} if(!ok) location.replace('./');})();
+if('scrollRestoration' in history) history.scrollRestoration='manual';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  ПРОТОТИП САЙТА БАНКА «НОВЫЙ ВЕК» (по макетам из PDF)
+  Страницы внутри одного файла: #main — главная, #credit — калькулятор, #news — новости.
+  Макет нарисован на ширину 1440: все размеры ниже в rem, где 1rem = 16px на экране 1440,
+  поэтому страница целиком масштабируется под ширину окна, как картинка.
+-->
+<style>
+:root{
+  --bg:#CED7DF; --card:#F1F4F7; --red:#D90016; --red2:#C60524; --ink:#000; --dark:#25292C; --dark2:#1F2124;
+  --grey:#6F757C; --line:#9A9CA1; --menu:#32373F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:min(calc(100vw / 90), 1.25rem);background:var(--bg)}
+body{font-family:Onest,system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{display:block;max-width:none;user-select:none;-webkit-user-drag:none}
+.wrap{width:90rem;margin:0 auto;position:relative}
+
+/* ---------- шапка ---------- */
+.hdr{position:sticky;top:0;z-index:50;background:var(--bg);transition:box-shadow .3s}
+.hdr.scrolled{box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.hdr .wrap{height:5.75rem;display:flex;align-items:center}
+.logo{position:absolute;left:1rem;top:1.375rem;width:13.5rem;height:2.375rem;display:block}
+.logo svg{width:100%;height:100%;overflow:visible}
+.logo .flower{transform-origin:2.1875rem 2.5625rem;transform-box:view-box}
+.logo:hover .flower{animation:spin 1.2s cubic-bezier(.6,0,.2,1)}
+.loaded .logo .flower{animation:spin 1.4s cubic-bezier(.6,0,.2,1) .2s both}
+@keyframes spin{from{transform:rotate(-180deg) scale(.6)}to{transform:none}}
+.nav{position:absolute;left:23.5625rem;top:2.25rem;display:flex;gap:3.0625rem;font-size:1rem}
+.nav a{position:relative;padding-bottom:0.25rem}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.nav a:hover::after,.nav a.on::after{transform:scaleX(1)}
+.btn-red{display:inline-flex;align-items:center;justify-content:center;background:var(--red2);color:#fff;border-radius:62.4375rem;transition:background .25s,transform .25s}
+.btn-red:hover{background:#A8001A}
+.btn-red:active{transform:scale(.97)}
+.hdr .open{position:absolute;left:75.9375rem;top:1.5625rem;width:12.9375rem;height:2.625rem;font-size:1rem;padding-bottom:0.125rem}
+
+/* ---------- страницы ---------- */
+.page{display:none}
+.page.on{display:block;animation:pageIn .6s cubic-bezier(.2,.7,.2,1)}
+@keyframes pageIn{from{opacity:0;transform:translateY(1.5rem)}to{opacity:1;transform:none}}
+[data-rise]{opacity:0;transform:translateY(2.5rem);transition:opacity .8s,transform .9s cubic-bezier(.2,.7,.2,1)}
+[data-rise].in{opacity:1;transform:none}
+
+/* ---------- первый экран ---------- */
+.hero{height:48.75rem;position:relative}
+.hero h1{position:absolute;top:12.25rem;font-size:3.25rem;font-weight:500;letter-spacing:-.01em;line-height:1.1}
+.hero h1 span{display:inline-block;transition:transform 1.3s cubic-bezier(.2,.8,.2,1),opacity 1s}
+.hero .h-l{left:1rem}
+.hero .h-r{left:58.875rem}
+.hero:not(.ready) .h-l span{transform:translateX(13.75rem);opacity:0}
+.hero:not(.ready) .h-r span{transform:translateX(-13.75rem);opacity:0}
+.hero .sub{position:absolute;left:1rem;top:21.75rem;font-family:Roboto;font-size:1.25rem;font-weight:500;line-height:1.4;transition:opacity 1s .7s,transform 1s .7s}
+.hero:not(.ready) .sub{opacity:0;transform:translateY(1rem)}
+.stage{position:absolute;left:26.5625rem;top:10.625rem;width:37rem;height:40rem;perspective:87.5rem}
+.stage .coin3d{position:absolute;left:0;top:0;width:37rem;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.stage .main{width:37rem;animation:float 6s ease-in-out infinite}
+.stage .mirror{position:absolute;left:9.0625rem;top:17.5rem;width:17.1875rem;pointer-events:none;animation:floatM 6s ease-in-out infinite}
+@keyframes floatM{0%,100%{transform:translateY(0)}50%{transform:translateY(.875rem)}}
+.hero:not(.ready) .stage{opacity:0;transform:translateY(3.75rem) scale(.94)}
+.stage{transition:opacity 1.2s,transform 1.4s cubic-bezier(.2,.8,.2,1)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-0.875rem)}}
+
+/* ---------- монетная колонна: ВЭД / сбережения ---------- */
+.pin{height:137.5rem;position:relative}
+.pin .sticky{position:sticky;top:5.75rem;height:calc(100vh - 5.75rem);min-height:37.5rem;overflow:hidden}
+.pin .box{position:absolute;left:0;top:50%;width:90rem;height:48.5625rem;margin-top:-24.25rem}
+.pin .box>*{transition:opacity .4s}
+.pin.dim .box>*:not(.services){opacity:.38}
+.pick{position:absolute;left:6.625rem;top:3.25rem;font-family:Roboto;font-size:3.25rem;font-weight:500;line-height:1.16}
+.column{position:absolute;left:34.125rem;top:0;width:21.875rem;height:48.5625rem;perspective:100rem}
+.column img{position:absolute;left:50%;transform-origin:50% 50%;will-change:transform}
+.c-top{top:-0.5rem;width:20.125rem;margin-left:-10.0625rem}
+.c-bottom{top:35rem;width:20.125rem;margin-left:-10.0625rem}
+.c-mid{position:absolute;left:0.25rem;top:13rem;width:21.375rem;height:21.375rem;transform-style:preserve-3d;will-change:transform}
+.c-mid img{left:0;top:0;width:21.375rem;height:auto;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.c-mid .back{transform:rotateY(180deg)}
+.services{position:absolute;left:60.9375rem;top:4.75rem}
+.services h3{font-family:Roboto;font-size:1.375rem;font-weight:400;margin-bottom:1.25rem}
+.services .pills{display:flex;gap:1rem;position:relative}
+.pill{height:2.3125rem;padding:0 1.625rem 0.125rem;border-radius:62.4375rem;background:var(--dark);color:#fff;font-size:0.8125rem;transition:opacity .3s,background .3s}
+.services.open .pill:not(.act){opacity:.3}
+.menu{position:absolute;top:2.3125rem;width:14.8125rem;padding:0.625rem 0;background:var(--menu);border-radius:0 1.125rem 1.125rem 1.125rem;color:#fff;font-size:0.9375rem;opacity:0;transform:translateY(-0.375rem);pointer-events:none;transition:opacity .25s,transform .3s;z-index:5}
+.menu a{display:block;padding:0.625rem 1.375rem;transition:padding .25s,color .25s}
+.menu a:hover{padding-left:1.875rem;color:#fff}
+.menu a:hover::before{content:"";position:absolute;left:1.125rem;margin-top:0.5625rem;width:0.3125rem;height:0.3125rem;border-radius:50%;background:var(--red)}
+.services.open .menu{opacity:1;transform:none;pointer-events:auto}
+.state{position:absolute;inset:0;pointer-events:none}
+.state>*{position:absolute;transition:opacity .55s,transform .7s cubic-bezier(.2,.7,.2,1)}
+.state:not(.on)>*{opacity:0;transform:translateY(1.875rem)}
+.state.on>*{pointer-events:auto}
+.state.on>*:nth-child(2){transition-delay:.06s}.state.on>*:nth-child(3){transition-delay:.12s}.state.on>*:nth-child(4){transition-delay:.18s}
+.st-title{left:6.625rem;top:21rem;font-family:Roboto;font-size:2.625rem;font-weight:400}
+.st-text{left:6.625rem;top:26.25rem;width:22rem;font-family:Roboto;font-size:1.375rem;line-height:1.45}
+.st-right{left:60.9375rem;top:26.25rem;width:21.25rem;font-family:Roboto;font-size:1.375rem;line-height:1.45}
+.st-btn{left:60.9375rem;top:36rem;width:13rem;height:2.25rem;font-size:0.8125rem;background:var(--red)}
+.progress{position:absolute;left:6.625rem;top:42.4375rem;width:24.375rem;height:1.5px;background:#5b6066}
+.progress i{position:absolute;top:-1px;height:0.2188rem;width:6.125rem;left:18.25rem;background:var(--dark);transition:left .6s cubic-bezier(.2,.7,.2,1);border-radius:0.125rem}
+
+/* ---------- валютный пульс ---------- */
+.pulse{position:relative;height:68.125rem}
+.pulse h2{position:absolute;left:23.5625rem;top:3.125rem;font-size:3.25rem;font-weight:500}
+.fly{position:absolute;will-change:transform;pointer-events:none}
+.fly img{width:100%;animation:float 7s ease-in-out infinite}
+.rates{position:absolute;left:23.5625rem;top:8.75rem;width:37.375rem;padding:2rem 2rem 2.5rem;background:var(--dark);color:#fff;border-radius:1.75rem;z-index:2}
+.rates .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.125rem}
+.rates h4{font-size:1.375rem;font-weight:500}
+.sel{position:relative}
+.sel>button{height:2.625rem;padding:0 1rem;background:#fff;color:#111;border-radius:0.75rem;font-size:0.9375rem;display:flex;align-items:center;gap:1.375rem}
+.sel>button svg{width:0.625rem;transition:transform .3s}
+.sel.open>button svg{transform:rotate(180deg)}
+.sel ul{list-style:none;position:absolute;right:0;top:3rem;background:#fff;color:#111;border-radius:0.75rem;padding:0.375rem;min-width:100%;font-size:0.9375rem;opacity:0;transform:translateY(-0.375rem);pointer-events:none;transition:.25s;z-index:4}
+.sel.open ul{opacity:1;transform:none;pointer-events:auto}
+.sel li{padding:0.5625rem 0.75rem;border-radius:0.5rem;cursor:pointer;white-space:nowrap}
+.sel li:hover{background:var(--card)}
+.grid{display:grid;grid-template-columns:16.6875rem 6.25rem 6.5625rem 1fr;font-size:0.875rem}
+.grid .h{color:#9da3aa;font-size:0.875rem;padding-bottom:1rem}
+.grid .r{padding-bottom:1.25rem}
+.grid .num{font-size:1rem;font-variant-numeric:tabular-nums}
+.grid .num.small{font-size:0.875rem}
+.grid .right{text-align:right}
+.cur{display:flex;gap:1rem}
+.cur svg{width:2rem;height:2rem;flex:none}
+.cur b{display:block;font-weight:400;font-size:1rem;margin-bottom:0.25rem}
+.cur small{color:#9da3aa;font-size:0.875rem}
+.tabs{display:flex;justify-content:space-between;margin:0.875rem 0 2.125rem;font-size:1rem}
+.tabs button{color:#fff;padding-bottom:0.125rem;border-bottom:1.5px solid transparent;transition:border-color .3s,opacity .3s;opacity:.85}
+.tabs button.on{border-color:#fff;opacity:1}
+.rates .note{font-size:0.8125rem;color:#b9bec4}
+.rates .note u{color:#fff}
+.flip{display:inline-block;transition:transform .35s,opacity .35s}
+.flip.out{transform:translateY(-0.5rem);opacity:0}
+
+/* ---------- плитки ---------- */
+.bento{position:relative;height:53.75rem}
+.b-dark{position:absolute;left:1.125rem;top:0;width:51rem;height:46.1875rem;background:var(--dark);border-radius:1.75rem;color:#fff;overflow:hidden}
+.b-dark h3{position:absolute;left:3rem;top:2.75rem;font-size:3rem;font-weight:500;line-height:1.2}
+.b-dark p{position:absolute;left:3rem;top:21.125rem;font-family:Roboto;font-size:1.375rem;line-height:1.45}
+.lk{position:absolute;left:1.25rem;bottom:1.5rem;width:48.3125rem;height:4.5rem;background:#fff;border-radius:1rem;color:#111;display:flex;align-items:center;padding:0 0.75rem 0 1.5rem;font-family:Roboto;font-size:1.375rem}
+.lk span{flex:1}
+.lk i{width:3rem;height:3rem;border-radius:0.625rem;background:#E6EAEE;display:grid;place-items:center;transition:background .3s,transform .3s}
+.lk:hover i{background:var(--red);color:#fff;transform:translateX(0.25rem)}
+.lk svg{width:0.875rem}
+.b-news{position:absolute;left:53.4375rem;top:0;width:35.4375rem;height:22.375rem;background:#EEF0F3;border-radius:1.5rem;overflow:visible}
+.b-news h3{position:absolute;left:2.5625rem;top:2.75rem;font-size:3rem;font-weight:500;line-height:1.25;z-index:2}
+.b-news .arr{position:absolute;left:2.5625rem;bottom:2.5rem;width:1.125rem}
+.b-news .nc1{position:absolute;left:11.875rem;top:-5.9375rem;width:15.625rem;transform:rotate(-12deg);transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.b-news .nc2{position:absolute;left:18.75rem;top:3.75rem;width:13.4375rem;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.b-news:hover .nc1{transform:rotate(-30deg) translate(-1.25rem,0.625rem)}
+.b-news:hover .nc2{transform:rotate(25deg) translateY(-0.75rem)}
+.b-red{position:absolute;left:53.4375rem;top:23.8125rem;width:35.4375rem;height:22.375rem;background:var(--red);border-radius:1.5rem;color:#fff;overflow:hidden}
+.b-red small{position:absolute;left:2.5rem;top:2.625rem;font-size:0.9375rem}
+.b-red .arr{position:absolute;right:2.5rem;top:2.625rem;width:1rem;transition:transform .4s}
+.b-red:hover .arr{transform:translate(0.25rem,-0.25rem)}
+.b-red h3{position:absolute;left:2.5rem;bottom:1.5rem;font-size:3.25rem;font-weight:500;line-height:1.15}
+.b-red h3 span{display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.b-red:hover h3 span:last-child{transform:translateX(1.125rem)}
+.b-red::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--x,80%) var(--y,30%),rgba(255,255,255,.18),transparent 45%);opacity:0;transition:opacity .4s}
+.b-red:hover::after{opacity:1}
+
+/* ---------- подвал ---------- */
+.ftr{border-top:1px solid #6b7076;padding:4rem 0 0;font-size:1rem}
+.ftr .wrap{padding:0 5rem}
+.ftr .brand{display:flex;align-items:center;gap:1.25rem;margin-bottom:4.5rem}
+.ftr .brand img{width:3.875rem}
+.ftr .brand div{font-size:1.5rem;line-height:1}
+.ftr .brand b{display:block;font-size:2.625rem;font-weight:500}
+.cols{display:grid;grid-template-columns:16.9375rem 16.9375rem 20.875rem 1fr}
+.cols h5,.cols2 h5{font-size:1rem;font-weight:400;margin-bottom:1.375rem}
+.cols a,.cols2 a,.cols .g{display:block;color:var(--grey);margin-bottom:1.125rem;line-height:1.5;max-width:12.5rem;transition:color .2s}
+.cols a:hover,.cols2 a:hover{color:#000}
+.cols .s{font-size:0.8125rem;color:#000;margin:-0.25rem 0 0.25rem}
+.cols .b{color:#000;margin-bottom:1.125rem}
+.app p{color:var(--grey);font-size:1.5rem;line-height:1.35;margin-bottom:0.875rem}
+.app small{display:block;color:var(--grey);font-size:1rem;line-height:1.5;margin-bottom:0.875rem}
+.badges{display:flex;gap:0.375rem;margin-bottom:2rem}
+.badges span{height:1.9375rem;padding:0 0.5625rem;border-radius:0.4375rem;background:#2c3035;color:#b9bec4;font-size:0.75rem;display:flex;align-items:center;gap:0.375rem;border:1px solid #555}
+.badges i{width:0.75rem;height:0.75rem;border-radius:0.1875rem;display:block}
+.qr{width:12rem;height:12rem;border-radius:1rem;background:#fff;padding:1.375rem}
+.qr img{width:100%}
+.cols2{display:grid;grid-template-columns:repeat(5,16.9375rem);border-top:1px solid #6b7076;margin:4rem -5rem 0;padding:4.625rem 5rem 3.375rem}
+.legal{border-top:1px solid #6b7076;margin:0 -5rem;padding:4.375rem 5rem 4.375rem;font-size:0.875rem;line-height:1.6}
+.legal p{margin-bottom:1rem}
+.legal .ln{display:flex;gap:4rem;margin-top:1.25rem}
+.legal .ln a{text-decoration:underline}
+.legal .ln span{margin-left:auto}
+.legal .ln span a{text-decoration:underline}
+
+/* ---------- внутренние страницы ---------- */
+.crumbs{padding:2.75rem 0 0 1rem;font-size:1.5rem;color:#444}
+.crumbs a:hover{color:#000}
+.tag{padding:3.25rem 0 0 1rem;color:var(--red);font-size:0.6875rem}
+.ptitle{padding:0.75rem 0 0 1rem;font-size:3.25rem;font-weight:500}
+.seg{position:absolute;right:1.25rem;top:10.125rem;display:flex;background:#fff;border-radius:62.4375rem;padding:0.125rem;font-size:1rem}
+.seg button{position:relative;z-index:1;height:2.75rem;padding:0 1.0625rem 0.125rem;border-radius:62.4375rem;transition:color .35s}
+.seg button.on{color:#fff}
+.seg i{position:absolute;top:0.125rem;bottom:0.125rem;left:0.125rem;background:var(--dark2);border-radius:62.4375rem;transition:left .45s cubic-bezier(.2,.7,.2,1),width .45s cubic-bezier(.2,.7,.2,1)}
+.calc{margin:3.625rem 1.125rem 5.625rem;height:28.125rem;background:#fff;border-radius:1.5rem;position:relative}
+.calc h4{position:absolute;top:3.125rem;font-size:1.375rem;font-weight:500}
+.calc .lh{left:3rem}.calc .rh{left:50.25rem}
+.calc .lh span{display:inline-block;transition:opacity .25s,transform .35s}
+.calc .lh span.out{opacity:0;transform:translateY(-0.5rem)}
+.field{position:absolute;left:3rem;width:38.75rem;height:5.5rem;background:var(--card);border-radius:1.25rem;padding:1.25rem 1.25rem 0}
+.field small{display:block;font-size:0.6875rem;color:#777;margin-bottom:0.625rem}
+.field b{font-size:1.5rem;font-weight:600;font-variant-numeric:tabular-nums}
+.f1{top:6.5rem}.f2{top:14.25rem}
+.range{position:absolute;left:1.25rem;right:1.25rem;bottom:-1px;height:1.5rem}
+.range input{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;margin:0}
+.range .track{position:absolute;left:0;right:0;top:0.5625rem;height:0.25rem;border-radius:0.125rem;background:#D4D8DD}
+.range .fill{position:absolute;left:0;top:0.5625rem;height:0.25rem;border-radius:0.125rem;background:var(--red)}
+.range .knob{position:absolute;top:0;width:1.375rem;height:1.375rem;margin-left:-0.6875rem;border-radius:50%;background:var(--dark2);transition:transform .2s;pointer-events:none}
+.range:hover .knob{transform:scale(1.15)}
+.ticks{position:absolute;left:3rem;width:37.5rem;font-size:0.6875rem;color:#777}
+.ticks span{position:absolute;white-space:nowrap}
+.t1{top:12.625rem}.t2{top:20.375rem}
+.fine{position:absolute;left:3rem;top:23rem;width:35rem;font-size:0.6875rem;line-height:1.35;color:#777}
+.pay{position:absolute;left:50.25rem;top:6rem;width:31.9375rem;display:flex;justify-content:space-between;align-items:baseline;padding-bottom:1.75rem;border-bottom:1px solid #c9d6e0}
+.pay small{font-size:0.6875rem;color:#777}
+.pay b{font-size:1.5rem;font-weight:600;font-variant-numeric:tabular-nums}
+.need{position:absolute;left:50.25rem;top:10.5rem;width:32.1875rem;height:6rem;background:var(--card);border-radius:1.25rem;padding:0.875rem 1.25rem}
+.need small{display:block;font-size:0.6875rem;color:#777;margin-bottom:0.875rem}
+.need div{display:flex;gap:2rem;align-items:center;font-size:1rem}
+.need span{display:flex;gap:0.625rem;align-items:center}
+.need svg{width:1.625rem;height:1.625rem}
+.need u{text-underline-offset:0.1875rem}
+.rate{position:absolute;left:50.25rem;top:18.375rem;font-size:0.6875rem;color:#777}
+.conds{position:absolute;left:50.25rem;top:20.3125rem;font-size:0.75rem;color:var(--red)}
+.conds:hover{text-decoration:underline}
+.getm{position:absolute;left:69.25rem;top:18.3125rem;width:12.9375rem;height:2.625rem;font-size:1rem;padding-bottom:0.125rem}
+
+.news-head{position:relative;border-bottom:1px solid #b8c0c8;padding-bottom:4.625rem;margin:0 1.125rem 0.375rem 0}
+.ngrid{display:grid;grid-template-columns:repeat(3,27.9375rem);gap:2.625rem 1.9375rem;padding:0 1.125rem 6.875rem}
+.ncard{background:#fff;border-radius:1.375rem;overflow:hidden;height:26.875rem;position:relative;display:block}
+.ncard .im{height:13.75rem;overflow:hidden;background:#cdd6e0}
+.ncard .im img{width:100%;height:100%;object-fit:cover;transform:scale(1.06) translate(var(--px,0),var(--py,0));transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.ncard .d{padding:1rem 1.125rem 0;font-size:0.625rem;color:var(--red)}
+.ncard h4{padding:0.75rem 1.125rem 0;font-size:1rem;font-weight:500;line-height:1.3;min-height:4.125rem}
+.ncard p{padding:0.75rem 1.125rem 0;font-size:0.6875rem;line-height:1.4;color:#555}
+.ncard .more{position:absolute;left:1.125rem;bottom:1rem;height:1.375rem;padding:0 1.0625rem 1px;border-radius:62.4375rem;background:#000;color:#fff;font-size:0.5rem;display:flex;align-items:center;transition:background .3s,padding .3s}
+.ncard:hover .more{background:var(--red);padding:0 1.5rem 1px}
+.ngrid .ncard{opacity:0;transform:translateY(3.125rem)}
+.page.on .ngrid .ncard{animation:card .9s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes card{to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="logo" href="#main" aria-label="Новый век — на главную"></a>
+    <nav class="nav">
+      <a href="#main">Для всех</a>
+      <a href="#main" data-to="services">Для бизнеса</a>
+      <a href="#credit">Продукты</a>
+      <a href="#news">О банке</a>
+      <a href="#main" data-to="footer">Контакты</a>
+    </nav>
+    <a class="btn-red open" href="#credit">открыть счет</a>
+  </div>
+</header>
+
+<!-- ================= ГЛАВНАЯ ================= -->
+<main class="page" data-page="main">
+  <section class="hero wrap">
+    <h1 class="h-l"><span>лучшие стороны</span></h1>
+    <h1 class="h-r"><span>одного капитала</span></h1>
+    <p class="sub">банк для бизнеса<br>и частных лиц</p>
+    <div class="stage"><div class="coin3d">
+      <img class="mirror" src="img/coin-mirror.webp" alt="">
+      <img class="main" src="img/hero-coin.webp" alt="Монета с логотипом банка на подиуме">
+    </div></div>
+  </section>
+
+  <section class="pin" id="services">
+    <div class="sticky"><div class="box">
+      <h2 class="pick">выбирайте<br>лучшее</h2>
+      <div class="column">
+        <img class="c-top" src="img/coin-top.webp" alt="">
+        <div class="c-mid">
+          <img class="front" src="img/coin-globe.webp" alt="">
+          <img class="back" src="img/coin-piggy.webp" alt="">
+        </div>
+        <img class="c-bottom" src="img/coin-bottom.webp" alt="">
+      </div>
+      <div class="services">
+        <h3>посмотреть все услуги</h3>
+        <div class="pills">
+          <button class="pill" data-menu>для бизнеса</button>
+          <button class="pill" data-menu>частным клиентам</button>
+          <div class="menu">
+            <a href="#credit">дебетовые карты</a>
+            <a href="#credit">кредитные карты</a>
+            <a href="#credit">кредитование физлиц</a>
+            <a href="#main" data-to="pulse">вклады</a>
+            <a href="#main" data-to="pulse">накопительный счет</a>
+          </div>
+        </div>
+      </div>
+      <div class="state on" data-state="0">
+        <h3 class="st-title">ВЭД</h3>
+        <p class="st-text">берем на себя валютный контроль, оптимизацию транзакций и взаимодействие с&nbsp;контрагентами</p>
+        <p class="st-right">никаких технических пауз: работаем с любыми валютами и юрисдикциями</p>
+        <a class="btn-red st-btn" href="#credit">получить карту</a>
+      </div>
+      <div class="state" data-state="1">
+        <h3 class="st-title">сбережения</h3>
+        <p class="st-text">гибкие сроки, пополнение от&nbsp;50&nbsp;000&nbsp;₽, привязка к ключевой ставке и гарантированная доходность до&nbsp;20% годовых</p>
+        <p class="st-right">все депозиты клиентов застрахованы государством, что гарантирует возврат средств до 1.4&nbsp;млн рублей</p>
+        <a class="btn-red st-btn" href="#credit">открыть вклад</a>
+      </div>
+      <div class="progress"><i></i></div>
+    </div></div>
+  </section>
+
+  <section class="pulse wrap" id="pulse">
+    <h2 data-rise>валютный пульс</h2>
+    <div class="fly" style="left:9.7rem;top:-3rem;width:10.9rem" data-r="-40"><img src="img/fly2.webp" alt=""></div>
+    <div class="fly" style="left:70.3rem;top:0;width:17.5rem" data-r="30"><img src="img/fly1.webp" alt=""></div>
+    <div class="fly" style="left:0;top:17rem;width:21rem" data-r="-25"><img src="img/fly4.webp" alt=""></div>
+    <div class="fly" style="left:62.5rem;top:28.5rem;width:19rem" data-r="35"><img src="img/fly3.webp" alt=""></div>
+    <div class="fly" style="left:62.5rem;top:44.5rem;width:18.8rem" data-r="-30"><img src="img/fly0.webp" alt=""></div>
+    <div class="rates" data-rise>
+      <div class="top">
+        <h4>Курсы валют</h4>
+        <div class="sel">
+          <button><span class="sel-v">Наличные</span><svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+          <ul><li data-v="cash">Наличные</li><li data-v="card">По карте</li><li data-v="cb">Безналичные</li></ul>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="h">Валюта</div><div class="h">Покупка</div><div class="h">Продажа</div><div class="h right">ЦБ РФ</div>
+        <div class="r cur"><svg viewBox="0 0 32 32"><clipPath id="cu"><circle cx="16" cy="16" r="16"/></clipPath><g clip-path="url(#cu)"><rect width="32" height="32" fill="#fff"/><g fill="#D80027"><rect y="0" width="32" height="2.5"/><rect y="5" width="32" height="2.5"/><rect y="10" width="32" height="2.5"/><rect y="15" width="32" height="2.5"/><rect y="20" width="32" height="2.5"/><rect y="25" width="32" height="2.5"/><rect y="30" width="32" height="2.5"/></g><rect width="15" height="15" fill="#0052B4"/><g fill="#fff"><circle cx="4" cy="4" r=".9"/><circle cx="8" cy="4" r=".9"/><circle cx="12" cy="4" r=".9"/><circle cx="6" cy="7.5" r=".9"/><circle cx="10" cy="7.5" r=".9"/><circle cx="4" cy="11" r=".9"/><circle cx="8" cy="11" r=".9"/><circle cx="12" cy="11" r=".9"/></g></g></svg><div><b>USD*</b><small>Доллар США (USD)</small></div></div>
+        <div class="r num small" data-k="usd.buy"></div><div class="r num" data-k="usd.sell"></div><div class="r num right" data-k="usd.cb"></div>
+        <div class="r cur"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#0052B4"/><g fill="#FFDA44"><circle cx="16" cy="8" r="1.3"/><circle cx="16" cy="24" r="1.3"/><circle cx="8" cy="16" r="1.3"/><circle cx="24" cy="16" r="1.3"/><circle cx="10.3" cy="10.3" r="1.3"/><circle cx="21.7" cy="10.3" r="1.3"/><circle cx="10.3" cy="21.7" r="1.3"/><circle cx="21.7" cy="21.7" r="1.3"/></g></svg><div><b>EUR*</b><small>Евро (EUR)</small></div></div>
+        <div class="r num small" data-k="eur.buy"></div><div class="r num" data-k="eur.sell"></div><div class="r num right" data-k="eur.cb"></div>
+      </div>
+      <div class="tabs"><button data-t="0">до 999</button><button data-t="1">от 1 000 до 9 999</button><button data-t="2" class="on">от 10 000</button></div>
+      <p class="note">* Курс валют на 09.06.2026 11:06. Возможно взимание <u>комиссии</u>.</p>
+    </div>
+  </section>
+
+  <section class="bento wrap">
+    <div class="b-dark" data-rise>
+      <h3>новый век ваших<br>возможностей</h3>
+      <p>все счета, депозиты, кредитные линии<br>и валютные позиции в одном окне,<br>с интуитивной навигацией<br>и приоритетной поддержкой 24/7</p>
+      <a class="lk" href="#credit"><span class="lk-t">личный кабинет</span><i><svg viewBox="0 0 14 12"><path d="M1 6h11M7 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></i></a>
+    </div>
+    <a class="b-news" href="#news" data-rise>
+      <img class="nc1" src="img/coin-big.webp" alt="">
+      <h3>наши<br>новости</h3>
+      <img class="nc2" src="img/coin-big.webp" alt="">
+      <svg class="arr" viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="#000" stroke-width="1.8"/></svg>
+    </a>
+    <a class="b-red" href="#credit" data-rise>
+      <small>помощь в развитии вашего бизнеса</small>
+      <svg class="arr" viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="#fff" stroke-width="1.8"/></svg>
+      <h3><span>рассчитать</span><span>кредит онлайн</span></h3>
+    </a>
+  </section>
+</main>
+
+<!-- ================= КАЛЬКУЛЯТОР ================= -->
+<main class="page" data-page="credit">
+  <div class="wrap">
+    <div class="crumbs"><a href="#main">главная</a> / калькулятор</div>
+    <div class="tag">[июнь]</div>
+    <h1 class="ptitle">калькулятор кредита</h1>
+    <div class="seg"><i></i><button class="on" data-kind="0">кредит наличными</button><button data-kind="1">кредит под залог</button></div>
+    <div class="calc">
+      <h4 class="lh"><span>кредит наличными</span></h4>
+      <h4 class="rh">наше предложение</h4>
+      <div class="field f1"><small>Сумма кредита</small><b class="v-sum"></b>
+        <div class="range" data-r="sum"><div class="track"></div><div class="fill"></div><div class="knob"></div><input type="range" min="0" max="1000" aria-label="Сумма кредита"></div></div>
+      <div class="ticks t1"><span style="left:0">30 тыс.</span><span class="mid" style="left:0">15 млн</span><span style="right:0">30 млн</span></div>
+      <div class="field f2"><small>Срок кредита</small><b class="v-term"></b>
+        <div class="range" data-r="term"><div class="track"></div><div class="fill"></div><div class="knob"></div><input type="range" min="1" max="15" step="1" aria-label="Срок кредита"></div></div>
+      <div class="ticks t2"><span style="left:0">1 год</span><span style="right:0.4rem">15 лет</span></div>
+      <p class="fine">ПСК 18,990% — 53,999%. Ставка от 17,40% до 53,99% годовых определяется индивидуально, сумма не включает страховку. Не является публичной офертой.</p>
+      <div class="pay"><small>Ежемесячный платёж</small><b class="v-pay"></b></div>
+      <div class="need"><small>Вам понадобится</small>
+        <div>
+          <span><svg viewBox="0 0 26 26"><rect x="5" y="3" width="15" height="20" rx="2" fill="#1F2124"/><circle cx="12.5" cy="11" r="3.4" fill="none" stroke="#fff" stroke-width="1.4"/><path d="M8 18h9" stroke="#fff" stroke-width="1.4"/></svg>паспорт</span>
+          <span><svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="11.5" fill="none" stroke="#1F2124" stroke-width="1.3" stroke-dasharray="3 1.5"/><text x="13" y="12" font-size="5" text-anchor="middle" font-family="Onest" fill="#1F2124">гос</text><text x="13" y="17" font-size="4.4" text-anchor="middle" font-family="Onest" fill="#1F2124">услуги</text></svg><u>госуслуги или справка о доходах</u></span>
+        </div>
+      </div>
+      <div class="rate">Индивидуальная ставка — от 17,40% годовых</div>
+      <a class="conds" href="#credit">Все условия кредитования →</a>
+      <a class="btn-red getm" href="#credit">получить деньги</a>
+    </div>
+  </div>
+</main>
+
+<!-- ================= НОВОСТИ ================= -->
+<main class="page" data-page="news">
+  <div class="wrap">
+    <div class="news-head">
+      <div class="crumbs"><a href="#main">главная</a> / новости</div>
+      <div class="tag">[июнь]</div>
+      <h1 class="ptitle">НОВОСТИ</h1>
+    </div>
+    <div class="ngrid"></div>
+  </div>
+</main>
+
+<footer class="ftr" id="footer">
+  <div class="wrap">
+    <div class="brand"><img src="img/mark.svg" alt=""><div>банк<b>новый век</b></div></div>
+    <div class="cols">
+      <div>
+        <h5>Связь с банком</h5>
+        <div class="s">Частным лицам</div><a href="#main">Звонок в банк</a>
+        <div class="s">Если вы абонент Новый Век</div><div class="g">1203</div>
+        <div class="s">Звонок из-за границы</div><div class="g">+7 (999) 999-99-99</div>
+        <a href="#main">Карта сайта</a>
+        <div class="b">Местоположение</div><div class="g">↗ Москва</div>
+        <div class="b">Наши соцсети</div>
+        <svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="7"/><circle cx="16" cy="15.5" r="8" fill="none" stroke="#fff" stroke-width="2.6"/><path d="M10 24l3-3" stroke="#fff" stroke-width="2.6"/></svg>
+      </div>
+      <div><h5>Сервисы</h5><a href="#main" data-to="pulse">Курсы валют</a><a href="#main">Отделения банка и банкоматы</a><a href="#main">Платежи и переводы</a><a href="#main">Комиссия</a><a href="#main">Поддержка</a></div>
+      <div><h5>Банк</h5><a href="#credit">Дебетовые карты</a><a href="#credit">Кредитные карты</a><a href="#credit">Кредитование физлиц</a><a href="#main">Вклады</a><a href="#main">Накопительный счет</a><a href="#main">Обращение в банк</a><a href="#main">Справочный центр</a></div>
+      <div class="app">
+        <h5>Скачать мобильное приложение</h5>
+        <p>Все функции банка<br>в мобильном приложении</p>
+        <small>Проверяйте баланс, оплачивайте услуги, получайте помощь в чате 24/7</small>
+        <div class="badges"><span><i style="background:#ddd"></i>App Store</span><span><i style="background:linear-gradient(135deg,#34A853,#4285F4,#EA4335,#FBBC04)"></i>Google Play</span><span><i style="background:#1D6CF5"></i>RuStore</span></div>
+        <div class="qr"><img src="img/qr.webp" alt="QR-код приложения"></div>
+      </div>
+    </div>
+    <div class="cols2">
+      <div><h5>Частным клиентам</h5><a href="#main">Курсы валют</a><a href="#main">Отделения банка и банкоматы</a><a href="#main">Платежи и переводы</a><a href="#main">Комиссия</a></div>
+      <div><h5>Для бизнеса</h5><a href="#credit">Дебетовые карты</a><a href="#credit">Кредитные карты</a><a href="#credit">Кредитование физлиц</a><a href="#main">Вклады</a><a href="#main">Накопительный счет</a></div>
+      <div><h5>Ещё</h5><a href="#main">Обращение в банк</a><a href="#main">Справочный центр</a><a href="#news">Блок</a><a href="#main">Отзывы клиентов</a><a href="#main">Безопасность</a></div>
+      <div><h5>Ещё</h5><a href="#main">Курсы валют</a><a href="#main">Отделения банка и банкоматы</a><a href="#main">Платежи и переводы</a><a href="#main">Комиссия</a></div>
+      <div><h5>Ещё</h5><a href="#main">Курсы валют</a><a href="#main">Отделения банка и банкоматы</a><a href="#main">Платежи и переводы</a><a href="#main">Комиссия</a><a href="#main">Поддержка</a></div>
+    </div>
+    <div class="legal">
+      <p>С учётом сложившейся международной обстановки, сплочённость команды профессионалов предопределяет высокую востребованность соответствующих условий активизации. Каждый из нас понимает очевидную вещь: глубокий уровень погружения в значительной степени обусловливает важность укрепления моральных ценностей. С учётом сложившейся международной обстановки, сплочённость команды профессионалов предопределяет высокую востребованность соответствующих условий активизации.</p>
+      <p>С учётом сложившейся международной обстановки, сплочённость команды профессионалов предопределяет высокую востребованность соответствующих условий активизации. Каждый из нас понимает очевидную вещь: глубокий уровень погружения в значительной степени обусловливает важность укрепления моральных ценностей.</p>
+      <div class="ln"><a href="#main">Политика конфиденциальности</a><a href="#main">Условия использования сайта</a><span>Сделано в <a href="#main">Prophet</a></span></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ================= ДАННЫЕ ПРОТОТИПА =================
+   Всё, что можно поменять без программиста, — здесь. */
+var DATA = {
+  /* Калькулятор: годовая ставка в процентах. 19,02% дает ровно 49 500 ₽ из макета
+     (1 350 000 ₽ на 3 года). Ставку «под залог» в макете не видно — ПРОВЕРЬ. */
+  credit: [
+    { title: 'кредит наличными', rate: 19.02, min: 30000,  max: 30000000, sum: 1350000, years: 3 },
+    { title: 'кредит под залог', rate: 15.9,  min: 300000, max: 30000000, sum: 5000000, years: 7 },
+  ],
+  /* Курсы: «Наличные» — из макета. Остальные строки придуманы для демонстрации
+     переключателя — ПРОВЕРЬ или удали. Три значения = три суммы (до 999 / до 9 999 / от 10 000). */
+  rates: {
+    cash: { usd: { buy: [74.25, 74.55, 74.85], sell: [77.15, 76.85, 76.55], cb: 73.2644 },
+            eur: { buy: [88.60, 88.90, 89.20], sell: [91.60, 91.30, 91.00], cb: 85.2798 } },
+    card: { usd: { buy: [74.60, 74.80, 75.05], sell: [76.80, 76.60, 76.35], cb: 73.2644 },
+            eur: { buy: [88.95, 89.10, 89.40], sell: [91.35, 91.15, 90.85], cb: 85.2798 } },
+    cb:   { usd: { buy: [74.90, 75.05, 75.20], sell: [76.40, 76.25, 76.10], cb: 73.2644 },
+            eur: { buy: [89.30, 89.45, 89.60], sell: [90.90, 90.75, 90.60], cb: 85.2798 } },
+  },
+  /* Новости: картинка, дата, заголовок, текст */
+  news: [
+    { img: 'img/news0.webp', date: '12 июня 2026', title: 'Банк «Новый Век» вошёл в топ-50 рейтинга надёжности «Эксперт РА»', text: 'Аналитическое агентство «Эксперт РА» присвоило банку рейтинг ruA+ со стабильным прогнозом. Оценка отражает высокое качество активов и устойчивую бизнес-модель.' },
+    { img: 'img/news3.webp', date: '08 июня 2026', title: 'Запущен ускоренный валютный контроль для операций ВЭД', text: 'Новый сервис сокращает срок проверки документов с 3 дней до 24 часов. Доступен всем клиентам с тарифом «Бизнес» и выше.' },
+    { img: 'img/news5.webp', date: '01 июня 2026', title: 'Ставки по депозитам повышены до 18,5% для участников Private', text: 'Повышение распространяется на вклады от 1 млн рублей сроком от 6 месяцев. Условия действуют при наличии действующего расчётного счёта.' },
+    { img: 'img/news1.webp', date: '5 мая 2026', title: 'Ограничение работы мобильного интернета', text: 'Три простых шага для настройки в Личном кабинете.' },
+    { img: 'img/news4.webp', date: '30 апреля 2026', title: '1 мая – день Весны и Труда!', text: 'От всей души поздравляем вас с Наступающим Праздником!' },
+    { img: 'img/news6.webp', date: '29 апреля 2026', title: 'Сокращенный операционный день в четверг, 30 апреля', text: 'Сокращенный операционный день в четверг, 30 апреля' },
+  ],
+};
+</script>
+<script>
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v))};
+var ease=function(t){return 1-Math.pow(1-t,3)};
+var rem=function(){return parseFloat(getComputedStyle(document.documentElement).fontSize)};
+var fmt=function(n){return Math.round(n).toLocaleString('ru-RU').replace(/,/g,' ')};
+
+/* логотип: вставляем svg, чтобы цветок крутился отдельно от надписи */
+fetch('img/logo.svg').then(function(r){return r.text()}).then(function(t){
+  var logo=$('.logo'); logo.innerHTML=t;
+  var svg=logo.querySelector('svg'), g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class','flower');
+  $$('path[fill="#C60524"]',svg).forEach(function(p){g.appendChild(p)});
+  svg.insertBefore(g,svg.firstChild);
+}).catch(function(){ $('.logo').innerHTML='<img src="img/logo.svg" alt="Новый век" style="width:100%">'; });
+
+/* ---------- страницы ---------- */
+var current='';
+function show(){
+  var h=(location.hash||'#main').slice(1); var page=$('.page[data-page="'+h+'"]')? h : 'main';
+  if(page===current) return; current=page;
+  $$('.page').forEach(function(p){p.classList.toggle('on',p.dataset.page===page)});
+  $$('.nav a').forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+page && !a.dataset.to && page!=='main')});
+  window.scrollTo(0,0);
+  if(page==='main'){ var hero=$('.hero'); hero.classList.remove('ready'); requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList.add('ready')})}); }
+  if(page==='credit') sweep();
+  if(page==='news') buildNews();
+  try{ parent.postMessage({nvPage:page},'*'); }catch(e){}
+  observe(); tick();
+}
+document.addEventListener('click',function(e){
+  var a=e.target.closest('a[href^="#"]'); if(!a) return;
+  var to=a.dataset.to;
+  if(to){ e.preventDefault(); if(location.hash!=='#main') location.hash='main'; setTimeout(function(){ var el=document.getElementById(to); if(el) window.scrollTo({top:el.getBoundingClientRect().top+scrollY-(to==='footer'?0:92*rem()/16),behavior:'smooth'}); },60); }
+  else if(a.getAttribute('href')==='#'+current){ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); }
+});
+window.addEventListener('hashchange',show);
+window.addEventListener('message',function(e){ if(e.data&&e.data.nvGo){ if(e.data.nvGo==='services'){ location.hash='main'; setTimeout(function(){ var el=$('#services'); window.scrollTo({top:el.offsetTop+el.offsetHeight*0.05,behavior:'smooth'}); },80);} else location.hash=e.data.nvGo; } });
+
+/* появление блоков при прокрутке */
+var io=new IntersectionObserver(function(es){es.forEach(function(e){ if(e.isIntersecting){e.target.classList.add('in'); io.unobserve(e.target);} })},{threshold:.15});
+function observe(){ $$('.page.on [data-rise]:not(.in)').forEach(function(el){io.observe(el)}); }
+
+/* ---------- первый экран: монета следует за курсором ---------- */
+var stage=$('.coin3d');
+$('.hero').addEventListener('mousemove',function(e){
+  var r=this.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+  stage.style.transform='rotateY('+(x*14)+'deg) rotateX('+(-y*10)+'deg)';
+});
+$('.hero').addEventListener('mouseleave',function(){stage.style.transform=''});
+
+/* ---------- прокрутка: падающая монета, колонна, монеты вокруг курсов ---------- */
+var pin=$('.pin'), mid=$('.c-mid'), ctop=$('.c-top'), cbot=$('.c-bottom'), states=$$('.state'), bar=$('.progress i');
+var flies=$$('.fly'); var pulse=$('.pulse');
+function tick(){
+  if(current!=='main') return;
+  var vh=innerHeight, R=rem()/16;
+  var pr=pin.getBoundingClientRect();
+  /* пока колонна въезжает в экран, средняя монета раскручивается */
+  var ent=clamp(1-(pr.top-92*R)/vh,0,1), spin=(1-ease(ent))*360;
+  /* колонна: прогресс 0…1, пока секция прилипла */
+  var total=pin.offsetHeight-pr.height; var span=pin.offsetHeight-(vh-92*R);
+  var p=clamp((92*R-pr.top)/span,0,1);
+  var flipT=clamp((p-.42)/.16,0,1); var ang=ease(flipT)*180;
+  mid.style.transform='rotateY('+(ang+spin)+'deg) translateY('+(Math.sin(flipT*Math.PI)*-1.2)+'rem)';
+  ctop.style.transform='rotate('+(Math.sin(p*Math.PI*2)*7+(1-ent)*-25)+'deg) translateY('+(Math.sin(flipT*Math.PI)*-1.5)+'rem)';
+  cbot.style.transform='rotate('+(Math.sin(p*Math.PI*2)*-7+(1-ent)*25)+'deg) translateY('+(Math.sin(flipT*Math.PI)*1.5)+'rem)';
+  var idx=p<.5?0:1;
+  states.forEach(function(s,i){s.classList.toggle('on',i===idx)});
+  bar.style.left=(idx?18.25:0)+'rem';
+  /* монеты вокруг курсов падают сверху и раскладываются */
+  var qr=pulse.getBoundingClientRect(); var q=clamp((vh-qr.top)/(vh*1.1),0,1);
+  flies.forEach(function(f,i){
+    var t=ease(clamp((q-i*.07)/.6,0,1)); var r0=+f.dataset.r;
+    f.style.transform='translateY('+(-(1-t)*(45+i*6))+'rem) rotate('+((1-t)*r0*3)+'deg)';
+    f.style.opacity=clamp(t*3,0,1);
+  });
+  $('.hdr').classList.toggle('scrolled',scrollY>10);
+}
+addEventListener('scroll',function(){requestAnimationFrame(tick)},{passive:true});
+addEventListener('resize',tick);
+
+/* меню услуг: при наведении остальное притухает */
+var services=$('.services'), menu=$('.menu');
+$$('[data-menu]').forEach(function(b){
+  var open=function(){ $$('[data-menu]').forEach(function(x){x.classList.toggle('act',x===b)}); menu.style.left=b.offsetLeft+'px'; services.classList.add('open'); pin.classList.add('dim'); };
+  b.addEventListener('mouseenter',open); b.addEventListener('focus',open); b.addEventListener('click',open);
+});
+services.addEventListener('mouseleave',function(){services.classList.remove('open');pin.classList.remove('dim')});
+
+/* ---------- курсы ---------- */
+var rkind='cash', rtab=2;
+function setNum(el,v,digits){
+  var txt=v.toFixed(digits); if(el.textContent===txt) return;
+  if(!el.firstChild){ el.innerHTML='<span class="flip"></span>'; el.firstChild.textContent=txt; return; }
+  var s=el.firstChild; s.classList.add('out');
+  setTimeout(function(){ s.textContent=txt; s.classList.remove('out'); },180);
+}
+function renderRates(){
+  var d=DATA.rates[rkind];
+  $$('[data-k]').forEach(function(el){ var k=el.dataset.k.split('.'), v=d[k[0]][k[1]]; setNum(el, Array.isArray(v)?v[rtab]:v, k[1]==='cb'?4:2); });
+}
+var sel=$('.sel');
+sel.querySelector('button').addEventListener('click',function(e){e.stopPropagation();sel.classList.toggle('open')});
+$$('li',sel).forEach(function(li){li.addEventListener('click',function(){ rkind=li.dataset.v; $('.sel-v').textContent=li.textContent; sel.classList.remove('open'); renderRates(); })});
+document.addEventListener('click',function(){sel.classList.remove('open')});
+$$('.tabs button').forEach(function(b){b.addEventListener('click',function(){ rtab=+b.dataset.t; $$('.tabs button').forEach(function(x){x.classList.toggle('on',x===b)}); renderRates(); })});
+renderRates();
+
+/* красная плитка: блик за курсором */
+var red=$('.b-red');
+red.addEventListener('mousemove',function(e){var r=red.getBoundingClientRect(); red.style.setProperty('--x',(e.clientX-r.left)+'px'); red.style.setProperty('--y',(e.clientY-r.top)+'px');});
+
+/* личный кабинет: подпись меняется */
+var lkWords=['личный кабинет','счета и депозиты','валютные позиции','кредитные линии'], lkI=0, lkT=$('.lk-t');
+setInterval(function(){ if(current!=='main') return; lkI=(lkI+1)%lkWords.length; lkT.style.transition='opacity .3s'; lkT.style.opacity=0; setTimeout(function(){lkT.textContent=lkWords[lkI]; lkT.style.opacity=1;},300); },2600);
+
+/* ---------- калькулятор ---------- */
+var kind=0, cs={sum:0,years:0}, shown=0;
+var SUM_CURVE=2.7;   /* шкала суммы растянута в начале: мелкие суммы точнее */
+function sumFromT(t,c){ return c.min+(c.max-c.min)*Math.pow(t,SUM_CURVE); }
+function tFromSum(v,c){ return Math.pow((v-c.min)/(c.max-c.min),1/SUM_CURVE); }
+function roundSum(v){ return v<1e6? Math.round(v/10000)*10000 : Math.round(v/50000)*50000; }
+function years(n){ var m=n%10, mm=n%100; return n+' '+((m===1&&mm!==11)?'год':(m>=2&&m<=4&&(mm<12||mm>14))?'года':'лет'); }
+function payment(){ var c=DATA.credit[kind], r=c.rate/1200, n=cs.years*12; return cs.sum*r/(1-Math.pow(1+r,-n)); }
+var rs=$('[data-r="sum"]'), rt=$('[data-r="term"]');
+function place(range,t){ range.querySelector('.fill').style.width=(t*100)+'%'; range.querySelector('.knob').style.left=(t*100)+'%'; }
+function renderCalc(animatePay){
+  var c=DATA.credit[kind];
+  $('.v-sum').textContent=fmt(cs.sum)+' ₽';
+  $('.v-term').textContent=years(cs.years);
+  var ts=tFromSum(cs.sum,c); place(rs,ts); rs.querySelector('input').value=Math.round(ts*1000);
+  var tt=(cs.years-1)/14; place(rt,tt); rt.querySelector('input').value=cs.years;
+  $('.ticks .mid').style.left=(tFromSum(15000000,c)*100)+'%';
+  $('.ticks .mid').style.transform='translateX(-50%)';
+  tweenPay(payment(),animatePay);
+}
+var payRaf;
+function tweenPay(to,anim){
+  cancelAnimationFrame(payRaf); var from=shown, t0=performance.now(), d=anim?500:160;
+  (function f(now){ var k=clamp((now-t0)/d,0,1); shown=from+(to-from)*ease(k); $('.v-pay').textContent=fmt(Math.round(shown/100)*100)+' ₽'; if(k<1) payRaf=requestAnimationFrame(f); })(t0);
+}
+rs.querySelector('input').addEventListener('input',function(){ cs.sum=roundSum(sumFromT(this.value/1000,DATA.credit[kind])); renderCalc(); });
+rt.querySelector('input').addEventListener('input',function(){ cs.years=+this.value; renderCalc(); });
+function setKind(k,anim){
+  kind=k; var c=DATA.credit[k];
+  $$('.seg button').forEach(function(b,i){b.classList.toggle('on',i===k)});
+  var b=$$('.seg button')[k], i=$('.seg i'); i.style.left=b.offsetLeft+'px'; i.style.width=b.offsetWidth+'px';
+  var h=$('.calc .lh span'); h.classList.add('out'); setTimeout(function(){h.textContent=c.title;h.classList.remove('out')},200);
+  if(anim) animateTo(c.sum,c.years); else { cs.sum=c.sum; cs.years=c.years; renderCalc(true); }
+}
+$$('.seg button').forEach(function(b,i){b.addEventListener('click',function(){setKind(i,true)})});
+function animateTo(sum,yrs){
+  var c=DATA.credit[kind], s0=cs.sum||c.min, y0=cs.years||1, t0=performance.now();
+  (function f(now){ var k=ease(clamp((now-t0)/900,0,1));
+    cs.sum=roundSum(sumFromT(tFromSum(clamp(s0,c.min,c.max),c)+(tFromSum(sum,c)-tFromSum(clamp(s0,c.min,c.max),c))*k,c)); cs.years=Math.round(y0+(yrs-y0)*k);
+    if(k===1){cs.sum=sum;cs.years=yrs;}
+    renderCalc(); if(k<1) requestAnimationFrame(f); })(t0);
+}
+function sweep(){ requestAnimationFrame(function(){ var c=DATA.credit[kind]; var i=$('.seg i'), b=$$('.seg button')[kind]; i.style.left=b.offsetLeft+'px'; i.style.width=b.offsetWidth+'px'; cs.sum=c.min; cs.years=1; renderCalc(); setTimeout(function(){animateTo(c.sum,c.years)},350); }); }
+
+/* ---------- новости ---------- */
+var built=false;
+function buildNews(){
+  if(built) return; built=true;
+  $('.ngrid').innerHTML=DATA.news.map(function(n,i){
+    return '<a class="ncard" href="#news" style="animation-delay:'+(i*0.09+0.15)+'s"><div class="im"><img src="'+n.img+'" alt=""></div><div class="d">'+n.date+'</div><h4>'+n.title+'</h4><p>'+n.text+'</p><span class="more">читать полностью</span></a>';
+  }).join('');
+  $$('.ncard').forEach(function(c){
+    c.addEventListener('mousemove',function(e){ var r=c.getBoundingClientRect(); c.style.setProperty('--px',((e.clientX-r.left)/r.width-.5)*-14+'px'); c.style.setProperty('--py',((e.clientY-r.top)/r.height-.5)*-10+'px'); });
+    c.addEventListener('mouseleave',function(){ c.style.setProperty('--px','0px'); c.style.setProperty('--py','0px'); });
+  });
+}
+
+document.documentElement.classList.add('loaded');
+show();
+})();
+</script>
+</body>
+</html>

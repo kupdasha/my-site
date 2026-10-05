@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru" data-home="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Проекты под NDA — Дарья Купцова</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nda.css">
+</head>
+<body>
+<!-- Раздел NDA: kupdasha.ru/nda. Тексты — в nda.js, закрытые карточки — из content.js (SITE.nda.items) -->
+<div class="page">
+  <a class="back" href="../">← Дарья Купцова</a>
+  <h1 data-t="list.title"></h1>
+  <p class="lead" data-t="list.text"></p>
+  <div class="list"></div>
+</div>
+<script src="../content.js"></script>
+<script src="nda.js"></script>
+<script>
+ndaGate(function(){
+  document.querySelectorAll('[data-t]').forEach(function(el){
+    el.textContent = el.dataset.t.split('.').reduce(function(o,k){return o[k]}, NDA);
+  });
+  var html = NDA.projects.map(function(p, i){
+    return '<a class="card'+(i===0?' big':'')+'" href="'+p.link+'">'+
+      '<div class="cv" style="background:'+p.bg+'"><img src="'+p.cover+'" alt=""></div>'+
+      '<h3>'+p.title+'</h3><p>'+p.tag+'</p></a>';
+  });
+  var items = (window.SITE && SITE.nda && SITE.nda.items) || [];
+  items.forEach(function(it){
+    var c = it.colors || ['#F3F0FE','#E0D6FB','#CDBDF8','#F5D9F0'];
+    html.push('<div class="card locked">'+
+      '<div class="cv" data-closed="'+NDA.closed+'" style="background:linear-gradient(120deg,'+c.join(',')+')"></div>'+
+      '<h3>'+it.title+'</h3><p>'+(it.tag||'')+'</p></div>');
+  });
+  document.querySelector('.list').innerHTML = html.join('');
+});
+</script>
+</body>
+</html>

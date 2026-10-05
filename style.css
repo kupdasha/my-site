@@ -264,6 +264,12 @@ img,video{display:block;max-width:100%}
 .case-ttl .yr{margin-left:0;padding-top:.15em}
 .ttl .yr{padding-top:.25em}
 .case-ttl .yr{font-size:clamp(16px,1.4vw,20px);padding-top:.5em}
+/* на телефоне год встает за последним словом названия, как в карточках: длинное слово не выталкивает его за экран */
+@media (max-width:760px){
+  .case-ttl{display:block}
+  .case-ttl .case-title{display:inline;overflow-wrap:break-word}
+  .case-ttl .yr{display:inline-block;vertical-align:top;margin-left:.3em;padding-top:.35em}
+}
 .work h3{font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.1}
 .work p{display:block;font-size:18px;line-height:1.35;margin-top:10px;max-width:44ch}
 .tag{flex:none;font-size:16px;line-height:1;padding:6px 12px 9px;border:2px solid currentColor;border-radius:99px}
@@ -344,7 +350,7 @@ img,video{display:block;max-width:100%}
 .case-shot img,.case-shot video{width:100%;height:auto}
 .case-shot.frame{position:relative;aspect-ratio:16/9}
 .case-shot.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-@media (max-width:760px){.case-deck .case-shot.frame{aspect-ratio:auto;height:min(78dvh,640px)}}   /* презентация на телефоне: окно выше, видно несколько слайдов */
+@media (max-width:760px){.case-deck .case-shot.frame{aspect-ratio:auto;width:100%;height:min(78dvh,640px)}}   /* презентация на телефоне: окно выше, видно несколько слайдов */
 /* кампании внутри кейса (поле campaigns): заголовок с числом, меню, текст в три колонки, макеты рядами */
 .camps-title{font-weight:500;font-size:clamp(32px,4vw,56px);line-height:1.05;margin-bottom:clamp(24px,3vw,40px)}
 .camps-count{font-size:.36em;font-weight:400;vertical-align:top;margin-left:.3em;position:relative;top:.35em;opacity:.55}
@@ -428,10 +434,20 @@ img,video{display:block;max-width:100%}
   .camp-name,.camp-head>.camp-col:nth-child(2),.camp-head>.camp-col:nth-child(3),.scheme-cols>.camp-col{grid-column:1 / -1 !important}
 }
 @media (max-width:760px){
-  .camp-row{flex-wrap:wrap}
-  .camp-row>.camp-shot{flex-basis:40%}
-  .camp-row>.camp-shot.frame{flex-basis:100%}
+  /* ряд макетов на телефоне — лента, которую листают пальцем: каждый макет крупно и целиком, без полей.
+     Ширина — 84% экрана, но высокие картинки не выше 62% экрана; следующий макет выглядывает справа */
+  .camp-row:not(.collage){flex-wrap:nowrap;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+    margin:0 calc(-1 * var(--pad));padding:0 var(--pad);scroll-padding:0 var(--pad)}
+  .camp-row:not(.collage)::-webkit-scrollbar{display:none}
+  .camp-row:not(.collage)>.camp-shot{flex:0 0 auto;width:min(84vw, 62dvh * var(--ar));scroll-snap-align:start}
+  .camp-row:not(.collage)>.camp-shot:only-child{width:100%}
+  /* коллаж на телефоне — столбиком: пропорции и сетка из content.js (они в style у элемента) отключаются */
+  .collage{aspect-ratio:auto!important;grid-template:none!important}
+  .collage-cell{flex:none}
 }
+/* длинный текст кейса: на планшете остается в две колонки, на телефоне — в одну */
+@media (max-width:600px){.case-text.cols2 p{columns:1}}
+
 @media (prefers-reduced-motion:reduce){.camp-shot.pre,.camp-shot.pre img{transition:none;opacity:1;transform:none;clip-path:none}}
 .case-links{row-gap:12px}
 .case-links .link{grid-column:5 / -1;font-size:19px;justify-self:start}
@@ -837,7 +853,8 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .work.s,.work.m,.work.l,.work.right.s,.work.right.m,.work.right.l{grid-column:1 / -1}
   .about{grid-template-columns:1fr}
   .portrait{max-width:420px}
-  .nda{grid-template-columns:1fr}
+  .nda{grid-template-columns:minmax(0,1fr)}
+  .nda-item .meta{flex-wrap:wrap;row-gap:8px}   /* длинное название и тег не распирают карточку на узком телефоне */
   .pod-player,.pod-list{grid-column:1 / -1}
   .pod-list{max-height:none;margin-top:24px}
   .switch-hint{right:auto;left:0;transform-origin:20% 0}
@@ -846,7 +863,6 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .case-text p,.case-more{grid-column:1 / -1}
   .case-award-row{grid-column:1 / -1}
   .case-team{grid-column:1 / -1;grid-template-columns:repeat(2,minmax(0,1fr))}
-  .case-text.cols2 p{columns:1}
 }
 @media (max-width:520px){
   .logo{display:none}
@@ -854,6 +870,8 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .h1{font-size:calc(10.2vw - 4px)}
   .hero{min-height:88svh}
   .h2{font-size:clamp(30px,9vw,72px)}
+  .contact .h2{font-size:clamp(30px,10.4vw,44px)}   /* «или подружимся?» не шире экрана даже на 320 */
+  .topic{grid-template-columns:1fr}   /* темы и биография на странице спикера — в одну колонку, текст не сжимается в столбик */
   .switch{font-size:15px;height:40px;gap:8px}
   .btn{height:52px;padding:0 22px 4px;font-size:17px}
   .big-btn{height:60px;padding:0 28px 4px;font-size:18px}
@@ -918,6 +936,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .bk.in .bk-code{opacity:.75}
 .bk-name{font-size:clamp(19px,1.8vw,26px);line-height:1.2;max-width:10ch}
 .bk-code{font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums}
+.bk-rgb{white-space:nowrap}
 .bk-sw::after{content:attr(data-done);position:absolute;left:clamp(18px,2.4vw,36px);bottom:clamp(18px,2.4vw,36px);font-size:16px;opacity:0;transition:opacity .25s}
 .bk.in .bk-sw.copied .bk-code{opacity:0;transition-delay:0s}
 .bk-sw.copied::after{opacity:1}
@@ -1089,6 +1108,10 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 @media (max-width:760px){
   .bk-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .bk-swatches{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bk-sw{padding:18px;gap:16px}
+  .bk-rgb{white-space:nowrap}
+  .bk-rgb-l{display:none}   /* на телефоне без «RGB ( )» — иначе строка не влезает */
+  .case-shot.frame.drive{aspect-ratio:4/5}   /* презентация на телефоне — выше, листать удобнее */
   .bk-sw{transform:translate(calc(-1 * var(--x2) * (100% + var(--gap))),calc(-1 * var(--y2) * (100% + var(--gap)))) rotate(calc((var(--i) - 2.5) * 5deg)) scale(.82)}
   /* три цвета на телефоне — столбиком, невысокими полосами: название слева, коды справа */
   .bk-n3 .bk-swatches{grid-template-columns:1fr}
@@ -1149,6 +1172,13 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .switch-big>i{width:92px;height:52px}
   .switch-big>i::after{width:42px;height:42px;top:5px;left:5px}
   .ty-switch{padding:10px 10px 10px 24px}
+}
+/* самые узкие телефоны (320): тумблер «перейти на ты» компактнее, чтобы влезал в строку */
+@media (max-width:359px){
+  .switch.switch-big{font-size:18px;gap:10px}
+  .switch-big>i{width:80px;height:46px}
+  .switch-big>i::after{width:36px;height:36px}
+  .ty-switch{padding:8px 8px 8px 18px;max-width:100%}
 }
 /* планшет: маленькие и средние карточки — по две в ряд, большие — во всю ширину */
 @media (min-width:601px) and (max-width:900px){

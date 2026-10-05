@@ -20,7 +20,7 @@ if (window.__kdApp) return; window.__kdApp = true;
   const onTilda = !document.querySelector('script[src="content.js"]');
   const base = src.replace(/app\.js(\?.*)?$/, '');
   if (onTilda && typeof SITE !== 'undefined') {
-    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/about'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/nda']];
+    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/about'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/n_d_a']];
     const fix = s => {
       if (s.startsWith('img/')) return base + s;
       for (const [re, to] of PAGES) if (re.test(s)) return s.replace(re, to).replace('/#', '/#').replace(/^\/\/+/, '/');
@@ -927,7 +927,7 @@ function brandkitHTML(b){
     <div class="bk-swatches">${b.colors.items.map((c, i) => `
       <button class="bk-sw${isLight(c.hex) ? ' on-light' : ''}" style="--c:${c.hex};--i:${i};--x3:${i % 3};--y3:${Math.floor(i / 3)};--x2:${i % 2};--y2:${Math.floor(i / 2)}" data-hex="${c.hex}" data-done="${T(b.colors.copied || 'скопировано')}">
         <span class="bk-name">${T(c.name)}</span>
-        <span class="bk-code">${c.hex}<br>RGB (${hexRGB(c.hex).join(', ')})</span>
+        <span class="bk-code">${c.hex}<br><span class="bk-rgb"><span class="bk-rgb-l">RGB (</span>${hexRGB(c.hex).join(', ')}<span class="bk-rgb-l">)</span></span></span>
       </button>`).join('')}</div></div>`;
   if (b.film) h += `<div class="wrap bk bk-film"><div class="bk-film-box" style="aspect-ratio:${b.film.ratio || 16 / 9}">
     <iframe src="${embedURL(parseMedia(b.film.video), true)}" allow="autoplay" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div></div>`;
@@ -1253,7 +1253,12 @@ function watchCampaigns(root){
   const box = camps || (root.querySelector('.camp-row') && root.querySelector('.case-body')); if (!box) return;
   // пропорции ячейки берутся из самой картинки — так ряд из разных форматов выходит одной высоты
   box.querySelectorAll('.camp-shot img').forEach(img => {
-    const set = () => img.naturalWidth && img.parentNode.style.setProperty('--ar', img.naturalWidth / img.naturalHeight);
+    const set = () => {
+      if (!img.naturalWidth) return;
+      const ar = img.naturalWidth / img.naturalHeight;
+      img.parentNode.style.setProperty('--ar', ar);
+      img.parentNode.classList.toggle('wide', ar > 1.3);   // широкий макет: на телефоне встает во всю ширину
+    };
     img.complete ? set() : img.addEventListener('load', set, { once: true });
   });
   // у каждого ряда свой характер появления, чтобы листать было не монотонно;
