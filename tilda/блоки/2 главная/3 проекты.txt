@@ -96,7 +96,7 @@ Object.assign(SITE, {
                 'Айдентика нового мессенджера: логотип, сайт, реклама и тулкит, чтобы подрядчики не гадали'],
         image: 'https://edge-ams-1.kinescopecdn.net/7e15cdff-4b7a-4226-a05e-7528f8d68441/posters/8c73e5a9-788d-4fd9-a072-ec8122d295dc/poster_lg/01a10bfe-5f66-7030-8287-2a34fd9086e0.jpg',   // обложка ролика с Kinescope
         video: 'kinescope:gPrajX5kZmXu3EshMX3raw',   // ролик: в сетке играет сам без звука, в начале кейса — по кнопке
-        preview: 'img/max-preview.mp4',
+        preview: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/max-preview.mp4',
         /* heroNote — подпись под роликом в начале кейса */
         heroNote: ['Также понемногу подключалась к раскадровкам этого ролика.', 'А еще по мелочи помогала с раскадровками этого ролика'],
         /* deck — презентация в самом конце кейса, листается прямо на странице (Google Диск: 'drive:ID') */
@@ -335,8 +335,8 @@ Object.assign(SITE, {
                     { area: 'a', img: 'https://static.tildacdn.com/tild6538-6664-4630-b636-306438666337/vk-ny-wide.jpg' },
                     { area: 'b', img: 'https://static.tildacdn.com/tild3962-3234-4639-b937-343461383366/vk-ny-vertical.jpg' },
                     { area: 'c', img: 'https://static.tildacdn.com/tild3838-3138-4162-a634-646132366437/vk-ny-square.jpg' },
-                    { area: 'd', img: ['https://static.tildacdn.com/tild6637-3462-4036-a235-386431313630/vk-ny-320x480.jpg', 'https://static.tildacdn.com/tild3832-3262-4563-b634-383839616337/vk-ny-240x600.jpg', 'img/vk/vk-ny-narrow-tall.jpg'] },
-                    { area: 'e', img: ['https://static.tildacdn.com/tild3232-3532-4335-b137-636535393162/vk-ny-970x250.jpg', 'https://static.tildacdn.com/tild6134-3462-4635-a331-613333313264/vk-ny-970x200.jpg', 'img/vk/vk-ny-thin-strip.jpg'], dir: 'column' },
+                    { area: 'd', img: ['https://static.tildacdn.com/tild6637-3462-4036-a235-386431313630/vk-ny-320x480.jpg', 'https://static.tildacdn.com/tild3832-3262-4563-b634-383839616337/vk-ny-240x600.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/vk/vk-ny-narrow-tall.jpg'] },
+                    { area: 'e', img: ['https://static.tildacdn.com/tild3232-3532-4335-b137-636535393162/vk-ny-970x250.jpg', 'https://static.tildacdn.com/tild6134-3462-4635-a331-613333313264/vk-ny-970x200.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/vk/vk-ny-thin-strip.jpg'], dir: 'column' },
                   ],
                 } },
               { caption: ['моя рука на съемке для вертикальных версий баннеров — подробнее в статье о процессе', 'да, это моя рука — вся история в статье'],
@@ -398,27 +398,27 @@ Object.assign(SITE, {
         video: 'vimeo:931777735',
         /* галерея кейса. Первые четыре строки встают после блоков «задача», «роль», «решение», «результат»,
            остальные — следом. { row: [ ... ], caption: 'подпись' } — ряд макетов одной высоты;
-           ролик mp4 в ряду — объектом { video: 'img/...mp4', ratio: ширина / высота }.
+           ролик mp4 в ряду — объектом { video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/...mp4', ratio: ширина / высота }.
            Картинки и ролики — в img/inclusion (нарезаны из кейса на Behance), увеличиваются по нажатию */
         gallery: [
           { caption: ['знак: форма из логотипа VK', 'квадрат VK учится быть кем угодно'],
-            row: [ 'img/inclusion/inc-light-shapes.jpg', 'img/inclusion/inc-plate.jpg' ] },
+            row: [ 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-light-shapes.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-plate.jpg' ] },
           { caption: ['четыре символа: квадрат превращается в круг, пятиугольник и сердце', 'четыре символа'],
-            row: [ { video: 'img/inclusion/inc-shape.mp4', ratio: 1, blend: true }, { video: 'img/inclusion/inc-symbols.mp4', ratio: 1 } ] },
-          'img/inclusion/inc-hall.jpg',
+            row: [ { video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-shape.mp4', ratio: 1, blend: true }, { video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-symbols.mp4', ratio: 1 } ] },
+          'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-hall.jpg',
           { caption: ['сайт и трансляция с окном сурдопереводчика', 'сайт и трансляция, где сурдопереводчика видно'],
-            row: [ { video: 'img/inclusion/inc-site.mp4', ratio: 1488 / 1108 }, { video: 'img/inclusion/inc-stream.mp4', ratio: 1488 / 1108 } ] },
+            row: [ { video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-site.mp4', ratio: 1488 / 1108 }, { video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-stream.mp4', ratio: 1488 / 1108 } ] },
           { caption: ['анонсы', 'анонсы'],
-            row: [ 'img/inclusion/inc-stories-1.jpg', 'img/inclusion/inc-stories-2.jpg', 'img/inclusion/inc-stories-3.jpg' ] },
-          { row: [ 'img/inclusion/inc-banner-1.jpg', 'img/inclusion/inc-banner-2.jpg' ] },
+            row: [ 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-stories-1.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-stories-2.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-stories-3.jpg' ] },
+          { row: [ 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-banner-1.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-banner-2.jpg' ] },
           { caption: ['навигация и браслеты с символами', 'браслет, который собирают по пути'],
-            row: [ { video: 'img/inclusion/inc-nav.mp4', ratio: 1488 / 936 } ] },
-          { row: [ 'img/inclusion/inc-bracelet.jpg', 'img/inclusion/inc-pack.jpg', 'img/inclusion/inc-guest-hand.jpg' ] },
+            row: [ { video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-nav.mp4', ratio: 1488 / 936 } ] },
+          { row: [ 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-bracelet.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-pack.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-guest-hand.jpg' ] },
           { caption: ['мерч', 'худи с символами'],
-            row: [ 'img/inclusion/inc-hoodie.jpg', 'img/inclusion/inc-team.jpg' ] },
+            row: [ 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-hoodie.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-team.jpg' ] },
           { caption: ['на площадке', 'как это было'],
-            row: [ 'img/inclusion/inc-group.jpg', 'img/inclusion/inc-guest-ok.jpg' ] },
-          { row: [ 'img/inclusion/inc-interview.jpg', 'img/inclusion/inc-heart.jpg', 'img/inclusion/inc-guest-peace.jpg' ] },
+            row: [ 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-group.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-guest-ok.jpg' ] },
+          { row: [ 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-interview.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-heart.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/inc-guest-peace.jpg' ] },
           { caption: ['гости делились в соцсетях', 'гости выкладывали сторис'],
             /* ratio — пропорции ячейки (чем больше число, тем ниже полоса), frame — пропорции самого ролика */
             row: [ { video: 'vimeo:934082803', ratio: 1.9, frame: 266 / 240, loop: true, blend: true } ] },
@@ -439,7 +439,7 @@ Object.assign(SITE, {
         /* twoCols — какие блоки схемы набрать мельче, в две колонки */
         twoCols: ['solution'],
         /* award — ярлык премии рядом с результатом: ring — картинка кольца, title — подсказка для экранных дикторов */
-        award: { ring: 'img/inclusion/award-ring.png', title: 'Событие года 2024' },
+        award: { ring: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/inclusion/award-ring.png', title: 'Событие года 2024' },
         scheme: {
           task:     'VK Инклюзия — первая в России очная конференция о цифровой доступности для разработчиков, дизайнеров, продакт-менеджеров и бизнеса. Прошла 27 октября 2023 года в Москве и онлайн. Мероприятие рассказывало о людях, которые воспринимают мир иначе. Оформление должно было объяснять разные особенности восприятия и при этом работать для всех гостей.',
           role:     'Оформила мероприятие в паре с дизайн-лидом Владимиром Дорониным: анимация, офлайн-материалы, специальные окна для трансляции с сурдопереводом и дополнительное окно на сцене.',   // ПРОВЕРЬ: за что отвечала лично
@@ -454,7 +454,7 @@ Object.assign(SITE, {
         tag:   'аудит',
         short: ['Задача сформировать предложение, как доносить на сайте ключевые УТП и соблюдать консистентность.',
                 'Придумала, как рассказывать о диванах так, чтобы по будущему интерьеру хотелось погулять'],
-        image: 'img/divan.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan.jpg',
         video: 'drive:1zYzGNkNKf6pmL1NomXlHlms_5Yt1nFsE',
         link:  'https://kupdasha.ru/design',
         story: [
@@ -469,7 +469,7 @@ Object.assign(SITE, {
         tag:   'логотип',
         short: ['Юбилейный знак к 25-летию компании',
                 'Купила 25 манго и объелась'],
-        image: 'img/mango.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/mango.jpg',
         gallery: [
           'https://static.tildacdn.com/tild6132-3233-4631-b730-316535373737/2.jpg',
           'drive:15LxwjUt5Qrl1Y_DjmMIiuLwlxtc1kPcJ',
@@ -518,7 +518,7 @@ Object.assign(SITE, {
         title: 'ребрендинг VK Creative',
         year:  '2025',
         tag:   'ребрендинг',
-        image: 'img/vk-creative.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/vk-creative.jpg',
         gallery: [
           'https://static.tildacdn.com/tild3637-6634-4336-b166-313534666164/concept.jpg',
           'https://static.tildacdn.com/tild3166-6265-4564-a161-636231323061/concept_1.jpg',
@@ -609,7 +609,7 @@ Object.assign(SITE, {
         tag:   'вайб-кодинг',
         short: ['Проблема: разработка навигации требует большого количества разных технических ограничений и при этом большого количества бордов, которые трудно менеджерить и навигироваться.',
                 'Когда надоело гулять только по панорамам карт'],
-        image: 'img/navigation.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/navigation.jpg',
         video: 'kinescope:for2vJM7erLBrm68eiu6gD',
         link:  'https://kupdasha.ru/vaib',
         links: [
@@ -629,7 +629,7 @@ Object.assign(SITE, {
         tag:   'вайб-кодинг',
         short: ['Проблема: большинство презентаций скучные, а все опросы на мероприятиях проводятся через поднятие рук.',
                 'Лес рук больше не будет проблемой'],
-        image: 'img/presentations.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/presentations.jpg',
         video: 'kinescope:wu85KePyXNyEpc9HBNquBN',
         link:  'https://kupdasha.ru/vaib',
         links: [
@@ -647,7 +647,7 @@ Object.assign(SITE, {
         tag:   'вайб-кодинг',
         short: ['Проблема: зарубежные пакеты недоступны, отечественные аналоги повторяют ту же логику — отдельная программа под каждый тип файла, а за QR-кодом или страницей сотрудник все равно выходит в интернет, чего в контуре делать нельзя.',
                 'Помогаю людям считать счетчики на воду и электричество в экселе'],
-        image: 'img/russkiy-ofis.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/russkiy-ofis.jpg',
         pos:   'left center',   // картинка прижата к левому краю обложки
         gallery: [
           'https://static.tildacdn.com/tild6434-3739-4435-b561-643339356365/__2026-08-02_143136.png',
@@ -672,7 +672,7 @@ Object.assign(SITE, {
         short: ['Проблема: чтобы получить ответ от ИИ, документ надо отдать — со всеми названиями компаний, фамилиями, счетами и суммами.',
                 '"Ромашка" превращается в "Тавеслу", а юристы перестают закрывать вкладку.'],
         image: 'https://static.tildacdn.com/tild6362-3133-4464-a533-656565663638/Frame_3.jpg',
-        video: 'img/anonymizer.mp4',   // зациклено, играет само без звука
+        video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/anonymizer.mp4',   // зациклено, играет само без звука
         frost: true,
         link:  'https://kupdasha.ru/vaib',
         links: [
@@ -720,7 +720,7 @@ Object.assign(SITE, {
         tag:   'вайб-кодинг',
         short: ['Вы ведете активно соц сети и пришли на евент.',
                 'Теперь можно не бояться чихнуть на фото'],
-        image: 'img/ispravlyator.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/ispravlyator.jpg',
         video: 'kinescope:nKUu3sbT1d246RoCWUBFxT',
         headed: true,   // абзацы идут парами: подзаголовок, затем текст
         link:  'https://kupdasha.ru/vaib',
@@ -743,7 +743,7 @@ Object.assign(SITE, {
         tag:   'вайб-кодинг',
         short: ['Проблема: плагины векторизации в Figma платные, оплата зарубежных сервисов затруднена, а встроенный агент Figma дает результат без контроля — нет ни толщины линий, ни количества точек, ни сглаживания.',
                 'Поможет сделать векторную птичку и даже сгенерировать, если ты все еще жмешь денег на подписку на нейросети'],
-        image: 'img/vectorizer.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/vectorizer.jpg',
         gallery: [
           'https://static.tildacdn.com/tild6262-3836-4535-b861-383133613338/__2026-08-02_145604.png',
         ],
@@ -763,7 +763,7 @@ Object.assign(SITE, {
         tag:   'вайб-кодинг',
         short: ['Проблема: время варки зависит от температуры яйца и воды, а таймеры дают одно число на все случаи.',
                 'Таймер, который знает, что яйцо из холодильника и яйцо со стола - разные истории'],
-        image: 'img/egg-timer.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/egg-timer.jpg',
         link:  'https://kupdasha.ru/vaib',
         links: [
           { text: 'демо', link: 'https://snowy-rice-b09d.kupdaria26.workers.dev/' },
@@ -808,8 +808,8 @@ Object.assign(SITE, {
         tag:   'AI',
         short: ['Задача: снять клип с одной актрисой, десятком локаций и невозможной архитектурой — без съёмочной группы, без павильона и без бюджета на построение декораций.',
                 'Клип для тех, у кого не получилось накопить два ляма на съемки'],
-        image: 'img/clip-preview.jpg',
-        preview: 'img/clip-preview.mp4',   // легкий ролик для сетки, грузится быстро
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/clip-preview.jpg',
+        preview: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/clip-preview.mp4',   // легкий ролик для сетки, грузится быстро
         video: 'vk:-148654317_456239118',
         link:  'https://kupdasha.ru/video',
         story: [
@@ -840,8 +840,8 @@ Object.assign(SITE, {
         tag:   'AI',
         short: ['Мультик, где каждая сцена сгенерирована на JavaScript и адаптирована потом под рилсы.',
                 'Робот все-таки смог и сочинить симфонию, и нарисовать мультфильм'],
-        image: 'img/cartoon-preview.jpg',
-        preview: 'img/cartoon-preview.mp4',   // легкий ролик для сетки, грузится быстро
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/cartoon-preview.jpg',
+        preview: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/cartoon-preview.mp4',   // легкий ролик для сетки, грузится быстро
         video: 'vk:-226119573_456240084',
         link:  'https://kupdasha.ru/video',
         story: [
@@ -886,8 +886,8 @@ Object.assign(SITE, {
         tag:   'CG',
         short: ['За две недели и почти без бюджета мы с моушен-дизайнером сделали ролик для парфюма с ароматом самолета.',
                 'Оказывается, самолеты тоже пахнут, и без спирта'],
-        image: 'img/rostech.jpg',
-        preview: 'img/rostech.mp4',   // тихое зацикленное превью в сетке; в кейсе — ролик со звуком с Rutube
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/rostech.jpg',
+        preview: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/rostech.mp4',   // тихое зацикленное превью в сетке; в кейсе — ролик со звуком с Rutube
         video: 'rutube:363948af65ff07ac12812d2c3b3dcfef',
         link:  'https://kupdasha.ru/video',
         story: [
@@ -901,7 +901,7 @@ Object.assign(SITE, {
         tag:   'мерч',
         short: ['Бренд «Нате, носите» вместе с проектом «Где моё внимание?» выпустили общую капсулу, которая поддерживает людей с СДВГ.',
                 'Футболки для тревожников, которым хочется теребить что-то в руках'],
-        image: 'img/sdvg.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/sdvg.jpg',
         gallery: [
           'https://static.tildacdn.com/tild6238-6333-4437-b930-663733383163/hf_20260311_060941_a.jpg',
           'https://static.tildacdn.com/tild3965-6166-4137-a537-373136336632/5.jpg',
@@ -1027,7 +1027,7 @@ Object.assign(SITE, {
         title: 'VK Play, универсальный стенд',
         year:  '2024',
         tag:   'стенд',
-        image: 'img/vk-play.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/vk-play.jpg',
         video: 'drive:1u-SaqmQspOZcpe9LJoc52HYg7uk7LZ4E',
         link:  'https://kupdasha.ru/stands',
         story: [
@@ -1134,7 +1134,7 @@ Object.assign(SITE, {
         title: 'T2, оформление конференции',
         year:  '2020',
         tag:   'стенд',
-        image: 'img/t2.jpg',
+        image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/t2.jpg',
         gallery: [
           'https://static.tildacdn.com/tild3332-3733-4336-b631-366663393261/__1_.png',
           'https://static.tildacdn.com/tild6230-3939-4130-b435-373565623830/__1.png',

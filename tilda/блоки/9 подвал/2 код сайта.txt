@@ -1,0 +1,2 @@
+<!-- КОД САЙТА: движок, переливы и дружеская версия. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
+<script>(function(){var B='https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/',v=Math.floor(Date.now()/36e5);['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>

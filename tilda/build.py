@@ -26,8 +26,12 @@ def read(name):
 # адреса страниц на Тильде
 LINKS = [("'index.html#", "'/#"), ("'index.html'", "'/'"), ("'about.html'", "'/about'"), ("'speaker.html'", "'/speaker'")]
 
-# свои картинки и видео из папки img: на Тильде у них другие адреса.
-# Адреса записываются в tilda/адреса файлов.txt строками «имя файла = адрес»
+# Код, стили, картинки и видео лежат на GitHub (kupdasha/my-site) и раздаются через jsDelivr.
+# Блоки в Тильде на них только ссылаются: обновил файлы на GitHub — сайт подхватил сам.
+CDN = 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/'
+
+# Если картинку все же загрузили на Тильду, ее адрес можно вписать в tilda/адреса файлов.txt
+# строкой «имя файла = адрес» — тогда возьмется он, а не GitHub
 FILES = {}
 MAP = os.path.join(HERE, 'адреса файлов.txt')
 if os.path.exists(MAP):
@@ -42,8 +46,7 @@ def tildify(text):
     def file(m):
         name = m.group(1)
         if name in FILES: return "'" + FILES[name] + "'"
-        print(f'  нет адреса на Тильде для img/{name} — впишите его в «адреса файлов.txt»')
-        return m.group(0)
+        return "'" + CDN + 'img/' + name + "'"
     return re.sub(r"'img/([^']+)'", file, text)
 
 
@@ -114,7 +117,9 @@ def css_block():
             f'{fonts}\n'
             '<!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->\n'
             "<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>\n"
-            f'<style>\n{read("style.css")}\n</style>')
+            # стили берутся с GitHub; ?v= меняется раз в час, чтобы браузер не держал старую версию
+            "<script>(function(){var B='" + CDN + "',v=Math.floor(Date.now()/36e5);"
+            "document.write('<link rel=\"stylesheet\" href=\"'+B+'style.css?v='+v+'\">')})()</script>")
 
 def shared_block():
     body = '\n\n'.join(regions[k] for k in SHARED)
@@ -127,9 +132,12 @@ def shared_block():
 def page_block(sid, group, note):
     return f'{sections[sid]}\n\n' + (data(group, note) if group else '')
 
-def js_block(names, note, extra=''):
-    code = '\n\n'.join(read(n) for n in names)
-    return f'<!-- {note} Это код, тексты здесь не правятся. -->\n{extra}<script>\n{code}\n</script>'
+def js_block(names, note):
+    # файлы кода подключаются с GitHub по порядку; ?v= меняется раз в час
+    files = ','.join(f"'{n}'" for n in names)
+    return (f'<!-- {note} Это код, тексты здесь не правятся: сам код лежит на GitHub. -->\n'
+            f"<script>(function(){{var B='{CDN}',v=Math.floor(Date.now()/36e5);"
+            f"[{files}].forEach(function(f){{document.write('<script src=\"'+B+f+'?v='+v+'\"><\\/script>')}})}})()</script>")
 
 BLOCKS = {
     '1 шапка': [
@@ -145,9 +153,7 @@ BLOCKS = {
     ],
     '9 подвал': [
         ('1 служебные кнопки и окно кейса', f'<!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->\n{service_html}'),
-        ('2 движок сайта', js_block(['app.js'], 'ДВИЖОК: показ текстов, переключатель, кейсы, игра.')),
-        ('3 переливы', js_block(['waves.js', 'shimmer.js'], 'ПЕРЕЛИВЫ: волны на обложках и точки на первом экране.')),
-        ('4 дружеская версия', js_block(['fun.js'], 'ДРУЖЕСКАЯ ВЕРСИЯ: бегающие кнопки, многоножка, НЛО и прочее.')),
+        ('2 код сайта', js_block(['app.js', 'waves.js', 'fun.js', 'shimmer.js'], 'КОД САЙТА: движок, переливы и дружеская версия.')),
     ],
 }
 
@@ -169,6 +175,6 @@ with open(os.path.join(HERE, 'проверка.html'), 'w', encoding='utf-8') as
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Проверка блоков для Тильды</title>\n'
             '</head>\n<body>\n<div id="allrecords" class="t-records">\n')
     for folder, name, html in order:
-        f.write(f'<div class="r t-rec" data-record-type="131"><!-- {folder} / {name} -->\n{html}\n</div>\n')
+        f.write(f'<div class="r t-rec" data-record-type="131"><!-- {folder} / {name} -->\n{html.replace(CDN, "../")}\n</div>\n')
     f.write('</div>\n</body>\n</html>\n')
 print('готово: tilda/блоки и tilda/проверка.html')
