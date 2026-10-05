@@ -10,7 +10,7 @@
 - Превью: конфиг studia-preview (порт 8641) → http://localhost:8641/kupdasha/
 
 ## Как устроены проекты
-Поля проекта в `SITE.works.items`: `title`, `year` (маленькая цифра у названия; годы не дублировать в тегах и описаниях), `tag`, `short` (пара), `image`, `pos` (сдвиг обложки), `video`, `preview` (тихое видео для сетки: mp4, Vimeo или Kinescope), `ratio` (пропорции ролика, если не 16:9), `note` (приписка под описанием кейса), `heroNote` (подпись под роликом), `deck` (презентация в конце, `drive:ID`), `brandkit` (живой блок «логотип и цвета», см. MAX), `gallery`, `story` или `scheme` {task, role, solution, result}, `labels`, `links`, `frost`, `other: true` (в «другие работы»).
+Поля проекта в `SITE.works.items`: `title`, `year` (маленькая цифра у названия; годы не дублировать в тегах и описаниях), `tag`, `short` (пара), `image`, `pos` (сдвиг обложки), `video`, `preview` (тихое видео для сетки: mp4, Vimeo или Kinescope), `ratio` (пропорции ролика, если не 16:9), `note` (приписка под описанием кейса), `heroNote` (подпись под роликом), `deck` (презентация после описания: `drive:ID` — окно с PDF, или список картинок — слайды один под другим), `brandkit` (живой блок «логотип и цвета», см. MAX), `gallery`, `story` или `scheme` {task, role, solution, result}, `labels`, `links`, `frost`, `other: true` (в «другие работы»).
 Порядок в списке = порядок на сайте. Первые пять — сильнейшие кейсы для лида.
 
 ## Тильда
