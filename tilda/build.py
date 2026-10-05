@@ -53,7 +53,8 @@ def tildify(text):
 # ---------- тексты: content.js режется на разделы верхнего уровня ----------
 content = read('content.js')
 lines = content.split('\n')
-start = next(i for i, l in enumerate(lines) if l.startswith('const SITE = {'))
+# начало текстов: «const SITE = {» или «var SITE = window.SITE = {»
+start = next(i for i, l in enumerate(lines) if re.match(r'(const|var|let) SITE\b.*= \{', l))
 end = max(i for i, l in enumerate(lines) if l.startswith('};'))
 intro = '\n'.join(lines[:start]).rstrip()          # большой комментарий «как устроены тексты»
 
