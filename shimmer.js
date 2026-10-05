@@ -258,9 +258,12 @@ const started = performance.now();
 new IntersectionObserver(es => visible = es[0].isIntersecting).observe(hero);
 
 function frame(now){
-  const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
   if (!reduced) requestAnimationFrame(frame);
-  if (!visible || document.body.classList.contains('locked')) return;
+  draw(now);
+}
+function draw(now, force){
+  const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+  if (!force && (!visible || document.body.classList.contains('locked'))) return;
 
   time  += reduced ? 0 : dt * SHIMMER.speed;
   intro  = reduced ? 9 : (now - started) / 1000;   // появление идет по реальному времени
@@ -299,4 +302,6 @@ function frame(now){
 requestAnimationFrame(frame);
 /* при уменьшенном движении — один неподвижный кадр, перерисовка при смене версии */
 if (reduced) addEventListener('shimmer:ripple', () => requestAnimationFrame(frame));
+/* сменили версию — сразу рисуем кадр в новых цветах, чтобы шторка не показала старый фон */
+addEventListener('theme:apply', () => draw(performance.now(), true));
 })();

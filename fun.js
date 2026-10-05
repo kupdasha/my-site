@@ -30,6 +30,7 @@
    Ниже — всё, что можно спокойно менять.
    ================================================================ */
 const FUN = {
+  frostShare: 0.3,   // какую долю работ в выбранной категории покрывает иней (0.3 — 30%)
   runners: {
     speed:      130,   // скорость бега кнопок, px в секунду
     fleeSpeed:  260,   // скорость, с которой бегунья убегает от курсора
@@ -139,7 +140,8 @@ function setupRunners(){
   runners.forEach(removeLegs);
   runners = []; groups = [];
   if (!on) return;
-  runners = [...document.querySelectorAll('main .btn, main .hero-link')].map(addLegs);
+  // кнопки страницы (в прототипе — внутри main, на Тильде main нет), кроме шапки, кейса и сообщений
+  runners = [...document.querySelectorAll('.btn, .hero-link')].filter(el => !el.closest('.head, .case, .toasts, .fab')).map(addLegs);
   runners.forEach(freeRange);
   // характеры: по строкам
   const rows = new Map();
@@ -341,7 +343,7 @@ function setupHeadings(){
   heads.forEach(h => h.letters.forEach(ch => { ch.style.translate = ''; ch.style.rotate = ''; }));
   heads = [];
   if (!on) return;
-  [...document.querySelectorAll('main .h2, main .clients-title')].forEach((el, k) => {
+  [...document.querySelectorAll('.h2, .clients-title')].filter(el => !el.closest('.case')).forEach((el, k) => {
     const letters = [...el.querySelectorAll('.ch')];
     if (!letters.length) return;
     const words = [...el.querySelectorAll('.wd')];
@@ -690,7 +692,7 @@ function setupUfo(){
 /* что можно украсть: видно на экране, не в шапке, еще не украдено */
 function pickTarget(){
   const list = [...document.querySelectorAll(STEAL)].filter(el => {
-    if (ufo.loot.some(l => l.el === el) || el.closest('.case')) return false;
+    if (ufo.loot.some(l => l.el === el) || el.closest('.case, #hero')) return false;
     const r = el.getBoundingClientRect();
     return r.width > 12 && r.top > 140 && r.bottom < innerHeight - 90;
   });
@@ -717,6 +719,8 @@ function updateUfo(dt, now){
   ufo.el.style.visibility = ufo.beam.style.visibility = hidden ? 'hidden' : '';
   if (hidden) return;
   let tx = ufo.x, ty = ufo.y, k = 0.03;
+  // вернулись на первый экран — НЛО улетает: оно живет только со второго блока
+  if (ufo.state !== 'wait' && ufo.state !== 'leave' && scrollY < innerHeight * 0.8) ufo.state = 'leave';
   if (ufo.state === 'wait') {
     tx = -260; ty = 120;
     if (now > ufo.until && scrollY > innerHeight * 0.8) { ufo.state = 'fly';   // на первом экране НЛО не появляется
@@ -849,10 +853,14 @@ function setupFog(){
   fogs.forEach(f => { f.c.remove(); f.media.removeEventListener('pointermove', f.onMove); f.media.removeEventListener('pointerleave', f.onLeave); });
   fogs = [];
   if (!on) return;
-  // иней только на тех кейсах, у которых в content.js стоит frost: true
-  fogs = [...document.querySelectorAll('#workList .work')]
-    .filter(w => SITE.works.items[+w.dataset.k] && SITE.works.items[+w.dataset.k].frost)
-    .map(w => makeFog(w.querySelector('.media')));
+  // иней: на кейсах с frost: true и еще на стольких, чтобы в выбранной категории
+  // протирать пришлось не меньше FUN.frostShare работ (остальные берутся через одну, равномерно)
+  const works = [...document.querySelectorAll('#workList .work')];
+  const need = Math.ceil(works.length * FUN.frostShare);
+  const chosen = new Set(works.filter(w => SITE.works.items[+w.dataset.k]?.frost));
+  const step = works.length / Math.max(1, need);
+  for (let i = 0; chosen.size < need && i < works.length * 2; i++) chosen.add(works[Math.floor((i * step + 1) % works.length)]);
+  fogs = works.filter(w => chosen.has(w)).map(w => makeFog(w.querySelector('.media')));
 }
 
 
@@ -978,6 +986,7 @@ function refresh(){
   setupFog();
   setupSecrets();
 }
+addEventListener('theme:apply', refresh);   // сменили версию — убираем или включаем всё сразу, до снимка шторки
 new MutationObserver(() => setTimeout(refresh, 60)).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 desktop.addEventListener('change', refresh);
 let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { sizeCanvas(); if (bug.mode === 'frame') resetTrail(); setupRunners(); setupFog(); setupSecrets(); }, 200); });

@@ -6,7 +6,7 @@
 <title>Дарья Купцова — дизайн и нейросети</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <!-- версия (светлая или темная) выставляется сразу, чтобы страница не мигала -->
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>
@@ -25,7 +25,7 @@
     <span class="logo" data-text="name"></span>
     <nav class="nav" id="nav"></nav>
     <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-      <i></i><span data-text="switchLeft"></span><span data-text="switchRight"></span>
+      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
       <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
     </button>
   </div>
@@ -69,6 +69,13 @@
       </div>
       <div class="chips" id="workFilters" data-reveal></div>
       <div class="works" id="workList"></div>
+      <!-- Другие работы: проекты с other: true в content.js -->
+      <div class="other-works" id="otherWorks">
+        <h3 class="other-title" data-reveal data-text="works.otherTitle"></h3>
+        <div class="articles" id="otherList"></div>
+      </div>
+      <!-- те же фильтры еще раз: нажатие возвращает к началу проектов -->
+      <div class="chips chips-end" id="workFiltersEnd" data-reveal></div>
     </div>
   </section>
 
@@ -80,16 +87,30 @@
         <p class="sec-note" data-reveal data-text="nda.note"></p>
       </div>
       <div class="nda" id="ndaList"></div>
-      <div class="ctas nda-cta" data-reveal><a class="btn btn-accent" data-href="telegram"><span data-text="nda.button"></span><span class="arr">→</span></a><a class="btn btn-line" data-href="nda.link"><span data-text="nda.button2"></span><span class="arr">→</span></a></div>
+      <!-- закрытые карточки под градиентом: проектов больше, покажу на встрече -->
+      <div class="nda nda-more" id="ndaMore"></div>
+      <div class="ctas nda-cta" data-reveal><a class="btn btn-accent" data-href="telegram"><span data-text="nda.button"></span><span class="arr">→</span></a></div>
     </div>
   </section>
 
   <!-- Контакт -->
   <section class="contact" id="contact">
     <div class="wrap">
-      <h2 class="h2 center" data-reveal data-text="contact.title"></h2>
-      <p class="lead" data-reveal data-text="contact.lead"></p>
-      <div class="ctas contact-links" id="contactLinks" data-reveal></div>
+      <!-- Конец страницы: написать или переключиться на дружескую версию.
+           Тумблер справа работает как в шапке и возвращает в начало страницы -->
+      <div class="ty" data-reveal>
+        <h2 class="h2" data-text="contact.title"></h2>
+        <p class="lead" data-text="contact.lead"></p>
+        <div class="ty-row">
+          <div class="ctas contact-links" id="contactLinks"></div>
+        </div>
+        <!-- радужный перелив только под тумблером -->
+        <div class="ty-switch" data-waves data-colors="#E2FB5A,#B9F5C8,#BCD6FE,#E3D2FD" data-speed=".8">
+          <button class="switch switch-big" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+            <span data-text="contact.switch"></span><i></i>
+          </button>
+        </div>
+      </div>
       <div class="ttt" id="ttt" data-reveal></div>
       <footer class="foot">
         <span data-text="footer.left"></span>

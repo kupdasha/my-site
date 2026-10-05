@@ -27,8 +27,19 @@ const $$ = s => [...document.querySelectorAll(s)];
 
 /* Какая версия включена: 0 — формальная (светлая), 1 — дружеская (темная) */
 const isFun = () => root.dataset.theme === 'dark';
-const isAboutPage = document.body.classList.contains('page-about');
-const isSpeakerPage = document.body.classList.contains('page-speaker');
+/* Какая это страница: в прототипе — класс у body, на Тильде — атрибут data-page у раздела */
+const isAboutPage = document.body.classList.contains('page-about') || !!document.querySelector('[data-page="about"]');
+const isSpeakerPage = document.body.classList.contains('page-speaker') || !!document.querySelector('[data-page="speaker"]');
+/* Разделы, которых нет на этой странице (на Тильде у каждой страницы свои тексты), — пустые */
+['works', 'nda', 'directions', 'clients', 'about'].forEach(k => { SITE[k] = SITE[k] || {}; });
+SITE.works.items = SITE.works.items || []; SITE.nda.items = SITE.nda.items || [];
+SITE.directions.items = SITE.directions.items || []; SITE.clients.items = SITE.clients.items || [];
+SITE.about.facts = SITE.about.facts || [];
+/* Адрес главной: в прототипе index.html, на Тильде — / (задается в общих текстах) */
+const HOME = SITE.homePage || 'index.html';
+/* Ведет ли ссылка на эту же страницу: сравниваем адреса без index.html и .html */
+const pathOf = u => new URL(u || location.href, location.href).pathname.replace(/index\.html$/, '').replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const samePage = link => pathOf(link.split('#')[0] || location.href) === pathOf();
 /* Из пары ['формально', 'по-дружески'] берем нужную строку */
 const pick  = v => Array.isArray(v) ? v[isFun() ? 1 : 0] : v;
 /* Достать значение из content.js по пути вида 'hero.title' */
@@ -42,6 +53,8 @@ const SHORT = 'без|для|изо|над|под|про|при|что|как|и
 
 function typograf(input){
   let s = String(input ?? '');
+  // точка разделяет предложения; если предложение одно, точка в конце не нужна (многоточие не трогаем)
+  if (!/[.!?…](?=\s+["«„(]?[A-ZА-ЯЁ0-9])/.test(s.trim())) s = s.replace(/(?<!\.)\.\s*$/, '');
   s = s.replace(/…/g, '...');                                  // § 164: многоточие — три точки
   s = s.replace(/(^|[\s (\[—-])"/g, '$1«').replace(/"/g, '»'); // § 104: «елочки»
   s = nestQuotes(s);                                                //         внутри — „лапки“
@@ -113,27 +126,30 @@ function renderTexts(){
   });
   $$('[data-href]').forEach(el => el.href = get(el.dataset.href));
   document.title = pick(isSpeakerPage ? SITE.speaker.pageTitle : isAboutPage ? SITE.about.pageTitle : SITE.pageTitle);
-  $('#photo').src = SITE.about.photo;
+  if (SITE.about.photo) $('#photo').src = SITE.about.photo;
 }
 
 function renderLists(){
-  const here = location.pathname.split('/').pop() || 'index.html';
   $('#nav').innerHTML = SITE.nav.map(n => {
-    const page = n.link.split('#')[0];
-    return page === here && !n.link.includes('#')
+    const here = samePage(n.link);
+    return here && !n.link.includes('#')
       ? `<span class="nav-here" aria-current="page">${T(n.text)}</span>`
-      : `<a class="link" href="${page === here ? '#' + n.link.split('#')[1] : n.link}">${T(n.text)}</a>`;
+      : `<a class="link" href="${here ? '#' + n.link.split('#')[1] : n.link}">${T(n.text)}</a>`;
   }).join('');
 
   $('#facts').innerHTML = SITE.about.facts.map((f, k) =>
     `<div class="fact" data-reveal style="--d:${k * 0.06}s"><span>${T(f.name)}</span><span>${T(f.detail)}</span></div>`).join('');
+
+  // курсы — таким же списком, как награды
+  if (SITE.about.courses) $('#courses').innerHTML = SITE.about.courses.map((f, k) =>
+    `<div class="fact" data-reveal style="--d:${k * 0.06}s"><span>${T(f.school)}</span><span>${T(f.title)}</span></div>`).join('');
 
   $('#clients').innerHTML = SITE.clients.items.map((c, k) => {
     const i = c.project ? SITE.works.items.findIndex(w => w.title === c.project) : -1;
     const style = `--d:${(k * 0.03).toFixed(2)}s;${c.color ? `--c:${c.color}` : ''}`;
     const cls = `client${c.color ? ' tinted' : ''}`;
     return i >= 0
-      ? `<a class="${cls}" href="index.html#case-${i + 1}" data-k="${k}" data-reveal style="${style}">${T(c.name)}</a>`
+      ? `<a class="${cls}" href="${HOME}#case-${i + 1}" target="_blank" data-k="${k}" data-reveal style="${style}">${T(c.name)}</a>`
       : `<span class="${cls}" data-k="${k}" data-reveal style="${style}">${T(c.name)}</span>`;
   }).join('');
   $('#clientsWhat').innerHTML = T(SITE.clients.hint);
@@ -218,34 +234,91 @@ function renderAboutExtras(){
         `<figure class="photo" data-reveal style="--d:${(k * 0.08).toFixed(2)}s"><img src="${ph.src}" alt="Дарья Купцова" loading="lazy" style="object-position:${ph.pos}"></figure>`).join('');
     }
   }
-  if (SITE.articles) $('#articleList').innerHTML = SITE.articles.items.map((a, k) =>
+  // строки выступлений и жюри — в том же виде, что статьи; без ссылки строка просто текст
+  const row = (r, k) => { const inner = `<span class="article-source">${T(r.source)}</span><span class="article-title">${T(r.title)}</span>`;
+    return r.link ? `<a class="article" href="${r.link}" data-reveal style="--d:${(k * 0.05).toFixed(2)}s">${inner}<span class="go">${ARROW}</span></a>`
+                  : `<div class="article" data-reveal>${inner}<span></span></div>`; };
+  if (SITE.articles) $('#articleList').innerHTML = SITE.articles.items.slice(0, SITE.articles.limit || 99).map((a, k) =>
     `<a class="article" href="${a.link}" data-reveal style="--d:${(k * 0.05).toFixed(2)}s"><span class="article-source">${T(a.source)}</span><span class="article-title">${T(a.title)}</span><span class="go">${ARROW}</span></a>`).join('');
   if (SITE.podcast && SITE.podcast.links) $('#podLinks').innerHTML = SITE.podcast.links.map(l => `<a class="link" href="${l.link}">${T(l.text)}</a>`).join('');
 }
 
 
-/* фото по клику открывается на весь экран; листать — стрелками, закрыть — клик или Esc */
+/* фото по клику открывается на весь экран: картинка плавно вылетает из своего места и туда же возвращается.
+   Листать — стрелками на экране или на клавиатуре, закрыть — клик по фону или Esc */
 const viewer = document.createElement('div');
 viewer.className = 'viewer'; viewer.setAttribute('role', 'dialog'); viewer.setAttribute('aria-label', 'Фото');
-viewer.innerHTML = '<img alt=""><button class="viewer-close" aria-label="Закрыть"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l12 12M16 4L4 16"/></svg></button>';
+const VIEW_ICON = d => `<svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="${d}"/></svg>`;
+viewer.innerHTML = '<img alt="">'
+  + '<button class="viewer-close" aria-label="Закрыть">' + VIEW_ICON('M4 4l12 12M16 4L4 16') + '</button>'
+  + '<button class="viewer-nav prev" aria-label="Предыдущее фото">' + VIEW_ICON('M12 4l-6 6 6 6') + '</button>'
+  + '<button class="viewer-nav next" aria-label="Следующее фото">' + VIEW_ICON('M8 4l6 6-6 6') + '</button>'
+  + '<p class="viewer-count"></p>';
 document.body.appendChild(viewer);
-let viewList = [], viewAt = 0;
-function openViewer(list, k){ viewList = list; viewAt = k; viewer.querySelector('img').src = list[k]; viewer.classList.add('open'); }
-function closeViewer(){ viewer.classList.remove('open'); }
-viewer.addEventListener('click', closeViewer);
+const viewImg = viewer.querySelector('img');
+let viewList = [], viewAt = 0, viewFrom = [];   // viewFrom — картинки на странице, из которых вылетает фото
+const viewEase = 'transform .6s cubic-bezier(.2,.8,.2,1)';
+function viewRect(el){ return el && el.isConnected ? el.getBoundingClientRect() : null; }
+// сдвиг и масштаб, которые ставят открытое фото на место картинки на странице
+function viewOffset(r){
+  const v = viewImg.getBoundingClientRect();
+  if (!r || !v.width) return '';
+  return `translate(${r.left + r.width / 2 - (v.left + v.width / 2)}px,${r.top + r.height / 2 - (v.top + v.height / 2)}px) scale(${r.width / v.width})`;
+}
+function viewShow(){
+  viewer.querySelector('.viewer-count').textContent = viewList.length > 1 ? `${viewAt + 1} из ${viewList.length}` : '';
+  viewer.classList.toggle('single', viewList.length < 2);
+}
+function openViewer(list, k, from){
+  viewList = list; viewAt = k; viewFrom = from || [];
+  viewImg.src = list[k]; viewShow();
+  const src = viewFrom[k];
+  viewImg.style.transition = 'none'; viewImg.style.transform = '';
+  viewer.classList.add('fly'); viewer.getBoundingClientRect(); viewer.classList.add('open');   // фон темнеет плавно
+  const go = () => {
+    const off = viewOffset(viewRect(src));
+    if (!off) { viewImg.style.transition = ''; viewer.classList.remove('fly'); return; }
+    if (src) src.style.visibility = 'hidden';
+    viewImg.style.transform = off;
+    viewImg.getBoundingClientRect();   // зафиксировать начальное положение перед полетом
+    viewImg.style.transition = viewEase; viewImg.style.transform = '';
+  };
+  viewImg.complete && viewImg.naturalWidth ? go() : viewImg.addEventListener('load', go, { once: true });
+}
+function closeViewer(){
+  const src = viewFrom[viewAt], off = viewOffset(viewRect(src));
+  viewer.classList.remove('open');
+  if (off) { viewImg.style.transition = viewEase; viewImg.style.transform = off; }
+  setTimeout(() => {
+    viewFrom.forEach(el => el && (el.style.visibility = ''));
+    viewImg.style.transition = 'none'; viewImg.style.transform = ''; viewer.classList.remove('fly');
+  }, 600);
+}
+function stepViewer(d){
+  if (viewList.length < 2) return;
+  const old = viewFrom[viewAt];
+  viewAt = (viewAt + d + viewList.length) % viewList.length;
+  if (old) old.style.visibility = '';
+  if (viewFrom[viewAt]) viewFrom[viewAt].style.visibility = 'hidden';
+  viewImg.src = viewList[viewAt]; viewShow();
+  viewImg.animate([{ opacity: 0, transform: `translateX(${d * 40}px)` }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' });
+}
+viewer.addEventListener('click', e => {
+  const nav = e.target.closest('.viewer-nav');
+  if (nav) return stepViewer(nav.classList.contains('next') ? 1 : -1);
+  closeViewer();
+});
+// слушаем раньше остальных, чтобы Esc закрывал фото, а не весь кейс
 addEventListener('keydown', e => {
   if (!viewer.classList.contains('open')) return;
-  if (e.key === 'Escape') closeViewer();
-  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-    viewAt = (viewAt + (e.key === 'ArrowRight' ? 1 : -1) + viewList.length) % viewList.length;
-    viewer.querySelector('img').src = viewList[viewAt];
-  }
-});
+  if (e.key === 'Escape') { e.stopImmediatePropagation(); closeViewer(); }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') stepViewer(e.key === 'ArrowRight' ? 1 : -1);
+}, true);
 document.addEventListener('click', e => {
   const f = e.target.closest('.photo');
   if (!f) return;
   const group = [...f.parentElement.querySelectorAll('.photo img')];
-  openViewer(group.map(i => i.src), group.indexOf(f.querySelector('img')));
+  openViewer(group.map(i => i.src), group.indexOf(f.querySelector('img')), group);
 });
 
 /* колода: верхнюю карточку тянут курсором или пальцем; дальше — влево, нравится — вправо */
@@ -341,13 +414,18 @@ $('#bioList').addEventListener('click', e => {
 const sw = $('#switch');
 let switchCount = 0;
 
-function setMode(mode){
+function setMode(mode, toTop){
   const apply = () => {
+    root.classList.add('switching');   // без плавных переходов: фон сразу нужной версии
     root.dataset.theme = mode;
-    sw.setAttribute('aria-checked', mode === 'dark');
+    document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', mode === 'dark'));
+    if (toTop) scrollTo({ top: 0, behavior: 'instant' });
+    if (mode !== 'dark') { $('#toasts').innerHTML = ''; pendingJoke = null; }   // шутки остаются в дружеской версии
     renderTexts(); renderLists();
     if (caseIndex != null) renderCase(caseIndex, true);
     try { localStorage.setItem('kd-mode', mode); } catch (e) {}
+    dispatchEvent(new CustomEvent('theme:apply'));   // перелив первого экрана перерисовывается сразу
+    setTimeout(() => root.classList.remove('switching'), 900);
   };
   if (!document.startViewTransition || reduced) { apply(); afterSwitch(mode); return; }
   // новая версия опускается сверху, как штора, которую задернули
@@ -379,12 +457,13 @@ function nudge(){
 }
 setTimeout(nudge, 2400);
 
-sw.addEventListener('click', e => {
+// тумблеров может быть несколько: в шапке и в ярком блоке «Обо мне» (он еще и возвращает наверх)
+document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', e => {
   switchSeen = true;
   sw.classList.remove('unseen', 'nudge');
   try { localStorage.setItem('kd-switch-seen', '1'); } catch (e) {}
-  setMode(isFun() ? 'light' : 'dark');
-});
+  setMode(isFun() ? 'light' : 'dark', s !== sw);
+}));
 
 
 /* ================================================================
@@ -426,6 +505,7 @@ function layoutStrings(){
 }
 function drawString(s){
   const W = s.w, px = Math.min(Math.max(s.at, 0.02), 0.98) * W, N = 48;
+  if (!W) return;   // блок скрыт (в серьезной версии направлений на главной нет)
   let d = 'M0 0';
   for (let i = 1; i <= N; i++) {
     const x = (i / N) * W;
@@ -487,7 +567,7 @@ document.addEventListener('pointerleave', () => { pointerX = pointerY = null; })
    ================================================================ */
 const SIZE = { 'маленький': 's', 'средний': 'm', 'большой': 'l' };
 
-/* Видео и презентации: файл mp4 или ролик с площадки — 'vimeo:ID', 'vk:OID_ID',
+/* Видео и презентации: файл mp4 или ролик с площадки — 'vimeo:ID' (или 'vimeo:ID/ключ'), 'vk:OID_ID',
    'kinescope:ID', 'rutube:ID', 'drive:ID' (Google Диск, в том числе PDF) */
 function parseMedia(v){
   if (!v) return null;
@@ -499,11 +579,13 @@ function parseMedia(v){
 /* адрес проигрывателя; preview — тихий фон для карточки, без кнопок */
 function embedURL(m, preview){
   switch (m.type) {
-    case 'vimeo': return preview
-      ? `https://player.vimeo.com/video/${m.id}?background=1&muted=1&loop=1&autopause=0&dnt=1`
-      : `https://player.vimeo.com/video/${m.id}?autoplay=1&muted=1&loop=1&dnt=1&title=0&byline=0&portrait=0`;
+    case 'vimeo': {   // 'vimeo:ID' или 'vimeo:ID/ключ' для ролика по ссылке
+      const [vid, h] = m.id.split('/'), base = `https://player.vimeo.com/video/${vid}?${h ? 'h=' + h + '&' : ''}`;
+      return preview ? base + 'background=1&muted=1&loop=1&autopause=0&dnt=1&quality=540p'   // превью легче — грузится быстрее
+                     : base + 'autoplay=1&muted=1&loop=1&dnt=1&title=0&byline=0&portrait=0';
+    }
     case 'vk': { const [oid, id] = m.id.split(/_(?=\d+$)/); return `https://vkvideo.ru/video_ext.php?oid=${oid}&id=${id}&hd=2${preview ? '' : '&autoplay=1'}`; }
-    case 'kinescope': return `https://kinescope.io/embed/${m.id}${preview ? '?autoplay=1&muted=1&loop=1&controls=0' : ''}`;
+    case 'kinescope': return `https://kinescope.io/embed/${m.id}${preview ? '?autoplay=true&muted=true&loop=true&controls=false' : ''}`;   // Kinescope понимает только true/false: с muted=1 звук не выключается и браузер не дает ролику стартовать
     case 'rutube': return `https://rutube.ru/play/embed/${m.id}`;
     case 'drive': return `https://drive.google.com/file/d/${m.id}/preview`;
   }
@@ -512,13 +594,15 @@ function embedURL(m, preview){
 const FRAME_ALLOW = 'autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write';
 const legacyVideo = p => p.video || (p.vimeo ? 'vimeo:' + p.vimeo : '');
 
-/* Превью проекта в сетке: картинка; поверх — тихое видео (mp4 или Vimeo).
+/* Превью проекта в сетке: картинка; поверх — тихое видео (mp4, Vimeo или Kinescope).
    Если картинки нет — сам проигрыватель площадки с его обложкой */
 function mediaHTML(p){
-  const m = parseMedia(legacyVideo(p));
-  const img = p.image ? `<img src="${p.image}" alt="" loading="lazy">` : '';
-  if (m && m.type === 'file') return `<video muted loop playsinline autoplay preload="auto" ${p.image ? `poster="${p.image}"` : ''} src="${m.src}"></video>`;
-  if (m && m.type === 'vimeo') return img + `<iframe data-src="${embedURL(m, true)}" allow="autoplay" tabindex="-1" aria-hidden="true"></iframe>`;
+  // preview — отдельный легкий ролик для сетки (mp4), если основное видео на площадке, которая не умеет тихий повтор
+  const m = parseMedia(p.preview || legacyVideo(p));
+  const img = p.image ? `<img src="${p.image}" alt="" loading="lazy"${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
+  // ролик подгружается, только когда до карточки остается экран; до этого видна обложка
+  if (m && m.type === 'file') return `<video muted loop playsinline preload="none" ${p.image ? `poster="${p.image}"` : ''} data-src="${m.src}"></video>`;
+  if (m && (m.type === 'vimeo' || m.type === 'kinescope')) return img + `<iframe data-src="${embedURL(m, true)}"${p.ratio ? ` style="--vr:${p.ratio}"` : ''} allow="autoplay" tabindex="-1" aria-hidden="true"></iframe>`;
   if (img) return img;
   if (m && m.type !== 'image') return `<iframe class="still" data-src="${embedURL(m, true)}" allow="${FRAME_ALLOW}" tabindex="-1" aria-hidden="true"></iframe>`;
   return '';
@@ -527,33 +611,61 @@ function mediaHTML(p){
 /* Сетка раскладывается сама, если у проекта не указаны size и side */
 const PATTERN = [['большой', 'слева'], ['маленький', 'слева'], ['средний', 'справа'], ['большой', 'справа'], ['средний', 'слева'], ['маленький', 'справа']];
 let workFilter = '';
+/* проект может быть в нескольких категориях: cat: ['продакшен', '3D'] */
+const inCat = p => !workFilter || [].concat(p.cat).includes(workFilter);
+/* год проекта — маленькой цифрой рядом с названием */
+const yearHTML = p => p.year ? `<sup class="yr">${T(p.year)}</sup>` : '';
 function renderWorks(){
   const W = SITE.works;
-  $('#workFilters').innerHTML = (W.filters || []).map(f =>
+  // фильтры: над проектами и еще раз в самом конце, под «другими работами»
+  const chips = (W.filters || []).map(f =>
     `<button class="chip${f.key === workFilter ? ' on' : ''}" data-cat="${f.key}">${T(f.text)}</button>`).join('');
+  $('#workFilters').innerHTML = chips;
+  $('#workFiltersEnd').innerHTML = chips;
   let n = 0;
   $('#workList').innerHTML = W.items.map((p, k) => {
-    if (workFilter && p.cat !== workFilter) return '';
+    if (p.other || !inCat(p)) return '';
     const [size, side] = p.size ? [p.size, p.side] : PATTERN[n % PATTERN.length];
     n++;
-    const ratio = p.ratio || (size === 'большой' ? '16/9' : '16/10');
+    const ratio = p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');   // у видео всегда 16:9
     return `
     <button class="work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}" data-k="${k}" data-reveal>
       <span class="media" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
-      <span class="meta"><h3>${T(p.title)}</h3>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
+      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}
     </button>`;
   }).join('');
   $$('#workList .media').forEach(watchMedia);
+  // «другие работы» — простым списком под сеткой
+  const other = W.items.map((p, k) => [p, k]).filter(([p]) => p.other && inCat(p));
+  $('#otherWorks').hidden = !other.length;
+  $('#otherList').innerHTML = other.map(([p, k]) =>
+    `<button class="article" data-k="${k}"><span class="article-source">${T(p.tag || [].concat(p.cat)[0])}</span><span class="article-title">${T(p.title)}${yearHTML(p)}</span><span class="go">${ARROW}</span></button>`).join('');
 }
 function setFilter(cat){
   workFilter = cat;
   renderWorks();
   spellOut($('#workList'));
   watchReveals($('#workList'), true);
+  watchReveals($('#otherWorks'), true);   // строки «других работ» тоже проявляются заново, иначе остаются невидимыми
   dispatchEvent(new CustomEvent('works:rendered'));
 }
 $('#workFilters').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) setFilter(c.dataset.cat); });
+// нижние фильтры возвращают наверх, к заголовку проектов
+$('#workFiltersEnd').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  setFilter(c.dataset.cat);
+  const top = $('#works').getBoundingClientRect().top + scrollY - 80;
+  scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+});
+// «другие работы» открываются кодом, а не ссылкой: на Тильде ссылки с # перехватывает ее прокрутка
+$('#otherList').addEventListener('click', e => { const w = e.target.closest('[data-k]'); if (w) openInTab(w.dataset.k); });
+// превью при наведении на строку «других работ» — как у клиентов на «Обо мне»
+$('#otherList').addEventListener('pointerover', e => {
+  const w = e.target.closest('[data-k]'); const p = w && SITE.works.items[+w.dataset.k];
+  showPreviewImage(p && previewOf(p));
+});
+$('#otherList').addEventListener('pointerleave', () => showPreviewImage(''));
 
 /* Видео играет, только пока проект на экране; Vimeo грузится при первом показе */
 const mediaSizer = new ResizeObserver(es => es.forEach(e => {
@@ -562,17 +674,40 @@ const mediaSizer = new ResizeObserver(es => es.forEach(e => {
 }));
 const mediaWatcher = new IntersectionObserver(es => es.forEach(e => {
   const video = e.target.querySelector('video'), frame = e.target.querySelector('iframe[data-src]');
-  if (video) e.isIntersecting ? video.play().catch(() => {}) : video.pause();
+  if (video) { if (e.isIntersecting && !video.src && video.dataset.src) video.src = video.dataset.src; e.isIntersecting ? video.play().catch(() => {}) : video.pause(); }
   if (frame && e.isIntersecting && !frame.src) {
     frame.addEventListener('load', () => setTimeout(() => frame.classList.add('ready'), 600), { once: true });
     frame.src = frame.dataset.src;
   }
 }), { threshold: 0.15 });
-function watchMedia(el){ mediaSizer.observe(el); mediaWatcher.observe(el); }
+// видео площадок начинают грузиться заранее, за экран до появления, — к прокрутке они уже готовы
+const framePreloader = new IntersectionObserver(es => es.forEach(e => {
+  const vid = e.target.querySelector('video[data-src]');
+  if (e.isIntersecting && vid && !vid.src) { vid.src = vid.dataset.src; vid.preload = 'auto'; }
+  const frame = e.target.querySelector('iframe[data-src]');
+  if (!e.isIntersecting || !frame || frame.src) return;
+  frame.addEventListener('load', () => setTimeout(() => frame.classList.add('ready'), 600), { once: true });
+  frame.src = frame.dataset.src;
+}), { rootMargin: '100% 0px' });
+function watchMedia(el){ mediaSizer.observe(el); mediaWatcher.observe(el); framePreloader.observe(el); }
 
+/* Кружок «смотреть» едет за курсором над обложкой проекта */
+const lookCursor = document.createElement('div');
+lookCursor.className = 'look-cursor'; lookCursor.setAttribute('aria-hidden', 'true');
+document.body.appendChild(lookCursor);
+if (!touch) {
+  addEventListener('pointermove', e => {
+    const over = !!e.target.closest?.('.work .media');
+    if (over && !lookCursor.classList.contains('show')) lookCursor.innerHTML = `<span>${T(SITE.works.cursor || 'смотреть')}</span>`;
+    lookCursor.classList.toggle('show', over);
+    lookCursor.style.translate = `${e.clientX}px ${e.clientY}px`;
+  }, { passive: true });
+}
+/* Кейс открывается в новой вкладке; в ней сразу показан кейс, «все работы» ведут на главную */
+const openInTab = k => window.open(location.pathname + location.search + '#case-' + (+k + 1), '_blank');
 $('#workList').addEventListener('click', e => {
   const w = e.target.closest('.work');
-  if (w) location.hash = 'case-' + (+w.dataset.k + 1);
+  if (w) openInTab(w.dataset.k);
 });
 
 
@@ -586,7 +721,6 @@ function setClient(k){
   activeClient = k;
   $$('#clients .client').forEach(el => el.classList.toggle('on', +el.dataset.k === k));
   const c = SITE.clients.items[k];
-  showClientPreview(c);
   if (!c || !c.what) { $('#clientsWhat').innerHTML = T(SITE.clients.hint); return; }
   $('#clientsWhat').innerHTML = `${T(c.name)} — ${T(c.what)}` + (c.project ? `<span class="client-open">${T(SITE.clients.open)} →</span>` : '');
 }
@@ -594,12 +728,14 @@ function setClient(k){
 const clientPreview = document.createElement('div');
 clientPreview.className = 'client-preview'; clientPreview.setAttribute('aria-hidden', 'true');
 document.body.appendChild(clientPreview);
+const previewOf = w => { const m = parseMedia(legacyVideo(w)); return w.image || (m && m.type === 'drive' ? `https://drive.google.com/thumbnail?id=${m.id}&sz=w800` : ''); };
+function showPreviewImage(img){
+  clientPreview.classList.toggle('show', !!img);
+  if (img && clientPreview.dataset.src !== img) { clientPreview.dataset.src = img; clientPreview.innerHTML = `<img src="${img}" alt="">`; }
+}
 function showClientPreview(c){
   const w = c && c.project && SITE.works.items.find(x => x.title === c.project);
-  const m = w && parseMedia(legacyVideo(w));
-  const img = w && (w.image || (m && m.type === 'drive' ? `https://drive.google.com/thumbnail?id=${m.id}&sz=w800` : ''));
-  clientPreview.classList.toggle('show', !!img);
-  if (img) clientPreview.innerHTML = `<img src="${img}" alt=""><span>${T(w.title)}</span>`;
+  showPreviewImage(w && previewOf(w));
 }
 addEventListener('pointermove', e => {
   if (!clientPreview.classList.contains('show')) return;
@@ -615,8 +751,12 @@ $('#clients').addEventListener('pointermove', e => {
     if (d < bestD) { bestD = d; best = +el.dataset.k; }
   });
   setClient(best);
+  // превью — только того клиента, чье имя прямо под курсором (подсветка соседей не путает картинку)
+  const hit = e.target.closest('.client');
+  showClientPreview(hit ? SITE.clients.items[+hit.dataset.k] : null);
 });
 $('#clients').addEventListener('pointerleave', () => {
+  showClientPreview(null);
   $$('#clients .client').forEach(el => el.style.setProperty('--s', 1));
   setClient(null);
 });
@@ -629,6 +769,7 @@ const PLAY = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor
 let podIndex = 0, podPlaying = false;
 function renderPodcast(){
   const P = SITE.podcast;
+  if (!P) return;   // подкаста на этой странице нет
   $('#podList').innerHTML = P.episodes.map((ep, k) =>
     `<button class="ep ${k === podIndex ? 'on' : ''}" data-k="${k}"><span>${T(ep.title)}</span><span class="ep-time">${ep.time}</span></button>`).join('');
   if (!podPlaying) showCover();
@@ -659,12 +800,19 @@ function renderNda(){
   $('#ndaList').innerHTML = N.items.map((p, k) => {
     const cols = (p.colors || ['#EAECF0', '#D4D5D9', '#80858E', '#D4D5D9']).join(',');
     // обложка — текучие волны цветов проекта (waves.js), как перелив на первом экране
-    const picture = p.image ? `<img src="${p.image}" alt="" loading="lazy">` : `<span class="waves" data-waves data-speed="2.6" data-colors="${cols}"></span>`;
+    const picture = p.image ? `<img src="${p.image}" alt="" loading="lazy">` : `<span class="waves" data-waves data-speed="1.1" data-scroll data-colors="${cols}"></span>`;
     return `<a class="nda-item" href="${N.link}" data-reveal style="--d:${(k % 2) * 0.1}s">
       <span class="nda-media">${picture}<span class="nda-lock">${LOCK}</span></span>
       <span class="meta"><h3>${T(p.title)}</h3>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
     </a>`;
   }).join('');
+  // еще ряд закрытых карточек, уходящих под градиент
+  const ghosts = ['#EEF8F1,#D4F0DE,#BFE7CF,#E2F3E0', '#FBF0F8,#F3D9EC,#EAC8E3,#F0E0F5', '#F7FBE6,#EAF5C2,#DDEFA6,#E3F3D2', '#EEF0FE,#D9DDFB,#C6CCF8,#E4DAF8'];   // пастельные, как у карточек выше
+  $('#ndaMore').innerHTML = Array.from({ length: N.more || 0 }, (_, k) =>
+    `<a class="nda-ghost" href="${N.link}" aria-hidden="true" tabindex="-1">
+      <span class="nda-media"><span class="waves" data-waves data-speed="1.1" data-scroll data-colors="${ghosts[k % ghosts.length]}"></span><span class="nda-lock">${LOCK}</span></span>
+      <span class="meta"><h3>${T(N.hidden)}</h3></span>
+    </a>`).join('');
 }
 
 
@@ -686,10 +834,216 @@ function shotHTML(src){
 function heroHTML(p){
   const m = parseMedia(legacyVideo(p));
   if (m && m.type === 'file') return `<video src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} muted loop playsinline autoplay></video>`;
+  const poster = p.image ? `<img src="${p.image}" alt=""${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
+  // Vimeo запускается сам поверх обложки; тяжелые плееры (Rutube, VK, Kinescope) грузятся по нажатию —
+  // до этого видна обложка с кнопкой, и кейс открывается сразу
+  if (m && m.type === 'vimeo') return poster + `<iframe class="hero-frame" src="${embedURL(m, false)}" allow="${FRAME_ALLOW}" allowfullscreen onload="setTimeout(()=>this.classList.add('ready'),400)"></iframe>`;
+  if (m && m.type !== 'image' && m.type !== 'drive' && p.image)
+    return poster + `<button class="hero-play" data-src="${embedURL(m, false)}${m.type === 'rutube' ? '?autoplay=1' : m.type === 'kinescope' ? '?autoplay=1' : ''}" aria-label="Смотреть видео"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>`;
   if (m && m.type !== 'image') return `<iframe src="${embedURL(m, false)}" allow="${FRAME_ALLOW}" allowfullscreen></iframe>`;
-  return p.image ? `<img src="${p.image}" alt="">` : '';
+  return poster;
 }
 
+/* ================================================================
+   ЖИВОЙ БЛОК «ЛОГОТИП И ЦВЕТА» в кейсе (поле brandkit у проекта)
+   ================================================================ */
+// знак: градиент рисуется CSS-ом и вырезается по контуру знака (маска)
+function brandMark(b, mono){
+  const mask = `url(&quot;data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${b.view[1]} ${b.view[1]}'><path fill-rule='evenodd' d='${b.mark}'/></svg>`)}&quot;)`;
+  return `<span class="bk-mark${mono ? ' mono' : ''}" style="-webkit-mask-image:${mask};mask-image:${mask}"></span>`;
+}
+function brandLogo(b, mono){
+  return `<span class="bk-logo" style="aspect-ratio:${b.view[0]}/${b.view[1]};--mk:${b.view[1] / b.view[0] * 100}%">${brandMark(b, mono)}<svg viewBox="0 0 ${b.view[0]} ${b.view[1]}" aria-hidden="true">${b.word.map((d, i) => `<path fill="currentColor" style="--l:${i}" d="${d}"/>`).join('')}</svg></span>`;
+}
+const hexRGB = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const isLight = h => { const [r, g, b] = hexRGB(h); return r * .299 + g * .587 + b * .114 > 130; };
+function brandkitHTML(b){
+  const head = x => `<div class="case-text"><span class="case-label">${T(x.title)}</span><p>${T(x.text)}</p></div>`;
+  let h = '';
+  if (b.logo) h += `<div class="wrap bk bk-logos">${head(b.logo)}
+    <div class="bk-grid" aria-label="Версии логотипа MAX">
+      <div class="bk-tile dark wide">${brandLogo(b)}</div><div class="bk-tile light wide">${brandLogo(b)}</div>
+      <div class="bk-tile dark wide">${brandLogo(b, true)}</div><div class="bk-tile light wide">${brandLogo(b, true)}</div>
+      <div class="bk-tile dark">${brandMark(b)}</div><div class="bk-tile dark">${brandMark(b, true)}</div>
+      <div class="bk-tile light">${brandMark(b)}</div><div class="bk-tile light">${brandMark(b, true)}</div>
+    </div></div>`;
+  if (b.colors) h += `<div class="wrap bk bk-colors">${head(b.colors)}
+    <div class="bk-swatches">${b.colors.items.map((c, i) => `
+      <button class="bk-sw${isLight(c.hex) ? ' on-light' : ''}" style="--c:${c.hex};--i:${i};--x3:${i % 3};--y3:${Math.floor(i / 3)};--x2:${i % 2};--y2:${Math.floor(i / 2)}" data-hex="${c.hex}" data-done="${T(b.colors.copied || 'скопировано')}">
+        <span class="bk-name">${T(c.name)}</span>
+        <span class="bk-code">${c.hex}<br>RGB (${hexRGB(c.hex).join(', ')})</span>
+      </button>`).join('')}</div></div>`;
+  if (b.film) h += `<div class="wrap bk bk-film"><div class="bk-film-box" style="aspect-ratio:${b.film.ratio || 16 / 9}">
+    <iframe src="${embedURL(parseMedia(b.film.video), true)}" allow="autoplay" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div></div>`;
+  return h;
+}
+// анимация запускается, когда блок доезжает до экрана; клик по цвету копирует код
+const brandWatcher = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); brandWatcher.unobserve(e.target); }
+}), { threshold: 0.2 });
+function watchBrandkit(el){
+  brandWatcher.observe(el);
+  el.addEventListener('click', e => {
+    const sw = e.target.closest('.bk-sw'); if (!sw) return;
+    navigator.clipboard?.writeText(sw.dataset.hex).catch(() => {});
+    sw.classList.add('copied'); clearTimeout(sw._t); sw._t = setTimeout(() => sw.classList.remove('copied'), 1400);
+  });
+}
+
+/* ================================================================
+   КАМПАНИИ ВНУТРИ КЕЙСА (поле campaigns у проекта, см. «рекламные кампании VK»)
+   ================================================================ */
+// одна ячейка ряда: картинка (увеличивается по нажатию) или ролик
+function campCell(src){
+  // ролик с особыми пропорциями: { video: 'kinescope:ID', ratio: 7.1 }
+  // loop: true — Vimeo играет сам по кругу без кнопок; frame: пропорции самого ролика, если ячейка ниже —
+  // лишнее сверху и снизу срезается; blend: true — белый фон ролика сливается с фоном страницы
+  if (src && src.video) {
+    let html = campCell(src.video);
+    if (src.loop) html = html.replace(/data-src="[^"]*"/, `data-src="${embedURL(parseMedia(src.video), true)}"`);
+    const cls = 'camp-shot frame' + (src.blend ? ' blend' : '') + (src.frame ? ' cropped' : '');
+    return html.replace('class="camp-shot frame"', `class="${cls}" style="--ar:${src.ratio || 16 / 9}${src.frame ? ';--fr:' + src.frame : ''}"`);
+  }
+  const m = parseMedia(src);
+  if (m.type === 'image') return `<button class="camp-shot" aria-label="Увеличить"><img src="${m.src}" alt="" loading="lazy"></button>`;
+  if (m.type === 'file') return `<div class="camp-shot frame"><video src="${m.src}" muted loop playsinline autoplay></video></div>`;
+  // Kinescope играет сам без звука, как живая картинка; остальные — обычный плеер
+  const url = m.type === 'kinescope' ? embedURL(m, true) : embedURL(m, false).replace('&autoplay=1', '');
+  // ролик загружается, когда ячейка доезжает до экрана, — тогда Kinescope сам запускается
+  return `<div class="camp-shot frame"><iframe data-src="${url}" allow="${FRAME_ALLOW}" allowfullscreen></iframe></div>`;
+}
+function campRow(items, caption){
+  return `<div class="wrap camp-rowbox">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row">${items.map(campCell).join('')}</div></div>`;
+}
+// коллаж: ячейки раскладываются по схеме areas, у каждой подпись сверху; фото увеличиваются по нажатию
+function campCollage(g){
+  const c = g.collage;
+  const cap = g.caption ? `<p class="camp-cap">${g.link ? `<a class="link" href="${g.link}">${T(g.caption)}</a>` : T(g.caption)}</p>` : '';
+  // несколько картинок в ячейке — стопкой: в ряд (одной высоты) или столбиком (dir: 'column')
+  const fill = x => Array.isArray(x.img) ? `<div class="collage-stack${x.dir === 'column' ? ' col' : ''}">${x.img.map(campCell).join('')}</div>` : campCell(x.img);
+  return `<div class="wrap camp-rowbox">${cap}<div class="collage camp-row" style="grid-template-areas:${c.areas.replace(/"/g, '&quot;')};grid-template-columns:${c.cols || ''};grid-template-rows:${c.rows || ''};aspect-ratio:${c.ratio || '16/9'}">${
+    c.cells.map(x => `<div class="collage-cell" style="grid-area:${x.area}">${x.text ? `<span class="collage-txt">${T(x.text)}</span>` : ''}${fill(x)}</div>`).join('')
+  }</div></div>`;
+}
+// галерея: картинки-строки встают рядами по cols, { row: [...] } — своя полоска, ролик VK — во всю ширину
+function campGallery(c){
+  const cols = c.cols || 3, out = [];
+  let pile = [];
+  const flush = () => { for (let i = 0; i < pile.length; i += cols) out.push(campRow(pile.slice(i, i + cols))); pile = []; };
+  (c.gallery || []).forEach(g => {
+    if (g && g.collage) { flush(); out.push(campCollage(g)); }
+    else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption)); }
+    else if (parseMedia(g).type === 'image') pile.push(g);
+    else { flush(); out.push(campRow([g])); }
+  });
+  flush();
+  return out.join('');
+}
+function campaignsHTML(list, C){
+  const col = (label, text) => text ? `<div class="camp-col"><span class="camp-label">${T(label)}</span><p>${T(text)}</p></div>` : '<div class="camp-col"></div>';
+  return `
+    <div class="wrap"><h2 class="camps-title">${T(C.title)}<sup class="camps-count">${list.length}</sup></h2></div>
+    <div class="camps">
+      <nav class="camps-nav" aria-label="Кампании"><div class="wrap"><div class="camps-strip">${
+        list.map((c, i) => `<button class="camps-link" data-camp="${i}">${T(c.title)}</button>`).join('')
+      }</div></div></nav>
+      ${list.map((c, i) => `
+      <section class="camp" data-camp="${i}">
+        <div class="wrap"><div class="camp-head">
+          <div class="camp-col camp-name"><h3 class="camp-title">${T(c.title)}</h3>${
+            c.links && c.links.length ? `<div class="camp-links">${c.links.map(l => `<a class="link" href="${l.link}">${T(l.text)}</a>`).join('')}</div>` : ''}</div>
+          ${col(C.task, pick(c.task))}
+          ${col(C.solution, pick(c.solution)).replace(/<\/div>$/, c.note ? `<p class="camp-note">${T(c.note)}</p></div>` : '</div>')}
+        </div></div>
+        ${campGallery(c)}
+      </section>`).join('')}
+    </div>`;
+}
+// макеты плавно выезжают, когда доезжают до экрана: каждый следующий в ряду — чуть позже
+// виды появления (описаны в style.css, ищите data-fx): подъем, шторка слева, раскрытие из центра,
+// приближение, шторка сверху, выезд сбоку
+const REVEAL_FX = ['rise', 'wipe', 'split', 'zoom', 'drop', 'slide'];
+const campReveal = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add('in'); campReveal.unobserve(e.target);
+  const f = e.target.querySelector('iframe[data-src]');
+  if (f) { f.src = f.dataset.src; f.removeAttribute('data-src'); }
+}), { rootMargin: '0px 0px -8% 0px' });
+function watchCampaigns(root){
+  // ряды бывают и в меню кампаний (.camps), и прямо в галерее обычного кейса
+  const camps = root.querySelector('.camps');
+  const box = camps || (root.querySelector('.camp-row') && root.querySelector('.case-body')); if (!box) return;
+  // пропорции ячейки берутся из самой картинки — так ряд из разных форматов выходит одной высоты
+  box.querySelectorAll('.camp-shot img').forEach(img => {
+    const set = () => img.naturalWidth && img.parentNode.style.setProperty('--ar', img.naturalWidth / img.naturalHeight);
+    img.complete ? set() : img.addEventListener('load', set, { once: true });
+  });
+  // у каждого ряда свой характер появления, чтобы листать было не монотонно;
+  // в коллаже каждая ячейка появляется по-своему
+  box.querySelectorAll('.camp-row').forEach((row, r) => {
+    const cells = [...row.querySelectorAll(':scope>.camp-shot, :scope>.collage-cell .camp-shot')];
+    const collage = row.classList.contains('collage');
+    cells.forEach((cell, i) => {
+      cell.dataset.fx = REVEAL_FX[(collage ? r + i : r) % REVEAL_FX.length];
+      cell.style.setProperty('--k', i); cell.classList.add('pre'); campReveal.observe(cell);
+    });
+  });
+  // увеличение по нажатию: листаются все картинки кейса подряд
+  box.addEventListener('click', e => {
+    const b = e.target.closest('button.camp-shot');
+    if (b) {
+      const imgs = [...box.querySelectorAll('button.camp-shot img')];
+      return openViewer(imgs.map(i => i.currentSrc || i.src), imgs.indexOf(b.querySelector('img')), imgs);
+    }
+    const l = camps && e.target.closest('.camps-link');
+    if (l) {
+      const sec = box.querySelector(`.camp[data-camp="${l.dataset.camp}"]`), nav = box.querySelector('.camps-nav');
+      // место под прилипшими полоской «все работы» и меню
+      const top = sec.getBoundingClientRect().top - caseEl.getBoundingClientRect().top + caseEl.scrollTop - ($('.case-bar')?.offsetHeight || 0) - nav.offsetHeight + 8;
+      caseEl.scrollTo({ top, behavior: 'smooth' });
+    }
+  });
+  // в меню подсвечивается кампания, которую сейчас читают
+  if (!camps) return;
+  const strip = box.querySelector('.camps-strip'), links = [...strip.children];
+  const spy = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    links.forEach(l => l.classList.toggle('on', l.dataset.camp === e.target.dataset.camp));
+    const on = links[+e.target.dataset.camp];
+    strip.scrollTo({ left: on.offsetLeft - (strip.clientWidth - on.offsetWidth) / 2, behavior: 'smooth' });
+  }), { rootMargin: '-35% 0px -60% 0px' });
+  box.querySelectorAll('.camp').forEach(s => spy.observe(s));
+}
+
+/* ссылки на статьи — заметные: когда доезжают до экрана, их заливает лаймовым маркером.
+   Статьей считается ссылка, в тексте которой есть «стат», или ссылка на dsgners.ru, dprofile.ru, vc.ru, habr.com */
+const ARTICLE = { text: /стат/i, host: /(dsgners\.ru|dprofile\.ru|vc\.ru|habr\.com|clck\.ru)/ };
+const articleLit = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('lit'); articleLit.unobserve(e.target); }
+}), { rootMargin: '0px 0px -15% 0px' });
+function markArticles(root){
+  root.querySelectorAll('a.link').forEach(a => {
+    if (!ARTICLE.text.test(a.textContent) && !ARTICLE.host.test(a.href)) return;
+    a.classList.add('article');
+    a.closest('.camp-cap')?.classList.add('has-article');
+    articleLit.observe(a);
+  });
+}
+
+// ярлык премии: лента рисуется стилями, кольцо — картинка, поверх мерцают блестки (.award i)
+function awardHTML(a){
+  return `<span class="award" role="img" aria-label="${a.title || ''}"><img src="${a.ring}" alt=""><i></i><i></i><i></i><i></i><i></i></span>`;
+}
+// команда проекта под блоком «роль»: [['арт-директор', 'Имя Фамилия'], ...] — список в три колонки
+function teamHTML(team){
+  return `<ul class="case-team">${team.map(([role, name]) => `<li><span>${T(role)}</span>${T(name)}</li>`).join('')}</ul>`;
+}
+// элемент галереи кейса: { row, caption } — ряд макетов одной высоты, { collage } — коллаж, остальное — во всю ширину
+function galleryItem(x){
+  if (x && x.row) return campRow(x.row, x.caption);
+  if (x && x.collage) return campCollage(x);
+  return `<div class="wrap">${shotHTML(x)}</div>`;
+}
 function renderCase(k, keepScroll){
   const W = SITE.works, p = W.items[k], next = W.items[(k + 1) % W.items.length];
   // story: один список абзацев или пара [формальный, дружеский]
@@ -697,24 +1051,44 @@ function renderCase(k, keepScroll){
   const story = Array.isArray(raw[0]) ? pick(raw) || [] : raw;
   // блоки: подпись слева + абзац справа
   let blocks = [];
-  if (p.headed) for (let i = 0; i < story.length; i += 2) blocks.push([story[i], story[i + 1] || '']);
+  if (p.scheme) blocks = ['task', 'role', 'solution', 'result'].map(f => [W.scheme[f], pick(p.scheme[f]) || '', f]).filter(b => b[1]);
+  else if (p.headed) for (let i = 0; i < story.length; i += 2) blocks.push([story[i], story[i + 1] || '']);
   else blocks = story.map((par, i) => [p.labels ? p.labels[i] || '' : i === 0 ? p.tag || '' : '', par]);
   const gallery = p.gallery || [];
   let body = '', g = 0;
-  blocks.forEach(([label, par]) => {
-    body += `<div class="wrap"><div class="case-text" data-reveal><span class="case-label">${T(label)}</span><p>${T(par)}</p></div></div>`;
-    if (g < gallery.length) body += `<div class="wrap">${shotHTML(gallery[g++])}</div>`;
+  // schemeCols: все блоки схемы одной строкой, колонками (как текст кампаний)
+  if (p.schemeCols) {
+    body += `<div class="wrap"><div class="camp-head scheme-cols">${
+      blocks.map(([label, par]) => `<div class="camp-col" style="grid-column:span ${Math.floor(12 / blocks.length)}"><span class="camp-label">${T(label)}</span><p>${T(par)}</p></div>`).join('')}</div></div>`;
+    blocks = [];
+  }
+  // twoCols: ['solution'] — длинный блок схемы набран мельче, в две колонки
+  const twoCols = p.twoCols || [];
+  blocks.forEach(([label, par, key]) => {
+    // award — ярлык премии под подписью «результат»: черная лента, кольцо и блестки
+    const award = key === 'result' && p.award ? awardHTML(p.award) : '';
+    body += `<div class="wrap"><div class="case-text${twoCols.includes(key) ? ' cols2' : ''}" data-reveal><span class="case-label">${T(label)}${award}</span><p>${T(par)}</p>${
+      key === 'role' && p.team ? teamHTML(p.team) : ''}</div></div>`;
+    if (g < gallery.length) body += galleryItem(gallery[g++]);
+    if (p.brandkit && p.brandkit.after === key) body += brandkitHTML(p.brandkit);
   });
-  while (g < gallery.length) body += `<div class="wrap">${shotHTML(gallery[g++])}</div>`;
-  const links = p.links && p.links.length ? p.links : [{ text: W.more, link: p.link }];
-  body += `<div class="wrap"><div class="case-text case-links" data-reveal>${links.map(l => `<a class="link" href="${l.link}">${T(l.text)}</a>`).join('')}</div></div>`;
+  while (g < gallery.length) body += galleryItem(gallery[g++]);
+  // кампании внутри кейса: меню, у каждой — текст в три колонки (название, задача, решение) и макеты рядами
+  if (p.campaigns && p.campaigns.length) body += campaignsHTML(p.campaigns, W.campaigns);
+  // презентация — в самом конце, перед ссылками
+  if (p.deck) body += `<div class="wrap">${shotHTML(p.deck)}</div>`;
+  // links: [] — ссылок в конце нет; поле не указано — ссылка на старую страницу
+  const links = p.links || [{ text: W.more, link: p.link }];
+  if (links.length) body += `<div class="wrap"><div class="case-text case-links" data-reveal>${links.map(l => `<a class="link" href="${l.link}">${T(l.text)}</a>`).join('')}</div></div>`;
 
   caseContent.innerHTML = `
     <div class="wrap case-head">
-      <h1 class="case-title split" id="caseTitle"></h1>
+      <div class="case-ttl"><h1 class="case-title split" id="caseTitle"></h1>${yearHTML(p)}</div>
       ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
+      ${p.note ? `<p class="case-note" data-reveal>${T(p.note)}</p>` : ''}
     </div>
-    <div class="case-hero">${heroHTML(p)}</div>
+    <div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>
+    ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
     <div class="case-body">${body}</div>
     <div class="wrap">
       <button class="case-next" data-next="${(k + 1) % W.items.length}">
@@ -729,6 +1103,9 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.case-next .media').forEach(watchMedia);
   // в кейсе всё видно сразу, без анимации появления — так текст точно не пропадет
   caseContent.querySelectorAll('[data-reveal]').forEach(el => el.removeAttribute('data-reveal'));
+  caseContent.querySelectorAll('.bk').forEach(watchBrandkit);
+  markArticles(caseContent);
+  watchCampaigns(caseContent);
   if (!keepScroll) caseEl.scrollTop = 0;
 }
 
@@ -736,6 +1113,7 @@ function openCase(k){
   caseIndex = k;
   renderCase(k);
   caseEl.classList.add('open');
+  placeFab();
   document.body.classList.add('locked');
   caseEl.focus?.();
 }
@@ -743,6 +1121,7 @@ function closeCase(){
   if (caseIndex == null) return;
   caseIndex = null;
   caseEl.classList.remove('open');
+  placeFab();
   document.body.classList.remove('locked');
   setTimeout(() => { if (caseIndex == null) caseContent.innerHTML = ''; }, 900);
 }
@@ -759,6 +1138,8 @@ $('#caseBack').addEventListener('click', () => {
 });
 addEventListener('keydown', e => { if (e.key === 'Escape' && caseIndex != null) $('#caseBack').click(); });
 caseContent.addEventListener('click', e => {
+  const play = e.target.closest('.hero-play');
+  if (play) { play.outerHTML = `<iframe src="${play.dataset.src}" allow="${FRAME_ALLOW}" allowfullscreen></iframe>`; return; }
   const n = e.target.closest('.case-next');
   if (n) history.replaceState(null, '', '#case-' + (+n.dataset.next + 1)), openCase(+n.dataset.next);
 });
@@ -936,28 +1317,49 @@ $('#ttt').addEventListener('submit', e => {
 
 
 /* ================================================================
-   ТЕПЛОВОЕ ПЯТНО НА ЗАГОЛОВКЕ ПЕРВОГО ЭКРАНА (серьезная версия)
-   Под курсором буквы переливаются цветами тепловизора, остальной
-   текст остается обычным. Пятно плавно растет и тает.
+   БЕНЗИНОВАЯ ПЛЕНКА НА ЗАГОЛОВКЕ ПЕРВОГО ЭКРАНА (серьезная версия)
+   Под курсором по буквам едва заметно текут кольца-переливы,
+   как пятно бензина на асфальте. Сила и размер — в OIL.
    ================================================================ */
+const OIL = {
+  radius: 260,     // размер пятна, px
+  strength: 0.42,  // насколько заметно: 0 — не видно, 1 — ярко
+  rings: 14,       // сколько цветных колец в пятне
+  speed: 0.35,     // как быстро текут переливы
+  colors: ['#C86BD8', '#4F7BF2', '#3FD3C9', '#9BE36A', '#E9E36A', '#3FD3C9', '#4F7BF2'],   // без оранжевого
+};
 {
   const h1 = document.querySelector('#hero .h1');
   if (h1) {
     let tx = -999, ty = -999, x = -999, y = -999, r = 0, tr = 0, running = false;
-    const RADIUS = 190;
+    const rgbOf = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+    const cols = OIL.colors.map(rgbOf);
     h1.classList.add('heat');
-    h1.addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; tr = isFun() || reduced ? 0 : RADIUS; if (x < -900) { x = tx; y = ty; } start(); });
+    h1.addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; tr = isFun() || reduced ? 0 : OIL.radius; if (x < -900) { x = tx; y = ty; } start(); });
     h1.addEventListener('pointerleave', () => { tr = 0; start(); });
     const start = () => { if (!running) { running = true; requestAnimationFrame(step); } };
-    function step(){
-      x += (tx - x) * 0.18; y += (ty - y) * 0.18; r += (tr - r) * 0.12;
+    function stops(t){
+      // цвета плавно перетекают из кольца в кольцо и уходят в прозрачность к краю
+      const out = [];
+      for (let i = 0; i <= OIL.rings; i++){
+        const k = i / OIL.rings, f = (k * 3.2 + t) % cols.length, j = Math.floor(f), m = f - j;
+        const a = cols[j], b = cols[(j + 1) % cols.length];
+        const c = a.map((v, n) => Math.round(v + (b[n] - v) * m));
+        const alpha = OIL.strength * Math.pow(1 - k, 1.6) * (0.75 + 0.25 * Math.sin(k * 19 + t * 4));
+        out.push(`rgba(${c},${alpha.toFixed(3)}) ${(k * 100).toFixed(1)}%`);
+      }
+      return out.join(',');
+    }
+    function step(now){
+      x += (tx - x) * 0.12; y += (ty - y) * 0.12; r += (tr - r) * 0.08;
+      h1.style.setProperty('--oil', stops(now / 1000 * OIL.speed));
       h1.querySelectorAll('.w > span').forEach(sp => {
         const b = sp.getBoundingClientRect();
         sp.style.setProperty('--hx', (x - b.left).toFixed(1) + 'px');
         sp.style.setProperty('--hy', (y - b.top).toFixed(1) + 'px');
         sp.style.setProperty('--hr', r.toFixed(1) + 'px');
       });
-      if (Math.abs(tr - r) > 0.5 || Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5) requestAnimationFrame(step);
+      if (r > 0.5 || tr > 0) requestAnimationFrame(step);   // пока пятно на месте, переливы текут
       else running = false;
     }
   }
@@ -970,10 +1372,19 @@ $('#ttt').addEventListener('submit', e => {
 let saved = 'light';
 try { saved = localStorage.getItem('kd-mode') || 'light'; } catch (e) {}
 root.dataset.theme = saved;
-sw.setAttribute('aria-checked', saved === 'dark');
+document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', saved === 'dark'));
 renderTexts();
 renderLists();
 setTimeout(() => $('#fab').classList.add('in'), 700);   // «связаться» проявляется по буквам
+/* «связаться» прячется на первом экране; в дружеской версии «поболтать» появляется ближе к середине страницы */
+function placeFab(){
+  const far = isFun() ? (document.documentElement.scrollHeight - innerHeight) * 0.4 : innerHeight * 0.8;
+  $('#fab').classList.toggle('away', caseIndex == null && scrollY < far);
+}
+addEventListener('scroll', placeFab, { passive: true });
+addEventListener('resize', placeFab);
+addEventListener('theme:apply', placeFab);
+placeFab();
 requestAnimationFrame(() => requestAnimationFrame(() => watchReveals(document, true)));
 if (document.fonts) document.fonts.ready.then(layoutStrings);
 readHash();

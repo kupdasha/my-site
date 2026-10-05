@@ -4,6 +4,8 @@
    Любой элемент с атрибутом data-waves превращается в медленно
    текущие цветные волны. Цвета — в data-colors через запятую
    (четыре цвета, по кругу), скорость — data-speed (по умолчанию 1).
+   С атрибутом data-scroll волны на компьютере текут только при прокрутке
+   страницы, на телефоне — сами по себе.
 
    Все блоки рисуются одной видеокарточной сценой по очереди, поэтому
    волн на странице может быть сколько угодно — браузер не тормозит.
@@ -11,6 +13,7 @@
 const WAVES = {
   scale: 0.4,    // детализация: волны мягкие, высокое разрешение им не нужно
   speed: 1,      // общая скорость течения
+  scroll: 0.004, // для data-scroll: насколько продвигаются волны за пиксель прокрутки
 };
 
 (() => {
@@ -75,7 +78,7 @@ function scan(){
     const cv = document.createElement('canvas');
     cv.className = 'waves-canvas'; cv.setAttribute('aria-hidden', 'true');
     el.prepend(cv);
-    targets.set(el, { cv, ctx: cv.getContext('2d'), seed: Math.random() * 40, visible: false });
+    targets.set(el, { cv, ctx: cv.getContext('2d'), seed: Math.random() * 40, visible: false, time: 0, drawn: false });
     io.observe(el);
   });
   targets.forEach((t, el) => { if (!el.isConnected) { io.unobserve(el); targets.delete(el); } });
@@ -83,20 +86,28 @@ function scan(){
 new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
 scan();
 
-const t0 = performance.now();
+const desktop = matchMedia('(min-width: 901px) and (hover: hover)');
+let prev = performance.now(), lastScroll = scrollY;
 function frame(now){
   requestAnimationFrame(frame);
-  const time = reduced ? 0 : (now - t0) / 1000 * WAVES.speed;
+  const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+  const scrolled = Math.abs(scrollY - lastScroll); lastScroll = scrollY;
   targets.forEach((t, el) => {
     if (!t.visible || el.style.opacity === '0' || parseFloat(el.style.opacity) < 0.01) return;   // погашенный блок не рисуем
     const r = el.getBoundingClientRect();
     const w = Math.max(16, Math.round(r.width * WAVES.scale)), h = Math.max(16, Math.round(r.height * WAVES.scale));
+    const speed = (parseFloat(el.dataset.speed) || 1) * WAVES.speed;
+    const same = t.cv.width === w && t.cv.height === h;
+    if (reduced) { if (t.drawn && same) return; }
+    else if ('scroll' in el.dataset && desktop.matches) { if (!scrolled && t.drawn && same) return; t.time += scrolled * WAVES.scroll * speed; }
+    else t.time += dt * speed;
+    t.drawn = true;
     if (glc.width !== w || glc.height !== h) { glc.width = w; glc.height = h; }
     if (t.cv.width !== w || t.cv.height !== h) { t.cv.width = w; t.cv.height = h; }
     gl.viewport(0, 0, w, h);
     const cols = (el.dataset.colors || '#9867F9,#4480F3,#1FAFC1,#E2FB5A').split(',').map(rgb);
     gl.uniform2f(U.uRes, w, h);
-    gl.uniform1f(U.uTime, time * (parseFloat(el.dataset.speed) || 1));
+    gl.uniform1f(U.uTime, t.time);
     gl.uniform1f(U.uSeed, t.seed);
     gl.uniform3fv(U.uC0, cols[0]); gl.uniform3fv(U.uC1, cols[1 % cols.length]);
     gl.uniform3fv(U.uC2, cols[2 % cols.length]); gl.uniform3fv(U.uC3, cols[3 % cols.length]);

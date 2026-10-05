@@ -1,0 +1,26 @@
+<!-- Контакт -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <!-- Конец страницы: написать или переключиться на дружескую версию.
+           Тумблер справа работает как в шапке и возвращает в начало страницы -->
+      <div class="ty" data-reveal>
+        <h2 class="h2" data-text="contact.title"></h2>
+        <p class="lead" data-text="contact.lead"></p>
+        <div class="ty-row">
+          <div class="ctas contact-links" id="contactLinks"></div>
+        </div>
+        <!-- радужный перелив только под тумблером -->
+        <div class="ty-switch" data-waves data-colors="#E2FB5A,#B9F5C8,#BCD6FE,#E3D2FD" data-speed=".8">
+          <button class="switch switch-big" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+            <span data-text="contact.switch"></span><i></i>
+          </button>
+        </div>
+      </div>
+      <div class="ttt" id="ttt" data-reveal></div>
+      <footer class="foot">
+        <span data-text="footer.left"></span>
+      </footer>
+    </div>
+  </section>
+
+

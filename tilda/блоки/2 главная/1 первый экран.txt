@@ -1,0 +1,38 @@
+<!-- Первый экран -->
+  <section class="hero" id="hero">
+    <canvas id="dots" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="eyebrow" data-reveal data-text="hero.eyebrow"></div>
+      <h1 class="h1 split" data-text="hero.title"></h1>
+      <p class="hero-sub" data-reveal style="--d:.25s" data-text="hero.subtitle"></p>
+      <div class="hero-row">
+        <p class="lead" data-reveal style="--d:.35s" data-text="hero.lead"></p>
+        <div class="ctas" data-reveal style="--d:.5s">
+          <a class="btn btn-accent tease" data-href="telegram"><span data-text="hero.button"></span><span class="arr">→</span></a>
+          <a class="link hero-link" href="#works" data-text="hero.button2"></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<script>
+/* Первый экран: заголовок, текст и кнопки.
+   Правила записи текстов — в блоке «общие тексты» на странице «Шапка». */
+Object.assign(SITE, {
+
+  /* ---------- Первый экран ---------- */
+  hero: {
+    eyebrow: ['Арт-директор, дизайнер, вайб-кодер', 'теперь можно на "ты"'],
+    title:   ['коммуникационный дизайн, брендинг и нейросети', 'привет'],
+    /* строка средним кеглем под заголовком; в формальной версии ее нет */
+    subtitle: ['', 'я так рада тебя видеть, что вся переливаюсь'],
+    /* это слово в строке выше переливается радугой поверх белого */
+    iris:    'переливаюсь',
+    lead:    ['Вела дизайн федеральных кампаний и команды до 15 дизайнеров.',
+              'Поводи курсором по точкам -\nони тоже рады.'],   // \n — перенос строки
+    button:  ['обсудить проект',  'написать без повода'],
+    button2: ['смотреть работы',  'посмотреть, что умею'],
+  },
+
+});
+</script>
