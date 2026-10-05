@@ -466,7 +466,14 @@ Object.assign(SITE, {
         image: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan.jpg',
         video: 'kinescope:iezYVQ7By6kc46a7rBguXk',   // ролик в начале кейса — по кнопке поверх обложки
         /* deck — презентация после описания: слайды крупно, листаются прокруткой (оригинал: Google Диск 1zYzGNkNKf6pmL1NomXlHlms_5Yt1nFsE) */
-        deck:  Array.from({ length: 22 }, (_, i) => `img/divan/s-${String(i + 1).padStart(2, '0')}.jpg`),
+        deck: [
+          'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-01.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-02.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-03.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-04.jpg',
+          'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-05.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-06.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-07.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-08.jpg',
+          'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-09.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-10.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-11.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-12.jpg',
+          'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-13.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-14.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-15.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-16.jpg',
+          'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-17.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-18.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-19.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-20.jpg',
+          'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-21.jpg', 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/img/divan/s-22.jpg',
+        ],
         link:  'https://kupdasha.ru/design',
         story: [
           'Задача сформировать предложение, как доносить на сайте ключевые УТП и соблюдать консистентность. Учитывая: глобальные тренды, текущий «срез» команды и продукта, боли / потребности / восприятие аудитории, образ действия.',
