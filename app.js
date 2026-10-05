@@ -18,7 +18,7 @@
   const onTilda = !document.querySelector('script[src="content.js"]');
   const base = src.replace(/app\.js(\?.*)?$/, '');
   if (onTilda && typeof SITE !== 'undefined') {
-    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/about'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/n_d_a']];
+    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/about'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/nda']];
     const fix = s => {
       if (s.startsWith('img/')) return base + s;
       for (const [re, to] of PAGES) if (re.test(s)) return s.replace(re, to).replace('/#', '/#').replace(/^\/\/+/, '/');
@@ -1764,6 +1764,27 @@ const OIL = {
       if (r > 0.5 || tr > 0) requestAnimationFrame(step);   // пока пятно на месте, переливы текут
       else running = false;
     }
+  }
+}
+
+
+/* ================================================================
+   МЕНЮ НА ТЕЛЕФОНЕ И ПЛАНШЕТЕ
+   Пункты шапки прячутся под кнопку «меню»; кнопка создается здесь,
+   поэтому разметку шапки на Тильде менять не нужно
+   ================================================================ */
+{
+  const head = document.querySelector('.head'), nav = document.getElementById('nav');
+  if (head && nav && !document.getElementById('menuBtn')) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.id = 'menuBtn'; b.className = 'menu-btn';
+    b.setAttribute('aria-controls', 'nav'); b.setAttribute('aria-expanded', 'false');
+    b.textContent = 'меню';
+    nav.after(b);
+    const set = open => { head.classList.toggle('menu-open', open); b.setAttribute('aria-expanded', open); b.textContent = open ? 'закрыть' : 'меню'; };
+    b.addEventListener('click', () => set(!head.classList.contains('menu-open')));
+    nav.addEventListener('click', e => { if (e.target.closest('a')) set(false); });
+    addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
   }
 }
 
