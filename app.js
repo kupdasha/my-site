@@ -427,6 +427,8 @@ function renderNdaPage(){
       <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}`;
     const cls = `work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}`;
+    // page: '' — отдельной страницы еще нет: карточка видна, но никуда не ведет
+    if (p.page === '') return `<div class="${cls} soon" style="cursor:default" data-reveal>${inner}</div>`;
     return p.page
       ? `<a class="${cls}" href="${p.page}" data-reveal>${inner}</a>`
       : `<button class="${cls}" data-k="${k}" data-reveal>${inner}</button>`;
@@ -1457,7 +1459,7 @@ function renderCase(k, keepScroll){
   // следующий проект — без отдельных страниц (page) и без самого себя
   const W = SITE.works, items = caseItems(), p = items[k];
   let nk = (k + 1) % items.length;
-  while (nk !== k && items[nk].page) nk = (nk + 1) % items.length;
+  while (nk !== k && items[nk].page != null) nk = (nk + 1) % items.length;
   const next = nk !== k ? items[nk] : null;
   // story: один список абзацев или пара [формальный, дружеский]
   const raw = p.story || [];
@@ -1557,7 +1559,7 @@ function closeCase(){
 function readHash(){
   const m = /^#case-(\d+)$/.exec(location.hash);
   const k = m ? +m[1] - 1 : null;
-  if (k != null && caseItems()[k] && !caseItems()[k].page) { openedByClick = openedByClick || false; openCase(k); }
+  if (k != null && caseItems()[k] && caseItems()[k].page == null) { openedByClick = openedByClick || false; openCase(k); }
   else closeCase();
 }
 addEventListener('hashchange', () => { openedByClick = true; readHash(); });
