@@ -53,7 +53,7 @@
 .au-f-word{display:inline-block;transition:transform 1.2s var(--ease) .2s,opacity .8s var(--ease) .2s;opacity:0}
 .au-f-word.a{transform:translateX(-30%)}
 .au-f-word.b{transform:translateX(30%)}
-.au-f-plus{display:inline-grid;place-items:center;width:1.1em;height:1.1em;border-radius:50%;background:var(--dv-ink);color:var(--dv-blue);font-size:.7em;transform:scale(0) rotate(-90deg);transition:transform .8s var(--ease) 1s}
+.au-f-plus{display:inline-grid;place-items:center;position:relative;top:.1em;width:1.1em;height:1.1em;border-radius:50%;background:var(--dv-ink);color:var(--dv-blue);font-size:.7em;transform:scale(0) rotate(-90deg);transition:transform .8s var(--ease) 1s}
 .au-ch.in .au-f-word{opacity:1;transform:none}
 .au-ch.in .au-f-plus{transform:none}
 .au-f-notes{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:clamp(28px,4vw,56px) auto 0;font-size:clamp(18px,1.5vw,21px);line-height:1.35;text-align:center;opacity:0;transition:opacity .8s var(--ease) 1.5s}
@@ -323,3 +323,10 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-city-cover.ph>*{position:relative;z-index:1;margin:0 0 3% 0}
 .au-city-cover.ph .au-city-logo{margin-left:4%}
 .au-city-cover.ph .au-city-line{margin-right:4%}
+/* ряды «сейчас | предлагаю»: все карточки одного размера */
+.au-pairs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.6vw,24px) clamp(16px,2.4vw,40px)}
+.au-pair-cell{aspect-ratio:16/10;padding:0;overflow:hidden;border-radius:var(--r-img);background:var(--soft);opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease) .2s,transform .9s var(--ease) .2s}
+.au-pair-cell.next{transition-delay:.45s}
+.au-pair-cell:not(.next) img{filter:saturate(.7)}
+.au-pair-cell img{width:100%;height:100%;object-fit:cover;border-radius:0}
+.au-ch.in .au-pair-cell{opacity:1;transform:none}

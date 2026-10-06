@@ -191,7 +191,8 @@ function fix(f){
     <div class="au-fix-col now"><span class="au-fix-tag">${H.T(L[0])}</span><p>${H.T(f.now)}</p>${slide ? '' : fixMedia(f.before)}</div>
     <div class="au-fix-col next"><span class="au-fix-tag">${H.T(L[1])}</span><p>${H.T(f.next)}</p>${slide ? '' : fixMedia(f.after)}</div>
   </div>
-  ${slide ? `<div class="au-cmps n1">${compare([{ before: f.before[0], after: f.after[0], labels: L }])}</div>` : ''}`;
+  ${slide ? `<div class="au-cmps n1">${compare([{ before: f.before[0], after: f.after[0], labels: L }])}</div>` : ''}
+  ${f.pairs ? `<div class="au-pairs">${f.pairs.map(pr => pr.map((src, k) => `<button class="au-pair-cell au-zoomable${k ? ' next' : ''}" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')).join('')}</div>` : ''}`;
 }
 
 /* ---------- глава ---------- */
