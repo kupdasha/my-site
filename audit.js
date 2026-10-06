@@ -310,12 +310,13 @@ function phoneTable(t){
 
 // «увеличить»: на телефоне график целиком, по кнопке телефон поворачивается и график раскрывается на весь экран
 function zoomPhone(z){
-  const max = Math.max(...z.items.map(x => x.v));
-  const bars = cls => `<div class="au-zp-bars ${cls}">${z.items.map((x, i) => `<span style="--i:${i};--h:${(x.v / max * 100).toFixed(1)}%"><i></i><em>${x.year}</em></span>`).join('')}</div>`;
+  const max = z.items ? Math.max(...z.items.map(x => x.v)) : 1;
+  const bars = cls => `<div class="au-zp-bars ${cls}">${(z.items || []).map((x, i) => `<span style="--i:${i};--h:${(x.v / max * 100).toFixed(1)}%"><i></i><em>${x.year}</em></span>`).join('')}</div>`;
   return `<div class="au-zp">
     <div class="au-zp-stage">
       <div class="au-phone au-zp-phone"><div class="au-phone-scr">
-        <div class="au-zp-port">
+        ${z.port ? `<div class="au-zp-port img">${z.port.map(src => `<img src="${src}" alt="" loading="lazy">`).join('')}</div>
+        <div class="au-zp-land img"><img src="${z.land}" alt="" loading="lazy"></div>` : `<div class="au-zp-port">
           <p class="au-pt-ttl">${H.T(z.title)}</p>
           ${bars('mini')}
           <div class="au-zp-foot"><button class="au-zp-btn">${H.T(z.button)}</button><span>${H.T(z.source)}</span></div>
@@ -324,11 +325,29 @@ function zoomPhone(z){
         <div class="au-zp-land">
           <p class="au-pt-ttl">${H.T(z.title)}</p>
           ${bars('big')}
-        </div>
+        </div>`}
       </div></div>
     </div>
     <ul class="au-zp-steps">${z.steps.map((s, i) => `<li style="--i:${i}">${H.T(s)}</li>`).join('')}</ul>
   </div>`;
+}
+
+// макет на сайте: монитор с векторным графиком прямо из Figma (один в один) и рядом телефон с мобильной версией.
+// desk — график со страницы, deskAlt — второе состояние (показывается при наведении и по очереди само),
+// nav / phoneNav — шапка сайта, phone — мобильная версия. Всё — SVG из «ЕАБР.fig»
+function screens(c){
+  const img = (src, cls = '') => `<img class="${cls}" src="${src}" alt="" loading="lazy" decoding="async">`;
+  return `<div class="au-scr${c.phone ? '' : ' solo'}">
+    <div class="au-mon">
+      <div class="au-mon-scr">
+        ${c.nav ? img(c.nav, 'au-mon-nav') : ''}
+        <div class="au-mon-body${c.deskAlt ? ' alt' : ''}">${img(c.desk, 'a')}${c.deskAlt ? img(c.deskAlt, 'b') : ''}</div>
+      </div>
+      <span class="au-mon-neck" aria-hidden="true"></span><span class="au-mon-base" aria-hidden="true"></span>
+    </div>
+    ${c.phone ? `<div class="au-phone au-scr-phone"><div class="au-phone-scr">${c.phoneNav ? img(c.phoneNav, 'au-scr-pnav') : ''}${img(c.phone, 'au-scr-pchart')}</div></div>` : ''}
+  </div>
+  ${c.altNote ? `<p class="au-cap">${H.T(c.altNote)}</p>` : ''}`;
 }
 
 // палитра айдентики: цвета-полоски раскрываются при наведении, ниже — градиенты
@@ -366,6 +385,7 @@ function chapter(ch, p){
   if (ch.phoneTable) viz += phoneTable(ch.phoneTable);
   if (ch.zoomPhone) viz += zoomPhone(ch.zoomPhone);
   if (ch.palette)   viz += palette(ch.palette);
+  if (ch.screens)   viz += screens(ch.screens);
   if (ch.rows)      viz += rows(ch.rows);
   return `<section class="au-ch${ch.color ? ' c-' + ch.color : ''}">
     <div class="wrap">
@@ -499,6 +519,15 @@ function livePhoneTable(box){
     el.addEventListener('pointerleave', c.free);
   });
 }
+// второе состояние графика в мониторе: при наведении и само, по очереди
+function liveScreens(box){
+  const body = box.querySelector('.au-mon-body.alt'); if (!body) return;
+  let t = 0, held = false;
+  const loop = () => { clearTimeout(t); if (held || still()) return; t = setTimeout(() => { body.classList.toggle('on'); loop(); }, 2600); };
+  box.closest('.au-ch').addEventListener('au:in', () => setTimeout(loop, 1200), { once: true });
+  body.addEventListener('pointerenter', () => { held = true; clearTimeout(t); body.classList.add('on'); });
+  body.addEventListener('pointerleave', () => { held = false; body.classList.remove('on'); loop(); });
+}
 // телефон сам поворачивается туда и обратно; кнопка «увеличить» делает то же по нажатию
 function liveZoom(box){
   let t = 0, auto = true;
@@ -627,6 +656,7 @@ export async function mountAudit(mount, p, helpers){
   mount.querySelectorAll('.au-rk').forEach(liveRank);
   mount.querySelectorAll('.au-pt').forEach(livePhoneTable);
   mount.querySelectorAll('.au-zp').forEach(liveZoom);
+  mount.querySelectorAll('.au-scr').forEach(liveScreens);
   mount.querySelectorAll('.world').forEach(H.watchWorld);
   // ряды одной высоты: пропорции ячейки берутся из самой картинки
   mount.querySelectorAll('.au-pair-row').forEach(row => {

@@ -695,3 +695,37 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
   .au-edb .au-cell{flex:1 1 calc(50% - 8px);width:auto;aspect-ratio:auto}
   .au-edb .au-cell img{height:auto}
 }
+
+/* ---------- макет на сайте: монитор с графиком из Figma и телефон с мобильной версией ---------- */
+.au-scr{position:relative;padding-bottom:clamp(20px,3vw,48px)}
+.au-mon{width:84%;display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(32px);transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
+.au-scr.solo .au-mon{width:100%}
+.au-ch.in .au-mon{opacity:1;transform:none}
+.au-mon-scr{position:relative;width:100%;aspect-ratio:16/10;background:#fff;border:clamp(8px,1vw,16px) solid #1D222A;border-radius:clamp(12px,1.4vw,22px);overflow:hidden;
+  box-shadow:0 40px 80px -40px rgba(0,22,91,.45)}
+.au-mon-nav{position:absolute;top:0;left:0;width:100%;height:auto}
+.au-mon-body{position:absolute;inset:3.3% 0 0;display:grid;place-items:center}
+.au-mon-body img{grid-area:1 / 1;width:90%;height:auto;max-height:94%;object-fit:contain;
+  clip-path:inset(0 100% 0 0);transition:clip-path 1.6s var(--ease-io) .5s,opacity .6s var(--ease)}
+.au-ch.in .au-mon-body img{clip-path:inset(0 0 0 0)}
+.au-mon-body .b{opacity:0}
+.au-mon-body.on .a{opacity:0}
+.au-mon-body.on .b{opacity:1}
+.au-mon-body.alt{cursor:pointer}
+.au-mon-neck{width:9%;height:clamp(24px,4vw,64px);background:linear-gradient(90deg,#C9CCD3,#E6E8EC 50%,#C9CCD3)}
+.au-mon-base{width:26%;height:clamp(6px,.8vw,12px);border-radius:6px 6px 2px 2px;background:#C9CCD3}
+.au-scr-phone{--pw:clamp(150px,17vw,250px);position:absolute;right:0;bottom:0;opacity:0;transform:translateX(40px);transition:opacity .8s var(--ease) .9s,transform 1s var(--ease) .9s}
+.au-ch.in .au-scr-phone{opacity:1;transform:none}
+.au-scr-phone .au-phone-scr{padding:14px 0 0;gap:0;overflow:hidden}
+.au-scr-phone img{width:100%;height:auto;border-radius:0}
+.au-scr-pchart{transform:translateY(24px);transition:transform 1.2s var(--ease) 1.2s}
+.au-ch.in .au-scr-pchart{transform:none}
+@media (max-width:760px){
+  .au-mon{width:100%}
+  .au-scr-phone{--pw:230px;position:relative;margin:28px auto 0;transform:translateY(24px)}
+}
+/* «увеличить» с макетами из Figma: в превью — шапка и таблица, после поворота — таблица крупно */
+.au-zp-port.img{inset:14px 0 0;gap:0}
+.au-zp-port.img img,.au-zp-land.img img{width:100%;height:auto;border-radius:0}
+.au-zp-land.img{padding:10px 14px;display:grid;place-items:center}
+.au-zp-land.img img{max-height:100%;object-fit:contain}
