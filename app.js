@@ -276,6 +276,7 @@ function renderAboutExtras(){
       strip.innerHTML = E.items.slice(0, E.first || 4).map((e, k) =>
         `<figure class="ev" data-i="${k}" data-reveal style="--d:${(k * 0.08).toFixed(2)}s;--ar:${e.ratio || 1.5}"><img src="${e.thumb || e.src}" alt="${uesc(pick(e.caption))}" loading="lazy"><figcaption>${T(e.caption)}</figcaption></figure>`).join('')
         + `<p class="ev-more" data-reveal><button type="button" class="link ev-all">${T(E.more)}</button><sup class="yr">${E.items.length}</sup></p>`;
+      rotateEvents(strip);
     } else if (isFun() && SITE.photos.dating) {
       // дружеская версия: колода, как в приложении знакомств
       const D = SITE.photos.dating;
@@ -345,6 +346,37 @@ document.addEventListener('pointerover', e => {
   showPreviewImage(E.items[talkShown++ % E.items.length].thumb);
 });
 document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.ev-link')) showPreviewImage(''); });
+/* Фото в ленте выступлений сами сменяются: раз в несколько секунд одно из окошек плавно
+   показывает следующее фото того же формата (вертикальное — вертикальным), с подписью.
+   Пока лента не на экране или включено «уменьшить движение» — стоит */
+const EV_ROTATE = 2800;   // как часто меняется одно фото, мс
+let evTimer = null;
+function rotateEvents(strip){
+  clearInterval(evTimer);
+  const E = SITE.photos.events, slots = [...strip.querySelectorAll('.ev')];
+  if (!slots.length || reduced) return;
+  let turn = 0;
+  evTimer = setInterval(() => {
+    const r = strip.getBoundingClientRect();
+    if (document.hidden || !strip.isConnected || r.bottom < 0 || r.top > innerHeight) return;   // лента не на экране — стоим
+    const slot = slots[turn++ % slots.length];
+    const shown = new Set(slots.map(s => +s.dataset.i));
+    const tall = (E.items[+slot.dataset.i].ratio || 1.5) < 1;
+    const pool = E.items.map((x, i) => i).filter(i => !shown.has(i) && ((E.items[i].ratio || 1.5) < 1) === tall);
+    if (!pool.length) return;
+    const cur = +slot.dataset.i, next = pool.find(i => i > cur) ?? pool[0], item = E.items[next];
+    const old = slot.querySelector('img'), img = new Image();
+    img.alt = pick(item.caption); img.className = 'ev-next';
+    img.onload = () => {
+      old.after(img);
+      requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('on')));
+      const cap = slot.querySelector('figcaption'); cap.classList.add('swap');
+      setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, 450);
+      setTimeout(() => { old.remove(); img.className = ''; slot.dataset.i = next; }, 1000);
+    };
+    img.src = item.thumb || item.src;
+  }, EV_ROTATE);
+}
 /* хроника выступлений: фото в ленте — сразу увеличивается; «все выступления» — плитка всех фото по событиям,
    нажатие на плитку увеличивает фото (листать можно по всем) */
 const evGallery = document.createElement('div');

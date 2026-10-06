@@ -1442,3 +1442,9 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .ev-g-chip .yr{margin-left:.3em}
 .ev-g-flow .ev-g-tile.first{margin-left:0}
 @media (max-width:760px){.ev-g-flow .ev-g-tile{flex-basis:calc(var(--ar) * 150px)}}
+/* смена фото в ленте выступлений: новое проявляется поверх старого, подпись мягко меняется */
+.ev{position:relative}
+.ev img.ev-next{position:absolute;left:0;top:0;opacity:0;transition:opacity 1s var(--ease)}
+.ev img.ev-next.on{opacity:1}
+.ev figcaption{transition:opacity .45s var(--ease)}
+.ev figcaption.swap{opacity:0}

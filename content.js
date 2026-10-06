@@ -1954,6 +1954,8 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         { src: 'img/events/ev-62.jpg', thumb: 'img/events/ev-62-s.jpg', ratio: 1.33, caption: 'Подкаст «Одна кавычка»', note: 'Лифанов, агентство «Супрематика»' },
         { src: 'img/events/ev-63.jpg', thumb: 'img/events/ev-63-s.jpg', ratio: 0.57, caption: 'MADS' },
         { src: 'img/events/ev-64.jpg', thumb: 'img/events/ev-64-s.jpg', ratio: 0.75, caption: 'Собственный митап' },
+        { src: 'img/events/ev-68.jpg', thumb: 'img/events/ev-68-s.jpg', ratio: 1.5, caption: 'Собственный митап' },
+        { src: 'img/events/ev-69.jpg', thumb: 'img/events/ev-69-s.jpg', ratio: 1.78, caption: 'Собственный митап' },
         { src: 'img/events/ev-65.jpg', thumb: 'img/events/ev-65-s.jpg', ratio: 0.72, caption: '«Среда», церемония награждения' },
         { src: 'img/events/ev-66.jpg', thumb: 'img/events/ev-66-s.jpg', ratio: 0.56, caption: 'Подкаст «Одна кавычка»' },
         { src: 'img/events/ev-67.jpg', thumb: 'img/events/ev-67-s.jpg', ratio: 0.8, caption: 'Новый год «Сетки»' },
