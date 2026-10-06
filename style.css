@@ -1507,3 +1507,6 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .clients{display:flex;flex-direction:column}
 .clients-note{order:1;margin-top:clamp(14px,1.4vw,20px)}
 .clients-what{order:2;margin-top:clamp(16px,1.6vw,24px)}
+/* переносы строк: без одиноких слов в последней строке, короткие приписки — ровными строками */
+p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
+.clients-note,.sec-note,.ev-g-head{text-wrap:balance}

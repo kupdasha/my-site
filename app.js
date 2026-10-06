@@ -113,6 +113,8 @@ function typograf(input){
   // названия брендов не рвутся между строками: MANGO OFFICE, The Ventures Japan, VK Инклюзия
   s = s.replace(/(?<=(?:^|[\s\u00a0«„(])[A-Z][A-Za-z0-9&'’.]*)[ \t]+(?=[A-Z])/g, '\u00a0');
   s = s.replace(/(?<=(?:^|[\s\u00a0«„(])[A-Z]{2,})[ \t]+(?=[А-ЯЁ])/g, '\u00a0');
+  // последнее слово абзаца не остается на строке одно: держится за предыдущее (если не слишком длинное для телефона)
+  s = s.split('\n').map(l => l.trim().split(/[ \t]+/).length < 4 ? l : l.replace(/[ \t]+(?=[^\s\u00a0]{1,12}\s*$)/, '\u00a0')).join('\n');
   return s;
 }
 function nestQuotes(s){
