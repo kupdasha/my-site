@@ -29,49 +29,47 @@ a{color:inherit}
 *{box-sizing:border-box}
 
 #field{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
-.tl{position:relative;padding:16px 16px 40px}
-.col{position:relative;z-index:1;max-width:440px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+html,body{overflow-x:hidden}
+/* весь таплинк — один экран: --k сжимает отступы и высоты, если экран низкий (считает скрипт) */
+.tl{--k:1;position:relative;min-height:100svh;display:flex;flex-direction:column;padding:calc(10px*var(--k)) 16px calc(16px*var(--k))}
+.col{position:relative;z-index:1;flex:1;width:100%;max-width:420px;margin-inline:auto;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:calc(18px*var(--k))}
 
-.top{align-self:stretch;display:flex;justify-content:flex-end}
-.switch{display:flex;align-items:center;gap:10px;height:44px;padding:0 2px;border:0;background:none;font:500 16px/1 var(--font);color:var(--ink);cursor:pointer}
+.top{position:relative;z-index:2;width:100%;max-width:420px;margin-inline:auto;display:flex;justify-content:flex-end}
+.switch{display:flex;align-items:center;gap:10px;height:40px;padding:0 2px;border:0;background:none;font:500 16px/1 var(--font);color:var(--ink);cursor:pointer}
 .switch>span{opacity:.45;transition:opacity .45s var(--ease);padding-bottom:2px}
 .switch>span:first-child{opacity:1}
 :root[data-mode="fun"] .switch>span:first-child{opacity:.45}
 :root[data-mode="fun"] .switch>span:last-child{opacity:1}
-.switch>i{position:relative;width:64px;height:36px;border-radius:99px;flex:none;
+.switch>i{position:relative;width:60px;height:34px;border-radius:99px;flex:none;
   background-image:linear-gradient(100deg,#E2FB5A,#7DE36A,#3FD3C9,#4F7BF2,#A65BEF,#E85BD0,#A65BEF,#4F7BF2,#3FD3C9,#7DE36A,#E2FB5A);
   background-size:300% 100%;animation:track 6s linear infinite}
-.switch>i::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(14,15,18,.28);transition:transform .55s var(--ease-io)}
-:root[data-mode="fun"] .switch>i::after{transform:translateX(28px)}
+.switch>i::after{content:"";position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(14,15,18,.28);transition:transform .55s var(--ease-io)}
+:root[data-mode="fun"] .switch>i::after{transform:translateX(26px)}
 .switch:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:8px}
 @keyframes track{to{background-position:300% 0}}
 
-/* первый экран: имя и главная кнопка в центре */
-.lead{align-self:stretch;min-height:calc(100svh - 76px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding-block:24px 40px}
-h1{margin:0;font-weight:600;font-size:clamp(36px,11vw,52px);line-height:1;letter-spacing:-.015em;text-align:center}
-.bio{margin:18px 0 0;font-family:var(--font-read);font-weight:400;font-size:19px;line-height:1.42;text-align:center;text-wrap:pretty}
+.intro{text-align:center}
+h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line-height:1;letter-spacing:-.015em}
+.bio{margin:calc(12px*var(--k)) 0 0;font-family:var(--font-read);font-weight:400;font-size:max(16px,calc(17.5px*var(--k)));line-height:1.36;text-wrap:pretty}
 .bio a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .bio a:hover{background:var(--accent);color:var(--accent-text);text-decoration:none}
 
-.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;font-weight:500;text-decoration:none;text-align:center;transition:transform .35s var(--ease),background .35s,color .35s}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;border-radius:99px;font-weight:500;text-decoration:none;text-align:center;transition:transform .35s var(--ease),background .35s,color .35s}
 .btn:active{transform:scale(.97)}
 .btn:focus-visible,.soc a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.btn-main{margin-top:44px;align-self:stretch;height:68px;padding:0 28px 4px;background:var(--btn);color:var(--btn-text);font-size:21px}
+.actions{display:flex;flex-direction:column;gap:calc(8px*var(--k))}
+.btn-main{height:calc(60px*var(--k));padding:0 24px 3px;background:var(--btn);color:var(--btn-text);font-size:20px;margin-bottom:calc(4px*var(--k))}
 .btn-main:hover{background:var(--btn-hover);color:var(--btn-hover-text)}
-
-.more{align-self:stretch;display:flex;flex-direction:column;gap:10px}
-.btn-more{height:56px;padding:0 24px 3px;background:var(--soft);color:var(--ink);font-size:18px}
+.btn-more{height:calc(48px*var(--k));padding:0 20px 2px;background:var(--soft);color:var(--ink);font-size:17px}
 .btn-more:hover{background:var(--accent);color:var(--accent-text)}
 
-.group{align-self:stretch;margin-top:36px}
-.group h2{margin:0 0 12px;font-size:16px;font-weight:500;color:var(--muted);text-align:center}
-.soc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.soc a{display:flex;align-items:center;justify-content:center;height:46px;padding:0 8px 2px;border-radius:99px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s,color .3s}
+.links{display:flex;flex-direction:column;align-items:center;gap:calc(10px*var(--k))}
+.soc{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
+.soc a{display:flex;align-items:center;height:calc(38px*var(--k));padding:0 13px 2px;border-radius:99px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;transition:background .3s,color .3s}
 .soc a:hover{background:var(--accent);color:var(--accent-text)}
+.soc span{font-size:16px;color:var(--muted);padding:0 4px 2px}
 
-.legal{margin:40px 0 0;font-size:16px;line-height:1.35;color:var(--muted);text-align:center;text-wrap:balance}
-
-@media (max-width:359px){.soc{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.legal{position:relative;z-index:1;width:100%;max-width:420px;margin:calc(14px*var(--k)) auto 0;font-size:16px;line-height:1.3;color:var(--muted);text-align:center;text-wrap:balance}
 @media (prefers-reduced-motion:reduce){.switch>i{animation:none}}
 </style>
 <style>body{margin:0}</style>
@@ -80,49 +78,45 @@ h1{margin:0;font-weight:600;font-size:clamp(36px,11vw,52px);line-height:1;letter
 
 <canvas id="field" aria-hidden="true"></canvas>
 <main class="tl" id="tl">
+  <div class="top">
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию" data-quiet>
+      <span>серьезно</span><i></i><span>повеселее</span>
+    </button>
+  </div>
+
   <div class="col">
-    <div class="top">
-      <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию" data-solid>
-        <span>серьезно</span><i></i><span>повеселее</span>
-      </button>
+    <div class="intro">
+      <h1 data-text>Даша Купцова</h1>
+      <p class="bio" data-text>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст <a href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">«Одна&nbsp;кавычка»</a>&nbsp;— среди гостей Студия Лебедева, Depot, Супрематика, DDVB и&nbsp;другие.</p>
     </div>
 
-    <section class="lead">
-      <h1 data-solid>Даша Купцова</h1>
-      <p class="bio" data-solid>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст <a href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">«Одна&nbsp;кавычка»</a>&nbsp;— среди гостей Студия Лебедева, Depot, Супрематика, DDVB и&nbsp;другие.</p>
-      <a class="btn btn-main" id="magnet" data-solid href="https://kupdasha.ru/" target="_blank" rel="noopener">заказать дизайн-проект</a>
-    </section>
-
-    <nav class="more" aria-label="Еще">
-      <a class="btn btn-more" data-solid href="https://kupdasha.ru/profile" target="_blank" rel="noopener">позвать выступать</a>
-      <a class="btn btn-more" data-solid href="https://kupdasha.ru/merch" target="_blank" rel="noopener">задизайнить себе мерч</a>
-      <a class="btn btn-more" data-solid href="https://kupdasha.ru/ai" target="_blank" rel="noopener">ИИ-воркшоп для вашей команды</a>
+    <nav class="actions" aria-label="Главное">
+      <a class="btn btn-main" id="magnet" data-quiet href="https://kupdasha.ru/" target="_blank" rel="noopener">заказать дизайн-проект</a>
+      <a class="btn btn-more" data-quiet href="https://kupdasha.ru/profile" target="_blank" rel="noopener">позвать выступать</a>
+      <a class="btn btn-more" data-quiet href="https://kupdasha.ru/merch" target="_blank" rel="noopener">задизайнить себе мерч</a>
+      <a class="btn btn-more" data-quiet href="https://kupdasha.ru/ai" target="_blank" rel="noopener">ИИ-воркшоп для вашей команды</a>
     </nav>
 
-    <section class="group" aria-label="Соцсети">
-      <h2 data-solid>я в соцсетях</h2>
-      <div class="soc">
-        <a data-solid href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
-        <a data-solid href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
-        <a data-solid href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
-        <a data-solid href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
-        <a data-solid href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
-        <a data-solid href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
-      </div>
-    </section>
-
-    <section class="group" aria-label="Подкаст">
-      <h2 data-solid>подкаст «Одна&nbsp;кавычка»</h2>
-      <div class="soc">
-        <a data-solid href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">слушать</a>
-        <a data-solid href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
-        <a data-solid href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
-        <a data-solid href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
-      </div>
-    </section>
-
-    <p class="legal" data-solid>*Instagram&nbsp;— продукт Meta Platforms Inc., деятельность которой запрещена на&nbsp;территории Российской Федерации</p>
+    <div class="links">
+      <nav class="soc" aria-label="Соцсети">
+        <a data-quiet href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
+        <a data-quiet href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
+        <a data-quiet href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
+        <a data-quiet href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
+        <a data-quiet href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
+        <a data-quiet href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
+      </nav>
+      <nav class="soc" aria-label="Подкаст «Одна кавычка»">
+        <span data-text>подкаст</span>
+        <a data-quiet href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">слушать</a>
+        <a data-quiet href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
+        <a data-quiet href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
+        <a data-quiet href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
+      </nav>
+    </div>
   </div>
+
+  <p class="legal" data-text>*Instagram&nbsp;— продукт Meta Platforms Inc., деятельность которой запрещена на&nbsp;территории Российской Федерации</p>
 </main>
 
 <script>
@@ -151,6 +145,7 @@ h1{margin:0;font-weight:600;font-size:clamp(36px,11vw,52px);line-height:1;letter
     finger: 1500,    // сила пальца или курсора
     tilt: 9,         // сила наклона телефона
     maxLen: 9,       // самая длинная черточка у магнита, px
+    calm: [3, 30],   // искры гаснут ближе 3px к тексту и кнопкам и разгораются к 30px
     turn: 7,         // как быстро опилки разворачиваются (больше — резче)
     light: { glow: .5, vivid: .48, alpha: .9 },
     dark:  { glow: .62, vivid: .42, alpha: .9 },
@@ -181,9 +176,13 @@ h1{margin:0;font-weight:600;font-size:clamp(36px,11vw,52px);line-height:1;letter
     ang = new Float32Array(cols * rows);
     for (let i = 0; i < ang.length; i++) ang[i] = Math.random() * Math.PI;
     const sy = scrollY;
-    solids = [...document.querySelectorAll('[data-solid]')].map(el => {
-      const r = el.getBoundingClientRect();
-      return [r.left - 12, r.top + sy - 12, r.right + 12, r.bottom + sy + 12];
+    // где искры затихают: строки текста (по самим строкам, а не по блоку) и кнопки-капсулы
+    solids = [];
+    const add = (r, rad) => { if (r.width && r.height) solids.push([(r.left + r.right) / 2, (r.top + r.bottom) / 2 + sy, r.width / 2, r.height / 2, rad]); };
+    document.querySelectorAll('[data-quiet]').forEach(el => { const r = el.getBoundingClientRect(); add(r, Math.min(r.height / 2, 99)); });
+    document.querySelectorAll('[data-text]').forEach(el => {
+      const rg = document.createRange(); rg.selectNodeContents(el);
+      [...rg.getClientRects()].forEach(r => add(r, 6));
     });
     const m = magnetEl.getBoundingClientRect(), rad = m.height / 2;
     mag = { x0: m.left + rad, x1: m.right - rad, y: m.top + sy + rad, r: rad };
@@ -218,31 +217,37 @@ h1{margin:0;font-weight:600;font-size:clamp(36px,11vw,52px);line-height:1;letter
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, vw, vh);
     ctx.lineCap = 'round'; ctx.lineWidth = 1.7;
-    const paths = palette.map(() => new Path2D());
+    const paths = Array.from({ length: BINS * 3 }, () => new Path2D());
     const r0 = Math.max(0, Math.floor(sy / c)), r1 = Math.min(rows - 1, Math.ceil((sy + vh) / c));
     const k = still ? 1 : Math.min(1, dt * FIELD.turn);
     for (let r = r0; r <= r1; r++) {
       for (let q = 0; q < cols; q++) {
         const x = q * c + (r & 1 ? c / 2 : 0), y = r * c;
-        let hidden = false;
-        for (const b of solids) if (x > b[0] && x < b[2] && y > b[1] && y < b[3]) { hidden = true; break; }
-        if (hidden) continue;
+        // расстояние до ближайшего текста или кнопки: искры у краев плавно гаснут, жесткой рамки нет
+        let dmin = 1e9;
+        for (const b of solids) {
+          const qx = Math.abs(x - b[0]) - b[2] + b[4], qy = Math.abs(y - b[1]) - b[3] + b[4];
+          const d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - b[4];
+          if (d < dmin) dmin = d;
+        }
+        if (dmin < FIELD.calm[0]) continue;
+        const qz = Math.min(1, (dmin - FIELD.calm[0]) / (FIELD.calm[1] - FIELD.calm[0])), quiet = qz * qz * (3 - 2 * qz);
         const [vx, vy] = field(x, y);
         const f = Math.hypot(vx, vy);
         // опилки без головы и хвоста: поворачиваем по кратчайшему пути в пределах полуоборота
         const i = r * cols + q, want = Math.atan2(vy, vx);
         let d = want - ang[i]; d -= Math.round(d / Math.PI) * Math.PI; ang[i] += d * k;
-        let len = FIELD.maxLen * Math.pow(Math.min(1, Math.max(0, (f - 9) / 45)), .8);   // вдали — точки, у магнита — черточки
+        let len = quiet * FIELD.maxLen * Math.pow(Math.min(1, Math.max(0, (f - 9) / 45)), .8);   // вдали — точки, у магнита — черточки
         for (const w of waves) { const wd = Math.abs(Math.hypot(x - w.x, y - w.y) - w.r); if (wd < 40) len += (1 - wd / 40) * 6 * w.a; }
         const tw = .55 + .45 * Math.sin(t * (1.3 + (i * 7919 % 13) / 9) + i);   // каждая искра мерцает в своем ритме
-        if (tw < .2 && len < 1) continue;
+        if (tw * quiet < .2 && len < 1) continue;
         const ux = Math.cos(ang[i]) * len / 2, uy = Math.sin(ang[i]) * len / 2;
         const bin = ((Math.floor((x * .0016 + y * .0009 + phase) * BINS) % BINS) + BINS) % BINS;
-        paths[bin].moveTo(x - ux, y - sy - uy); paths[bin].lineTo(x + ux + .01, y - sy + uy);
+        const P = paths[bin * 3 + Math.min(2, Math.floor(quiet * 3))];
+        P.moveTo(x - ux, y - sy - uy); P.lineTo(x + ux + .01, y - sy + uy);
       }
     }
-    ctx.globalAlpha = s.alpha;
-    palette.forEach((col, b) => { ctx.strokeStyle = col; ctx.stroke(paths[b]); });
+    paths.forEach((P, n) => { ctx.globalAlpha = s.alpha * [.3, .62, 1][n % 3]; ctx.strokeStyle = palette[Math.floor(n / 3)]; ctx.stroke(P); });
     for (let j = waves.length - 1; j >= 0; j--) { const w = waves[j]; w.r += dt * 520; w.a = Math.max(0, 1 - w.r / 700); if (w.a <= 0) waves.splice(j, 1); }
   }
 
@@ -274,10 +279,16 @@ h1{margin:0;font-weight:600;font-size:clamp(36px,11vw,52px);line-height:1;letter
     if (still) render(0, 0);
   });
 
-  measure();
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { measure(); if (still) render(0, 0); });
+  /* таплинк помещается в один экран: если не влез — поджимаем отступы и высоты */
+  const tl = page;
+  function fit() {
+    let k = 1; tl.style.setProperty('--k', k);
+    while (k > .62 && document.documentElement.scrollHeight > innerHeight + 1) { k -= .04; tl.style.setProperty('--k', k.toFixed(2)); }
+  }
+  fit(); measure();
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { fit(); measure(); if (still) render(0, 0); });
   let rt, lw = innerWidth;
-  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { measure(); if (still) render(0, 0); }, 150); });
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { fit(); measure(); if (still) render(0, 0); }, 150); });
   if (still) { render(0, 0); addEventListener('scroll', () => render(0, 0), { passive: true }); }
   else requestAnimationFrame(frame);
 })();
