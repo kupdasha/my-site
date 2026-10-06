@@ -305,18 +305,10 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { row: [ 'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg' ] },
               /* узкие баннеры небольшого разрешения — лесенкой (stairs: true), каждый в половину ширины */
               { caption: ['баннеры', 'узкие баннеры'], row: [ 'img/vk/vk-adb-billboard-1.jpg', 'img/vk/vk-adb-billboard-2.jpg', 'img/vk/vk-adb-billboard-3.jpg' ], stairs: true },
-              /* съемки коллажом: слева видео, справа четыре фото; cover — фото заполняют ячейки целиком */
-              { caption: ['процесс съемок', 'бэкстейдж: как это снимали'], cover: true,
-                collage: {
-                  areas: '"v a b" "v c d"', cols: '1fr .1875fr .1875fr', rows: '1fr 1fr', ratio: '2.75/1',
-                  cells: [
-                    { area: 'v', img: { video: 'img/vk/vk-adb-backstage.mp4', ratio: 2 } },
-                    { area: 'a', img: 'img/vk/vk-adb-backstage-1.jpg' },
-                    { area: 'b', img: 'img/vk/vk-adb-backstage-3.jpg' },
-                    { area: 'c', img: 'img/vk/vk-adb-backstage-4.jpg' },
-                    { area: 'd', img: 'img/vk/vk-adb-backstage-5.jpg' },
-                  ],
-                } },
+              /* съемки: три фото крупным рядом без обрезки, под ними видео на всю ширину */
+              { caption: ['процесс съемок', 'бэкстейдж: как это снимали'], row: [
+                'img/vk/vk-adb-backstage-1.jpg', 'img/vk/vk-adb-backstage-3.jpg', 'img/vk/vk-adb-backstage-5.jpg' ] },
+              { row: [ { video: 'img/vk/vk-adb-backstage.mp4', ratio: 2 } ] },
             ],
             links: [
               { text: 'платформа VK AdBlogger', link: 'https://adblogger.vk.com/' },
