@@ -269,7 +269,14 @@ const photo = v => typeof v === 'string' ? { src: v, pos: '50% 50%' } : { pos: '
 function renderAboutExtras(){
   if (SITE.photos) {
     const strip = $('#photoStrip');
-    if (isFun() && SITE.photos.dating) {
+    const E = SITE.photos.events;
+    if (!isFun() && E && E.items && E.items.length) {
+      // серьезная версия: хроника выступлений — несколько фото в ряд, остальные в просмотре
+      strip.className = 'photo-strip ev-strip';
+      strip.innerHTML = E.items.slice(0, E.first || 4).map((e, k) =>
+        `<figure class="ev" data-i="${k}" data-reveal style="--d:${(k * 0.08).toFixed(2)}s;--ar:${e.ratio || 1.5}"><img src="${e.thumb || e.src}" alt="${esc(pick(e.caption))}" loading="lazy"><figcaption>${T(e.caption)}</figcaption></figure>`).join('')
+        + `<p class="ev-more" data-reveal><button type="button" class="link ev-all">${T(E.more)}</button><sup class="yr">${E.items.length}</sup></p>`;
+    } else if (isFun() && SITE.photos.dating) {
       // дружеская версия: колода, как в приложении знакомств
       const D = SITE.photos.dating;
       strip.className = 'deck-wrap';
@@ -294,6 +301,7 @@ function renderAboutExtras(){
   const row = (r, k) => { const inner = `<span class="article-source">${T(r.source)}</span><span class="article-title">${T(r.title)}</span>`;
     return r.link ? `<a class="article" href="${r.link}" data-reveal style="--d:${(k * 0.05).toFixed(2)}s">${inner}<span class="go">${ARROW}</span></a>`
                   : `<div class="article" data-reveal>${inner}<span></span></div>`; };
+  setTimeout(linkTalks, 0);   // после того как тексты встали на место
   if (SITE.articles) $('#articleList').innerHTML = SITE.articles.items.slice(0, SITE.articles.limit || 99).map((a, k) =>
     `<a class="article" href="${a.link}" data-reveal style="--d:${(k * 0.05).toFixed(2)}s"><span class="article-source">${T(a.source)}</span><span class="article-title">${T(a.title)}</span><span class="go">${ARROW}</span></a>`).join('');
   if (SITE.podcast && SITE.podcast.links) $('#podLinks').innerHTML = SITE.podcast.links.map(l => `<a class="link" href="${l.link}">${T(l.text)}</a>`).join('');
@@ -321,11 +329,39 @@ function viewOffset(r){
   if (!r || !v.width) return '';
   return `translate(${r.left + r.width / 2 - (v.left + v.width / 2)}px,${r.top + r.height / 2 - (v.top + v.height / 2)}px) scale(${r.width / v.width})`;
 }
+let viewCaps = [];
+/* В тексте «в профессиональном сообществе» слова про выступления — тихая ссылка:
+   при наведении рядом с курсором фото со сцены (по очереди), по нажатию — все фото выступлений */
+function linkTalks(){
+  const note = document.querySelector('#community .sec-note'), E = SITE.photos && SITE.photos.events;
+  if (!note || !E || isFun() || note.querySelector('.ev-link')) return;
+  note.innerHTML = note.innerHTML.replace(/(выступаю(?:\s|&nbsp;)+на(?:\s|&nbsp;)+конференциях(?:\s|&nbsp;)+и(?:\s|&nbsp;)+митапах)/, '<button type="button" class="ev-link ev-all">$1</button>');
+}
+let talkShown = 0;
+document.addEventListener('pointerover', e => {
+  const l = e.target.closest && e.target.closest('.ev-link');
+  if (!l || touch) return;
+  const E = SITE.photos.events;
+  showPreviewImage(E.items[talkShown++ % E.items.length].thumb);
+});
+document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.ev-link')) showPreviewImage(''); });
+/* хроника выступлений: нажатие на фото или на «все выступления» открывает все фото по порядку, с подписями */
+document.addEventListener('click', e => {
+  const f = e.target.closest('.ev, .ev-all');
+  const E = SITE.photos && SITE.photos.events;
+  if (!f || !E) return;
+  const i = f.classList.contains('ev') ? +f.dataset.i : 0;
+  const from = [];
+  document.querySelectorAll('.ev img').forEach((img, k) => from[k] = img);
+  openViewer(E.items.map(x => x.src), i, from, E.items.map(x => x.caption));
+});   // подписи к фото в просмотре (у хроники выступлений)
 function viewShow(){
-  viewer.querySelector('.viewer-count').textContent = viewList.length > 1 ? `${viewAt + 1} из ${viewList.length}` : '';
+  const count = viewList.length > 1 ? `${viewAt + 1} из ${viewList.length}` : '';
+  viewer.querySelector('.viewer-count').innerHTML = viewCaps[viewAt] ? `${T(viewCaps[viewAt])} <span class="viewer-n">${count}</span>` : count;
   viewer.classList.toggle('single', viewList.length < 2);
 }
-function openViewer(list, k, from){
+function openViewer(list, k, from, caps){
+  viewCaps = caps || [];
   viewList = list; viewAt = k; viewFrom = from || [];
   viewImg.src = list[k]; viewShow();
   const src = viewFrom[k];

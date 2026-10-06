@@ -1757,6 +1757,31 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
   /* ---------- Фотографии на странице «обо мне» ---------- */
   photos: {
     title: ['в жизни и на сцене', 'листай, вдруг мэтч'],
+    /* Хроника выступлений — в серьезной версии вместо ленты фото.
+       first — сколько фото видно сразу (остальные открываются по ссылке «все выступления»).
+       У каждого фото: src — большое, thumb — превью для ленты, ratio — ширина / высота, caption — подпись */
+    events: {
+      first: 4,
+      more:  ['все выступления', 'все фото со сцены'],
+      items: [
+        { src: 'img/events/forum-portrait.jpg', thumb: 'img/events/forum-portrait-s.jpg', ratio: 1.50, caption: 'Российский форум индустрии дизайна, Росконгресс' },
+        { src: 'img/events/sreda-boat.jpg', thumb: 'img/events/sreda-boat-s.jpg', ratio: 0.67, caption: '«Среда», теплоход' },
+        { src: 'img/events/kaiferencia-stage.jpg', thumb: 'img/events/kaiferencia-stage-s.jpg', ratio: 1.50, caption: 'Кайференция, PRAGMATICA' },
+        { src: 'img/events/shum-mic.jpg', thumb: 'img/events/shum-mic-s.jpg', ratio: 1.50, caption: 'ШУМ, Росмолодёжь, 2023' },
+        { src: 'img/events/forum-panel.jpg', thumb: 'img/events/forum-panel-s.jpg', ratio: 1.50, caption: 'Российский форум индустрии дизайна, панельная дискуссия' },
+        { src: 'img/events/forum-hall.jpg', thumb: 'img/events/forum-hall-s.jpg', ratio: 1.50, caption: 'Российский форум индустрии дизайна' },
+        { src: 'img/events/kaiferencia-screen.jpg', thumb: 'img/events/kaiferencia-screen-s.jpg', ratio: 0.75, caption: 'Кайференция, PRAGMATICA' },
+        { src: 'img/events/kaiferencia-award.jpg', thumb: 'img/events/kaiferencia-award-s.jpg', ratio: 1.50, caption: 'Кайференция: сертификат на менторинг за выступление на открытом микрофоне' },
+        { src: 'img/events/sreda-group.jpg', thumb: 'img/events/sreda-group-s.jpg', ratio: 1.50, caption: '«Среда», теплоход' },
+        { src: 'img/events/shum-hall.jpg', thumb: 'img/events/shum-hall-s.jpg', ratio: 1.50, caption: 'ШУМ, Росмолодёжь, 2023' },
+        { src: 'img/events/shum-panel.jpg', thumb: 'img/events/shum-panel-s.jpg', ratio: 1.29, caption: 'ШУМ, Росмолодёжь, 2023, панельная дискуссия' },
+        { src: 'img/events/standup.jpg', thumb: 'img/events/standup-s.jpg', ratio: 1.50, caption: 'Дизайн-стендап' },
+        { src: 'img/events/interior-panel.jpg', thumb: 'img/events/interior-panel-s.jpg', ratio: 1.50, caption: 'Interior+Design, дискуссия' },
+        { src: 'img/events/ts-award.jpg', thumb: 'img/events/ts-award-s.jpg', ratio: 1.50, caption: 'Церемония награждения' },
+        { src: 'img/events/lecture.jpg', thumb: 'img/events/lecture-s.jpg', ratio: 1.60, caption: 'Лекция для дизайнеров' },
+        { src: 'img/events/portfolio-review.jpg', thumb: 'img/events/portfolio-review-s.jpg', ratio: 1.50, caption: 'Разбор портфолио, 2026' },
+      ],
+    },
     /* в дружеской версии фотографии — колода, как в приложении знакомств */
     dating: {
       name: 'Купяша',
