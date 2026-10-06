@@ -25,7 +25,7 @@
 @media (max-width:760px){.au-label,.au-title,.au-text{grid-column:1 / -1}.au-label{grid-row:auto}}
 
 /* появление: схема мягко поднимается, детали — по очереди */
-.au-viz{opacity:0;transform:translateY(40px);transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
+.au-viz{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease) .15s,transform 1s var(--ease) .15s}
 .au-ch.in .au-viz{opacity:1;transform:none}
 .au-cap{font-size:16px;opacity:.6;margin-top:14px;max-width:60ch}
 .au-cap.top{margin:0 0 12px}
@@ -330,3 +330,61 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-pair-cell:not(.next) img{filter:saturate(.7)}
 .au-pair-cell img{width:100%;height:100%;object-fit:cover;border-radius:0}
 .au-ch.in .au-pair-cell{opacity:1;transform:none}
+
+/* ================================================================
+   ПЛАВНЫЕ ПОЯВЛЕНИЯ (audit.js → animate)
+   ================================================================ */
+/* заголовок: слова поднимаются из-под строки */
+.au-w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.au-w>span{display:inline-block;transform:translateY(105%);transition:transform 1s var(--ease) calc(var(--w) * 60ms)}
+.au-ch.in .au-w>span{transform:none}
+/* подпись и абзац — следом за заголовком */
+.au-label{opacity:0;transform:translateX(-16px);transition:opacity .7s var(--ease),transform .9s var(--ease)}
+.au-text{opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease) .35s,transform 1s var(--ease) .35s}
+.au-ch.in .au-label,.au-ch.in .au-text{opacity:1;transform:none}
+
+/* картинки: шторка снизу вверх и легкое приближение */
+.au-rv{clip-path:inset(100% 0 0 0 round var(--r-img));transition:clip-path 1.2s var(--ease-io) var(--rd, 0s)}
+.au-rv img{transform:scale(1.12) translateY(var(--py, 0%));transition:transform 1.6s var(--ease) var(--rd, 0s)}
+.au-rv.on{clip-path:inset(0 0 0 0 round var(--r-img))}
+.au-rv.on img{transform:scale(1.04) translateY(var(--py, 0%));transition:transform 1.6s var(--ease) var(--rd, 0s)}
+.au-rv.on.done img,.au-cell.au-rv.on img,.au-bd-card.au-rv.on img,.au-bd-set>div.au-rv.on img,.au-cmp.au-rv.on img,.au-s-shots.au-rv.on img{transform:none}
+/* у фото с параллаксом — запас по краям, чтобы смещение не открывало фон */
+.au-aud-photo.au-rv.on img,.au-plus figure.au-rv.on img,.au-pair-cell.au-rv.on img,.au-g-profile.au-rv.on img{transform:scale(1.08) translateY(var(--py, 0%));transition:transform .2s linear}
+.au-s-shots.au-rv img{transform:none}
+.au-s-shots.au-rv img:not(.on){transform:translateY(16px)}
+
+/* карточки «что мешает купить»: вылетают справа с легким поворотом */
+.au-fly{opacity:0;transform:translateX(56px) rotate(3deg);transition:opacity .7s var(--ease) var(--fd),transform 1s var(--ease) var(--fd)}
+.au-fly.on{opacity:1;transform:none}
+.au-fr-stage li:hover{transform:translateY(-3px);transition:transform .3s var(--ease)}
+
+/* остальные карточки ждут своей очереди не по главе, а по месту на экране */
+.au-city:not(.on),.au-stop:not(.on),.au-note:not(.on),.au-fix-col:not(.on),.au-chat:not(.on){opacity:0 !important}
+.au-city.on{opacity:1;transform:none}
+.au-chat.on{opacity:1;transform:rotate(calc((var(--i) - 1) * 1.2deg))}
+.au-chat:hover{transform:rotate(0) translateY(-6px);transition:transform .4s var(--ease)}
+
+/* полоски графика: блик пробегает по полоске, когда она доросла */
+.au-bar-track{overflow:hidden;border-radius:0 999px 999px 0}
+.au-bar-track i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%)}
+.au-ch.in .au-bar-track i::after{animation:auShine 1.4s var(--ease) calc(1s + var(--i) * .1s) 1 both}
+@keyframes auShine{to{transform:translateX(100%)}}
+.au-bar:hover .au-bar-track i{filter:brightness(.96)}
+
+/* путь покупателя: точки вспыхивают, когда до них доходит линия */
+.au-dot{transform:scale(0);transition:transform .7s var(--ease) calc(.5s + var(--i) * .45s)}
+.au-ch.in .au-dot{transform:none}
+.au-stop p{transition:transform .4s var(--ease)}
+.au-stop:hover p{transform:translateY(-4px)}
+
+/* плашки в шапке и теги — мягко вырастают */
+.au-s-head{transform:translateY(-20px);opacity:0;transition:transform .9s var(--ease) .3s,opacity .7s .3s}
+.au-ch.in .au-s-head{transform:none;opacity:1}
+.au-s-tab{transform:translateY(30%);transition:opacity .4s,transform .8s var(--ease) calc(.5s + var(--k, 0) * .1s)}
+.au-ch.in .au-s-tab{transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .au .au-w>span,.au .au-rv,.au .au-rv img,.au .au-fly,.au .au-dot,.au .au-label,.au .au-text,.au .au-s-head{transform:none !important;clip-path:none !important;opacity:1 !important}
+  .au .au-city,.au .au-stop,.au .au-note,.au .au-fix-col,.au .au-chat{opacity:1 !important}
+}

@@ -301,6 +301,82 @@ function liveKeys(hint){
   addEventListener('keyup', e => { const k = map[e.code]; if (k) hint.querySelectorAll(`[data-key="${k}"]`).forEach(x => x.classList.remove('down')); });
 }
 
+/* ---------- плавные появления ---------- */
+// заголовок главы: каждое слово поднимается из-под строки по очереди
+function splitTitle(h){
+  const walk = n => [...n.childNodes].forEach(c => {
+    if (c.nodeType === 3) {
+      const parts = c.textContent.split(/( )/);
+      const frag = document.createDocumentFragment();
+      parts.forEach(t => {
+        if (t === ' ' || !t) { frag.append(t); return; }
+        const w = document.createElement('span'); w.className = 'au-w';
+        const i = document.createElement('span'); i.textContent = t; w.append(i); frag.append(w);
+      });
+      c.replaceWith(frag);
+    } else if (c.nodeType === 1) walk(c);
+  });
+  walk(h);
+  h.querySelectorAll('.au-w > span').forEach((s, k) => s.style.setProperty('--w', k));
+}
+
+// каждая деталь оживает, когда сама доезжает до экрана (а не вся глава сразу)
+const bit = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add('on'); bit.unobserve(e.target);
+  if (e.target.dataset.count != null) countUp(e.target);
+}), { rootMargin: '0px 0px -8% 0px' });
+
+// цифры отсчитываются от нуля: «0,33%», «81», «35,1%»
+function countUp(el){
+  const raw = el.dataset.count, m = /^([^\d]*)([\d\s]+(?:,\d+)?)(.*)$/.exec(raw);
+  if (!m || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const dec = (m[2].split(',')[1] || '').length, to = parseFloat(m[2].replace(/\s/g, '').replace(',', '.'));
+  const t0 = performance.now(), dur = 1300;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = m[1] + (to * e).toFixed(dec).replace('.', ',') + m[3];
+    if (k < 1) requestAnimationFrame(step); else el.textContent = raw;
+  };
+  requestAnimationFrame(step);
+}
+
+// фото чуть отстают от прокрутки — появляется глубина
+function parallax(mount){
+  const box = mount.closest('#case') || window;
+  const items = [...mount.querySelectorAll('.au-aud-photo img, .au-plus figure img, .au-pair-cell img, .au-g-profile img')];
+  if (!items.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let raf = 0;
+  const run = () => {
+    raf = 0;
+    const vh = innerHeight;
+    items.forEach(img => {
+      const r = img.parentElement.getBoundingClientRect();
+      if (r.bottom < -100 || r.top > vh + 100) return;
+      const k = (r.top + r.height / 2 - vh / 2) / vh;   // -1…1 вокруг центра экрана
+      img.style.setProperty('--py', (k * -6).toFixed(2) + '%');
+    });
+  };
+  box.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(run); }, { passive: true });
+  run();
+}
+
+function animate(mount){
+  mount.querySelectorAll('.au-title').forEach(splitTitle);
+  // картинки раскрываются шторкой снизу, с легким приближением
+  mount.querySelectorAll('.au-aud-photo, .au-cell, .au-plus figure, .au-pair-cell, .au-bd-card, .au-bd-set > div, .au-g-profile, .au-s-shots, .au-cmp').forEach((el, i) => {
+    el.classList.add('au-rv'); el.style.setProperty('--rd', (i % 3) * 0.12 + 's'); bit.observe(el);
+  });
+  // ряды картинок: каждая следующая ячейка — чуть позже
+  mount.querySelectorAll('.au-row').forEach(row => [...row.children].forEach((c, k) => c.style.setProperty('--rd', k * 0.14 + 's')));
+  // карточки «что мешает купить» вылетают по одной
+  mount.querySelectorAll('.au-fr-stage li').forEach((li, k) => { li.classList.add('au-fly'); li.style.setProperty('--fd', (k % 4) * 0.1 + 's'); bit.observe(li); });
+  mount.querySelectorAll('.au-city, .au-stop, .au-note, .au-fix-col, .au-chat').forEach(el => bit.observe(el));
+  // цифры
+  mount.querySelectorAll('.au-note b, .au-bar-val .v').forEach(el => { el.dataset.count = el.textContent; bit.observe(el); });
+  parallax(mount);
+}
+
 /* ---------- запуск ---------- */
 let cssReady;
 function loadCSS(base){
@@ -317,6 +393,7 @@ export async function mountAudit(mount, p, helpers){
   await loadCSS(H.base);
   if (!mount.isConnected) return;   // кейс успели закрыть
   mount.innerHTML = p.audit.map(ch => chapter(ch, p)).join('');
+  animate(mount);
   mount.querySelectorAll('.au-ch').forEach(s => reveal.observe(s));
   mount.querySelectorAll('.au-traffic').forEach(liveTraffic);
   mount.querySelectorAll('.au-search').forEach(liveSearch);

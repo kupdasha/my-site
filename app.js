@@ -681,7 +681,8 @@ function mediaHTML(p){
   const m = parseMedia(p.preview || legacyVideo(p));
   const img = p.image ? `<img src="${p.image}" alt="" loading="lazy"${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
   // ролик подгружается, только когда до карточки остается экран; до этого видна обложка
-  if (m && m.type === 'file') return `<video muted loop playsinline preload="none" ${p.image ? `poster="${p.image}"` : ''} data-src="${m.src}"></video>`;
+  // hover: true — ролик стоит на обложке и играет, только пока курсор над карточкой
+  if (m && m.type === 'file') return `<video muted loop playsinline preload="none" ${p.image ? `poster="${p.image}"` : ''} data-src="${m.src}"${p.hover ? ' data-hover' : ''}></video>`;
   // still: true — в сетке только статичная обложка, без ролика
   if (p.still && img) return img;
   if (m && (m.type === 'vimeo' || m.type === 'kinescope')) return img + `<iframe data-src="${embedURL(m, true)}"${p.ratio ? ` style="--vr:${p.ratio}"` : ''} allow="autoplay" tabindex="-1" aria-hidden="true"></iframe>`;
@@ -759,7 +760,10 @@ const mediaSizer = new ResizeObserver(es => es.forEach(e => {
 }));
 const mediaWatcher = new IntersectionObserver(es => es.forEach(e => {
   const video = e.target.querySelector('video'), frame = e.target.querySelector('iframe[data-src]');
-  if (video) { if (e.isIntersecting && !video.src && video.dataset.src) video.src = video.dataset.src; e.isIntersecting ? video.play().catch(() => {}) : video.pause(); }
+  if (video) {
+    if (e.isIntersecting && !video.src && video.dataset.src) video.src = video.dataset.src;
+    if (!('hover' in video.dataset)) e.isIntersecting ? video.play().catch(() => {}) : video.pause();
+  }
   if (frame && e.isIntersecting && !frame.src) {
     frame.addEventListener('load', () => setTimeout(() => frame.classList.add('ready'), 600), { once: true });
     frame.src = frame.dataset.src;
@@ -775,6 +779,21 @@ const framePreloader = new IntersectionObserver(es => es.forEach(e => {
   frame.src = frame.dataset.src;
 }), { rootMargin: '100% 0px' });
 function watchMedia(el){ mediaSizer.observe(el); mediaWatcher.observe(el); framePreloader.observe(el); }
+// ролики с data-hover: курсор над карточкой — играет с начала, ушел — снова обложка
+document.addEventListener('pointerover', e => {
+  if (e.pointerType === 'touch') return;
+  const card = e.target.closest('.work, .case-next'), v = card && card.querySelector('video[data-hover]');
+  if (!v || v._on) return;
+  v._on = true;
+  if (!v.src && v.dataset.src) v.src = v.dataset.src;
+  v.play().catch(() => {});
+  const leave = ev => {
+    if (card.contains(ev.relatedTarget)) return;
+    card.removeEventListener('pointerout', leave);
+    v._on = false; v.pause(); v.currentTime = 0; v.load();   // load — снова показать обложку-постер
+  };
+  card.addEventListener('pointerout', leave);
+});
 
 /* Кружок «смотреть» едет за курсором над обложкой проекта */
 const lookCursor = document.createElement('div');
