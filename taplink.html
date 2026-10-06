@@ -32,7 +32,7 @@ a{color:inherit}
 html,body{overflow-x:hidden}
 /* весь таплинк — один экран: --k сжимает отступы и высоты, если экран низкий (считает скрипт) */
 .tl{--k:1;position:relative;min-height:100svh;display:flex;flex-direction:column;padding:calc(10px*var(--k)) 16px calc(16px*var(--k))}
-.col{position:relative;z-index:1;flex:1;width:100%;max-width:420px;margin-inline:auto;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:calc(18px*var(--k))}
+.col{position:relative;z-index:1;flex:1;width:100%;max-width:420px;margin-inline:auto;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:calc(16px*var(--k))}
 
 .top{position:relative;z-index:2;width:100%;max-width:420px;margin-inline:auto;display:flex;justify-content:flex-end}
 .switch{display:flex;align-items:center;gap:10px;height:40px;padding:0 2px;border:0;background:none;font:500 16px/1 var(--font);color:var(--ink);cursor:pointer}
@@ -57,15 +57,16 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
 .btn{display:flex;align-items:center;justify-content:center;width:100%;border-radius:99px;font-weight:500;text-decoration:none;text-align:center;transition:transform .35s var(--ease),background .35s,color .35s}
 .btn:active{transform:scale(.97)}
 .btn:focus-visible,.soc a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.actions{display:flex;flex-direction:column;gap:calc(8px*var(--k))}
-.btn-main{height:calc(60px*var(--k));padding:0 24px 3px;background:var(--btn);color:var(--btn-text);font-size:20px;margin-bottom:calc(4px*var(--k))}
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+/* вокруг главной кнопки — воздух: здесь опилки и ложатся лучами */
+.btn-main{height:calc(60px*var(--k));padding:0 24px 3px;background:var(--btn);color:var(--btn-text);font-size:20px;margin-block:calc(34px*var(--k))}
 .btn-main:hover{background:var(--btn-hover);color:var(--btn-hover-text)}
-.btn-more{height:calc(48px*var(--k));padding:0 20px 2px;background:var(--soft);color:var(--ink);font-size:17px}
+.btn-more{width:auto;flex:1 1 auto;height:calc(46px*var(--k));padding:0 14px 2px;background:var(--soft);color:var(--ink);font-size:16px;white-space:nowrap}
 .btn-more:hover{background:var(--accent);color:var(--accent-text)}
 
 .links{display:flex;flex-direction:column;align-items:center;gap:calc(10px*var(--k))}
 .soc{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
-.soc a{display:flex;align-items:center;height:calc(38px*var(--k));padding:0 13px 2px;border-radius:99px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;transition:background .3s,color .3s}
+.soc a{display:flex;align-items:center;height:calc(38px*var(--k));padding:0 11px 2px;white-space:nowrap;border-radius:99px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;transition:background .3s,color .3s}
 .soc a:hover{background:var(--accent);color:var(--accent-text)}
 .soc span{font-size:16px;color:var(--muted);padding:0 4px 2px}
 
@@ -87,33 +88,29 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
   <div class="col">
     <div class="intro">
       <h1 data-text>Даша Купцова</h1>
-      <p class="bio" data-text>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст <a href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">«Одна&nbsp;кавычка»</a>&nbsp;— среди гостей Студия Лебедева, Depot, Супрематика, DDVB и&nbsp;другие.</p>
+      <p class="bio" data-text>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС.</p>
     </div>
 
-    <nav class="actions" aria-label="Главное">
-      <a class="btn btn-main" id="magnet" data-quiet href="https://kupdasha.ru/" target="_blank" rel="noopener">заказать дизайн-проект</a>
+    <a class="btn btn-main" id="magnet" href="https://kupdasha.ru/" target="_blank" rel="noopener">заказать дизайн-проект</a>
+
+    <nav class="actions" aria-label="Еще">
       <a class="btn btn-more" data-quiet href="https://kupdasha.ru/profile" target="_blank" rel="noopener">позвать выступать</a>
       <a class="btn btn-more" data-quiet href="https://kupdasha.ru/merch" target="_blank" rel="noopener">задизайнить себе мерч</a>
       <a class="btn btn-more" data-quiet href="https://kupdasha.ru/ai" target="_blank" rel="noopener">ИИ-воркшоп для вашей команды</a>
     </nav>
 
-    <div class="links">
-      <nav class="soc" aria-label="Соцсети">
-        <a data-quiet href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
-        <a data-quiet href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
-        <a data-quiet href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
-        <a data-quiet href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
-        <a data-quiet href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
-        <a data-quiet href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
-      </nav>
-      <nav class="soc" aria-label="Подкаст «Одна кавычка»">
-        <span data-text>подкаст</span>
-        <a data-quiet href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">слушать</a>
-        <a data-quiet href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
-        <a data-quiet href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
-        <a data-quiet href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
-      </nav>
-    </div>
+    <nav class="soc" aria-label="Соцсети и подкаст">
+      <a data-quiet href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
+      <a data-quiet href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
+      <a data-quiet href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
+      <a data-quiet href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
+      <a data-quiet href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
+      <a data-quiet href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
+      <a data-quiet href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
+      <a data-quiet href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">подкаст «Одна&nbsp;кавычка»</a>
+      <a data-quiet href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
+      <a data-quiet href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
+    </nav>
   </div>
 
   <p class="legal" data-text>*Instagram&nbsp;— продукт Meta Platforms Inc., деятельность которой запрещена на&nbsp;территории Российской Федерации</p>
@@ -180,6 +177,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
     solids = [];
     const add = (r, rad) => { if (r.width && r.height) solids.push([(r.left + r.right) / 2, (r.top + r.bottom) / 2 + sy, r.width / 2, r.height / 2, rad]); };
     document.querySelectorAll('[data-quiet]').forEach(el => { const r = el.getBoundingClientRect(); add(r, Math.min(r.height / 2, 99)); });
+    { const r = magnetEl.getBoundingClientRect(); add(r, r.height / 2); solids[solids.length - 1].push(1); }   // у магнита опилки подходят вплотную
     document.querySelectorAll('[data-text]').forEach(el => {
       const rg = document.createRange(); rg.selectNodeContents(el);
       [...rg.getClientRects()].forEach(r => add(r, 6));
@@ -228,7 +226,8 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
         for (const b of solids) {
           const qx = Math.abs(x - b[0]) - b[2] + b[4], qy = Math.abs(y - b[1]) - b[3] + b[4];
           const d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - b[4];
-          if (d < dmin) dmin = d;
+          const dd = b[5] ? (d < 4 ? -1 : 1e9) : d;   // у магнита — только не залезать на саму кнопку
+          if (dd < dmin) dmin = dd;
         }
         if (dmin < FIELD.calm[0]) continue;
         const qz = Math.min(1, (dmin - FIELD.calm[0]) / (FIELD.calm[1] - FIELD.calm[0])), quiet = qz * qz * (3 - 2 * qz);
@@ -283,7 +282,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
   const tl = page;
   function fit() {
     let k = 1; tl.style.setProperty('--k', k);
-    while (k > .62 && document.documentElement.scrollHeight > innerHeight + 1) { k -= .04; tl.style.setProperty('--k', k.toFixed(2)); }
+    while (k > .5 && document.documentElement.scrollHeight > innerHeight + 1) { k -= .04; tl.style.setProperty('--k', k.toFixed(2)); }
   }
   fit(); measure();
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { fit(); measure(); if (still) render(0, 0); });
