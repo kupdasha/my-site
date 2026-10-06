@@ -1825,6 +1825,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     title: ['клиенты', 'с кем дружила по работе'],
     hint:  ['Наведите на имя, чтобы увидеть, что сделано', 'Наведи на имя — расскажу, что делали'],
     open:  ['открыть проект', 'смотреть'],
+    /* маленькая строка под списком клиентов */
+    noCase: ['Если кейса для компании нет, значит, он под NDA или визуально устарел',
+             'Нет кейса? Значит, он либо под NDA, либо уже не по моде'],
     items: [
       { name: 'VK',                 color: '',        project: 'рекламные кампании VK', what: 'ключевые визуалы кампаний, айдентика VK Инклюзия, детские зоны в Кидзании' },
       { name: 'LEGO',               color: '',        project: '',                      what: '' },
@@ -1832,6 +1835,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       { name: 'T2',                 color: '',        project: 'T2, оформление конференции', what: 'оформление конференции' },
       { name: 'Armani/Casa',        color: '',        project: 'Armani Casa',           what: 'ролик для резиденции: съемки в Дубае и CG' },
       { name: 'Mercedes-Benz',      color: '',        project: '',                      what: '' },
+      { name: 'Philips',            color: '',        project: '',                      what: '' },
       { name: 'MANGO OFFICE',       color: '',        project: 'юбилейный логотип MANGO OFFICE', what: 'юбилейный логотип к 25-летию' },
       { name: 'Heineken',           color: '',        project: '', what: 'стенд сидра Strongbow' },
       { name: 'Ростех',             color: '',        project: 'Ростех',                what: 'ролик' },

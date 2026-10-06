@@ -571,6 +571,7 @@ a.client::after{content:"";position:absolute;left:.22em;right:.22em;bottom:.04em
 a.client:hover::after{height:.09em}
 .client-open{margin-left:.6em;text-decoration:underline;text-underline-offset:.2em}
 .clients-what{min-height:1.4em;margin-top:clamp(28px,3vw,40px);font-size:clamp(18px,1.6vw,22px)}
+.clients-note{margin-top:12px;font-size:16px;line-height:1.35;color:var(--muted,currentColor);opacity:.6;max-width:52ch}
 
 /* ================================================================
    ПОДКАСТ: плеер слева, выпуски справа

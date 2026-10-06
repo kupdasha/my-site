@@ -201,6 +201,13 @@ function renderLists(){
       : `<span class="${cls}" data-k="${k}" data-reveal style="${style}">${T(c.name)}</span>`;
   }).join('');
   $('#clientsWhat').innerHTML = T(SITE.clients.hint);
+  // под клиентами — маленькая строка о том, почему у некоторых нет кейса (элемент создается здесь, разметку менять не нужно)
+  const what = document.getElementById('clientsWhat');
+  if (what && SITE.clients.noCase) {
+    let note = document.getElementById('clientsNote');
+    if (!note) { note = document.createElement('p'); note.id = 'clientsNote'; note.className = 'clients-note'; what.after(note); }
+    note.innerHTML = T(SITE.clients.noCase);
+  }
 
   $('#contactLinks').innerHTML = SITE.contact.links.map((l, k) =>
     `<a class="btn ${k === 0 ? 'btn-accent' : 'btn-line'} big-btn${k === 0 ? ' tease' : ''}" href="${l.link}"><span class="spell">${T(l.text)}</span><span class="arr">→</span></a>`).join('');
