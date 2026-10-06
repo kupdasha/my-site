@@ -1617,7 +1617,7 @@ function openCase(k){
   caseIndex = k;
   renderCase(k);
   caseEl.classList.add('open');
-  placeFab();
+  placeFab(); setTimeout(placeToTop, 100);
   document.body.classList.add('locked');
   caseEl.focus?.();
 }
@@ -1625,7 +1625,7 @@ function closeCase(){
   if (caseIndex == null) return;
   caseIndex = null;
   caseEl.classList.remove('open');
-  placeFab();
+  placeFab(); setTimeout(placeToTop, 100);
   document.body.classList.remove('locked');
   setTimeout(() => { if (caseIndex == null) caseContent.innerHTML = ''; }, 900);
 }
@@ -1678,7 +1678,7 @@ addEventListener('scroll', () => {
   const y = scrollY, now = performance.now();
   const max = root.scrollHeight - innerHeight;
   head.classList.toggle('solid', y > 40);
-  $('#toTop').classList.toggle('show', y > innerHeight * 0.8);   // шапка всегда на месте; «наверх» — когда пролистали экран
+  placeToTop();
   if (Math.abs(y - lastY) / Math.max(1, now - lastT) > 6) joke('fast');
   if (y >= max - 4) joke('bottom');
   lastY = y; lastT = now;
@@ -1743,7 +1743,37 @@ document.addEventListener('pointerover', e => {
   if (t && !t.contains(e.relatedTarget) && ++teases === 3) joke('tease');
 });
 document.addEventListener('copy', () => joke('copy'));
-$('#toTop').addEventListener('click', () => scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }));
+/* ================================================================
+   КНОПКА «НАВЕРХ» — на всех длинных страницах и в кейсах.
+   Правило (Nielsen Norman Group и дизайн-системы, которые на него опираются):
+   кнопка нужна, только если страница длиннее 2 экранов на компьютере и 4 экранов на телефоне;
+   появляется, когда пролистали больше экрана (на телефоне — больше двух), и не мешает в начале
+   ================================================================ */
+const TOTOP = { longDesktop: 2, longPhone: 4, showDesktop: 1, showPhone: 2 };
+const toTopBtn = document.getElementById('toTop') || (() => {
+  // на страницах без готовой кнопки (например, на новых страницах Тильды) она создается здесь
+  const b = document.createElement('button');
+  b.className = 'to-top'; b.id = 'toTop'; b.type = 'button'; b.setAttribute('aria-label', 'Наверх');
+  b.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg>';
+  document.body.appendChild(b);
+  return b;
+})();
+function placeToTop(){
+  const phone = innerWidth < 760;
+  const inCase = caseIndex != null && caseEl.scrollHeight > 0;
+  const length = inCase ? caseEl.scrollHeight : root.scrollHeight;
+  const y = inCase ? caseEl.scrollTop : scrollY;
+  const long = length > innerHeight * (phone ? TOTOP.longPhone : TOTOP.longDesktop);
+  toTopBtn.classList.toggle('show', long && y > innerHeight * (phone ? TOTOP.showPhone : TOTOP.showDesktop));
+}
+toTopBtn.addEventListener('click', () => {
+  const target = caseIndex != null ? caseEl : window;
+  target.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+});
+caseEl.addEventListener('scroll', placeToTop, { passive: true });
+addEventListener('resize', placeToTop);
+addEventListener('hashchange', () => setTimeout(placeToTop, 50));
+placeToTop();
 addEventListener('fun:joke', e => joke(e.detail));   // шутки от бегающих кнопок и многоножки (fun.js)
 document.addEventListener('contextmenu', () => joke('context'));
 $('#portrait').addEventListener('click', () => joke('photo'));
