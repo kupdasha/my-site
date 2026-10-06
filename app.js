@@ -1549,7 +1549,7 @@ function renderCase(k, keepScroll){
     if (g < gallery.length) body += galleryItem(gallery[g++]);
     if (p.brandkit && p.brandkit.after === key) body += brandkitHTML(p.brandkit);
     // world.after — ключ схемы ('solution') или номер абзаца story, считая с нуля
-    if (p.world && (p.world.after === key || p.world.after === i)) body += worldHTML(p.world);
+    if (p.world && p.world.after != null && (p.world.after === key || p.world.after === i)) body += worldHTML(p.world);
   });
   while (g < gallery.length) body += galleryItem(gallery[g++]);
   // кампании внутри кейса: меню, у каждой — текст в три колонки (название, задача, решение) и макеты рядами

@@ -63,14 +63,14 @@ function journey(j){
 
 // живая шапка: в поиске печатается запрос, слова «для бизнеса / дома / вау» меняют подборку
 function search(s){
-  return `<div class="au-search">
+  return `<div class="au-search" data-color="${s.tabs[0].color || 'green'}">
     <div class="au-s-head">
       <span class="au-s-logo">divan.ru</span>
       <span class="au-s-menu">${s.menu.map(m => `<span>${H.T(m)}</span>`).join('')}</span>
       <span class="au-s-field"><span class="au-s-q"></span><i class="au-s-caret"></i>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span>
     </div>
-    <div class="au-s-lead"><span>${H.T(s.lead)}</span>${s.tabs.map((t, i) => `<button class="au-s-tab${i ? '' : ' on'}" data-k="${i}" data-q="${esc(t.query)}">${H.T(t.word)}</button>`).join('')}</div>
+    <div class="au-s-lead"><span>${H.T(s.lead)}</span>${s.tabs.map((t, i) => `<button class="au-s-tab${i ? '' : ' on'}" data-k="${i}" data-q="${esc(t.query)}" data-color="${t.color || 'green'}">${H.T(t.word)}</button>`).join('')}</div>
     <div class="au-s-shots">${s.tabs.map((t, i) => `<img class="${i ? '' : 'on'}" src="${t.img}" alt="" loading="lazy">`).join('')}</div>
   </div>
   ${s.note ? `<p class="au-cap">${H.T(s.note)}</p>` : ''}`;
@@ -105,7 +105,7 @@ function lowercase(l){
   const word = w => `<span class="au-lw"><span class="up">${w}</span><span class="lo">${w.toLowerCase()}</span></span>`;
   return `<div class="au-lower">
     <div class="au-lw-menu">${l.words.map(word).join('')}</div>
-    <div class="au-lw-logo">divan.ru</div>
+    ${l.logo ? `<img class="au-lw-logo" src="${l.logo}" alt="divan.ru">` : '<div class="au-lw-logo">divan.ru</div>'}
     <div class="au-lw-tags">${l.tags.map((t, i) => `<span style="--i:${i}">${H.T(t)}</span>`).join('')}</div>
   </div>
   ${l.note ? `<p class="au-cap">${H.T(l.note)}</p>` : ''}`;
@@ -142,17 +142,73 @@ function worldHint(w){
   return `<div class="au-whint">${keys}<p>${H.T(text || '')}</p></div>`;
 }
 
+// русское название: латинский знак уезжает, приходит русский; ниже меню и теги
+function rename(r){
+  return `<div class="au-rename">
+    <div class="au-rn-logos">
+      <img class="au-rn-from" src="${r.from}" alt="divan.ru">
+      <svg class="au-rn-arrow" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      <img class="au-rn-to" src="${r.to}" alt="диван.ру">
+    </div>
+    <div class="au-rn-menu">${r.menu.map((m, i) => `<span style="--i:${i}">${H.T(m)}</span>`).join('')}</div>
+    <div class="au-lw-tags">${r.tags.map((t, i) => `<span style="--i:${i}">${H.T(t)}</span>`).join('')}</div>
+  </div>`;
+}
+
+// товар и то, что к нему подходит: маленькая карточка, плюс и лента сочетаний — картинки не крупнее, чем они есть
+function bundle(b){
+  return `<div class="au-bundle">
+    <div class="au-bd-card au-zoomable"><img src="${b.card}" alt="" loading="lazy"></div>
+    <span class="au-plus-sign" aria-hidden="true">+</span>
+    <div class="au-bd-set">
+      <b>${H.T(b.title)}</b>
+      <div class="au-zoomable"><img src="${b.together}" alt="" loading="lazy"></div>
+    </div>
+  </div>
+  ${b.note ? `<p class="au-cap">${H.T(b.note)}</p>` : ''}`;
+}
+
+// переписки со знакомыми: три скриншота, как сообщения в ленте
+function chats(list){
+  return `<div class="au-chats">${list.map((src, i) => `<button class="au-chat au-zoomable" style="--i:${i}" aria-label="Увеличить переписку"><img src="${src}" alt="Переписка о покупке на divan.ru" loading="lazy"></button>`).join('')}</div>`;
+}
+
+// набросок единого шаблона сообществ: одна обложка, меняется только город
+function cities(c){
+  return `<div class="au-cities">${c.cities.map((name, i) => `<div class="au-city" style="--i:${i}">
+    <div class="au-city-cover${c.photo ? ' ph' : ''}"${c.photo ? ` style="--ph:url('${c.photo}')"` : ''}>${c.logo ? `<img class="au-city-logo" src="${c.logo}" alt="divan.ru">` : '<span class="au-city-logo">divan.ru</span>'}<span class="au-city-line">${H.T(c.line)}</span></div>
+    <div class="au-city-row"><span class="au-city-ava" aria-hidden="true"><i class="o"></i><i class="l"></i></span><b>divan.ru ${H.T(name)}</b></div>
+    <div class="au-city-tabs"><span>каталог</span><span>акции</span><span>шоурумы</span></div>
+  </div>`).join('')}</div>`;
+}
+
+// проблема → решение: «сейчас» и «предлагаю», под каждым свои картинки
+const fixMedia = m => !m ? '' : m.cities ? cities(m) : `<div class="au-row${m.length > 2 ? ' stack' : ''}">${m.map(src => `<button class="au-cell au-zoomable" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div>`;
+function fix(f){
+  const L = f.labels || ['сейчас', 'предлагаю'];
+  const slide = f.slider && f.before && f.after;
+  return `<div class="au-fix${slide ? ' slide' : ''}">
+    <div class="au-fix-col now"><span class="au-fix-tag">${H.T(L[0])}</span><p>${H.T(f.now)}</p>${slide ? '' : fixMedia(f.before)}</div>
+    <div class="au-fix-col next"><span class="au-fix-tag">${H.T(L[1])}</span><p>${H.T(f.next)}</p>${slide ? '' : fixMedia(f.after)}</div>
+  </div>
+  ${slide ? `<div class="au-cmps n1">${compare([{ before: f.before[0], after: f.after[0], labels: L }])}</div>` : ''}`;
+}
+
 /* ---------- глава ---------- */
 function chapter(ch, p){
   let viz = '';
+  if (ch.rename)    viz += rename(ch.rename);
   if (ch.audience)  viz += audience(ch.audience);
   if (ch.formula)   viz += formula(ch.formula);
   if (ch.traffic)   viz += traffic(ch.traffic);
   if (ch.journey)   viz += journey(ch.journey);
   if (ch.search)    viz += search(ch.search);
   if (ch.compare)   viz += `<div class="au-cmps n${ch.compare.length}">${compare(ch.compare)}</div>`;
+  if (ch.bundle)    viz += bundle(ch.bundle);
   if (ch.plus)      viz += plus(ch);
+  if (ch.chats)     viz += chats(ch.chats);
   if (ch.friction)  viz += friction(ch.friction);
+  if (ch.fix)       viz += fix(ch.fix);
   if (ch.lowercase) viz += lowercase(ch.lowercase);
   if (ch.glass)     viz += glass(ch.glass);
   if (ch.world && p.world) viz += worldHint(p.world) + H.worldHTML({ ...p.world, hint: null });
@@ -195,6 +251,7 @@ function liveSearch(box){
     k = i;
     tabs.forEach((t, j) => t.classList.toggle('on', j === i));
     shots.forEach((s, j) => s.classList.toggle('on', j === i));
+    box.dataset.color = tabs[i].dataset.color;   // у каждого слова свой фон из палитры бренда
     type(tabs[i].dataset.q);
   };
   // пока никто не нажимал — слова меняются сами
@@ -266,7 +323,7 @@ export async function mountAudit(mount, p, helpers){
   mount.querySelectorAll('.au-whint').forEach(liveKeys);
   mount.querySelectorAll('.world').forEach(H.watchWorld);
   // ряды одной высоты: пропорции ячейки берутся из самой картинки
-  mount.querySelectorAll('.au-cell img').forEach(img => {
+  mount.querySelectorAll('.au-cell img, .au-chat img').forEach(img => {
     const set = () => img.naturalWidth && img.parentNode.style.setProperty('--ar', img.naturalWidth / img.naturalHeight);
     img.complete ? set() : img.addEventListener('load', set, { once: true });
   });
