@@ -104,7 +104,8 @@ button.ad-fin:hover img{transform:scale(1.04)}
 
 /* ---------- карусель для соцсетей: слайд целиком, как пост ---------- */
 .ad-car{display:flex;flex-direction:column;align-items:center}
-.ad-car-frame{position:relative;width:min(100%,520px);aspect-ratio:4/5;border-radius:clamp(14px,2vw,22px);overflow:hidden;background:var(--soft);cursor:pointer;touch-action:pan-y;user-select:none;
+.ad-car-frame{position:relative;width:min(100%,520px,calc((100svh - 180px) * .8));   /* слайд всегда целиком в экране */
+  aspect-ratio:4/5;border-radius:clamp(14px,2vw,22px);overflow:hidden;background:var(--soft);cursor:pointer;touch-action:pan-y;user-select:none;
   box-shadow:0 24px 60px -24px rgba(0,0,0,.35)}
 .ad-car-track{display:flex;height:100%;transition:transform .7s var(--ease)}
 .ad-car-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
