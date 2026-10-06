@@ -20,8 +20,12 @@ const TUNE = {
   size: 0.6,          // высота знака от высоты блока
   drop: 0.1,          // на сколько знак ниже центра (доля высоты блока) — чтобы надпись сверху читалась, как на обложке
   tall: [0.4, -0.03], // на вертикальном блоке (телефон): высота знака и сдвиг — знак между надписью и подписями
-  metal: '#E4E4E2',   // цвет серебра
+  metal: '#F4F4F2',   // цвет серебра
   rough: 0.16,        // шероховатость: меньше — зеркальнее
+  lime: '#B3F843',    // цвет бликов подсветки
+  tint: '#C9FA6E',    // в какой цвет плавно уходит серебро при наведении на направление
+  glow: [1.2, 12],     // сила лаймовых бликов: в покое и при наведении на направление
+  glowEase: 0.06,     // плавность разгорания и угасания
 };
 
 // студия для отражений: вертикальные полосы света и тени, сверху светло, снизу темнее
@@ -29,12 +33,12 @@ function studio(THREE, renderer){
   const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
   const g = c.getContext('2d');
   const sky = g.createLinearGradient(0, 0, 0, 512);
-  sky.addColorStop(0, '#FFFFFF'); sky.addColorStop(.45, '#E6E6E4'); sky.addColorStop(.56, '#8A8A88'); sky.addColorStop(1, '#3C3C3A');
+  sky.addColorStop(0, '#FFFFFF'); sky.addColorStop(.45, '#F2F2F0'); sky.addColorStop(.52, '#C8C8C6'); sky.addColorStop(.6, '#5E5E5C'); sky.addColorStop(1, '#262626');
   g.fillStyle = sky; g.fillRect(0, 0, 1024, 512);
   // мягкие софтбоксы: светлые и темные полосы с размытыми краями — блики на хроме ложатся плавно
   g.filter = 'blur(18px)';
-  [[60, 90, '#FFFFFF'], [200, 50, '#383836'], [330, 130, '#FFFFFF'], [530, 60, '#464644'], [660, 80, '#FFFFFF'],
-   [800, 70, '#363634'], [930, 60, '#F4F4F2']]
+  [[60, 90, '#FFFFFF'], [200, 46, '#4A4A48'], [330, 130, '#FFFFFF'], [530, 56, '#585856'], [660, 80, '#FFFFFF'],
+   [800, 64, '#4A4A48'], [930, 60, '#F4F4F2']]
     .forEach(([x, w, col]) => { g.fillStyle = col; g.globalAlpha = .9; g.fillRect(x, 70, w, 300); });
   g.filter = 'none';
   g.globalAlpha = 1;
@@ -72,6 +76,7 @@ export async function mountMark(box){
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.12;
   const scene = new THREE.Scene();
   scene.environment = studio(THREE, renderer);
   const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 50);
@@ -82,7 +87,12 @@ export async function mountMark(box){
   const mesh = new THREE.Mesh(geo, mat);
   const pivot = new THREE.Group(); pivot.add(mesh); scene.add(pivot);
   // мягкий блик сверху слева — как свет в исходной сцене
-  const key = new THREE.DirectionalLight('#FFFFFF', 1.4); key.position.set(-3, 4, 5); scene.add(key);
+  const key = new THREE.DirectionalLight('#FFFFFF', 1.6); key.position.set(-3, 4, 5); scene.add(key);
+  // лаймовые блики сбоку и снизу: слегка видны всегда, разгораются при наведении на направление
+  const limeA = new THREE.DirectionalLight(TUNE.lime, 0), limeB = new THREE.DirectionalLight(TUNE.lime, 0);
+  limeA.position.set(5, -1, 2.5); limeB.position.set(-4, -3, 1.5); scene.add(limeA, limeB);
+  let glow = TUNE.glow[0];
+  const silver = new THREE.Color(TUNE.metal), tint = new THREE.Color(TUNE.tint);
 
   const size = () => {
     const w = box.clientWidth, h = box.clientHeight; if (!w || !h) return;
@@ -123,6 +133,9 @@ export async function mountMark(box){
       extra = Math.PI * 2 * (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
       if (k >= 1) spin = null;
     }
+    glow += ((box.classList.contains('hot') ? TUNE.glow[1] : TUNE.glow[0]) - glow) * TUNE.glowEase;
+    limeA.intensity = glow; limeB.intensity = glow * .7;
+    mat.color.lerpColors(silver, tint, (glow - TUNE.glow[0]) / (TUNE.glow[1] - TUNE.glow[0]));
     pivot.rotation.set(rx, ry + extra, 0);
     renderer.render(scene, camera);
   }

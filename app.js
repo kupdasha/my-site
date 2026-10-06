@@ -1874,15 +1874,15 @@ const PILL = 'M143.16 52.4C147.22 48.35 149.25 46.32 150.52 44.25C154.56 37.66 1
 function mark3dHTML(m){
   const touch = matchMedia('(pointer:coarse)').matches;
   const hint = m.hint && (touch ? m.hint.touch : m.hint.mouse);
-  return `<div class="wrap case-m3d"><div class="m3d" data-model="${m.model}" style="--m3d-bg:${m.bg || '#BFBFBD'};--m3d-accent:${m.accent || '#B3F843'}">
+  return `<div class="wrap case-m3d">${hint ? `<p class="m3d-hint">${T(hint)}</p>` : ''}<div class="m3d" data-model="${m.model}" style="--m3d-bg:${m.bg || '#BFBFBD'};--m3d-accent:${m.accent || '#B3F843'}">
     <i class="m3d-grid" aria-hidden="true"></i>
     ${m.word ? `<img class="m3d-word" src="${m.word}" alt="${T(m.label || '')}">` : ''}
     ${m.poster ? `<img class="m3d-poster" src="${m.poster}" alt="">` : ''}
     <canvas aria-hidden="true"></canvas>
     ${m.slogan ? `<p class="m3d-slogan">${T(m.slogan)}</p>` : ''}
     ${m.button ? `<a class="m3d-pill" href="${m.button.link}" target="_blank" rel="noopener"><svg viewBox="0 0 155 68" aria-hidden="true"><path d="${PILL}"/><path class="m3d-arr" d="M111 34h19M122 25l9 9-9 9"/></svg><span>${T(m.button.text)}</span></a>` : ''}
-    ${m.list ? `<ul class="m3d-dirs" aria-hidden="true">${m.list.map((x, i) => `<li style="--i:${i}">${T(x)}</li>`).join('')}</ul>` : ''}
-  </div>${hint ? `<p class="case-note world-hint">${T(hint)}</p>` : ''}</div>`;
+    ${m.list ? `<ul class="m3d-dirs">${m.list.map((x, i) => `<li style="--i:${i}">${T(x)}</li>`).join('')}</ul>` : ''}
+  </div></div>`;
 }
 function sheetHTML(rows, bg, cls){
   return `<div class="wrap camp-rowbox"><div class="case-sheet${cls ? ' ' + cls : ''}" style="--sheet:${bg || '#E9E9E7'}">${
@@ -1894,17 +1894,21 @@ const markWatcher = new IntersectionObserver(es => es.forEach(e => {
   import(SCRIPT_BASE + 'mark3d.js?v=' + Math.floor(Date.now() / 36e5))
     .then(m => m.mountMark(e.target)).catch(err => console.warn('3D-знак не загрузился', err));
 }), { rootMargin: '400px 0px' });
-// список направлений: подсвечивается по очереди, пока блок на экране
+// список направлений: подсвечивается по очереди, пока блок на экране; при наведении на направление
+// перебор останавливается, а знак плавно загорается лаймовыми бликами (класс hot читает mark3d.js)
 function watchMark(el){
   markWatcher.observe(el);
   const li = [...el.querySelectorAll('.m3d-dirs li')]; if (!li.length) return;
-  let k = 0, t = 0;
-  const step = () => { li.forEach((x, i) => x.classList.toggle('on', i === k)); k = (k + 1) % li.length; };
+  let k = 0, t = 0, seen = false, held = false;
+  const show = i => li.forEach((x, j) => x.classList.toggle('on', i === j));
+  const step = () => { if (held) return; show(k); k = (k + 1) % li.length; };
+  const run = () => { clearInterval(t); if (seen && !matchMedia('(prefers-reduced-motion: reduce)').matches) t = setInterval(step, 1500); };
   step();
-  new IntersectionObserver(([e]) => {
-    clearInterval(t);
-    if (e.isIntersecting && !matchMedia('(prefers-reduced-motion: reduce)').matches) t = setInterval(step, 1500);
-  }).observe(el);
+  li.forEach((x, i) => {
+    x.addEventListener('pointerenter', () => { held = true; show(i); k = (i + 1) % li.length; el.classList.add('hot'); });
+    x.addEventListener('pointerleave', () => { held = false; el.classList.remove('hot'); run(); });
+  });
+  new IntersectionObserver(([e]) => { seen = e.isIntersecting; run(); }).observe(el);
 }
 
 function renderCase(k, keepScroll){

@@ -1476,6 +1476,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
    Обложка агентства: серый фон, белая модульная сетка, надпись во всю ширину,
    по центру серебряный знак (рисует mark3d.js), слева слоган и кнопка-капля, справа направления */
 .case-m3d{margin-bottom:clamp(56px,7vw,104px)}
+.m3d-hint{font-size:clamp(18px,1.5vw,22px);line-height:1.35;margin:0 0 clamp(14px,1.4vw,22px);opacity:.75}
 .m3d{position:relative;aspect-ratio:16/9;max-height:88vh;width:100%;overflow:hidden;border-radius:var(--r-img);background:var(--m3d-bg);color:#1A1A1A;cursor:pointer;touch-action:pan-y;
   --gx:5.5%;--gt:10%;--gb:89%}
 .m3d-grid{position:absolute;inset:0;pointer-events:none;
@@ -1492,7 +1493,8 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .m3d-pill .m3d-arr{fill:none;stroke:#0B0026;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s var(--ease)}
 .m3d-pill span{position:absolute;left:12.5%;top:50%;transform:translateY(-50%);font-size:clamp(16px,1.2vw,18px);line-height:1}
 .m3d-pill:hover .m3d-arr{transform:translateX(3px)}
-.m3d-dirs{position:absolute;right:calc(var(--gx) + 1.6%);top:33%;list-style:none;margin:0;padding:0;font-size:clamp(22px,3.1vw,44px);line-height:1.18;letter-spacing:-.01em;pointer-events:none}
+.m3d-dirs{position:absolute;right:calc(var(--gx) + 1.6%);top:33%;list-style:none;margin:0;padding:0;font-size:clamp(22px,3.1vw,44px);line-height:1.18;letter-spacing:-.01em}
+.m3d-dirs li{cursor:default;padding:0 0 .04em}
 .m3d-dirs li{color:rgba(26,26,26,.22);transition:color .7s var(--ease)}
 .m3d-dirs li.on{color:#1A1A1A}
 @media (max-width:760px){
