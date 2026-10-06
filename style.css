@@ -1102,6 +1102,10 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .camp-rowbox.narrow>.camp-row{width:calc(66.67% + clamp(16px,2vw,28px) / 3);margin-left:auto}
 .camp-rowbox.narrow>.camp-cap{margin-left:calc(33.33% - clamp(16px,2vw,28px) / 3)}
 @media (max-width:760px){.camp-rowbox.narrow>.camp-row{width:auto}.camp-rowbox.narrow>.camp-cap{margin-left:0}}
+/* small: true — маленькие баннеры, примерно в половину ширины, под текстовой колонкой */
+.camp-rowbox.small>.camp-row{width:calc(50% - clamp(16px,2vw,28px) / 2);margin-left:auto}
+.camp-rowbox.small>.camp-cap{margin-left:calc(50% + clamp(16px,2vw,28px) / 2)}
+@media (max-width:760px){.camp-rowbox.small>.camp-row{width:auto}.camp-rowbox.small>.camp-cap{margin-left:0}}
 /* фото в коллаже обрезаются по ячейке */
 .collage.cover .camp-shot img{object-fit:cover}
 @media (max-width:760px){

@@ -1224,9 +1224,10 @@ function campCell(src){
   // ролик загружается, когда ячейка доезжает до экрана, — тогда Kinescope сам запускается
   return `<div class="camp-shot frame"><iframe data-src="${url}" allow="${FRAME_ALLOW}" allowfullscreen></iframe></div>`;
 }
-// narrow: true — ряд уже, по ширине текстовой колонки (для картинок низкого разрешения)
-function campRow(items, caption, narrow){
-  return `<div class="wrap camp-rowbox${narrow ? ' narrow' : ''}">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row">${items.map(campCell).join('')}</div></div>`;
+// narrow: true — ряд уже, по ширине текстовой колонки (для картинок низкого разрешения);
+// small: true — еще уже, примерно в половину ширины (маленькие баннеры)
+function campRow(items, caption, narrow, small){
+  return `<div class="wrap camp-rowbox${narrow ? ' narrow' : ''}${small ? ' small' : ''}">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row">${items.map(campCell).join('')}</div></div>`;
 }
 // коллаж: ячейки раскладываются по схеме areas, у каждой подпись сверху; фото увеличиваются по нажатию
 // презентация-листалка: слайды в ленте с прилипанием, стрелки по бокам, счетчик «3 из 30»
@@ -1278,7 +1279,7 @@ function campGallery(c){
   (c.gallery || []).forEach(g => {
     if (g && g.slides) { flush(); out.push(campSlides(g)); }
     else if (g && g.collage) { flush(); out.push(campCollage(g)); }
-    else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption)); }
+    else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption, g.narrow, g.small)); }
     else if (parseMedia(g).type === 'image') pile.push(g);
     else { flush(); out.push(campRow([g])); }
   });

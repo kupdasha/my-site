@@ -303,9 +303,10 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { caption: ['ресайзы под соцсети, сторис и баннерные сети', 'одна съемка — все форматы'], row: [
                 'img/vk/vk-adb-square-1.jpg', 'img/vk/vk-adb-square-2.jpg', 'img/vk/vk-adb-square-3.jpg' ] },
               { row: [ 'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg' ] },
-              { row: [ 'img/vk/vk-adb-billboard-1.jpg' ] },
-              { row: [ 'img/vk/vk-adb-billboard-2.jpg' ] },
-              { row: [ 'img/vk/vk-adb-billboard-3.jpg' ] },
+              /* узкие баннеры небольшого разрешения — small: true, чтобы не растягивать на весь экран */
+              { caption: ['баннеры', 'узкие баннеры'], row: [ 'img/vk/vk-adb-billboard-1.jpg' ], small: true },
+              { row: [ 'img/vk/vk-adb-billboard-2.jpg' ], small: true },
+              { row: [ 'img/vk/vk-adb-billboard-3.jpg' ], small: true },
               { caption: ['процесс съемок', 'бэкстейдж: как это снимали'], row: [
                 'img/vk/vk-adb-backstage-1.jpg', 'img/vk/vk-adb-backstage-3.jpg' ] },
               { row: [ 'img/vk/vk-adb-backstage-4.jpg', 'img/vk/vk-adb-backstage-5.jpg' ] },
@@ -365,7 +366,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { row: [ 'img/vk/vk-cyber-wide-2.jpg', 'img/vk/vk-cyber-wide-1.jpg', 'img/vk/vk-cyber-wide-3.jpg' ] },
               /* slides — презентация-листалка: слайды листаются вправо-влево (стрелки, свайп, клавиши),
                  по нажатию слайд открывается крупно. Слайд с контактами сотрудницы VK убран */
-              { caption: ['тулкит для подрядчиков и партнеров — его собирал дизайнер под моим руководством', 'тулкит: всё, чтобы партнеры сделали красиво без нас'],
+              { caption: ['тулкит: собрали его для подрядчиков и партнеров, чтобы они грамотно использовали элементы key visual и сердце в своих материалах', 'тулкит: всё, чтобы партнеры правильно ставили key visual и сердце у себя'],
                 slides: Array.from({ length: 30 }, (_, i) => `img/vk/toolkit/vk-cyber-toolkit-${String(i + 1).padStart(2, '0')}.jpg`) },
             ],
             links: [
