@@ -327,6 +327,7 @@ img,video{display:block;max-width:100%}
 .case-award-row{grid-column:5 / -1;display:flex;align-items:flex-start;gap:clamp(20px,2vw,32px)}
 .case-award-row p{margin:0}
 .award{position:relative;flex:none;display:block;width:56px;height:88px;margin-top:6px;background:#000;clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%)}
+:root[data-theme="dark"] .award{background:#2A2B31}   /* в темной версии лента чуть светлее фона, иначе сливается */
 .award img{position:absolute;left:9px;top:16px;width:38px;height:38px}
 .award i{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;background:#FFF3C9;opacity:0;transform:scale(0);
   clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:award-spark 2.8s ease-in-out infinite}
