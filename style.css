@@ -1502,3 +1502,8 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .m3d-dirs{display:none}
 }
 @media (prefers-reduced-motion:reduce){.m3d-dirs li{transition:none}}
+/* приписка про NDA стоит сразу под названиями компаний, чтобы было видно, что она про них;
+   строка с описанием клиента при наведении — ниже нее */
+.clients{display:flex;flex-direction:column}
+.clients-note{order:1;margin-top:clamp(14px,1.4vw,20px)}
+.clients-what{order:2;margin-top:clamp(16px,1.6vw,24px)}
