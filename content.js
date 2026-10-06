@@ -1962,7 +1962,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             { stars: { mode: 'versions', items: [
               { bg: 'light', name: ['цветная', 'цветная'] },
               { bg: 'soft', fill: '#3C3C3B', name: ['монохромная', 'монохромная'] },
-              { bg: 'grad', fill: '#FFFFFF', name: ['белая на цветном фоне', 'белая на цветном'] },
+              { bg: 'grad', fill: '#FFFFFF', name: ['белая', 'белая'] },
             ] } },
             { row: ['img/mts/logo-light.jpg'], caption: ['логотип на светлом фоне', 'на светлом фоне'] },
             { colors: {

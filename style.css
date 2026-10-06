@@ -1713,11 +1713,22 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 @keyframes sky-spin{to{rotate:360deg}}
 @keyframes sky-sway{from{transform:rotateY(-40deg)}to{transform:rotateY(40deg)}}
 @keyframes sky-breathe{from{transform:scale(.88) rotate(-6deg)}to{transform:scale(1.06) rotate(6deg)}}
+/* планшет: блоки выше, знаки крупнее */
+@media (min-width:701px) and (max-width:1024px){
+  .st-hero{aspect-ratio:4/3}
+  .st-hero .st-tilt{width:58%}
+  .sky{aspect-ratio:4/3}
+  .sky-it{width:calc(16% * var(--s))}
+  .sky.in .sky-it{left:calc(var(--l) * .86 + 7%);top:calc(var(--t) * .9 + 5%)}
+  .st-ver .st-svg{width:50%}
+}
 @media (max-width:700px){
   .st-hero{aspect-ratio:1}
   .st-hero .st-tilt{width:72%}
-  .st-vers,.st-crops{grid-template-columns:1fr}
-  .st-ver .st-svg{width:36%}
+  .st-crops{grid-template-columns:1fr}
+  .st-ver .st-tilt{aspect-ratio:1}
+  .st-ver .st-svg{width:62%}
+  .st-ver figcaption{text-wrap:balance}
   .sky{aspect-ratio:4/5}
   .sky-it{width:calc(21% * var(--s))}
   .sky.in .sky-it{left:calc(var(--l) * .8 + 10%);top:calc(var(--t) * .86 + 7%)}
