@@ -32,6 +32,9 @@ if (window.__kdApp) return; window.__kdApp = true;
   }
 }
 
+// папка, откуда пришел app.js: на Тильде это GitHub, в прототипе — сама папка сайта
+const SCRIPT_BASE = (document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/app\.js(\?|$)/.test(s)) || '').replace(/app\.js(\?.*)?$/, '');
+
 const TUNE = {
   stringPull:     44,    // на сколько пикселей можно оттянуть струну
   stringStiff:    0.085, // упругость струны: больше — колеблется чаще
@@ -1462,6 +1465,23 @@ function galleryItem(x){
   if (x && x.src) return `<div class="wrap">${shotHTML(x.src)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   return `<div class="wrap">${shotHTML(x)}</div>`;
 }
+/* 3D-пространство (поле world у проекта): обложка, поверх нее — мир Marble, который можно покрутить.
+   Сам просмотрщик — в world.js, грузится, только когда блок подъезжает к экрану */
+function worldHTML(w){
+  const touch = matchMedia('(pointer:coarse)').matches;
+  const hint = w.hint && (touch ? w.hint.touch : w.hint.mouse);
+  return `<div class="wrap case-world"><div class="world" tabindex="0" role="application" aria-label="${T(w.label || '3D-пространство')}" data-src="${w.src}" data-lite="${w.lite || ''}">
+    ${w.poster ? `<img src="${w.poster}" alt="">` : ''}<canvas></canvas></div>
+    ${hint ? `<p class="case-note world-hint">${T(hint)}</p>` : ''}</div>`;
+}
+const worldWatcher = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  worldWatcher.unobserve(e.target);
+  import(SCRIPT_BASE + 'world.js?v=' + Math.floor(Date.now() / 36e5))
+    .then(m => m.mountWorld(e.target)).catch(err => console.warn('3D-пространство не загрузилось', err));
+}), { rootMargin: '400px 0px' });
+function watchWorld(el){ worldWatcher.observe(el); }
+
 function renderCase(k, keepScroll){
   // следующий проект — без отдельных страниц (page) и без самого себя
   const W = SITE.works, items = caseItems(), p = items[k];
@@ -1486,7 +1506,7 @@ function renderCase(k, keepScroll){
   }
   // twoCols: ['solution'] — длинный блок схемы набран мельче, в две колонки
   const twoCols = p.twoCols || [];
-  blocks.forEach(([label, par, key]) => {
+  blocks.forEach(([label, par, key], i) => {
     // award — ярлык премии слева от текста результата: черная лента, кольцо и блестки
     const text = key === 'result' && p.award ? `<div class="case-award-row">${awardHTML(p.award)}<p>${T(par)}</p></div>` : `<p>${T(par)}</p>`;
     body += `<div class="wrap"><div class="case-text${twoCols.includes(key) ? ' cols2' : ''}" data-reveal><span class="case-label">${T(label)}</span>${text}${
@@ -1494,6 +1514,8 @@ function renderCase(k, keepScroll){
     if (p.thermal && p.thermal.after === key) body += thermalHTML(p.thermal);
     if (g < gallery.length) body += galleryItem(gallery[g++]);
     if (p.brandkit && p.brandkit.after === key) body += brandkitHTML(p.brandkit);
+    // world.after — ключ схемы ('solution') или номер абзаца story, считая с нуля
+    if (p.world && (p.world.after === key || p.world.after === i)) body += worldHTML(p.world);
   });
   while (g < gallery.length) body += galleryItem(gallery[g++]);
   // кампании внутри кейса: меню, у каждой — текст в три колонки (название, задача, решение) и макеты рядами
@@ -1537,6 +1559,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.bk').forEach(watchBrandkit);
   markArticles(caseContent);
   watchCampaigns(caseContent);
+  caseContent.querySelectorAll('.world').forEach(watchWorld);
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));

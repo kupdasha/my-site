@@ -1202,3 +1202,14 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 /* подпись под роликом или макетом в кейсе ({ src, caption }) — прижата к нему, отступ уходит под подпись */
 .wrap:has(> .shot-note) > .case-shot{margin-bottom:0}
 .shot-note{margin-bottom:clamp(56px,7vw,104px)}
+
+/* 3D-пространство в кейсе (world.js): обложка видна, пока мир грузится, потом плавно уходит */
+.case-world{margin-bottom:clamp(56px,7vw,104px)}
+.world{position:relative;aspect-ratio:16/9;max-height:86vh;width:100%;overflow:hidden;background:var(--soft);cursor:grab;touch-action:pan-y;outline:none}
+.world.grab{cursor:grabbing}
+.world:focus-visible{box-shadow:0 0 0 3px var(--ink)}
+.world canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.world img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none;transition:opacity 1s var(--ease)}
+.world.ready img{opacity:0}
+.world-hint{margin-top:16px}
+@media (max-width:760px){.world{aspect-ratio:4/5}}
