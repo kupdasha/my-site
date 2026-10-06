@@ -313,6 +313,10 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             gallery: [
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d22ef3205231597.674edb6fdb87c.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/df7ca7205231597.67515f4a65a33.jpg',
+              { caption: ['анимация для цифровой наружной рекламы', 'Дед Мороз в движении — на городских экранах'], row: [
+                { video: 'img/vk/vk-newcontent-dooh-1.mp4', ratio: 2 },
+                { video: 'img/vk/vk-newcontent-dooh-2.mp4', ratio: 2 },
+              ] },
               'vk:-220754053_456242583',
             ],
           },

@@ -86,3 +86,5 @@ inclusion/inc-stories-3.jpg =
 inclusion/inc-stream.mp4 = 
 inclusion/inc-team.jpg = 
 inclusion/award-ring.png = 
+vk/vk-newcontent-dooh-1.mp4 = 
+vk/vk-newcontent-dooh-2.mp4 = 
