@@ -848,10 +848,11 @@ function renderWorks(){
     if ((isOther(p) && p !== solo) || !inCat(p)) return '';
     const [size, side] = p.size ? [p.size, p.side] : PATTERN[n % PATTERN.length];
     n++;
-    const ratio = p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');   // у видео всегда 16:9
+    // cardRatio — пропорции карточки в сетке, когда превью нужно показать целиком, а обложка кейса другая
+    const ratio = p.cardRatio || p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');   // у видео всегда 16:9
     return `
     <button class="work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}" data-k="${k}" data-reveal>
-      <span class="media" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
+      <span class="media${p.cardRatio ? ' whole' : ''}" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
       <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}
     </button>`;

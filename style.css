@@ -1519,3 +1519,6 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
   .case-sheet .camp-row:not(.collage){flex-direction:column;overflow:visible;scroll-snap-type:none}
   .case-sheet .camp-row:not(.collage)>.camp-shot{flex:none;width:100%;height:auto}
 }
+
+/* превью, которое нужно показать целиком (cardRatio): карточка в пропорциях ролика, без приближения */
+.work .media.whole video,.work .media.whole img{transform:none}
