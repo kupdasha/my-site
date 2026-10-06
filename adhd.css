@@ -10,15 +10,18 @@
 .ad-label{grid-column:1 / span 3;grid-row:1}
 .ad-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
 .ad-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
+/* на широком экране абзац — в две колонки, чтобы не тянулся длинной лентой */
+@media (min-width:900px){.ad-text{max-width:none;column-count:2;column-gap:clamp(24px,3vw,48px);font-size:clamp(19px,1.5vw,22px)}}
 @media (max-width:760px){.ad-label,.ad-title,.ad-text{grid-column:1 / -1}.ad-label{grid-row:auto}}
 .ad-cap{font-size:16px;opacity:.6;margin-top:16px;max-width:60ch;text-wrap:balance}
+.ad-cap.top{margin:0 0 8px}
 
 /* появление главы */
 .ad-viz{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease) .15s,transform 1s var(--ease) .15s}
 .ad-ch.in .ad-viz{opacity:1;transform:none}
 
 /* ---------- мысли ---------- */
-.ad-thoughts{position:relative;height:clamp(420px,52vw,620px);background:var(--soft);border-radius:clamp(20px,3vw,40px);overflow:hidden;cursor:crosshair;touch-action:pan-y}
+.ad-thoughts{position:relative;height:clamp(420px,46vw,560px);overflow:hidden;cursor:crosshair;touch-action:pan-y}
 .ad-th{position:absolute;left:0;top:0;width:max-content;font-weight:500;font-size:clamp(20px,2.3vw,34px);line-height:1.1;text-wrap:balance;will-change:transform,filter;user-select:none}
 .ad-thoughts.still .ad-th{filter:none;opacity:1}
 @media (max-width:640px){.ad-th{font-size:18px}}
@@ -45,7 +48,8 @@
 .ad-hook{stroke:var(--accent);stroke-width:30;stroke-linecap:round}
 .ad-slow text{font-size:26px;fill:var(--accent-text)}
 :root[data-theme="dark"] .ad-slow text{fill:#1D222A}
-.ad-wave text{font-size:19px}
+.ad-wave{overflow:hidden}
+.ad-wave text{font-size:20px}
 /* три в ряд — только на широком экране, иначе буквы в схемах мельче 16px */
 .ad-types figure{max-width:520px;width:100%;margin:0 auto}
 @media (min-width:1280px){.ad-types{grid-template-columns:repeat(3,minmax(0,1fr))}.ad-types figure{max-width:none}}
@@ -57,7 +61,8 @@
 .ad-ver-stack img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.03);transition:opacity .55s var(--ease),transform 1.2s var(--ease)}
 .ad-ver-stack img.on{opacity:1;transform:none}
 .ad-ver.held .ad-ver-stack img{transition:opacity .2s linear,transform .2s linear}
-.ad-tag{position:absolute;left:14px;top:14px;z-index:2;font-size:16px;line-height:1;padding:8px 12px;border:1.5px solid #1D222A;border-radius:999px;background:var(--accent);color:#1D222A}
+/* у строчных букв нет выносных вверх, поэтому снизу отступ чуть больше — текст встает по центру на глаз */
+.ad-tag{position:absolute;left:14px;top:14px;z-index:2;font-size:16px;line-height:1;padding:7px 13px 10px;border-radius:999px;background:#FFFFFF;color:#1D222A}
 .ad-ver figcaption{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .ad-ver-name{font-weight:500;font-size:clamp(18px,1.5vw,22px);line-height:1.2;text-wrap:balance}
 .ad-dots{display:flex;gap:2px;flex:none;padding-top:4px}
@@ -66,26 +71,35 @@
 .ad-dots button.on::before{opacity:1;transform:scale(1.25)}
 @media (max-width:860px){.ad-vers{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* на телефоне — два столбца, точки под названием */
-@media (max-width:520px){.ad-ver figcaption{flex-direction:column;gap:6px}.ad-ver-name{font-size:17px}.ad-dots{margin-left:-6px}.ad-ver-stack{cursor:pointer}.ad-tag{left:8px;top:8px;font-size:16px;padding:6px 10px}}
+@media (max-width:520px){.ad-ver figcaption{flex-direction:column;gap:6px}.ad-ver-name{font-size:17px}.ad-dots{margin-left:-6px}.ad-ver-stack{cursor:pointer}.ad-tag{left:8px;top:8px;padding:6px 11px 9px}}
 
-/* ---------- фурнитура ---------- */
-.ad-dets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(24px,3vw,40px) clamp(14px,2vw,28px)}
-.ad-det{display:flex;flex-direction:column;gap:12px;transform-origin:50% 0}
-.ad-det-img{display:block;aspect-ratio:1;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in}
-.ad-det-img img{width:100%;height:100%;object-fit:cover}
-.ad-det figcaption{font-size:17px;line-height:1.35;opacity:.75;text-wrap:balance}
-.ad-det.swing{animation:adSwing 1.8s var(--ease) both}
-.ad-ch.in .ad-det{animation:adSwing 1.8s var(--ease) calc(.3s + var(--i) * .12s) both}
-.ad-ch.in .ad-det.swing{animation:adSwing 1.8s var(--ease) both}
-@keyframes adSwing{0%{transform:rotate(0)}12%{transform:rotate(5deg)}30%{transform:rotate(-3.5deg)}48%{transform:rotate(2deg)}66%{transform:rotate(-1deg)}82%{transform:rotate(.4deg)}100%{transform:rotate(0)}}
-@media (max-width:760px){.ad-dets{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* ---------- фурнитура: солнышко вокруг подписи ---------- */
+.ad-orbit{container-type:inline-size;position:relative;width:100%;max-width:760px;aspect-ratio:1;margin:0 auto;--R:36cqw;--s:21cqw}
+.ad-orb-ring{position:absolute;inset:0;--rot:0deg}
+.ad-orb{position:absolute;left:50%;top:50%;width:var(--s);aspect-ratio:1;padding:0;cursor:zoom-in;
+  transform:translate(-50%,-50%) rotate(calc(var(--a) + var(--rot))) translateY(calc(var(--R) * -1)) rotate(calc((var(--a) + var(--rot)) * -1))}
+.ad-orb-in{display:block;width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--soft);transform:scale(.001);transition:transform .9s var(--ease)}
+.ad-ch.in .ad-orb-in{transform:scale(1)}
+.ad-ch.in .ad-orb.on .ad-orb-in{transform:scale(1.18)}
+.ad-orb-in img{width:100%;height:100%;object-fit:cover}
+.ad-orb.on{z-index:2}
+.ad-orb-core{position:absolute;left:50%;top:50%;width:44cqw;transform:translate(-50%,-50%);display:grid;justify-items:center;text-align:center;gap:14px}
+.ad-orb-title{font-weight:500;font-size:clamp(24px,4.2cqw,40px);line-height:1.05;text-wrap:balance}
+.ad-orb-notes{display:grid}
+.ad-orb-note{grid-area:1 / 1;font-size:clamp(16px,2.4cqw,20px);line-height:1.3;text-wrap:balance;opacity:0;transform:translateY(8px);transition:opacity .45s var(--ease),transform .6s var(--ease)}
+.ad-orb-note.on{opacity:.75;transform:none}
+@container (max-width:460px){.ad-orbit{--R:37cqw;--s:23cqw}.ad-orb-title{font-size:20px}.ad-orb-note{font-size:16px}}
 
 /* ---------- что вышло ---------- */
+.ad-finals{display:grid;gap:clamp(32px,4vw,56px)}
+.ad-fin-name{font-weight:500;font-size:clamp(20px,1.8vw,26px);margin-bottom:14px}
 .ad-final{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,1.4vw,20px)}
-.ad-fin{aspect-ratio:4/5;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in;opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease) calc(.2s + var(--i) * .08s),transform .9s var(--ease) calc(.2s + var(--i) * .08s)}
-.ad-fin img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
-.ad-fin:hover img{transform:scale(1.04)}
-.ad-ch.in .ad-fin{opacity:1;transform:none}
+.ad-fin{display:block;aspect-ratio:4/5;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in;padding:0}
+.ad-fin.vid{cursor:default}
+.ad-fin img,.ad-fin video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
+button.ad-fin:hover img{transform:scale(1.04)}
+.ad-fin-group{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease) calc(.2s + var(--i) * .1s),transform .9s var(--ease) calc(.2s + var(--i) * .1s)}
+.ad-ch.in .ad-fin-group{opacity:1;transform:none}
 @media (max-width:760px){.ad-final{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* ---------- о проекте писали ---------- */
@@ -100,6 +114,5 @@
 @media (max-width:640px){.ad-press-a{flex-direction:column;gap:6px}.ad-press-a span{text-align:left}}
 
 @media (prefers-reduced-motion: reduce){
-  .ad-viz,.ad-fin,.ad-press li{opacity:1;transform:none;transition:none}
-  .ad-det,.ad-ch.in .ad-det{animation:none}
+  .ad-viz,.ad-fin-group,.ad-press li,.ad-orb-in{opacity:1;transform:none;transition:none}
 }

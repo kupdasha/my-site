@@ -17,13 +17,13 @@ const head = ch => `<div class="ad-head">
   <h2 class="ad-title">${H.T(ch.title)}</h2>
   ${ch.text ? `<p class="ad-text">${H.T(ch.text)}</p>` : ''}
 </div>`;
-const cap = t => t ? `<p class="ad-cap">${H.T(t)}</p>` : '';
+const cap = (t, cls) => t ? `<p class="ad-cap${cls ? ' ' + cls : ''}">${H.T(t)}</p>` : '';
 
 /* ---------- мысли: одна в фокусе, остальные расплываются и дрейфуют ---------- */
 function thoughtsHTML(c){
-  return `<div class="ad-thoughts" aria-label="${c.items.map(x => H.pick(x)).join(', ')}">
+  return `${cap(c.hint, 'top')}<div class="ad-thoughts" aria-label="${c.items.map(x => H.pick(x)).join(', ')}">
     ${c.items.map((t, i) => `<span class="ad-th" style="--i:${i}" aria-hidden="true">${H.T(t)}</span>`).join('')}
-  </div>${cap(c.hint)}`;
+  </div>`;
 }
 function liveThoughts(box){
   const els = [...box.querySelectorAll('.ad-th')];
@@ -128,22 +128,20 @@ function ringSVG(t){
     <text class="ad-core" x="200" y="208" text-anchor="middle">${H.pick(t.core)}</text>
   </svg>`;
 }
-// «всё вокруг в слоумо»: строчка медленно ползет по крючку, как принт на футболке
+// «всё вокруг в слоумо»: фраза без конца медленно едет по крючку, как принт на футболке;
+// крючок нарисован от хвоста к верху, чтобы текст читался слева направо и стоял ровно по середине полосы
+const HOOK = 'M40 352C80 352 130 346 176 322C214 302 246 330 224 354C200 380 150 360 168 306C190 236 290 150 336 44';
 function slowSVG(t){
-  const s = H.pick(t.slow);
   return `<svg class="ad-type ad-slow" viewBox="0 0 400 400" aria-hidden="true">
-    <path id="adHook" d="M330 40C300 140 200 230 170 300C150 350 190 380 220 360C250 340 220 300 180 320C120 350 60 340 40 360" fill="none"/>
-    <path class="ad-hook" d="M330 40C300 140 200 230 170 300C150 350 190 380 220 360C250 340 220 300 180 320C120 350 60 340 40 360" fill="none"/>
-    <text><textPath class="ad-slow-path" href="#adHook" startOffset="0">${s}</textPath></text>
+    <path id="adHook" d="${HOOK}" fill="none"/>
+    <path class="ad-hook" d="${HOOK}" fill="none"/>
+    <text dominant-baseline="central"><textPath class="ad-slow-path" href="#adHook" startOffset="0" data-s="${H.pick(t.slow)}"></textPath></text>
   </svg>`;
 }
-// «я вас слушаю очень невнимательно»: каждая следующая строчка провисает сильнее — внимание утекает
+// «я вас слушаю очень невнимательно»: строчки повторяются, и с каждой следующей у фразы отваливается конец —
+// буквы по одной соскальзывают и падают, как внимание на долгом созвоне; потом «ой, простите» — и всё снова на месте
 function waveSVG(t){
-  const s = H.pick(t.wave), n = 7;
-  return `<svg class="ad-type ad-wave" viewBox="0 0 400 400" aria-hidden="true" data-n="${n}">
-    <defs>${Array.from({ length: n }, (_, i) => `<path id="adW${i}" d=""/>`).join('')}</defs>
-    ${Array.from({ length: n }, (_, i) => `<text style="opacity:${(1 - i * .11).toFixed(2)}"><textPath href="#adW${i}">${s}</textPath></text>`).join('')}
-  </svg>`;
+  return `<svg class="ad-type ad-wave" viewBox="0 0 400 400" aria-hidden="true" data-s="${H.pick(t.wave)}"></svg>`;
 }
 function typeHTML(c){
   return `<div class="ad-types">
@@ -152,17 +150,53 @@ function typeHTML(c){
     <figure>${waveSVG(c)}${c.notes ? `<figcaption>${H.T(c.notes[2])}</figcaption>` : ''}</figure>
   </div>${cap(c.hint)}`;
 }
+function liveSlow(svg){
+  const tp = svg.querySelector('.ad-slow-path'), word = tp.dataset.s + '   ';
+  const L = svg.querySelector('#adHook').getTotalLength();
+  // мерим одну фразу и повторяем ее с запасом: строка всегда закрывает крючок целиком
+  tp.textContent = word;
+  const one = tp.parentNode.getComputedTextLength() || 200;
+  tp.textContent = word.repeat(Math.ceil(L / one) + 2);
+  return s => tp.setAttribute('startOffset', (-(s * 14 % one)).toFixed(2));   // 14 единиц в секунду — слоумо
+}
+function liveFall(svg){
+  const NS = 'http://www.w3.org/2000/svg', txt = svg.dataset.s, rows = 7, X0 = 20, Y0 = 64, DY = 44;
+  // раскладываем буквы одной строки по ширине, потом размножаем строки
+  const probe = document.createElementNS(NS, 'text');
+  probe.textContent = txt; svg.appendChild(probe);
+  const xs = [...txt].map((_, j) => probe.getStartPositionOfChar(j).x);
+  probe.remove();
+  const letters = [];
+  for (let i = 0; i < rows; i++) [...txt].forEach((ch, j) => {
+    if (ch === ' ') return;
+    const el = document.createElementNS(NS, 'text');
+    el.textContent = ch; el.setAttribute('x', X0 + xs[j]); el.setAttribute('y', Y0 + i * DY);
+    svg.appendChild(el);
+    // чем ниже строка, тем больше букв с конца отваливается и тем раньше
+    const tail = (j + 1) / txt.length, lost = i / (rows - 1);
+    letters.push({ el, falls: tail > 1 - lost * .85, at: .6 + (1 - tail) * 3.2 * (1 - lost * .5) + Math.random() * .6,
+      rot: (Math.random() - .5) * 140, drift: (Math.random() - .3) * 30, ox: X0 + xs[j], oy: Y0 + i * DY });
+  });
+  const CYCLE = 7.5;
+  return s => {
+    const t = s % CYCLE;
+    // последние полсекунды буквы возвращаются на место — внимание вернули
+    const back = t > CYCLE - .7 ? 1 - (t - (CYCLE - .7)) / .7 : 1;
+    letters.forEach(l => {
+      if (!l.falls) return;
+      const d = Math.max(0, t - l.at), k = back * back * (3 - 2 * back);
+      const y = 140 * d * d * k, x = l.drift * d * k, r = l.rot * d * k;
+      l.el.setAttribute('transform', d ? `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(1)} ${l.ox} ${l.oy})` : '');
+      l.el.style.opacity = Math.max(0, 1 - y / 260).toFixed(2);
+    });
+  };
+}
 function liveType(box){
-  const wave = box.querySelector('.ad-wave'), n = +wave.dataset.n, paths = [...wave.querySelectorAll('defs path')];
-  const slow = box.querySelector('.ad-slow-path');
+  const slow = liveSlow(box.querySelector('.ad-slow'));
+  const fall = liveFall(box.querySelector('.ad-wave'));
   const ring = box.querySelector('.ad-spin');
   let raf = 0, seen = false, t0 = performance.now(), ang = 0, speed = .05, goal = .05, last = t0;
-  const shape = s => paths.forEach((p, i) => {
-    // строчка начинается ровно, а к концу уходит вниз; провисание растет с номером строки и «дышит»
-    const y = 70 + i * 34, sag = (i * 26 + 10) * (.75 + .25 * Math.sin(s * .9 - i * .35));
-    p.setAttribute('d', `M20 ${y}C140 ${y} 230 ${y + sag * .15} 290 ${y + sag * .55}S370 ${y + sag * 1.2} 385 ${y + sag * 1.5}`);
-  });
-  shape(0);
+  slow(0); fall(0);
   if (still()) return;
   ring.closest('figure').addEventListener('pointerenter', () => { goal = .6; });
   ring.closest('figure').addEventListener('pointerleave', () => { goal = .05; });
@@ -170,8 +204,7 @@ function liveType(box){
     const s = (t - t0) / 1000, dt = Math.min(64, t - last); last = t;
     speed += (goal - speed) * .05; ang = (ang + speed * dt / 16) % 360;
     ring.setAttribute('transform', `rotate(${ang.toFixed(2)} 200 200)`);
-    slow.setAttribute('startOffset', ((s * 6) % 120 - 20).toFixed(2) + '%');   // очень медленно, по кругу
-    shape(s);
+    slow(s); fall(s);
     if (seen) raf = requestAnimationFrame(draw);
   };
   onScreen(box, v => {
@@ -229,39 +262,85 @@ function liveVersions(box){
   onScreen(box, v => { seen = v; cards.forEach(c => c._tick()); });
 }
 
-/* ---------- фурнитура: карточки покачиваются, как брелоки ---------- */
+/* ---------- фурнитура: детали кружат солнышком вокруг подписи ---------- */
+// по кругу медленно вращаются круглые фото; та, что «в фокусе», подрастает, а ее подпись встает в центр;
+// наведение останавливает круг и показывает подпись под курсором
 function detailsHTML(c){
-  return `<div class="ad-dets">${c.items.map((x, i) => `
-    <figure class="ad-det" style="--i:${i}">
-      <button class="ad-det-img" aria-label="Увеличить"><img src="${x.img}" alt="" loading="lazy" draggable="false"></button>
-      ${x.note ? `<figcaption>${H.T(x.note)}</figcaption>` : ''}
-    </figure>`).join('')}</div>${cap(c.hint)}`;
+  const n = c.items.length;
+  return `<div class="ad-orbit" style="--n:${n}">
+    <div class="ad-orb-ring">${c.items.map((x, i) => `
+      <button class="ad-orb" style="--a:${(360 / n * i).toFixed(2)}deg" data-i="${i}" aria-label="${H.pick(x.note) || 'Увеличить'}">
+        <span class="ad-orb-in"><img src="${x.img}" alt="" loading="lazy" draggable="false"></span>
+      </button>`).join('')}</div>
+    <div class="ad-orb-core">
+      ${c.center ? `<b class="ad-orb-title">${H.T(c.center)}</b>` : ''}
+      <div class="ad-orb-notes">${c.items.map((x, i) => `<p class="ad-orb-note${i ? '' : ' on'}" data-i="${i}">${H.T(x.note)}</p>`).join('')}</div>
+    </div>
+  </div>${cap(c.hint)}`;
 }
 function liveDetails(box){
-  const btns = [...box.querySelectorAll('.ad-det-img')];
-  box.addEventListener('click', e => {
-    const b = e.target.closest('.ad-det-img'); if (!b) return;
-    const imgs = btns.map(t => t.querySelector('img'));
-    H.openViewer(imgs.map(i => i.currentSrc || i.src), btns.indexOf(b), imgs);
+  const orbs = [...box.querySelectorAll('.ad-orb')], notes = [...box.querySelectorAll('.ad-orb-note')];
+  const ring = box.querySelector('.ad-orb-ring'), n = orbs.length;
+  let ang = 0, k = 0, held = false, seen = false, raf = 0, last = 0, next = 0;
+  const show = i => {
+    k = i;
+    orbs.forEach((o, j) => o.classList.toggle('on', j === i));
+    notes.forEach((p, j) => p.classList.toggle('on', j === i));
+  };
+  show(0);
+  const place = () => {
+    ring.style.setProperty('--rot', ang.toFixed(2) + 'deg');
+  };
+  const draw = t => {
+    const dt = Math.min(64, t - (last || t)); last = t;
+    if (!held) ang = (ang + dt * .006) % 360;   // полный круг примерно за минуту
+    place();
+    if (!held && t > next) { show((k + 1) % n); next = t + 2600; }
+    if (seen) raf = requestAnimationFrame(draw);
+  };
+  orbs.forEach((o, i) => {
+    o.addEventListener('pointerenter', () => { held = true; show(i); });
+    o.addEventListener('pointerleave', () => { held = false; next = performance.now() + 2600; });
   });
-  // наведение — толчок: брелок раскачивается и затухает
-  box.querySelectorAll('.ad-det').forEach(f => f.addEventListener('pointerenter', () => {
-    if (still()) return;
-    f.classList.remove('swing'); void f.offsetWidth; f.classList.add('swing');
-  }));
+  box.addEventListener('click', e => {
+    const b = e.target.closest('.ad-orb'); if (!b) return;
+    const i = orbs.indexOf(b);
+    // пальцем: первое касание — подпись, второе — увеличить
+    if (e.pointerType && e.pointerType !== 'mouse' && k !== i) { show(i); held = true; setTimeout(() => { held = false; }, 4000); return; }
+    const imgs = orbs.map(t => t.querySelector('img'));
+    H.openViewer(imgs.map(im => im.currentSrc || im.src), i, imgs);
+  });
+  if (still()) return;
+  onScreen(box, v => {
+    if (v && !seen) { seen = true; last = 0; raf = requestAnimationFrame(draw); }
+    else if (!v) { seen = false; cancelAnimationFrame(raf); }
+  });
 }
 
-/* ---------- что вышло: финальные фото ---------- */
+/* ---------- что вышло: четыре футболки, которые пошли в производство ---------- */
+// у каждой — подпись и ряд фото и роликов; ролики играют без звука, только когда на экране
+function finMedia(src){
+  return /\.mp4$/.test(src)
+    ? `<div class="ad-fin vid"><video src="${src}" muted loop playsinline preload="metadata"></video></div>`
+    : `<button class="ad-fin" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`;
+}
 function finalHTML(c){
-  return `<div class="ad-final">${c.items.map((src, i) => `<button class="ad-fin" style="--i:${i}" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div>${cap(c.hint)}`;
+  return `<div class="ad-finals">${c.items.map((g, i) => `
+    <div class="ad-fin-group" style="--i:${i}">
+      <p class="ad-fin-name">${H.T(g.name)}</p>
+      <div class="ad-final">${g.media.map(finMedia).join('')}</div>
+    </div>`).join('')}</div>${cap(c.hint)}`;
 }
 function liveFinal(box){
-  const btns = [...box.querySelectorAll('.ad-fin')];
+  const btns = [...box.querySelectorAll('button.ad-fin')];
   box.addEventListener('click', e => {
-    const b = e.target.closest('.ad-fin'); if (!b) return;
+    const b = e.target.closest('button.ad-fin'); if (!b) return;
     const imgs = btns.map(t => t.querySelector('img'));
     H.openViewer(imgs.map(i => i.currentSrc || i.src), btns.indexOf(b), imgs);
   });
+  box.querySelectorAll('video').forEach(v => onScreen(v, on => {
+    if (on && !still()) v.play().catch(() => {}); else v.pause();
+  }));
 }
 
 /* ---------- о проекте писали: названия изданий крупно ---------- */
@@ -275,7 +354,7 @@ const KINDS = {
   board:    [boardHTML, liveBoard, '.ad-board'],
   type:     [typeHTML, liveType, '.ad-types'],
   versions: [versionsHTML, liveVersions, '.ad-vers'],
-  details:  [detailsHTML, liveDetails, '.ad-dets'],
+  details:  [detailsHTML, liveDetails, '.ad-orbit'],
   final:    [finalHTML, liveFinal, '.ad-final'],
   press:    [pressHTML, null, '.ad-press'],
 };

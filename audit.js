@@ -431,12 +431,12 @@ function mobCurve(c){
 
 // обложки разделов: сменяют друг друга вместе с заголовком и текстом раздела; снизу — переключатели
 function covers(list){
-  return `<div class="au-cov">
+  return `<div class="au-cov" style="--n:${list.length}">
+    <div class="au-cov-tabs" role="tablist"><span class="au-cov-thumb" aria-hidden="true"><i></i></span>${list.map((c, i) => `<button class="au-cov-tab${i ? '' : ' on'}" data-k="${i}" role="tab">${H.T(c.tab || c.title)}</button>`).join('')}</div>
     <div class="au-cov-stage">${list.map((c, i) => `<div class="au-cov-slide${i ? '' : ' on'}" data-k="${i}">
       <img src="${c.img}" alt="" loading="lazy">
       <div class="au-cov-txt"><b>${H.T(c.title)}</b><span>${H.T(c.text)}</span></div>
     </div>`).join('')}</div>
-    <div class="au-cov-tabs">${list.map((c, i) => `<button class="au-cov-tab${i ? '' : ' on'}" data-k="${i}"><i></i>${H.T(c.tab || c.title)}</button>`).join('')}</div>
   </div>`;
 }
 
@@ -641,10 +641,15 @@ function liveMobCurve(box){
   });
 }
 function liveCovers(box){
-  const all = [...box.querySelectorAll('[data-k]')], tabs = box.querySelectorAll('.au-cov-tab');
-  const show = i => all.forEach(el => el.classList.toggle('on', el.dataset.k === String(i)));
+  const all = [...box.querySelectorAll('[data-k]')], tabs = box.querySelectorAll('.au-cov-tab'), thumb = box.querySelector('.au-cov-thumb i');
+  const show = i => {
+    all.forEach(el => el.classList.toggle('on', el.dataset.k === String(i)));
+    box.style.setProperty('--k', i);
+    // полоска в ползунке заполняется заново до следующей смены
+    thumb.style.animation = 'none'; thumb.offsetWidth; thumb.style.animation = '';
+  };
   const c = cycle(box, tabs.length, show, 4200);
-  tabs.forEach(el => el.addEventListener('click', () => c.stop(+el.dataset.k)));
+  tabs.forEach(el => el.addEventListener('click', () => { c.stop(+el.dataset.k); box.classList.add('held'); }));
 }
 // второе состояние графика в мониторе: при наведении и само, по очереди
 function liveScreens(box){

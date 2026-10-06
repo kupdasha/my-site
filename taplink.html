@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@300;400&display=swap" rel="stylesheet">
 <style>
-/* одна колонка по центру; портрет собран из песчинок, кнопки — препятствия, на которых копится песок */
+/* одна колонка; главная кнопка — магнит, россыпь искр вокруг ложится по ее силовым линиям, как опилки */
 :root{
   --bg:#FFFFFF; --ink:#1D222A; --muted:rgba(29,34,42,.55); --soft:#F1F2F4;
   --accent:#E2FB5A; --accent-text:#1D222A;
@@ -28,11 +28,11 @@ body{font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased;t
 a{color:inherit}
 *{box-sizing:border-box}
 
-.tl{position:relative;min-height:100svh;padding:16px 16px 40px;overflow:hidden}
-#sand{position:absolute;left:0;top:0;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
-.col{position:relative;z-index:1;max-width:440px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0}
+#field{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.tl{position:relative;padding:16px 16px 40px}
+.col{position:relative;z-index:1;max-width:440px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
 
-.top{align-self:stretch;display:flex;justify-content:flex-end;margin-bottom:8px}
+.top{align-self:stretch;display:flex;justify-content:flex-end}
 .switch{display:flex;align-items:center;gap:10px;height:44px;padding:0 2px;border:0;background:none;font:500 16px/1 var(--font);color:var(--ink);cursor:pointer}
 .switch>span{opacity:.45;transition:opacity .45s var(--ease);padding-bottom:2px}
 .switch>span:first-child{opacity:1}
@@ -46,19 +46,22 @@ a{color:inherit}
 .switch:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:8px}
 @keyframes track{to{background-position:300% 0}}
 
-.face{width:256px;height:256px;flex:none;touch-action:none;cursor:crosshair}
-.hint{margin:14px 0 0;font-size:16px;line-height:1.3;color:var(--muted);text-align:center;text-wrap:balance}
-
-h1{margin:30px 0 0;font-weight:600;font-size:clamp(32px,9vw,40px);line-height:1;letter-spacing:-.01em;text-align:center}
-.bio{margin:16px 0 0;font-family:var(--font-read);font-weight:400;font-size:19px;line-height:1.42;text-align:center;text-wrap:pretty}
+/* первый экран: имя и главная кнопка в центре */
+.lead{align-self:stretch;min-height:calc(100svh - 76px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding-block:24px 40px}
+h1{margin:0;font-weight:600;font-size:clamp(36px,11vw,52px);line-height:1;letter-spacing:-.015em;text-align:center}
+.bio{margin:18px 0 0;font-family:var(--font-read);font-weight:400;font-size:19px;line-height:1.42;text-align:center;text-wrap:pretty}
 .bio a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .bio a:hover{background:var(--accent);color:var(--accent-text);text-decoration:none}
 
-.main{align-self:stretch;display:flex;flex-direction:column;gap:12px;margin-top:32px}
-.btn{display:flex;align-items:center;justify-content:center;height:58px;padding:0 24px 3px;border-radius:99px;background:var(--btn);color:var(--btn-text);font-size:18px;font-weight:500;text-decoration:none;text-align:center;transition:transform .35s var(--ease),background .35s,color .35s}
-.btn:hover{background:var(--btn-hover);color:var(--btn-hover-text)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;font-weight:500;text-decoration:none;text-align:center;transition:transform .35s var(--ease),background .35s,color .35s}
 .btn:active{transform:scale(.97)}
 .btn:focus-visible,.soc a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.btn-main{margin-top:44px;align-self:stretch;height:68px;padding:0 28px 4px;background:var(--btn);color:var(--btn-text);font-size:21px}
+.btn-main:hover{background:var(--btn-hover);color:var(--btn-hover-text)}
+
+.more{align-self:stretch;display:flex;flex-direction:column;gap:10px}
+.btn-more{height:56px;padding:0 24px 3px;background:var(--soft);color:var(--ink);font-size:18px}
+.btn-more:hover{background:var(--accent);color:var(--accent-text)}
 
 .group{align-self:stretch;margin-top:36px}
 .group h2{margin:0 0 12px;font-size:16px;font-weight:500;color:var(--muted);text-align:center}
@@ -68,15 +71,15 @@ h1{margin:30px 0 0;font-weight:600;font-size:clamp(32px,9vw,40px);line-height:1;
 
 .legal{margin:40px 0 0;font-size:16px;line-height:1.35;color:var(--muted);text-align:center;text-wrap:balance}
 
-@media (max-width:359px){.face{width:192px;height:192px}.soc{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:359px){.soc{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){.switch>i{animation:none}}
 </style>
 <style>body{margin:0}</style>
 </head>
 <body>
 
+<canvas id="field" aria-hidden="true"></canvas>
 <main class="tl" id="tl">
-  <canvas id="sand" aria-hidden="true"></canvas>
   <div class="col">
     <div class="top">
       <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию" data-solid>
@@ -84,17 +87,16 @@ h1{margin:30px 0 0;font-weight:600;font-size:clamp(32px,9vw,40px);line-height:1;
       </button>
     </div>
 
-    <div class="face" id="face" role="img" aria-label="Портрет Даши Купцовой"></div>
-    <p class="hint" id="hint" data-solid>проведите курсором по&nbsp;портрету</p>
+    <section class="lead">
+      <h1 data-solid>Даша Купцова</h1>
+      <p class="bio" data-solid>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст <a href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">«Одна&nbsp;кавычка»</a>&nbsp;— среди гостей Студия Лебедева, Depot, Супрематика, DDVB и&nbsp;другие.</p>
+      <a class="btn btn-main" id="magnet" data-solid href="https://kupdasha.ru/" target="_blank" rel="noopener">заказать дизайн-проект</a>
+    </section>
 
-    <h1 data-solid>Даша Купцова</h1>
-    <p class="bio" data-solid>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст <a href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">«Одна&nbsp;кавычка»</a>&nbsp;— среди гостей Студия Лебедева, Depot, Супрематика, DDVB и&nbsp;другие.</p>
-
-    <nav class="main" aria-label="Главное">
-      <a class="btn" data-solid href="https://kupdasha.ru/" target="_blank" rel="noopener">заказать дизайн-проект</a>
-      <a class="btn" data-solid href="https://kupdasha.ru/profile" target="_blank" rel="noopener">позвать выступать</a>
-      <a class="btn" data-solid href="https://kupdasha.ru/merch" target="_blank" rel="noopener">задизайнить себе мерч</a>
-      <a class="btn" data-solid href="https://kupdasha.ru/ai" target="_blank" rel="noopener">ИИ-воркшоп для вашей команды</a>
+    <nav class="more" aria-label="Еще">
+      <a class="btn btn-more" data-solid href="https://kupdasha.ru/profile" target="_blank" rel="noopener">позвать выступать</a>
+      <a class="btn btn-more" data-solid href="https://kupdasha.ru/merch" target="_blank" rel="noopener">задизайнить себе мерч</a>
+      <a class="btn btn-more" data-solid href="https://kupdasha.ru/ai" target="_blank" rel="noopener">ИИ-воркшоп для вашей команды</a>
     </nav>
 
     <section class="group" aria-label="Соцсети">
@@ -110,7 +112,7 @@ h1{margin:30px 0 0;font-weight:600;font-size:clamp(32px,9vw,40px);line-height:1;
     </section>
 
     <section class="group" aria-label="Подкаст">
-      <h2 data-solid>подкаст «Одна кавычка»</h2>
+      <h2 data-solid>подкаст «Одна&nbsp;кавычка»</h2>
       <div class="soc">
         <a data-solid href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">слушать</a>
         <a data-solid href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
@@ -127,207 +129,157 @@ h1{margin:30px 0 0;font-weight:600;font-size:clamp(32px,9vw,40px);line-height:1;
 (() => {
   /* ---------- версия: серьезно / повеселее ---------- */
   const root = document.documentElement, sw = document.getElementById('switch');
-  const setMode = fun => {
-    root.dataset.mode = fun ? 'fun' : 'serious';
-    sw.setAttribute('aria-checked', fun);
-    try { localStorage.setItem('tl-mode', fun ? 'fun' : 'serious'); } catch (e) {}
+  let fun = false;
+  const setMode = on => {
+    fun = on; root.dataset.mode = on ? 'fun' : 'serious';
+    sw.setAttribute('aria-checked', on);
+    try { localStorage.setItem('tl-mode', on ? 'fun' : 'serious'); } catch (e) {}
   };
   let saved = null; try { saved = localStorage.getItem('tl-mode'); } catch (e) {}
   setMode(saved === 'fun');
-  sw.addEventListener('click', () => setMode(root.dataset.mode !== 'fun'));
 
-  /* ---------- песок ---------- */
-  const N = 64;
-  const FACE = Uint8Array.from(atob('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'), c => c.charCodeAt(0));
-  const page = document.getElementById('tl'), cv = document.getElementById('sand'), ctx = cv.getContext('2d');
-  const faceEl = document.getElementById('face'), hint = document.getElementById('hint');
+  /* ================================================================
+     ОПИЛКИ: та же россыпь искр, что на первом экране сайта, но каждая
+     искра — крошечная стрелка компаса. Главная кнопка — магнит: искры
+     вокруг вытягиваются в черточки и ложатся по ее силовым линиям.
+     Палец или курсор — второй полюс: линии тянутся от кнопки к нему.
+     Наклон телефона поворачивает общее поле, касание пускает волну.
+     ================================================================ */
+  const FIELD = {
+    cell: 11,        // шаг россыпи, px
+    magnet: 2400,    // сила кнопки
+    finger: 1500,    // сила пальца или курсора
+    tilt: 9,         // сила наклона телефона
+    maxLen: 9,       // самая длинная черточка у магнита, px
+    turn: 7,         // как быстро опилки разворачиваются (больше — резче)
+    light: { glow: .5, vivid: .48, alpha: .9 },
+    dark:  { glow: .62, vivid: .42, alpha: .9 },
+  };
+
+  const cv = document.getElementById('field'), ctx = cv.getContext('2d');
+  const page = document.getElementById('tl'), magnetEl = document.getElementById('magnet');
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const touch = matchMedia('(pointer: coarse)').matches;
-  if (touch) hint.textContent = 'наклоните телефон или проведите по портрету пальцем';
+  const BINS = 24;
 
-  const DIRS = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
-  let cell, W, H, grid, img, buf, M = 0;
-  let hx, hy, gx_, gy_, st, col, fx, fy, ft, fd;   // песчинки: дом, позиция, состояние, цвет, полет
-  // состояние: 0 — на месте в портрете, 1 — сыплется, 2 — летит домой
-  let lastW = 0, lastH = 0;
+  // радуга без оранжевого, как в shimmer.js: от желтого через зеленый и голубой к пурпурному и обратно
+  function rainbow(x, glow, vivid) {
+    const h = .15 + .75 * (1 - Math.abs((x - Math.floor(x)) * 2 - 1));
+    const c = [0, 4, 2].map(o => Math.min(1, Math.max(0, Math.abs(((h * 6 + o) % 6 + 6) % 6 - 3) - 1)));
+    return 'rgb(' + c.map(v => Math.round(255 * Math.min(1, Math.max(0, glow + vivid * (v * 2 - 1))))).join(',') + ')';
+  }
+  let palette = [];
+  const paint = () => { const s = fun ? FIELD.dark : FIELD.light; palette = Array.from({ length: BINS }, (_, i) => rainbow(i / BINS, s.glow, s.vivid)); };
+  paint();
 
-  function build() {
-    const pr = page.getBoundingClientRect();
-    const fr = faceEl.getBoundingClientRect();
-    cell = fr.width / N;
-    W = Math.ceil(pr.width / cell); H = Math.ceil(page.scrollHeight / cell);
-    lastW = pr.width; lastH = page.scrollHeight;
-    cv.width = W; cv.height = H;
-    cv.style.width = W * cell + 'px'; cv.style.height = H * cell + 'px';
-    img = ctx.createImageData(W, H); buf = new Uint32Array(img.data.buffer);
-    grid = new Int32Array(W * H).fill(-1);
-    page.querySelectorAll('[data-solid]').forEach(el => {
+  let dpr, vw, vh, cols, rows, ang, solids = [], mag = null;
+  function measure() {
+    dpr = Math.min(2, devicePixelRatio || 1);
+    vw = innerWidth; vh = innerHeight;
+    cv.width = vw * dpr; cv.height = vh * dpr;
+    const H = Math.max(document.documentElement.scrollHeight, vh);
+    cols = Math.ceil(vw / FIELD.cell) + 1; rows = Math.ceil(H / FIELD.cell) + 1;
+    ang = new Float32Array(cols * rows);
+    for (let i = 0; i < ang.length; i++) ang[i] = Math.random() * Math.PI;
+    const sy = scrollY;
+    solids = [...document.querySelectorAll('[data-solid]')].map(el => {
       const r = el.getBoundingClientRect();
-      const x0 = Math.max(0, Math.floor((r.left - pr.left) / cell)), x1 = Math.min(W - 1, Math.ceil((r.right - pr.left) / cell) - 1);
-      const y0 = Math.max(0, Math.floor((r.top - pr.top) / cell)), y1 = Math.min(H - 1, Math.ceil((r.bottom - pr.top) / cell) - 1);
-      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) grid[y * W + x] = -2;
+      return [r.left - 12, r.top + sy - 12, r.right + 12, r.bottom + sy + 12];
     });
-    const ox = Math.round((fr.left - pr.left) / cell), oy = Math.round((fr.top - pr.top) / cell);
-    const cap = N * N;
-    hx = new Int16Array(cap); hy = new Int16Array(cap); gx_ = new Int16Array(cap); gy_ = new Int16Array(cap);
-    st = new Uint8Array(cap); col = new Uint32Array(cap);
-    fx = new Float32Array(cap); fy = new Float32Array(cap); ft = new Float32Array(cap); fd = new Float32Array(cap);
-    M = 0;
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-      const k = (y * N + x) * 4;
-      if (!FACE[k + 3]) continue;
-      const j = 0.92 + Math.random() * 0.16;          // у каждой песчинки свой оттенок
-      const r = Math.min(255, FACE[k] * j), g = Math.min(255, FACE[k + 1] * j), b = Math.min(255, FACE[k + 2] * j);
-      hx[M] = gx_[M] = ox + x; hy[M] = gy_[M] = oy + y; st[M] = 0;
-      col[M] = (255 << 24) | (b << 16) | (g << 8) | r;
-      grid[(oy + y) * W + ox + x] = M; M++;
-    }
-    draw();
+    const m = magnetEl.getBoundingClientRect(), rad = m.height / 2;
+    mag = { x0: m.left + rad, x1: m.right - rad, y: m.top + sy + rad, r: rad };
   }
 
-  function draw() {
-    buf.fill(0);
-    for (let i = 0; i < M; i++) {
-      const x = st[i] === 2 ? Math.round(fx[i]) : gx_[i], y = st[i] === 2 ? Math.round(fy[i]) : gy_[i];
-      if (x >= 0 && y >= 0 && x < W && y < H) buf[y * W + x] = col[i];
+  // поле в точке страницы: от кнопки-капсулы наружу, к пальцу внутрь, плюс наклон
+  let fingerOn = false, fx = 0, fy = 0, fpow = 0, tx = 0, ty = 0;
+  function field(x, y) {
+    const nx = Math.max(mag.x0, Math.min(mag.x1, x)), dx = x - nx, dy = y - mag.y;
+    const d2 = Math.max(dx * dx + dy * dy, mag.r * mag.r);
+    let vx = FIELD.magnet * dx / d2, vy = FIELD.magnet * dy / d2;
+    if (fpow > 0.01) {
+      const ex = x - fx, ey = y - fy, e2 = Math.max(ex * ex + ey * ey, 400);
+      vx -= fpow * FIELD.finger * ex / e2; vy -= fpow * FIELD.finger * ey / e2;
     }
-    ctx.putImageData(img, 0, 0);
+    return [vx + tx * FIELD.tilt, vy + ty * FIELD.tilt];
   }
 
-  const free = i => { if (st[i] === 0) { st[i] = 1; loose++; } };
-  let loose = 0;
-
-  /* шаг песка: каждая свободная песчинка падает по направлению силы тяжести или скатывается вбок на 45° */
-  function step(gx, gy) {
-    const mag = Math.hypot(gx, gy); if (mag < 0.12) return;
-    const dx = Math.abs(gx) > 0.38 * mag ? Math.sign(gx) : 0, dy = Math.abs(gy) > 0.38 * mag ? Math.sign(gy) : 0;
-    const k = DIRS.findIndex(d => d[0] === dx && d[1] === dy);
-    const a = DIRS[(k + 1) % 8], b = DIRS[(k + 7) % 8], p = DIRS[k];
-    const chance = Math.min(1, mag * 1.3);
-    // сначала двигаем те, что ниже по склону
-    order.length = 0;
-    for (let i = 0; i < M; i++) if (st[i] === 1) order.push(i);
-    order.sort((i, j) => (gx_[j] * gx + gy_[j] * gy) - (gx_[i] * gx + gy_[i] * gy));
-    for (const i of order) {
-      if (Math.random() > chance) continue;
-      const x = gx_[i], y = gy_[i];
-      if (tryMove(i, x, y, p)) continue;
-      const first = Math.random() < 0.5 ? a : b, second = first === a ? b : a;
-      if (tryMove(i, x, y, first)) continue;
-      tryMove(i, x, y, second);
-    }
-  }
-  const order = [];
-  function tryMove(i, x, y, d) {
-    const nx = x + d[0], ny = y + d[1];
-    if (nx < 0 || ny < 0 || nx >= W || ny >= H) return false;
-    const n = ny * W + nx; if (grid[n] !== -1) return false;
-    grid[y * W + x] = -1; grid[n] = i; gx_[i] = nx; gy_[i] = ny; return true;
+  const waves = [];
+  let t0 = performance.now(), prev = t0, phase = 0;
+  function frame(now) {
+    const dt = Math.min(.05, (now - prev) / 1000); prev = now;
+    const t = (now - t0) / 1000;
+    fpow += ((fingerOn ? 1 : 0) - fpow) * Math.min(1, dt * 4);
+    phase += dt * .05 + (tx * tx + ty * ty) * dt * .2;   // перелив течет быстрее, когда телефон наклонен
+    render(t, dt);
+    if (!still) requestAnimationFrame(frame);
   }
 
-  /* портрет осыпается с той стороны, куда наклонили */
-  function erode(gx, gy, amount) {
-    const mag = Math.hypot(gx, gy); if (mag < 0.12) return;
-    const dx = Math.abs(gx) > 0.38 * mag ? Math.sign(gx) : 0, dy = Math.abs(gy) > 0.38 * mag ? Math.sign(gy) : 0;
-    for (let i = 0; i < M; i++) {
-      if (st[i] !== 0 || Math.random() > amount) continue;
-      const nx = gx_[i] + dx, ny = gy_[i] + dy;
-      if (nx >= 0 && ny >= 0 && nx < W && ny < H && grid[ny * W + nx] === -1) free(i);
-    }
-  }
-
-  /* когда все успокоилось — песчинки летят на свои места */
-  function recall() {
-    for (let i = 0; i < M; i++) if (st[i] === 1) {
-      grid[gy_[i] * W + gx_[i]] = -1;
-      st[i] = 2; sx[i] = fx[i] = gx_[i]; sy[i] = fy[i] = gy_[i];
-      const dist = Math.hypot(hx[i] - sx[i], hy[i] - sy[i]);
-      ft[i] = -(Math.random() * 0.35 + dist * 0.003); fd[i] = 0.8 + Math.random() * 0.5;
-    }
-    loose = 0;
-  }
-  let sx, sy;
-  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  function fly(dt) {
-    let busy = false;
-    for (let i = 0; i < M; i++) if (st[i] === 2) {
-      busy = true;
-      ft[i] += dt;
-      const t = Math.max(0, Math.min(1, ft[i] / fd[i])), e = ease(t);
-      fx[i] = sx[i] + (hx[i] - sx[i]) * e; fy[i] = sy[i] + (hy[i] - sy[i]) * e;
-      if (t >= 1) {
-        const n = hy[i] * W + hx[i];
-        if (grid[n] === -1) { grid[n] = i; gx_[i] = hx[i]; gy_[i] = hy[i]; st[i] = 0; }
+  function render(t, dt) {
+    const s = fun ? FIELD.dark : FIELD.light, sy = scrollY, c = FIELD.cell;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, vw, vh);
+    ctx.lineCap = 'round'; ctx.lineWidth = 1.7;
+    const paths = palette.map(() => new Path2D());
+    const r0 = Math.max(0, Math.floor(sy / c)), r1 = Math.min(rows - 1, Math.ceil((sy + vh) / c));
+    const k = still ? 1 : Math.min(1, dt * FIELD.turn);
+    for (let r = r0; r <= r1; r++) {
+      for (let q = 0; q < cols; q++) {
+        const x = q * c + (r & 1 ? c / 2 : 0), y = r * c;
+        let hidden = false;
+        for (const b of solids) if (x > b[0] && x < b[2] && y > b[1] && y < b[3]) { hidden = true; break; }
+        if (hidden) continue;
+        const [vx, vy] = field(x, y);
+        const f = Math.hypot(vx, vy);
+        // опилки без головы и хвоста: поворачиваем по кратчайшему пути в пределах полуоборота
+        const i = r * cols + q, want = Math.atan2(vy, vx);
+        let d = want - ang[i]; d -= Math.round(d / Math.PI) * Math.PI; ang[i] += d * k;
+        let len = FIELD.maxLen * Math.pow(Math.min(1, Math.max(0, (f - 9) / 45)), .8);   // вдали — точки, у магнита — черточки
+        for (const w of waves) { const wd = Math.abs(Math.hypot(x - w.x, y - w.y) - w.r); if (wd < 40) len += (1 - wd / 40) * 6 * w.a; }
+        const tw = .55 + .45 * Math.sin(t * (1.3 + (i * 7919 % 13) / 9) + i);   // каждая искра мерцает в своем ритме
+        if (tw < .2 && len < 1) continue;
+        const ux = Math.cos(ang[i]) * len / 2, uy = Math.sin(ang[i]) * len / 2;
+        const bin = ((Math.floor((x * .0016 + y * .0009 + phase) * BINS) % BINS) + BINS) % BINS;
+        paths[bin].moveTo(x - ux, y - sy - uy); paths[bin].lineTo(x + ux + .01, y - sy + uy);
       }
     }
-    return busy;
+    ctx.globalAlpha = s.alpha;
+    palette.forEach((col, b) => { ctx.strokeStyle = col; ctx.stroke(paths[b]); });
+    for (let j = waves.length - 1; j >= 0; j--) { const w = waves[j]; w.r += dt * 520; w.a = Math.max(0, 1 - w.r / 700); if (w.a <= 0) waves.splice(j, 1); }
   }
 
-  /* курсор и палец рассыпают портрет */
-  let lastPoke = -1e9;
-  function poke(e) {
-    const pr = page.getBoundingClientRect();
-    const cx = (e.clientX - pr.left) / cell, cy = (e.clientY - pr.top) / cell, R = 5.5;
-    for (let i = 0; i < M; i++) if (st[i] === 0) {
-      const dx = gx_[i] - cx, dy = gy_[i] - cy;
-      if (dx * dx + dy * dy < R * R) free(i);
-    }
-    lastPoke = performance.now();
-  }
-  page.addEventListener('pointermove', poke);
-  page.addEventListener('pointerdown', poke);
+  /* курсор и палец — второй полюс; клик и касание пускают волну, как на сайте */
+  const pt = e => { fx = e.clientX; fy = e.clientY + scrollY; };
+  addEventListener('pointermove', e => { pt(e); if (e.pointerType === 'mouse') fingerOn = true; }, { passive: true });
+  addEventListener('pointerdown', e => { pt(e); fingerOn = true; waves.push({ x: fx, y: fy, r: 0, a: 1 }); }, { passive: true });
+  addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') fingerOn = false; });
+  addEventListener('pointercancel', () => { fingerOn = false; });
+  document.addEventListener('mouseleave', () => { fingerOn = false; });
 
-  /* наклон телефона */
-  let sensor = false, beta = 0, gamma = 0, b0 = null, g0 = 0;
+  /* наклон телефона поворачивает поле; на айфоне датчик включается после первого касания */
   addEventListener('deviceorientation', e => {
     if (e.beta == null || e.gamma == null) return;
-    sensor = true; beta = e.beta; gamma = e.gamma;
-    if (b0 === null) { b0 = beta; g0 = gamma; }
-    if (touch) hint.textContent = 'наклоните телефон';
+    const ang0 = (screen.orientation && screen.orientation.angle) || 0;
+    let x = Math.sin(e.gamma * Math.PI / 180), y = Math.sin((e.beta - 45) * Math.PI / 180);   // держат телефон под ~45°
+    if (ang0 === 90) [x, y] = [y, -x]; else if (ang0 === 270 || ang0 === -90) [x, y] = [-y, x];
+    tx += (x - tx) * .2; ty += (y - ty) * .2;
   });
-  // на айфоне датчик включается только после касания
   addEventListener('pointerdown', () => {
     const D = window.DeviceOrientationEvent;
     if (D && typeof D.requestPermission === 'function') D.requestPermission().catch(() => {});
   }, { once: true });
 
-  function tilt() {
-    const ang = (screen.orientation && screen.orientation.angle) || 0;
-    let gx = Math.sin(gamma * Math.PI / 180), gy = Math.sin(beta * Math.PI / 180);
-    if (ang === 90) [gx, gy] = [gy, -gx]; else if (ang === 270 || ang === -90) [gx, gy] = [-gy, gx]; else if (ang === 180) [gx, gy] = [-gx, -gy];
-    return [gx, gy];
-  }
+  sw.addEventListener('click', () => {
+    setMode(!fun); paint();
+    const r = sw.getBoundingClientRect();
+    waves.push({ x: r.left + r.width / 2, y: r.top + r.height / 2 + scrollY, r: 0, a: 1 });
+    if (still) render(0, 0);
+  });
 
-  let quiet = 0, prev = performance.now();
-  function frame(now) {
-    const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
-    let gx = 0, gy = 1, dev = 0;
-    if (sensor) {
-      [gx, gy] = tilt();
-      b0 += (beta - b0) * Math.min(1, dt / 3.5); g0 += (gamma - g0) * Math.min(1, dt / 3.5);
-      dev = Math.hypot(beta - b0, gamma - g0);
-      if (dev > 9) erode(gx, gy, Math.min(0.3, 0.015 + (dev - 9) * 0.012));
-    }
-    if (loose) { step(gx, gy); step(gx, gy); step(gx, gy); }
-    const calm = now - lastPoke > 600 && dev < 6;
-    quiet = calm ? quiet + dt : 0;
-    if (loose && quiet > 1.6) recall();
-    fly(dt);
-    draw();
-    requestAnimationFrame(frame);
-  }
-
-  function rebuild() { build(); sx = new Float32Array(M); sy = new Float32Array(M); }
-  rebuild();
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(rebuild);
-  let rt;
-  new ResizeObserver(() => {
-    if (Math.abs(page.getBoundingClientRect().width - lastW) < 1 && Math.abs(page.scrollHeight - lastH) < 2) return;
-    clearTimeout(rt); rt = setTimeout(rebuild, 150);
-  }).observe(page);
-
-  if (!still) requestAnimationFrame(frame);
-  else hint.hidden = true;
+  measure();
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { measure(); if (still) render(0, 0); });
+  let rt, lw = innerWidth;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { measure(); if (still) render(0, 0); }, 150); });
+  if (still) { render(0, 0); addEventListener('scroll', () => render(0, 0), { passive: true }); }
+  else requestAnimationFrame(frame);
 })();
 </script>
 </body>
