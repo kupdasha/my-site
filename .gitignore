@@ -1,3 +1,4 @@
 .DS_Store
 исходники видео/
 __pycache__/
+.claude/

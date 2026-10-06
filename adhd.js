@@ -32,12 +32,14 @@ function liveThoughts(box){
   let fx = 0, fy = 0, gx = 0, gy = 0, hover = false, jumpAt = 0, stealUntil = 0;
   // раскладка: ячейки сетки, внутри — случайный сдвиг, чтобы не выглядело таблицей
   const lay = () => {
-    const w = box.clientWidth, h = box.clientHeight, cols = w < 640 ? 2 : 3, rows = Math.ceil(n / cols);
+    // поле внутри отступа: с запасом на дрейф, чтобы фразы не уезжали за край
+    const P = Math.min(40, box.clientWidth * .05) + 16, w = box.clientWidth - P * 2, h = box.clientHeight - P * 2;
+    const cols = box.clientWidth < 640 ? 2 : 3, rows = Math.ceil(n / cols);
     pos = els.map((el, i) => {
       const cw = w / cols, ch = h / rows, c = i % cols, r = Math.floor(i / cols);
-      el.style.maxWidth = (cw - 24) + 'px';
+      el.style.maxWidth = (cw - 16) + 'px';
       const ew = el.offsetWidth, eh = el.offsetHeight;
-      return { x: c * cw + rnd(8, Math.max(8, cw - ew - 8)), y: r * ch + rnd(4, Math.max(4, ch - eh - 4)), w: ew, h: eh,
+      return { x: P + c * cw + rnd(0, Math.max(0, cw - ew)), y: P + r * ch + rnd(0, Math.max(0, ch - eh)), w: ew, h: eh,
         ph: rnd(0, 6.28), sp: rnd(.25, .5), amp: rnd(6, 16) };
     });
   };
@@ -57,8 +59,8 @@ function liveThoughts(box){
       const [cx, cy] = [p.x + p.w / 2 + dx, p.y + p.h / 2 + dy];
       const d = Math.min(1, Math.hypot(cx - fx, cy - fy) / R);
       el.style.transform = `translate(${(p.x + dx).toFixed(1)}px,${(p.y + dy).toFixed(1)}px)`;
-      el.style.filter = d < .08 ? 'none' : `blur(${(d * 5).toFixed(2)}px)`;
-      el.style.opacity = (1 - d * .7).toFixed(2);
+      el.style.filter = d < .08 ? 'none' : `blur(${(d * 3.6).toFixed(2)}px)`;
+      el.style.opacity = (1 - d * .6).toFixed(2);
     });
     if (seen) raf = requestAnimationFrame(draw);
   };
@@ -119,10 +121,10 @@ function liveBoard(box){
 /* ---------- живая типографика из набросков ---------- */
 // кольцо «многоозадаченность» крутится; на наведении — быстрее, как будто взялась за всё сразу
 function ringSVG(t){
-  const word = (H.pick(t.ring) + ' ').repeat(3);
+  const word = (H.pick(t.ring) + '\u00A0\u00A0').repeat(2);   // неразрывные пробелы: на стыке кольца отступ не пропадает
   return `<svg class="ad-type ad-ring" viewBox="0 0 400 400" aria-hidden="true">
     <defs><path id="adRing" d="M200 200m-150 0a150 150 0 1 1 300 0a150 150 0 1 1-300 0"/></defs>
-    <g class="ad-spin"><text><textPath href="#adRing" textLength="930">${word}</textPath></text></g>
+    <g class="ad-spin"><text><textPath href="#adRing" textLength="938" lengthAdjust="spacing">${word}</textPath></text></g>
     <text class="ad-core" x="200" y="208" text-anchor="middle">${H.pick(t.core)}</text>
   </svg>`;
 }
@@ -291,7 +293,7 @@ function loadCSS(base){
 // глава появляется, когда доезжает до экрана
 const reveal = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { e.target.classList.add('in'); reveal.unobserve(e.target); }
-}), { threshold: .12 });
+}), { rootMargin: '0px 0px -12% 0px' });   // без порога по доле: длинная глава на телефоне выше нескольких экранов
 
 export async function mountADHD(mount, p, helpers){
   H = helpers;
