@@ -1898,10 +1898,12 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       more:  ['все выступления', 'все фото со сцены'],
       /* короткие подписи к карточкам в «всех выступлениях» (полное название видно при увеличении фото) */
       labels: { 'Российский форум индустрии дизайна, Росконгресс': 'Форум дизайна, Росконгресс', 'Кайференция, PRAGMATICA': 'Кайференция',
-                'ШУМ, Росмолодёжь, 2023': 'ШУМ, 2023', 'Корпоратив Студии Лебедева': 'Студия Лебедева', '«Среда», теплоход': '«Среда»' },
+                'ШУМ, Росмолодёжь, 2023': 'ШУМ, 2023', 'Корпоратив Студии Лебедева': 'Студия Лебедева', '«Среда», теплоход': '«Среда», теплоход',
+                'Подкаст «Одна кавычка»': 'Подкаст', 'Основа, церемония награждения': 'Основа', '«Среда», церемония награждения': '«Среда», награждение' },
       /* порядок карточек событий в «всех выступлениях» (названия — как в caption) */
-      order: ['Российский форум индустрии дизайна, Росконгресс', 'Кайференция, PRAGMATICA', 'ШУМ, Росмолодёжь, 2023', 'Telling Stories',
-              'Корпоратив Студии Лебедева', 'HSE Creative HUB', '«Среда», теплоход', 'B&D', 'VK', 'Дизайн-стендап'],
+      order: ['Российский форум индустрии дизайна, Росконгресс', 'Кайференция, PRAGMATICA', 'Основа, церемония награждения', 'ШУМ, Росмолодёжь, 2023',
+              'Подкаст «Одна кавычка»', 'Telling Stories', '«Среда», церемония награждения', 'MADS', 'Корпоратив Студии Лебедева', '11 друзей Моушена',
+              'HSE Creative HUB', 'Собственный митап', '«Среда», теплоход', 'B&D', 'VK', 'Новый год «Сетки»', 'Дизайн-стендап'],
       items: [
         { src: 'img/events/ev-01.jpg', thumb: 'img/events/ev-01-s.jpg', ratio: 1.5, caption: 'Российский форум индустрии дизайна, Росконгресс' },
         { src: 'img/events/ev-02.jpg', thumb: 'img/events/ev-02-s.jpg', ratio: 0.67, caption: '«Среда», теплоход' },
@@ -1944,6 +1946,17 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         { src: 'img/events/ev-46.jpg', thumb: 'img/events/ev-46-s.jpg', ratio: 1.78, caption: 'VK' },
         { src: 'img/events/ev-19.jpg', thumb: 'img/events/ev-19-s.jpg', ratio: 1.29, caption: 'ШУМ, Росмолодёжь, 2023' },
         { src: 'img/events/ev-47.jpg', thumb: 'img/events/ev-47-s.jpg', ratio: 1.53, caption: 'VK' },
+        { src: 'img/events/ev-57.jpg', thumb: 'img/events/ev-57-s.jpg', ratio: 0.73, caption: '11 друзей Моушена' },
+        { src: 'img/events/ev-58.jpg', thumb: 'img/events/ev-58-s.jpg', ratio: 0.56, caption: 'Подкаст «Одна кавычка»', note: 'Сергей Кулинкович, арт-директор Студии Лебедева' },
+        { src: 'img/events/ev-59.jpg', thumb: 'img/events/ev-59-s.jpg', ratio: 0.67, caption: 'Основа, церемония награждения' },
+        { src: 'img/events/ev-60.jpg', thumb: 'img/events/ev-60-s.jpg', ratio: 0.67, caption: 'Основа, церемония награждения' },
+        { src: 'img/events/ev-61.jpg', thumb: 'img/events/ev-61-s.jpg', ratio: 1.33, caption: 'Подкаст «Одна кавычка»', note: 'Дима Карпов' },
+        { src: 'img/events/ev-62.jpg', thumb: 'img/events/ev-62-s.jpg', ratio: 1.33, caption: 'Подкаст «Одна кавычка»', note: 'Лифанов, агентство «Супрематика»' },
+        { src: 'img/events/ev-63.jpg', thumb: 'img/events/ev-63-s.jpg', ratio: 0.57, caption: 'MADS' },
+        { src: 'img/events/ev-64.jpg', thumb: 'img/events/ev-64-s.jpg', ratio: 0.75, caption: 'Собственный митап' },
+        { src: 'img/events/ev-65.jpg', thumb: 'img/events/ev-65-s.jpg', ratio: 0.72, caption: '«Среда», церемония награждения' },
+        { src: 'img/events/ev-66.jpg', thumb: 'img/events/ev-66-s.jpg', ratio: 0.56, caption: 'Подкаст «Одна кавычка»' },
+        { src: 'img/events/ev-67.jpg', thumb: 'img/events/ev-67-s.jpg', ratio: 0.8, caption: 'Новый год «Сетки»' },
       ],
     },
     /* в дружеской версии фотографии — колода, как в приложении знакомств */

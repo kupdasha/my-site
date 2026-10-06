@@ -352,7 +352,8 @@ evGallery.className = 'ev-gallery'; evGallery.setAttribute('role', 'dialog'); ev
 document.body.appendChild(evGallery);
 function evOpenViewer(i, from){
   const E = SITE.photos.events;
-  openViewer(E.items.map(x => x.src), i, from, E.items.map(x => x.caption));
+  // в подписи при увеличении — событие и, если есть, с кем (note)
+  openViewer(E.items.map(x => x.src), i, from, E.items.map(x => x.note ? `${pick(x.caption)}: ${pick(x.note)}` : x.caption));
 }
 function openGallery(){
   const E = SITE.photos.events;
