@@ -1084,7 +1084,8 @@ function shotHTML(src){
 function heroHTML(p){
   const m = parseMedia(legacyVideo(p));
   if (m && m.type === 'file') return `<video src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} muted loop playsinline autoplay></video>`;
-  // heroImage — своя картинка в шапке кейса, если она отличается от обложки в сетке
+  // heroImage — своя картинка в шапке кейса, если она отличается от обложки в сетке;
+  // heroRatio — шапка в пропорциях картинки: целиком и без увеличения, карточка в сетке не меняется (см. СДВГ)
   const himg = p.heroImage || p.image;
   const poster = himg ? `<img src="${himg}" alt=""${p.pos && !p.heroImage ? ` style="object-position:${p.pos}"` : ''}>` : '';
   // Vimeo запускается сам поверх обложки; тяжелые плееры (Rutube, VK, Kinescope) грузятся по нажатию —
@@ -2181,6 +2182,8 @@ function renderCase(k, keepScroll){
   if (p.audit) body += `<div class="au au-mount${p.auditTheme ? ' au-' + p.auditTheme : ''}"></div>`;
   // adhd — кейс «Где моё внимание?»: мысли, наброски, версии футболок с живыми анимациями; рисует adhd.js
   if (p.adhd) body += `<div class="adhd adhd-mount"></div>`;
+  // fleet — кейс Nέofleet как дорога: слоганы на полосах, цвета рядами, живая разметка, фары; рисует fleet.js
+  if (p.fleet) body += `<div class="fleet fleet-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2201,7 +2204,7 @@ function renderCase(k, keepScroll){
       ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
       ${p.note ? `<p class="case-note" data-reveal>${T(p.note)}</p>` : ''}
     </div>
-    <div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>
+    <div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>
     ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
     <div class="case-body">${body}</div>
     <div class="wrap case-end">
@@ -2245,6 +2248,10 @@ function renderCase(k, keepScroll){
   if (ad) import(SCRIPT_BASE + 'adhd.js?v=' + VER)
     .then(m => m.mountADHD(ad, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс СДВГ не загрузился', err));
+  const fl = caseContent.querySelector('.fleet-mount');
+  if (fl) import(SCRIPT_BASE + 'fleet.js?v=' + VER)
+    .then(m => m.mountFleet(fl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс Nέofleet не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
