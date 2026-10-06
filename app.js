@@ -268,7 +268,7 @@ function renderAboutExtras(){
       strip.className = 'deck-wrap';
       strip.innerHTML = `<div class="deck" id="deck">${SITE.photos.items.map(photo).map((ph, k) => `
         <div class="swipe-card" data-k="${k}">
-          <img src="${ph.src}" alt="Дарья Купцова" draggable="false" style="object-position:${ph.pos}">
+          <img src="${ph.funSrc || ph.src}" alt="Дарья Купцова" draggable="false" style="object-position:${ph.funPos || ph.pos}">
           <div class="swipe-info"><b>${T(D.name)}</b><span class="swipe-age">${T(D.age)}</span><p>${T(ph.caption || D.bio)}</p></div>
           <span class="swipe-stamp no">${T(D.no)}</span><span class="swipe-stamp yes">${T(D.yes)}</span>
         </div>`).reverse().join('')}</div>

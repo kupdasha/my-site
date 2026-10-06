@@ -1773,6 +1773,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       { src: 'https://static.tildacdn.com/tild3130-3037-4865-b134-366262323939/231A8190.jpg', pos: '46% 40%',
         caption: 'Стою на красном фоне и рассказываю дизайн-стендап.' },
       { src: 'https://static.tildacdn.com/tild6133-3130-4566-a332-303931333166/IROD8764.jpg', pos: '58% 40%',
+        funSrc: 'img/photo-stage-mic.jpg', funPos: '52% 30%',   // в веселой версии (колода «как в Тиндере») — другое фото
         caption: 'Российский форум индустрии дизайна: говорю серьезные вещи с серьезным лицом.' },
       { src: 'https://static.tildacdn.com/tild3565-6162-4964-b536-653533393934/dg4vId6BZtP47oIDwRUQ.jpg', pos: '50% 30%',
         caption: 'Выступаем на Telling Stories.' },
