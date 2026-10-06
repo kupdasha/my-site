@@ -443,7 +443,14 @@ img,video{display:block;max-width:100%}
   .collage-stack{flex-direction:column}
   .collage-txt{text-align:left}
 }
+/* планшет: название кампании во всю ширину, задача и решение — в две колонки; схема кейса остается в три */
 @media (max-width:900px){
+  .camp-name{grid-column:1 / -1}
+  .camp-head>.camp-col:nth-child(2){grid-column:1 / span 6}
+  .camp-head>.camp-col:nth-child(3){grid-column:7 / span 6}
+}
+/* телефон: всё в одну колонку */
+@media (max-width:760px){
   .camp-name,.camp-head>.camp-col:nth-child(2),.camp-head>.camp-col:nth-child(3),.scheme-cols>.camp-col{grid-column:1 / -1 !important}
 }
 @media (max-width:760px){
@@ -457,6 +464,12 @@ img,video{display:block;max-width:100%}
   /* коллаж на телефоне — столбиком: пропорции и сетка из content.js (они в style у элемента) отключаются */
   .collage{aspect-ratio:auto!important;grid-template:none!important}
   .collage-cell{flex:none}
+  /* коллаж без подписей (ресайзы) — тоже лента: ячейки и стопки раскрываются в один ряд */
+  .collage:not(:has(.collage-txt)){flex-direction:row;flex-wrap:nowrap;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+    margin:0 calc(-1 * var(--pad));padding:0 var(--pad);scroll-padding:0 var(--pad)}
+  .collage:not(:has(.collage-txt))::-webkit-scrollbar{display:none}
+  .collage:not(:has(.collage-txt)) :is(.collage-cell,.collage-stack){display:contents}
+  .collage:not(:has(.collage-txt)) .camp-shot{flex:0 0 auto;width:min(84vw, 62dvh * var(--ar));scroll-snap-align:start}
 }
 /* длинный текст кейса: на планшете остается в две колонки, на телефоне — в одну */
 @media (max-width:600px){.case-text.cols2 p{columns:1}}
