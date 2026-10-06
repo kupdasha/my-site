@@ -1391,11 +1391,50 @@ function campRow(items, caption, narrow, small, stairs){
 }
 // коллаж: ячейки раскладываются по схеме areas, у каждой подпись сверху; фото увеличиваются по нажатию
 // блок-памятка (spec): заголовок и короткие пункты в колонках; у пункта могут быть цвета — плашки с кодом
+// рисунки к пунктам памятки (поле viz): плоские схемы в цветах брифа, без текста внутри
+const SPEC_CYAN = '#00D3E6', SPEC_BLUE = '#0077FF';
+// силуэт человека: голова и плечи; x — центр, y — низ, k — масштаб
+const specPerson = (x, y, k, style) => `<g transform="translate(${x} ${y}) scale(${k})" style="${style}">
+  <circle cx="0" cy="-64" r="17"/><path d="M-36 0C-36-30-23-44 0-44S36-30 36 0Z"/></g>`;
+const SPEC_VIZ = {
+  // одна схема света на всех: три героя на одной бирюзовой циклораме, у всех один синий контур
+  series: () => `<rect width="320" height="180" fill="${SPEC_CYAN}"/>
+    ${[80, 160, 240].map(x => specPerson(x, 180, 1.15, `fill:#0E0F12;stroke:${SPEC_BLUE};stroke-width:4`)).join('')}`,
+  // запас фона: штриховка — фон про запас, синяя рамка — то, что войдет в макет
+  frame: () => `<defs><pattern id="specHatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="10" style="stroke:var(--line);stroke-width:4"/></pattern></defs>
+    <rect width="320" height="180" fill="url(#specHatch)"/>
+    <rect x="96" y="30" width="128" height="150" style="fill:var(--bg)"/>
+    ${specPerson(160, 180, 1.25, 'fill:var(--ink)')}
+    <rect x="96" y="30" width="128" height="150" fill="none" stroke="${SPEC_BLUE}" stroke-width="3"/>`,
+  // разрешение: кадр, у которого подсвечена меньшая сторона, и крупное число
+  res: () => `<rect x="24" y="40" width="150" height="100" fill="none" style="stroke:var(--ink)" stroke-width="2"/>
+    <line x1="24" y1="40" x2="24" y2="140" stroke="${SPEC_BLUE}" stroke-width="6"/>
+    <text x="196" y="104" style="fill:var(--ink);font:500 46px var(--font)">6000</text>
+    <text x="198" y="134" style="fill:var(--ink);font:400 22px var(--font);opacity:.6">px</text>`,
+  // свет: бирюзовый фон, по бокам контурные приборы, на герое — синий рефлекс
+  light: () => `<rect width="320" height="180" fill="${SPEC_CYAN}"/>
+    <rect x="28" y="40" width="22" height="70" rx="4" fill="#FFFFFF"/><rect x="270" y="40" width="22" height="70" rx="4" fill="#FFFFFF"/>
+    <path d="M50 52L118 96M50 98L118 110M270 52L202 96M270 98L202 110" stroke="#FFFFFF" stroke-width="2" opacity=".7"/>
+    ${specPerson(160, 180, 1.45, `fill:#0E0F12;stroke:${SPEC_BLUE};stroke-width:5`)}`,
+  // эмоция: серьезно и с прищуром — да, широкая улыбка — нет
+  emotion: () => {
+    const face = (x, mouth, no) => `<g transform="translate(${x} 92)" fill="none" style="stroke:var(--ink)" stroke-width="3" stroke-linecap="round">
+      <circle r="36"/><circle cx="-12" cy="-8" r="2.5" style="fill:var(--ink)"/><circle cx="12" cy="-8" r="2.5" style="fill:var(--ink)"/>
+      <path d="${mouth}"/>${no ? '<path d="M-44 44L44-44" stroke="#E5484D"/>' : ''}</g>`;
+    return face(70, 'M-13 14H13') + face(160, 'M-13 16Q2 18 14 9') + face(250, 'M-17 8Q0 30 17 8', true);
+  },
+  // одежда: фирменные белый и синий
+  clothes: () => `<rect width="320" height="180" style="fill:var(--soft)"/>
+    <g transform="translate(160 180) scale(1.6)"><circle cx="0" cy="-64" r="17" style="fill:var(--ink)"/>
+      <path d="M-36 0C-36-30-23-44 0-44S36-30 36 0Z" fill="${SPEC_BLUE}"/><path d="M-12-43L0-14L12-43Z" fill="#FFFFFF"/></g>`,
+};
 function campSpec(sp){
   const sw = c => `<span class="spec-sw" style="--c:${c}"></span>${c}`;
+  const viz = it => it.viz && SPEC_VIZ[it.viz] ? `<svg class="spec-viz" viewBox="0 0 320 180" aria-hidden="true">${SPEC_VIZ[it.viz]()}</svg>` : '';
   return `<div class="wrap camp-rowbox"><div class="spec">
     <h4 class="spec-title">${T(sp.title)}</h4>
-    <dl class="spec-list">${sp.items.map(it => `<div class="spec-item"><dt>${T(it.label)}</dt><dd>${T(it.text)}${
+    <dl class="spec-list">${sp.items.map(it => `<div class="spec-item">${viz(it)}<dt>${T(it.label)}</dt><dd>${T(it.text)}${
       it.colors ? `<span class="spec-colors">${it.colors.map(sw).join('')}</span>` : ''}</dd></div>`).join('')}</dl>
   </div></div>`;
 }
@@ -1902,6 +1941,7 @@ function galleryItem(x){
   if (x && x.stars) return starsHTML(x.stars);
   if (x && x.sky) return skyHTML(x.sky);
   if (x && x.grads) return gradsHTML(x.grads);
+  if (x && x.pages) return pagesHTML(x.pages);
   // { sheet: [[…], […]], bg } — ряды макетов на серой подложке (светлые картинки не сливаются с белым фоном)
   // cls: 'keep' — ряд не складывается в столбик на телефоне, 'narrow' — без подложки, в правых двух третях
   if (x && x.sheet) return sheetHTML(x.sheet, x.bg, x.cls);
@@ -2025,18 +2065,19 @@ function watchStars(el){
   });
   el.addEventListener('pointerleave', () => { tilt.style.transform = ''; });
 }
-/* { sky: { items: [{ img, k }], hint } } — звездное небо отклоненных вариантов: знаки разлетаются из центра,
+/* { sky: { items: [{ img, k }], hint, top } } (top — подсказка над блоком) — звездное небо отклоненных вариантов: знаки разлетаются из центра,
    плывут каждый по-своему (k: turn — вращается, sway — качается в объеме, breathe — дышит),
    слоями откликаются на курсор; наведенный выходит вперед, остальные приглушаются */
-const SKY_SPOTS = [[9, 20], [27, 12], [47, 18], [67, 10], [88, 20], [16, 50], [36, 44], [57, 47], [78, 42], [94, 58],
-  [6, 82], [24, 80], [44, 78], [63, 84], [82, 80], [72, 64], [30, 64], [52, 72], [12, 34], [90, 86]];
+const SKY_SPOTS = [[16, 27], [39, 22], [62, 29], [85, 23], [10, 72], [30, 76], [50, 69], [70, 77], [90, 70],
+  [50, 48], [26, 48], [74, 48]];
 function skyHTML(x){
   const touch = matchMedia('(pointer:coarse)').matches;
   const hint = x.hint && (touch && x.hint.touch ? x.hint.touch : x.hint.mouse || x.hint);
-  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="sky" role="img" aria-label="${uesc(pick(x.label) || 'отклоненные варианты знака')}">${x.items.map((s, i) => {
+  const top = x.top && hint ? `<p class="m3d-hint">${T(hint)}</p>` : '';
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}${top}<div class="sky" role="img" aria-label="${uesc(pick(x.label) || 'отклоненные варианты знака')}">${x.items.map((s, i) => {
     const [l, t] = SKY_SPOTS[i % SKY_SPOTS.length], d = .4 + (i * 37 % 10) / 10;
     return `<span class="sky-it ${s.k || 'turn'}" style="--l:${l}%;--t:${t}%;--d:${d.toFixed(2)};--i:${i};--s:${s.s || 1};--dur:${(7 + i * 13 % 6).toFixed(1)}s"><i><img src="${s.img}" alt="" loading="lazy" draggable="false"></i></span>`;
-  }).join('')}</div>${hint ? `<p class="camp-cap">${T(hint)}</p>` : ''}</div>`;
+  }).join('')}</div>${hint && !x.top ? `<p class="camp-cap">${T(hint)}</p>` : ''}</div>`;
 }
 function watchSky(el){
   starReveal.observe(el);
@@ -2054,6 +2095,11 @@ function watchSky(el){
   });
   el.addEventListener('pointerleave', () => { tx = ty = 0; if (!raf) raf = requestAnimationFrame(step); });
   el.addEventListener('pointerover', e => el.classList.toggle('focus', !!e.target.closest('.sky-it')));
+}
+// { pages: { items: [img...], caption } } — страницы брендбука маленьким коллажем: без увеличения, появляются волной
+function pagesHTML(x){
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="st-pages">${x.items.map((src, i) =>
+    `<img src="${src}" alt="" loading="lazy" style="--i:${i}">`).join('')}</div></div>`;
 }
 // { grads: { items: [[цвет, цвет], ...] } } — фирменные градиенты: полосы проявляются слева направо, подписи — коды цветов на концах
 function gradsHTML(x){
@@ -2181,7 +2227,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   caseContent.querySelectorAll('.m3d').forEach(watchMark);
-  caseContent.querySelectorAll('.st, .st-grads').forEach(watchStars);
+  caseContent.querySelectorAll('.st, .st-grads, .st-pages').forEach(watchStars);
   caseContent.querySelectorAll('.sky').forEach(watchSky);
   // листалка прямо в галерее кейса (без рядов макетов watchCampaigns ее не найдет)
   if (!caseContent.querySelector('.camp-row')) caseContent.querySelectorAll('.case-body .slides').forEach(watchSlides);

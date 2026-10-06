@@ -301,21 +301,24 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             gallery: [
               /* в каждом ряду один порядок: Джарахов, Лебедев, Некрасова */
               { row: [ 'img/vk/vk-adb-wide-1.jpg', 'img/vk/vk-adb-wide-2.jpg', 'img/vk/vk-adb-wide-3.jpg' ] },
-              /* compact — все ресайзы одним плотным блоком: картинки одной небольшой высоты переносятся по строкам */
-              { caption: ['ресайзы под соцсети, сторис и баннерные сети', 'одна съемка — все форматы'], compact: [
+              /* квадраты и сторис одним рядом во всю ширину (row); compact: [...] вместо row — плотный блок с переносом строк */
+              { caption: ['ресайзы под соцсети, сторис и баннерные сети', 'одна съемка — все форматы'], row: [
                 'img/vk/vk-adb-square-1.jpg', 'img/vk/vk-adb-square-2.jpg', 'img/vk/vk-adb-square-3.jpg',
-                'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg',
-                'img/vk/vk-adb-billboard-1.jpg', 'img/vk/vk-adb-billboard-2.jpg', 'img/vk/vk-adb-billboard-3.jpg' ] },
-              /* spec — требования к фотосъемке из продакшен-брифа, коротко; colors — плашки цветов с кодом */
+                'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg' ] },
+              /* узкие баннеры — лесенкой (stairs: true): каждый в половину ширины, верхний справа, нижний слева */
+              { row: [ 'img/vk/vk-adb-billboard-1.jpg', 'img/vk/vk-adb-billboard-2.jpg', 'img/vk/vk-adb-billboard-3.jpg' ], stairs: true },
+              /* spec — требования к фотосъемке из продакшен-брифа, инфографикой. viz — рисунок над пунктом:
+                 series (одна схема света на всех), frame (запас фона), res (разрешение), light (свет и цвета),
+                 emotion (эмоция), clothes (одежда); colors — плашки цветов с кодом */
               { spec: {
                 title: ['требования к фотосъемке', 'что мы попросили у фотографа'],
                 items: [
-                  { label: 'задача',   text: 'Снять звезд для key visual по одной и той же схеме света, чтобы все макеты выглядели одной серией.' },
-                  { label: 'кадр',     text: 'Много фона вокруг героя — запас, чтобы масштабировать и кадрировать фото под любые форматы.' },
-                  { label: 'качество', text: 'Около 6000 px по меньшей стороне — с запасом для наружной рекламы и digital.' },
-                  { label: 'свет',     text: 'Бирюзовая циклорама, контурная подсветка того же цвета и синий рефлекс на лице — чтобы рефлексы попадали в колористику макета.', colors: ['#00D3E6', '#0077FF'] },
-                  { label: 'эмоция',   text: 'Серьезное бизнес-выражение или заигрывание с аудиторией, но без улыбки.' },
-                  { label: 'одежда',   text: 'По возможности в фирменных цветах сервиса — белом и синем.', colors: ['#FFFFFF', '#0077FF'] },
+                  { viz: 'series', label: 'задача',   text: 'Снять звезд для key visual по одной и той же схеме света, чтобы все макеты выглядели одной серией.' },
+                  { viz: 'frame', label: 'кадр',     text: 'Много фона вокруг героя — запас, чтобы масштабировать и кадрировать фото под любые форматы.' },
+                  { viz: 'res', label: 'качество', text: 'Около 6000 px по меньшей стороне — с запасом для наружной рекламы и digital.' },
+                  { viz: 'light', label: 'свет',     text: 'Бирюзовая циклорама, контурная подсветка того же цвета и синий рефлекс на лице — чтобы рефлексы попадали в колористику макета.', colors: ['#00D3E6', '#0077FF'] },
+                  { viz: 'emotion', label: 'эмоция',   text: 'Серьезное бизнес-выражение или заигрывание с аудиторией, но без улыбки.' },
+                  { viz: 'clothes', label: 'одежда',   text: 'По возможности в фирменных цветах сервиса — белом и синем.', colors: ['#FFFFFF', '#0077FF'] },
                 ],
               } },
               /* съемки: три фото крупным рядом без обрезки, под ними видео на всю ширину */
@@ -370,11 +373,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/822882205231597.672489274b333.jpg',
               /* ресайзы: в каждом ряду сцены в одном порядке — школьники, взрослые, студенты */
               { caption: ['ресайзы под соцсети и digital. Самым сложным тогда были ретушь и подготовка к печати: в те годы мы делали их еще вручную — со Stable Diffusion и ретушером. Команда — три человека: я как лид, дизайнер и ретушер',
-                           'ресайзы. Самое сложное — ретушь и подготовка к печати: тогда всё еще делали вручную, со Stable Diffusion и ретушером. Нас было трое: я как лид, дизайнер и ретушер'], compact: [
-                'img/vk/vk-cyber-square-2.jpg', 'img/vk/vk-cyber-square-3.jpg', 'img/vk/vk-cyber-square-1.jpg',
-                'img/vk/vk-cyber-portrait-3.jpg', 'img/vk/vk-cyber-portrait-1.jpg', 'img/vk/vk-cyber-portrait-2.jpg',
-                'img/vk/vk-cyber-story-2.jpg', 'img/vk/vk-cyber-story-3.jpg', 'img/vk/vk-cyber-story-1.jpg',
-                'img/vk/vk-cyber-wide-2.jpg', 'img/vk/vk-cyber-wide-1.jpg', 'img/vk/vk-cyber-wide-3.jpg' ] },
+                           'ресайзы. Самое сложное — ретушь и подготовка к печати: тогда всё еще делали вручную, со Stable Diffusion и ретушером. Нас было трое: я как лид, дизайнер и ретушер'], row: [
+                'img/vk/vk-cyber-square-2.jpg', 'img/vk/vk-cyber-square-3.jpg', 'img/vk/vk-cyber-square-1.jpg' ] },
+              { row: [ 'img/vk/vk-cyber-portrait-3.jpg', 'img/vk/vk-cyber-portrait-1.jpg', 'img/vk/vk-cyber-portrait-2.jpg' ] },
+              { row: [ 'img/vk/vk-cyber-story-2.jpg', 'img/vk/vk-cyber-story-3.jpg', 'img/vk/vk-cyber-story-1.jpg' ] },
+              { row: [ 'img/vk/vk-cyber-wide-2.jpg', 'img/vk/vk-cyber-wide-1.jpg', 'img/vk/vk-cyber-wide-3.jpg' ] },
               /* slides — презентация-листалка: слайды листаются вправо-влево (стрелки, свайп, клавиши),
                  по нажатию слайд открывается крупно. Слайд с контактами сотрудницы VK убран */
               { caption: ['тулкит: собрали его для подрядчиков и партнеров, чтобы они грамотно использовали элементы key visual и сердце в своих материалах', 'тулкит: всё, чтобы партнеры правильно ставили key visual и сердце у себя'],
@@ -405,11 +408,14 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/665f46205231597.66b73481b1a75.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4d11c9205231597.66b73481b12b0.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4f1dbc205231597.66b73481b0c49.jpg',
-              /* наружка по героям (мультики, обед, самолет): сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7; потом digital со спортзалом */
-              { caption: ['ресайзы: наружная реклама по героям — сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7 — и digital с кардио в спортзале', 'наружка по героям и digital'], compact: [
-                'img/vk/vk-video-boy-city.jpg', 'img/vk/vk-video-boy-pillar.jpg', 'img/vk/vk-video-boy-billboard.jpg',
-                'img/vk/vk-video-noodles-city.jpg', 'img/vk/vk-video-noodles-pillar.jpg', 'img/vk/vk-video-noodles-billboard.jpg',
-                'img/vk/vk-video-plane-city.jpg', 'img/vk/vk-video-plane-pillar.jpg', 'img/vk/vk-video-plane-billboard.jpg',
+              /* наружка по героям: в каждом ряду сити-формат 1,2 × 1,8, пиллар 1,4 × 3 и билборд 3,7 × 2,7 */
+              { caption: ['наружная реклама: сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7', 'наружка: сити-формат, пиллар, билборд'], row: [
+                'img/vk/vk-video-boy-city.jpg', 'img/vk/vk-video-boy-pillar.jpg', 'img/vk/vk-video-boy-billboard.jpg' ] },
+              { caption: ['обед', 'обед'], row: [
+                'img/vk/vk-video-noodles-city.jpg', 'img/vk/vk-video-noodles-pillar.jpg', 'img/vk/vk-video-noodles-billboard.jpg' ] },
+              { caption: ['полет в самолете', 'в самолете'], row: [
+                'img/vk/vk-video-plane-city.jpg', 'img/vk/vk-video-plane-pillar.jpg', 'img/vk/vk-video-plane-billboard.jpg' ] },
+              { caption: ['digital: кардио в спортзале', 'digital-ресайзы: спортзал'], row: [
                 'img/vk/vk-video-girl-story.jpg', 'img/vk/vk-video-girl-square.jpg', 'img/vk/vk-video-girl-screen-2.jpg', 'img/vk/vk-video-girl-screen.jpg' ] },
               { caption: ['на улицах города', 'а вот так это висело в городе'], row: [
                 'img/vk/vk-video-street-1.jpg', 'img/vk/vk-video-street-2.jpg', { video: 'img/vk/vk-video-street.mp4', ratio: 9 / 16 } ] },
@@ -438,8 +444,10 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             solution: 'В основу легла концепция притяжения людей с одинаковыми увлечениями, как магнитов: два персонажа находят друг друга, а в композицию органично включены ключевые элементы интерфейса приложения. Кампания выходила параллельно с динамичным видеороликом, в котором пара сближается благодаря совпадению музыкальных интересов, визуально «притягиваясь» друг к другу.',
             gallery: [
               'https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/ac9008205231597.66b72e32c40cc.jpg',
-              { caption: ['ресайзы под разные площадки', 'один визуал — много размеров'], compact: [
-                'img/vk/vk-dating-master.jpg', 'img/vk/vk-dating-square.jpg', 'img/vk/vk-dating-vertical.jpg', 'img/vk/vk-dating-wide.jpg', 'img/vk/vk-dating-banner.jpg' ] },
+              { caption: ['ресайзы под разные площадки', 'один визуал — много размеров'], row: [
+                'img/vk/vk-dating-master.jpg', 'img/vk/vk-dating-square.jpg', 'img/vk/vk-dating-vertical.jpg', 'img/vk/vk-dating-wide.jpg',
+              ] },
+              { row: [ 'img/vk/vk-dating-banner.jpg' ] },
               'vk:-180262371_456239366',
             ],
           },
@@ -485,11 +493,15 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               /* ролик не 16:9 — объектом: { video: 'kinescope:ID', ratio: ширина / высота } */
               { caption: ['анимации для экранов', 'Персик в движении'], row: [ 'kinescope:vKXcDJ9RFA6x2SnWCW7PwL', 'kinescope:otRxgzFCKqoNGiFvq59hP3', 'kinescope:6VBLbUMmkiQTKoNatgS9WS' ] },
               { row: [ { video: 'kinescope:t3knnieArqzGQcd2imZGx9', ratio: 400 / 56 } ] },
-              { caption: ['ресайзы: активности на зонах, экраны 3840 × 1330, LED-лента 5464 × 768 и баннеры интранета 2000 × 415', 'один кот — много поз и форматов'], compact: [
-                'img/vk/vk-corp-persik-ippolit.jpg', 'img/vk/vk-corp-kostum.jpg', 'img/vk/vk-corp-koncert.jpg', 'img/vk/vk-corp-tubing.jpg',
-                'img/vk/vk-corp-screen-1.jpg', 'img/vk/vk-corp-screen-2.jpg', 'img/vk/vk-corp-screen-3.jpg', 'img/vk/vk-corp-screen-4.jpg',
-                'img/vk/vk-corp-led-1.jpg', 'img/vk/vk-corp-led-2.jpg', 'img/vk/vk-corp-led-3.jpg',
-                'img/vk/vk-corp-intranet-1.jpg', 'img/vk/vk-corp-intranet-2.jpg', 'img/vk/vk-corp-intranet-3.jpg', 'img/vk/vk-corp-intranet-4.jpg', 'img/vk/vk-corp-intranet-5.jpg' ] },
+              { caption: ['ресайзы: активности на зонах', 'один кот — много поз'], row: [ 'img/vk/vk-corp-persik-ippolit.jpg', 'img/vk/vk-corp-kostum.jpg' ] },
+              { row: [ 'img/vk/vk-corp-koncert.jpg', 'img/vk/vk-corp-tubing.jpg' ] },
+              { caption: ['экраны 3840 × 1330', 'большие экраны'], row: [ 'img/vk/vk-corp-screen-1.jpg', 'img/vk/vk-corp-screen-2.jpg' ] },
+              { row: [ 'img/vk/vk-corp-screen-3.jpg', 'img/vk/vk-corp-screen-4.jpg' ] },
+              { caption: ['LED-лента 5464 × 768', 'очень длинный экран'], row: [ 'img/vk/vk-corp-led-1.jpg' ] },
+              { row: [ 'img/vk/vk-corp-led-2.jpg' ] },
+              { row: [ 'img/vk/vk-corp-led-3.jpg' ] },
+              { caption: ['баннеры интранета 2000 × 415', 'для внутреннего портала'], row: [ 'img/vk/vk-corp-intranet-1.jpg', 'img/vk/vk-corp-intranet-2.jpg' ] },
+              { row: [ 'img/vk/vk-corp-intranet-3.jpg', 'img/vk/vk-corp-intranet-4.jpg', 'img/vk/vk-corp-intranet-5.jpg' ] },
             ],
           },
         ],
@@ -1130,7 +1142,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'фотостиль',
         short: ['У Доставки прошел ребрендинг и появился маскот — коробка.',
                 'Курьеры тоже хотят красивую фотографию'],
-        image: 'https://static.tildacdn.com/tild6263-3965-4232-a661-303239353934/image_2.jpg',
+        image: 'img/yandex/cover.jpg',
         badge: ['кейс сделан в июле 2025 года', 'делала в июле 2025 года'],
         /* кейс: проблема → задача → решение. Картинки — из «Тестовое Купцова для ЯД.fig» (img/yandex);
            коробки, машины и кот с телефоном — обновленные генерации марта 2026.
@@ -1193,7 +1205,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             { head: { title: ['машины', 'грузовики'],
               text: ['Фирменные грузовики в мягком свете без жестких теней. Здесь я пробовала экстремальные ракурсы, кадрирование и эффект скорости.',
                      'Фирменные грузовики в мягком свете. Пробовала снимать снизу и добавлять скорость.'] } },
-            { row: ['img/yandex/truck_speed.jpg', 'img/yandex/truck_run.jpg'] },
+            { row: ['img/yandex/cover.jpg', 'img/yandex/truck_run.jpg'] },
             { row: ['img/yandex/truck_low.jpg', 'img/yandex/truck_side.jpg'] },
           ],
           [
@@ -1887,7 +1899,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'логотип',
         short: ['Название и знак стартап академии МТС для сотрудников',
                 'Знак для тех, кого в МТС хочется похвалить. А таких много'],
-        image: 'img/mts/cover.jpg',
+        image: 'img/mts/cover.jpg',   // белый логотип на красном
         /* векторы знака из исходника (logo2.ai): a, b — контуры двух лент с разрывами на перехлестах,
            la, lb — их осевые линии. По ним блоки { stars } рисуют живой знак */
         mark: {
@@ -1896,7 +1908,8 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           la: 'M450 172L440 161L429 150L419 139L408 127L398 115L387 104L375 93L362 85L348 79L333 76L318 76L303 79L289 85L277 94L267 105L260 118L254 133L249 148L245 163L242 179L238 194L235 210L232 226L229 242L226 257L224 273L221 289L219 305L217 320L215 336L212 352L210 368L209 384L207 400L206 416L204 431L203 447L201 463L200 479L199 495L198 511L197 527L196 543L195 559L194 575L194 591L194 606L194 622L194 638L196 654L200 669L205 684L213 697L223 709L234 720L246 731L258 741L272 750L285 758L299 764L314 769L328 775L342 782L356 789L370 797L383 806L397 814L411 822L424 830L438 838L452 844L467 849L482 851L497 853L512 856L528 859L543 862L559 865L574 866L590 866L605 863L619 858L631 849L641 838L648 824L653 810L655 794L656 778L655 762L654 747L653 731L652 715L653 699L654 683L655 668L656 653L654 638L649 623L644 608L637 594L631 579L624 564L618 550L611 535L605 520L600 506L596 491L594 475L592 460L589 445L584 430L578 415L572 400L566 385L560 371L553 356L546 342L538 328L530 315L522 302L514 288L507 274L500 260L492 246L485 231L478 217L471 203L463 190L455 178Z',
           lb: 'M286 336L297 327L309 318L322 309L336 301L350 294L364 287L379 280L393 274L408 268L423 262L438 257L453 251L468 246L483 241L499 236L514 232L529 227L545 223L560 219L576 215L591 212L607 208L622 205L638 202L654 200L670 197L686 195L701 193L717 192L733 191L749 191L764 192L779 196L793 202L805 211L814 223L821 237L824 252L824 267L822 282L817 297L810 311L802 325L794 338L785 352L776 365L768 379L759 392L750 405L741 418L732 432L722 445L713 458L704 471L695 484L685 496L676 509L666 522L656 535L647 548L637 560L627 573L617 585L607 597L596 610L586 622L576 634L565 646L555 658L544 670L533 682L522 693L511 705L500 716L489 728L477 739L466 750L454 761L442 771L430 782L418 792L405 802L393 812L380 822L367 831L354 840L341 849L326 855L312 860L296 862L281 862L266 858L253 851L241 842L230 831L220 818L211 806L203 792L195 778L189 763L182 749L176 734L170 719L163 705L157 690L151 675L145 660L138 646L132 631L126 616L120 601L114 587L107 573L100 559L94 545L90 530L89 515L90 500L95 485L102 471L110 458L119 445L128 433L138 421L149 411L162 403L176 395L190 388L204 381L219 374L233 367L247 360L261 352L274 345Z',
         },
-        /* gallery: первый элемент — после задачи (бриф и поиск формы), второй — после решения (знак и гайдлайн).
+        /* gallery: первый элемент — после задачи (бриф и поиск формы), второй — после решения (знак и его составляющие),
+           третий — после результата (световой короб). { pages } — коллаж маленьких страниц, сейчас не используется.
            { sky } — звездное небо отклоненных вариантов (k: turn — вращается, sway — качается, breathe — дышит; s — размер);
            { stars: { mode } } — живой знак: hero — крупно, versions — версии, crop — графические элементы;
            { grads } — фирменные градиенты. Картинки — в img/mts, вырезаны из файлов Illustrator */
@@ -1910,49 +1923,33 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             { head: { title: ['поиск формы', 'поиск формы'],
               text: ['Звезду искали в разных формах: с человечком внутри, со стрелкой взлета, кристаллом, мягким пятном, лентой. Все варианты ниже — из рабочих файлов, в финал они не прошли.',
                      'Звезда успела побыть человечком, стрелкой, кристаллом, мармеладкой и лентой. Все это — из рабочих файлов, и в финал не прошло'] } },
-            { sky: { items: [
-              { img: 'img/mts/sky/s01.png', k: 'turn' },
-              { img: 'img/mts/sky/s02.png', k: 'breathe', s: 1.15 },
-              { img: 'img/mts/sky/s03.png', k: 'turn' },
+            { sky: { top: true, items: [
               { img: 'img/mts/sky/s04.png', k: 'breathe', s: 1.15 },
-              { img: 'img/mts/sky/s05.png', k: 'sway', s: 1.1 },
-              { img: 'img/mts/sky/s06.png', k: 'sway' },
-              { img: 'img/mts/sky/s07.png', k: 'turn' },
-              { img: 'img/mts/sky/s08.png', k: 'turn' },
-              { img: 'img/mts/sky/s09.png', k: 'sway', s: 1.15 },
-              { img: 'img/mts/sky/s10.png', k: 'turn' },
-              { img: 'img/mts/sky/s11.png', k: 'breathe', s: 1.1 },
+              { img: 'img/mts/sky/s03.png', k: 'turn' },
               { img: 'img/mts/sky/s12.png', k: 'turn', s: 1.05 },
+              { img: 'img/mts/sky/s11.png', k: 'breathe', s: 1.1 },
+              { img: 'img/mts/sky/s06.png', k: 'turn' },
+              { img: 'img/mts/sky/s09.png', k: 'sway', s: 1.15 },
               { img: 'img/mts/sky/s13.png', k: 'turn' },
-              { img: 'img/mts/sky/s14.png', k: 'turn' },
-              { img: 'img/mts/sky/s15.png', k: 'turn', s: 1.1 },
-              { img: 'img/mts/sky/s16.png', k: 'sway' },
-              { img: 'img/mts/sky/s17.png', k: 'turn' },
+              { img: 'img/mts/sky/s08.png', k: 'turn' },
+              { img: 'img/mts/sky/s15.png', k: 'turn' }
             ],
               hint: { mouse: ['Поводите курсором — варианты откликаются, а тот, что под курсором, выходит вперед', 'Поводи курсором — звезды разбегаются, а одна выходит вперед'],
                       touch: ['Варианты плывут каждый по-своему: звезды вращаются, кристаллы качаются, пятна дышат', 'Звезды крутятся, кристаллы качаются, пятна дышат'] } } },
             { head: { title: ['вместе с названием', 'вместе с названием'],
               text: ['Каждый знак проверяли вместе с названием: латиницей и кириллицей, разными шрифтами и цветами, на белом и темном фоне.',
                      'Каждую звезду примеряли к названию: латиницей и кириллицей, разными шрифтами, на белом и на темном'] } },
-            { logos: [{ white: true, cols: 3, tcols: 3, pcols: 2, ratio: '3/2', items: [
-              { img: 'img/mts/lock/v01.jpg', fill: true },
-              { img: 'img/mts/lock/v02.jpg', fill: true },
-              { img: 'img/mts/lock/v03.jpg', fill: true },
-              { img: 'img/mts/lock/v04.jpg', fill: true },
-              { img: 'img/mts/lock/v08.jpg', fill: true },
-              { img: 'img/mts/lock/v09.jpg', fill: true },
-              { img: 'img/mts/lock/v10.jpg', fill: true },
-              { img: 'img/mts/lock/v11.jpg', fill: true },
-              { img: 'img/mts/lock/v12.jpg', fill: true },
-              { img: 'img/mts/lock/v14.jpg', fill: true },
-              { img: 'img/mts/lock/v16.jpg', fill: true },
-              { img: 'img/mts/lock/v17.jpg', fill: true },
-              { img: 'img/mts/lock/v18.jpg', fill: true },
-              { img: 'img/mts/lock/v19.jpg', fill: true },
-              { img: 'img/mts/lock/v20.jpg', fill: true },
-              { img: 'img/mts/lock/v21.jpg', fill: true },
-              { img: 'img/mts/lock/v22.jpg', fill: true },
-              { img: 'img/mts/lock/v23.jpg', fill: true },
+            { logos: [{ white: true, cols: 5, tcols: 2, pcols: 2, ratio: '3/2', items: [
+              { img: 'img/mts/lock/v01.png', fill: true },
+              { img: 'img/mts/lock/v02.png', fill: true },
+              { img: 'img/mts/lock/v03.png', fill: true },
+              { img: 'img/mts/lock/v09.png', fill: true },
+              { img: 'img/mts/lock/v12.png', fill: true },
+              { img: 'img/mts/lock/v14.png', fill: true },
+              { img: 'img/mts/lock/v16.png', fill: true },
+              { img: 'img/mts/lock/v17.png', fill: true },
+              { img: 'img/mts/lock/v18.png', fill: true },
+              { img: 'img/mts/lock/v21.png', fill: true },
             ] }] },
           ],
           [
@@ -1967,6 +1964,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { bg: 'soft', fill: '#3C3C3B', name: ['монохромная', 'монохромная'] },
               { bg: 'grad', fill: '#FFFFFF', name: ['белая на цветном фоне', 'белая на цветном'] },
             ] } },
+            { row: ['img/mts/logo-light.jpg'], caption: ['логотип на светлом фоне', 'на светлом фоне'] },
             { colors: {
               title: ['палитра', 'палитра'],
               text:  ['Три цвета: красный, оранжевый и синий. Нажмите на цвет, чтобы скопировать код.', 'Три цвета: красный, оранжевый и синий. Жми — код скопируется'],
@@ -1985,8 +1983,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               text: ['В макетах знак увеличивают и обрезают полями минимум с двух сторон. На цветном фоне — белая версия. Иллюстрации — в красно-оранжевых тонах, без синего и фиолетового.',
                      'Знак можно увеличить и обрезать краями макета, минимум с двух сторон. На цветном фоне он белый. Иллюстрации — красно-оранжевые, без синего и фиолетового'] } },
             { stars: { mode: 'crop' } },
-            { row: ['img/mts/kv.jpg', 'img/mts/mail.jpg'], caption: ['ключевой визуал и шаблон рассылки в Outlook', 'ключевой визуал и письмо для Outlook'] },
           ],
+          /* в самом конце — световой короб с логотипом */
+          { row: ['img/mts/lightbox.jpg'] },
         ],
         link:  'https://kupdasha.ru/design',
         links: [],
@@ -1997,8 +1996,8 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           role:     '',   // ВПИШИ: роль и команда
           solution: ['Знак — стилизованная звезда из двух лент, которая стремится вперед. Траектория взлета направлена в верхний правый угол: в психологии это направление читается как успех, а нижний левый — как провал. Палитра соединяет фирменный цвет МТС с градиентами.',
                      'Звезда из двух лент летит вперед и вверх вправо — туда, где в психологии живет успех. Вниз влево — это к провалу, туда не летим. Цвета — фирменный МТС плюс градиенты'],
-          result:   ['Знак и название собраны в гайдлайн: цветная и монохромные версии, горизонтальная и вертикальная компоновки, палитра, градиенты, шрифт, графические элементы, ключевой визуал и шаблон рассылки.',
-                     'Все собрано в гайдлайн: версии логотипа, цвета, градиенты, шрифт, графика, ключевой визуал и шаблон письма'],
+          result:   ['Собран брендбук стартап академии: концепция, цветная и монохромные версии логотипа, горизонтальная и вертикальная компоновки, палитра, градиенты, шрифт, графические элементы.',
+                     'Собрала брендбук: концепция, версии логотипа, цвета, градиенты, шрифт, графика'],
         },
       },
       {
