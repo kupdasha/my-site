@@ -153,7 +153,10 @@ def taplink_block():
             "<script>(function(){var B='" + CDN + "',v=Math.floor(Date.now()/36e5),root=document.getElementById('taplink-root');\n"
             # пока грузится — фон сразу в цвет выбранной версии, чтобы не мигало
             "try{if(localStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}\n"
-            "fetch(B+'taplink.html?v='+v).then(function(r){return r.text()}).then(function(html){\n"
+            # сначала прямо с GitHub (свежая версия через пару минут после публикации), если не ответил за 4 с — с jsDelivr
+            "var G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html';\n"
+            "function get(u,ms){return new Promise(function(ok,no){var t=setTimeout(no,ms);fetch(u).then(function(r){clearTimeout(t);r.ok?r.text().then(ok,no):no()},no)})}\n"
+            "get(G+'?v='+Math.floor(Date.now()/6e4),4000).catch(function(){return get(B+'taplink.html?v='+v,15000)}).then(function(html){\n"
             "var doc=new DOMParser().parseFromString(html,'text/html');\n"
             "[].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});\n"
             "[].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});\n"
