@@ -102,31 +102,27 @@ button.ad-fin:hover img{transform:scale(1.04)}
 .ad-ch.in .ad-fin-group{opacity:1;transform:none}
 @media (max-width:760px){.ad-final{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* ---------- карусель для соцсетей: слайд целиком, как пост ---------- */
-.ad-car{display:flex;flex-direction:column;align-items:center}
-.ad-car-frame{position:relative;width:min(100%,520px,calc((100svh - 180px) * .8));   /* слайд всегда целиком в экране */
-  aspect-ratio:4/5;border-radius:clamp(14px,2vw,22px);overflow:hidden;background:var(--soft);cursor:pointer;touch-action:pan-y;user-select:none;
-  box-shadow:0 24px 60px -24px rgba(0,0,0,.35)}
-.ad-car-track{display:flex;height:100%;transition:transform .7s var(--ease)}
-.ad-car-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
-/* полоски-таймеры сверху */
-.ad-car-bars{position:absolute;left:12px;right:12px;top:12px;z-index:2;display:flex;gap:4px;pointer-events:none}
-.ad-car-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.45);overflow:hidden;box-shadow:0 0 0 .5px rgba(0,0,0,.12)}
-.ad-car-bars b{display:block;height:100%;width:100%;background:#FFFFFF;transform:scaleX(0);transform-origin:0 50%}
-.ad-car-bars i.done b{transform:none}
-.ad-car-bars i.run b{animation:adBar var(--ms) linear forwards}
-.ad-car-frame:hover .ad-car-bars i.run b,.ad-car-frame:focus-within .ad-car-bars i.run b,.ad-car.paused .ad-car-bars i.run b{animation-play-state:paused}
-@keyframes adBar{to{transform:none}}
-.ad-car-btn{position:absolute;top:50%;z-index:2;width:44px;height:44px;margin-top:-22px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#1D222A;
-  opacity:0;transition:opacity .3s,transform .4s var(--ease)}
-.ad-car-btn.prev{left:12px}.ad-car-btn.next{right:12px}
-.ad-car-frame:hover .ad-car-btn{opacity:1}
-.ad-car-btn:hover{transform:scale(1.08)}
-.ad-car-dots{display:flex;gap:6px;margin-top:16px}
+/* ---------- карусель для соцсетей: три слайда в ряд, стрелки по бокам ---------- */
+.ad-car{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:clamp(12px,1.6vw,24px);--gap:clamp(10px,1.4vw,20px)}
+.ad-car-view{overflow:hidden;touch-action:pan-y;user-select:none;border-radius:var(--r-img)}
+.ad-car-track{display:flex;gap:var(--gap);transition:transform .8s var(--ease)}
+.ad-car-card{flex:0 0 calc((100% - 2 * var(--gap)) / 3);aspect-ratio:4/5;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in;padding:0}
+.ad-car-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
+.ad-car-card:hover img{transform:scale(1.03)}
+.ad-car-btn{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--bg);transition:transform .4s var(--ease)}
+.ad-car-btn:hover{transform:scale(1.07)}
+.ad-car-dots{grid-column:2;display:flex;justify-content:center;gap:6px;margin-top:16px}
 .ad-car-dots span{width:7px;height:7px;border-radius:50%;background:var(--ink);opacity:.2;transition:opacity .3s,transform .3s var(--ease)}
 .ad-car-dots span.on{opacity:1;transform:scale(1.2)}
-@media (hover:none){.ad-car-btn{display:none}}
-.ad-car + .ad-cap{text-align:center;margin-left:auto;margin-right:auto}
+/* на телефоне — один слайд целиком, стрелки под ним по краям */
+@media (max-width:760px){
+  .ad-car{grid-template-columns:1fr 1fr}
+  .ad-car-view{grid-column:1 / -1;grid-row:1}
+  .ad-car-card{flex-basis:100%}
+  .ad-car-btn{grid-row:2;margin-top:16px}
+  .ad-car-btn.prev{justify-self:start}.ad-car-btn.next{justify-self:end}
+  .ad-car-dots{grid-column:1 / -1;grid-row:2;align-self:center;margin-top:16px}
+}
 
 /* ---------- о проекте писали ---------- */
 .ad-press{list-style:none;border-top:1px solid var(--line)}

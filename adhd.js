@@ -356,55 +356,61 @@ function pressHTML(c){
     <b>${H.T(x.name)}</b><span>${H.T(x.note)}</span></a></li>`).join('')}</ul>`;
 }
 
-/* ---------- карусель для соцсетей: как пост в Инстаграме — слайд целиком, листается сам ---------- */
-// сверху полоски-таймеры, как в историях; наведение — пауза; нажатие слева — назад, справа — вперед; свайп пальцем
-const CAR_MS = 4000;
+/* ---------- карусель для соцсетей: три слайда в ряд, лента сама сдвигается на слайд ---------- */
+// стрелки — по бокам, вне картинок; наведение — пауза; нажатие на слайд — увеличить; свайп пальцем
+const CAR_MS = 3500;
 function carouselHTML(c){
   const arrow = d => `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="${d}"/></svg>`;
-  return `<div class="ad-car" style="--ms:${CAR_MS}ms">
-    <div class="ad-car-frame" tabindex="0" aria-label="Карусель, ${c.items.length} слайдов" aria-roledescription="carousel">
-      <div class="ad-car-bars">${c.items.map(() => '<i><b></b></i>').join('')}</div>
-      <div class="ad-car-track">${c.items.map((src, i) => `<img src="${src}" alt="Слайд ${i + 1}" loading="lazy" draggable="false">`).join('')}</div>
-      <button class="ad-car-btn prev" aria-label="Предыдущий слайд">${arrow('M12 4l-6 6 6 6')}</button>
-      <button class="ad-car-btn next" aria-label="Следующий слайд">${arrow('M8 4l6 6-6 6')}</button>
+  return `<div class="ad-car">
+    <button class="ad-car-btn prev" aria-label="Предыдущий слайд">${arrow('M12 4l-6 6 6 6')}</button>
+    <div class="ad-car-view" tabindex="0" aria-label="Карусель, ${c.items.length} слайдов" aria-roledescription="carousel">
+      <div class="ad-car-track">${c.items.map((src, i) => `<button class="ad-car-card" aria-label="Слайд ${i + 1}, увеличить"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>
     </div>
-    <div class="ad-car-dots">${c.items.map((_, i) => `<span${i ? '' : ' class="on"'}></span>`).join('')}</div>
+    <button class="ad-car-btn next" aria-label="Следующий слайд">${arrow('M8 4l6 6-6 6')}</button>
+    <div class="ad-car-dots"></div>
   </div>${cap(c.hint)}`;
 }
 function liveCarousel(box){
-  const frame = box.querySelector('.ad-car-frame'), track = box.querySelector('.ad-car-track');
-  const bars = [...box.querySelectorAll('.ad-car-bars i')], dots = [...box.querySelectorAll('.ad-car-dots span')], n = bars.length;
-  let k = 0, seen = false;
-  const go = i => {
-    k = (i + n) % n;
-    track.style.transform = `translateX(${-k * 100}%)`;
-    bars.forEach((b, j) => { b.className = j < k ? 'done' : ''; });
-    dots.forEach((d, j) => d.classList.toggle('on', j === k));
-    // перезапуск полоски: таймер — это анимация заполнения, по ее концу — следующий слайд
-    const cur = bars[k]; void cur.offsetWidth;
-    if (seen && !still()) cur.className = 'run';
+  const view = box.querySelector('.ad-car-view'), track = box.querySelector('.ad-car-track'), cards = [...track.children];
+  const dotsBox = box.querySelector('.ad-car-dots');
+  let k = 0, seen = false, held = false, timer = 0;
+  const per = () => Math.max(1, Math.round(view.clientWidth / cards[0].offsetWidth));   // сколько слайдов видно
+  const last = () => cards.length - per();
+  const drawDots = () => {
+    dotsBox.innerHTML = Array.from({ length: last() + 1 }, (_, i) => `<span${i === k ? ' class="on"' : ''}></span>`).join('');
   };
-  bars.forEach((b, j) => b.querySelector('b').addEventListener('animationend', () => { if (j === k) go(k + 1); }));
-  box.querySelector('.prev').addEventListener('click', e => { e.stopPropagation(); go(k - 1); });
-  box.querySelector('.next').addEventListener('click', e => { e.stopPropagation(); go(k + 1); });
-  frame.addEventListener('click', e => {
-    const r = frame.getBoundingClientRect();
-    go(k + (e.clientX - r.left < r.width / 3 ? -1 : 1));
-  });
-  frame.addEventListener('keydown', e => {
+  const go = i => {
+    const L = last();
+    k = i > L ? 0 : i < 0 ? L : i;   // по кругу: после последнего — снова первый
+    track.style.transform = `translateX(${-cards[k].offsetLeft}px)`;
+    [...dotsBox.children].forEach((d, j) => d.classList.toggle('on', j === k));
+    tick();
+  };
+  const tick = () => {
+    clearTimeout(timer);
+    if (seen && !held && !still()) timer = setTimeout(() => go(k + 1), CAR_MS);
+  };
+  box.querySelector('.prev').addEventListener('click', () => go(k - 1));
+  box.querySelector('.next').addEventListener('click', () => go(k + 1));
+  view.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { held = true; clearTimeout(timer); } });
+  view.addEventListener('pointerleave', () => { held = false; tick(); });
+  view.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); go(k + (e.key === 'ArrowRight' ? 1 : -1)); }
   });
-  // свайп
-  let x0 = null;
-  frame.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
-  frame.addEventListener('pointerup', e => {
+  let x0 = null, swiped = false;
+  view.addEventListener('pointerdown', e => { swiped = false; if (e.pointerType !== 'mouse') x0 = e.clientX; });
+  view.addEventListener('pointerup', e => {
     if (x0 == null) return;
     const dx = e.clientX - x0; x0 = null;
-    if (Math.abs(dx) > 40) { go(k + (dx < 0 ? 1 : -1)); frame.dataset.swiped = '1'; setTimeout(() => delete frame.dataset.swiped, 50); }
+    if (Math.abs(dx) > 40) { swiped = true; go(k + (dx < 0 ? 1 : -1)); }
   });
-  frame.addEventListener('click', e => { if (frame.dataset.swiped) e.stopImmediatePropagation(); }, true);
-  onScreen(box, v => { seen = v; box.classList.toggle('paused', !v); if (v && !bars[k].classList.contains('run')) go(k); });
-  go(0);
+  track.addEventListener('click', e => {
+    const b = e.target.closest('.ad-car-card'); if (!b || swiped) return;
+    const imgs = cards.map(c => c.querySelector('img'));
+    H.openViewer(imgs.map(i => i.currentSrc || i.src), cards.indexOf(b), imgs);
+  });
+  new ResizeObserver(() => { drawDots(); go(Math.min(k, last())); }).observe(view);
+  onScreen(box, v => { seen = v; tick(); });
 }
 
 const KINDS = {
