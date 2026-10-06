@@ -1151,6 +1151,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 'Убедила руководство, что мемы на сайте — это отличная идея'],
         image: 'https://i.vimeocdn.com/video/2005849191-a4c24eb6e45beaf720bcae4e7ba16f195b403c8be9caafdaac9463a775c7f9a9-d_1280',
         video: 'vimeo:1076123612',
+        preview: 'img/shturman-preview.mp4',   // только в сетке на главной: тихо и по кругу; в кейсе его нет (ролик прислан 06.10)
         gallery: [
           'drive:1C3euoKiy9I2mUVf3tEJ_kE2wg8sYYjyv',
         ],
