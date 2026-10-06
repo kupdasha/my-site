@@ -929,6 +929,7 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
   .au-cov-txt{z-index:1}
 }
 
+.au-flat[style*="--shift"]{overflow:hidden}
 .au-flat[style*="--shift"] img{transform:translateX(var(--shift))}
 /* планшет: монитор и телефон рядом, телефон не закрывает легенду графика */
 @media (min-width:761px) and (max-width:1100px){
