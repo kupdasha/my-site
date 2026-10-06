@@ -1390,6 +1390,15 @@ function campRow(items, caption, narrow, small, stairs){
   return `<div class="wrap camp-rowbox${narrow ? ' narrow' : ''}${small ? ' small' : ''}">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row${stairs ? ' stairs' : ''}"${stairs ? ` style="--n:${items.length}"` : ''}>${items.map(campCell).join('')}</div></div>`;
 }
 // коллаж: ячейки раскладываются по схеме areas, у каждой подпись сверху; фото увеличиваются по нажатию
+// блок-памятка (spec): заголовок и короткие пункты в колонках; у пункта могут быть цвета — плашки с кодом
+function campSpec(sp){
+  const sw = c => `<span class="spec-sw" style="--c:${c}"></span>${c}`;
+  return `<div class="wrap camp-rowbox"><div class="spec">
+    <h4 class="spec-title">${T(sp.title)}</h4>
+    <dl class="spec-list">${sp.items.map(it => `<div class="spec-item"><dt>${T(it.label)}</dt><dd>${T(it.text)}${
+      it.colors ? `<span class="spec-colors">${it.colors.map(sw).join('')}</span>` : ''}</dd></div>`).join('')}</dl>
+  </div></div>`;
+}
 // презентация-листалка: слайды в ленте с прилипанием, стрелки по бокам, счетчик «3 из 30»
 function campSlides(g){
   const cap = g.caption ? `<p class="camp-cap">${T(g.caption)}</p>` : '';
@@ -1437,7 +1446,8 @@ function campGallery(c){
   let pile = [];
   const flush = () => { for (let i = 0; i < pile.length; i += cols) out.push(campRow(pile.slice(i, i + cols))); pile = []; };
   (c.gallery || []).forEach(g => {
-    if (g && g.slides) { flush(); out.push(campSlides(g)); }
+    if (g && g.spec) { flush(); out.push(campSpec(g.spec)); }
+    else if (g && g.slides) { flush(); out.push(campSlides(g)); }
     else if (g && g.collage) { flush(); out.push(campCollage(g)); }
     else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption, g.narrow, g.small, g.stairs)); }
     else if (parseMedia(g).type === 'image') pile.push(g);
