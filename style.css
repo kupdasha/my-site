@@ -1108,6 +1108,10 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 @media (max-width:760px){.camp-rowbox.small>.camp-row{width:auto}.camp-rowbox.small>.camp-cap{margin-left:0}}
 /* фото в коллаже обрезаются по ячейке */
 .collage.cover .camp-shot img{object-fit:cover}
+/* лесенка (stairs): узкие баннеры друг под другом, каждый следующий сдвинут влево — верхний справа, нижний слева */
+.camp-row.stairs{flex-direction:column}
+.camp-row.stairs>.camp-shot{flex:none;width:50%;margin-left:calc((var(--n) - 1 - var(--k, 0)) / max(var(--n) - 1, 1) * 50%)}
+@media (max-width:760px){.camp-row.stairs>.camp-shot{width:80%;margin-left:calc((var(--n) - 1 - var(--k, 0)) / max(var(--n) - 1, 1) * 20%)}}
 @media (max-width:760px){
   .spin,.two-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .strip-parts i{padding:10px}

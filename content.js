@@ -303,14 +303,20 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { caption: ['ресайзы под соцсети, сторис и баннерные сети', 'одна съемка — все форматы'], row: [
                 'img/vk/vk-adb-square-1.jpg', 'img/vk/vk-adb-square-2.jpg', 'img/vk/vk-adb-square-3.jpg' ] },
               { row: [ 'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg' ] },
-              /* узкие баннеры небольшого разрешения — small: true, чтобы не растягивать на весь экран */
-              { caption: ['баннеры', 'узкие баннеры'], row: [ 'img/vk/vk-adb-billboard-1.jpg' ], small: true },
-              { row: [ 'img/vk/vk-adb-billboard-2.jpg' ], small: true },
-              { row: [ 'img/vk/vk-adb-billboard-3.jpg' ], small: true },
-              { caption: ['процесс съемок', 'бэкстейдж: как это снимали'], row: [
-                'img/vk/vk-adb-backstage-1.jpg', 'img/vk/vk-adb-backstage-3.jpg' ] },
-              { row: [ 'img/vk/vk-adb-backstage-4.jpg', 'img/vk/vk-adb-backstage-5.jpg' ] },
-              { row: [ { video: 'img/vk/vk-adb-backstage.mp4', ratio: 2 } ] },
+              /* узкие баннеры небольшого разрешения — лесенкой (stairs: true), каждый в половину ширины */
+              { caption: ['баннеры', 'узкие баннеры'], row: [ 'img/vk/vk-adb-billboard-1.jpg', 'img/vk/vk-adb-billboard-2.jpg', 'img/vk/vk-adb-billboard-3.jpg' ], stairs: true },
+              /* съемки коллажом: слева видео, справа четыре фото; cover — фото заполняют ячейки целиком */
+              { caption: ['процесс съемок', 'бэкстейдж: как это снимали'], cover: true,
+                collage: {
+                  areas: '"v a b" "v c d"', cols: '1fr .1875fr .1875fr', rows: '1fr 1fr', ratio: '2.75/1',
+                  cells: [
+                    { area: 'v', img: { video: 'img/vk/vk-adb-backstage.mp4', ratio: 2 } },
+                    { area: 'a', img: 'img/vk/vk-adb-backstage-1.jpg' },
+                    { area: 'b', img: 'img/vk/vk-adb-backstage-3.jpg' },
+                    { area: 'c', img: 'img/vk/vk-adb-backstage-4.jpg' },
+                    { area: 'd', img: 'img/vk/vk-adb-backstage-5.jpg' },
+                  ],
+                } },
             ],
             links: [
               { text: 'платформа VK AdBlogger', link: 'https://adblogger.vk.com/' },
@@ -395,18 +401,17 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4d11c9205231597.66b73481b12b0.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4f1dbc205231597.66b73481b0c49.jpg',
               /* наружка по героям: в каждом ряду сити-формат 1,2 × 1,8, пиллар 1,4 × 3 и билборд 3,7 × 2,7 */
-              { caption: ['наружная реклама: сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7. Дети смотрят мультики', 'наружка: сити-формат, пиллар, билборд. Мультики'], row: [
+              { caption: ['наружная реклама: сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7', 'наружка: сити-формат, пиллар, билборд'], row: [
                 'img/vk/vk-video-boy-city.jpg', 'img/vk/vk-video-boy-pillar.jpg', 'img/vk/vk-video-boy-billboard.jpg' ] },
               { caption: ['обед', 'обед'], row: [
                 'img/vk/vk-video-noodles-city.jpg', 'img/vk/vk-video-noodles-pillar.jpg', 'img/vk/vk-video-noodles-billboard.jpg' ] },
               { caption: ['полет в самолете', 'в самолете'], row: [
                 'img/vk/vk-video-plane-city.jpg', 'img/vk/vk-video-plane-pillar.jpg', 'img/vk/vk-video-plane-billboard.jpg' ] },
-              { caption: ['digital: кардио в спортзале и мультики', 'digital-ресайзы'], row: [
-                'img/vk/vk-video-girl-story.jpg', 'img/vk/vk-video-girl-square.jpg', 'img/vk/vk-video-girl-screen-2.jpg' ] },
-              { row: [ 'img/vk/vk-video-girl-screen.jpg', 'img/vk/vk-video-boy-wide.jpg' ] },
+              { caption: ['digital: кардио в спортзале', 'digital-ресайзы: спортзал'], row: [
+                'img/vk/vk-video-girl-story.jpg', 'img/vk/vk-video-girl-square.jpg', 'img/vk/vk-video-girl-screen-2.jpg', 'img/vk/vk-video-girl-screen.jpg' ] },
               { caption: ['на улицах города', 'а вот так это висело в городе'], row: [
                 'img/vk/vk-video-street-1.jpg', 'img/vk/vk-video-street-2.jpg', { video: 'img/vk/vk-video-street.mp4', ratio: 9 / 16 } ] },
-              'vk:-220754053_456240309',
+              { caption: ['ролик на ТВ', 'ролик, который крутили по ТВ'], row: [ 'vk:-220754053_456240309' ] },
             ],
             links: [
               { text: 'статья о создании проекта', link: 'https://dsgners.ru/kupdaria/9101-dorabotat-nelzya-ostavit-vesennyaya-kampaniya-vk-video' },
