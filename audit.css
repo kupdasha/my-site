@@ -394,3 +394,65 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
   .au .au-city,.au .au-stop,.au .au-note,.au .au-fix-col,.au .au-chat{opacity:1 !important}
 }
 .au-s-hint{font-weight:500;font-size:clamp(20px,2vw,28px);line-height:1.2;margin:0 0 clamp(14px,1.6vw,22px) 8px}
+
+/* ================================================================
+   ТЕЛЕФОН И ПЛАНШЕТ
+   ================================================================ */
+@media (max-width:600px){
+  /* русское название: знаки друг под другом, стрелка вниз */
+  .au-rn-logos{flex-direction:column;gap:14px}
+  .au-rn-logos img{height:clamp(40px,12vw,56px)}
+  .au-rn-from{transform:translateY(40%)}
+  .au-rn-arrow{transform:rotate(90deg);width:36px;height:36px}
+  .au-lw-tags{gap:8px}
+  .au-lw-tags span{padding:10px 20px 13px;font-size:18px}
+  /* аудитории — компактные плашки лесенкой */
+  .au-aud-list{gap:8px}
+  .au-aud-list li{padding:14px 20px 17px;border-radius:999px 999px 999px 18px}
+  .au-aud-list li:nth-child(2){margin-left:6%}
+  .au-aud-list li:nth-child(3){margin-left:12%}
+  .au-aud-list b{font-size:22px}
+  /* формула столбиком: слово, плюс, слово */
+  .au-f-line,.au-f-nb{flex-direction:column;gap:.15em}
+  .au-f-plus{top:0}
+  /* подсказка к 3D — в строку со значком */
+  .au-whint{flex-wrap:nowrap;gap:14px}
+  .au-whint p{flex:1 1 auto;font-size:17px}
+  /* «сейчас → предлагаю»: друг под другом, стрелка вниз */
+  .au-pair-row{grid-template-columns:1fr;gap:52px}
+  .au-pair-arrow{transform:scale(0) rotate(0deg)}
+  .au-ch.in .au-pair-arrow{transform:rotate(90deg)}
+  .au-pairs{gap:40px}
+  /* набросок обложки сообщества: без длинной фразы, плашка выше */
+  .au-city-cover.ph{aspect-ratio:2.4/1}
+  .au-city-cover.ph::after{height:46%}
+  .au-city-line{display:none}
+  .au-city-tabs span{font-size:16px;padding:4px 10px 6px}
+  /* блоки с подложкой — поля поменьше */
+  .au-formula,.au-rename,.au-lower,.au-search,.au-bundle{border-radius:24px}
+  .au-search{padding:16px}
+  .au-s-lead{margin:24px 0 14px 4px}
+}
+/* планшет: две колонки там, где они помещаются, остальное — шире */
+@media (min-width:601px) and (max-width:1024px){
+  .au-head{grid-template-columns:1fr}
+  .au-label,.au-title,.au-text{grid-column:1 / -1;grid-row:auto}
+  .au-title{max-width:20ch}
+  .au-text{max-width:46ch}
+  .au-aud{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+  .au-aud-list b{font-size:24px}
+  .au-aud-list li{padding:16px 22px 19px}
+  .au-journey{gap:20px}
+  .au-goal{font-size:24px}
+  .au-notes{row-gap:28px}
+  .au-note:nth-child(n){grid-column:span 6}
+  .au-note:nth-child(3){grid-column:1 / -1}
+  .au-glass{grid-template-columns:1fr}
+  .au-g-pair{justify-content:flex-start}
+  /* набросок сообществ в узкой колонке: строки друг под другом, теги переносятся */
+  .au-city{grid-template-columns:1fr}
+  .au-city-tabs{justify-content:flex-start;flex-wrap:wrap}
+  .au-city-line{display:none}
+}
+.au-city{min-width:0}
+.au-city-tabs{flex-wrap:wrap}
