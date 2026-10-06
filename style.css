@@ -1442,9 +1442,13 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .ev-g-chip .yr{margin-left:.3em}
 .ev-g-flow .ev-g-tile.first{margin-left:0}
 @media (max-width:760px){.ev-g-flow .ev-g-tile{flex-basis:calc(var(--ar) * 150px)}}
-/* смена фото в ленте выступлений: новое проявляется поверх старого, подпись мягко меняется */
-.ev{position:relative}
-.ev img.ev-next{position:absolute;left:0;top:0;opacity:0;transition:opacity 1s var(--ease)}
-.ev img.ev-next.on{opacity:1}
-.ev figcaption{transition:opacity .45s var(--ease)}
-.ev figcaption.swap{opacity:0}
+/* смена фото в ленте выступлений: новое фото «выезжает» шторкой снизу с легким приближением,
+   старое уходит вверх и гаснет; подпись меняется следом. Окошки идут с крошечной задержкой друг за другом */
+.ev{position:relative;overflow:hidden;border-radius:var(--r-img)}
+.ev img{transition:transform 1s cubic-bezier(.7,0,.2,1) calc(var(--k,0) * 70ms),opacity 1s ease calc(var(--k,0) * 70ms)}
+.ev img.ev-next{position:absolute;left:0;top:0;clip-path:inset(100% 0 0 0 round var(--r-img));transform:scale(1.12);
+  transition:clip-path .95s cubic-bezier(.7,0,.2,1) calc(var(--k,0) * 70ms),transform 1.3s cubic-bezier(.2,.8,.2,1) calc(var(--k,0) * 70ms)}
+.ev img.ev-next.on{clip-path:inset(0 0 0 0 round var(--r-img));transform:none}
+.ev img.ev-out{transform:translateY(-6%) scale(.96);opacity:.35}
+.ev figcaption{transition:opacity .4s var(--ease) calc(var(--k,0) * 70ms),transform .4s var(--ease) calc(var(--k,0) * 70ms)}
+.ev figcaption.swap{opacity:0;transform:translateY(6px)}

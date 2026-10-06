@@ -346,36 +346,51 @@ document.addEventListener('pointerover', e => {
   showPreviewImage(E.items[talkShown++ % E.items.length].thumb);
 });
 document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.ev-link')) showPreviewImage(''); });
-/* Фото в ленте выступлений сами сменяются: раз в несколько секунд одно из окошек плавно
-   показывает следующее фото того же формата (вертикальное — вертикальным), с подписью.
+/* Фото в ленте выступлений сами сменяются: раз в несколько секунд все окошки разом показывают
+   новые кадры. Кадры не повторяются, пока не покажутся все; в окошке не бывает два раза подряд одно и то же
+   событие, и в одной четверке все события разные. Вертикальное окошко получает только вертикальные фото.
    Пока лента не на экране или включено «уменьшить движение» — стоит */
-const EV_ROTATE = 2800;   // как часто меняется одно фото, мс
+const EV_ROTATE = 3200;   // как часто меняется четверка, мс
 let evTimer = null;
 function rotateEvents(strip){
   clearInterval(evTimer);
   const E = SITE.photos.events, slots = [...strip.querySelectorAll('.ev')];
   if (!slots.length || reduced) return;
-  let turn = 0;
+  const ev = i => pick(E.items[i].caption), tall = i => (E.items[i].ratio || 1.5) < 1;
+  let used = new Set(slots.map(s => +s.dataset.i));
   evTimer = setInterval(() => {
     const r = strip.getBoundingClientRect();
     if (document.hidden || !strip.isConnected || r.bottom < 0 || r.top > innerHeight) return;   // лента не на экране — стоим
-    const slot = slots[turn++ % slots.length];
-    const shown = new Set(slots.map(s => +s.dataset.i));
-    const tall = (E.items[+slot.dataset.i].ratio || 1.5) < 1;
-    const pool = E.items.map((x, i) => i).filter(i => !shown.has(i) && ((E.items[i].ratio || 1.5) < 1) === tall);
-    if (!pool.length) return;
-    const cur = +slot.dataset.i, next = pool.find(i => i > cur) ?? pool[0], item = E.items[next];
-    const old = slot.querySelector('img'), img = new Image();
-    img.alt = pick(item.caption); img.className = 'ev-next';
-    img.onload = () => {
-      old.after(img);
-      requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('on')));
-      const cap = slot.querySelector('figcaption'); cap.classList.add('swap');
-      setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, 450);
-      setTimeout(() => { old.remove(); img.className = ''; slot.dataset.i = next; }, 1000);
-    };
-    img.src = item.thumb || item.src;
+    const now = slots.map(s => +s.dataset.i), picked = [];
+    for (const slot of slots) {
+      const cur = +slot.dataset.i;
+      const ok = i => tall(i) === tall(cur) && !now.includes(i) && !picked.includes(i)
+        && ev(i) !== ev(cur) && !picked.some(j => ev(j) === ev(i));
+      let pool = E.items.map((x, i) => i).filter(i => ok(i) && !used.has(i));
+      if (!pool.length) {   // все кадры этого формата показаны — начинаем круг заново
+        E.items.forEach((x, i) => { if (tall(i) === tall(cur)) used.delete(i); });
+        pool = E.items.map((x, i) => i).filter(ok);
+      }
+      const next = pool.length ? pool[Math.floor(Math.random() * pool.length)] : cur;
+      picked.push(next); used.add(next);
+    }
+    slots.forEach((slot, k) => swapEvent(slot, picked[k], k));
   }, EV_ROTATE);
+}
+function swapEvent(slot, next, k){
+  const item = SITE.photos.events.items[next];
+  if (+slot.dataset.i === next) return;
+  const old = slot.querySelector('img'), img = new Image();
+  img.alt = pick(item.caption); img.className = 'ev-next';
+  img.style.setProperty('--k', k);
+  img.onload = () => {
+    old.after(img); old.classList.add('ev-out'); old.style.setProperty('--k', k);
+    requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('on')));
+    const cap = slot.querySelector('figcaption'); cap.style.setProperty('--k', k); cap.classList.add('swap');
+    setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, 420 + k * 70);
+    setTimeout(() => { old.remove(); img.className = ''; img.style.removeProperty('--k'); slot.dataset.i = next; }, 1100 + k * 70);
+  };
+  img.src = item.thumb || item.src;
 }
 /* хроника выступлений: фото в ленте — сразу увеличивается; «все выступления» — плитка всех фото по событиям,
    нажатие на плитку увеличивает фото (листать можно по всем) */
