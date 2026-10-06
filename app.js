@@ -1899,6 +1899,9 @@ function galleryItem(x){
   if (x && x.icons2d) return icons2dHTML(x.icons2d);
   if (x && x.logos) return logoWallHTML(x.logos);
   if (x && x.mark3d) return mark3dHTML(x.mark3d);
+  if (x && x.stars) return starsHTML(x.stars);
+  if (x && x.sky) return skyHTML(x.sky);
+  if (x && x.grads) return gradsHTML(x.grads);
   // { sheet: [[…], […]], bg } — ряды макетов на серой подложке (светлые картинки не сливаются с белым фоном)
   // cls: 'keep' — ряд не складывается в столбик на телефоне, 'narrow' — без подложки, в правых двух третях
   if (x && x.sheet) return sheetHTML(x.sheet, x.bg, x.cls);
@@ -1962,6 +1965,101 @@ function mark3dHTML(m){
     ${m.list ? `<ul class="m3d-dirs">${m.list.map((x, i) => `<li style="--i:${i}">${T(x)}</li>`).join('')}</ul>` : ''}
   </div></div>`;
 }
+/* ЖИВОЙ ЗНАК-ЛЕНТА (элементы { stars } и { sky } в галерее, см. MTS STARS).
+   Векторы знака лежат у проекта в поле mark: a, b — контуры двух петель (как в исходнике, с разрывами
+   на перехлестах), la, lb — их осевые линии. По осевой линии знак прорисовывается, по ней же бежит блик.
+   mode: 'hero' — крупный цветной знак; 'versions' — цветная, монохромная и белая версии; 'crop' — графические
+   элементы: увеличенный знак, обрезанный полями */
+let caseMark = null, starUid = 0;
+const STAR_FILL = {
+  // петля «острая»: оранжевый внизу слева, фиолетовый внизу справа, розовая вершина
+  a: [['#FF3C00', 0], ['#FF0A8C', .5], ['#6A00FF', 1]], aTop: '#FF1A5E',
+  // петля «широкая»: фиолетовый слева, красный справа
+  b: [['#5A10FF', 0], ['#C21490', .5], ['#FF001F', 1]],
+};
+function starSVG(m, o = {}){
+  const id = 'st' + (++starUid);
+  const stops = l => l.map(([c, k]) => `<stop offset="${k}" stop-color="${c}"/>`).join('');
+  const spin = `<animateTransform attributeName="gradientTransform" type="rotate" values="0 450 470;28 450 470;-22 450 470;0 450 470" dur="11s" repeatCount="indefinite"/>`;
+  const color = !o.fill;
+  const defs = `<defs>
+    ${color ? `<linearGradient id="${id}a" gradientUnits="userSpaceOnUse" x1="180" y1="700" x2="680" y2="800">${stops(STAR_FILL.a)}${spin}</linearGradient>
+    <linearGradient id="${id}t" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="480"><stop offset="0" stop-color="${STAR_FILL.aTop}"/><stop offset="1" stop-color="${STAR_FILL.aTop}" stop-opacity="0"/></linearGradient>
+    <linearGradient id="${id}b" gradientUnits="userSpaceOnUse" x1="80" y1="520" x2="850" y2="240">${stops(STAR_FILL.b)}${spin}</linearGradient>` : ''}
+    <mask id="${id}m" maskUnits="userSpaceOnUse" x="-100" y="-100" width="1100" height="1140">
+      <path class="st-draw a" d="${m.la}" pathLength="1"/><path class="st-draw b" d="${m.lb}" pathLength="1"/></mask>
+    <clipPath id="${id}c"><path d="${m.a}"/><path d="${m.b}"/></clipPath>
+  </defs>`;
+  const body = color
+    ? `<path d="${m.a}" fill="url(#${id}a)"/><path d="${m.a}" fill="url(#${id}t)"/><path d="${m.b}" fill="url(#${id}b)"/>`
+    : `<path d="${m.a}" fill="${o.fill}"/><path d="${m.b}" fill="${o.fill}"/>`;
+  // блик: короткий отрезок осевой линии, обрезанный по контуру — на перехлесте он ныряет под ленту
+  const glint = o.glint ? `<g clip-path="url(#${id}c)" class="st-glint"><path d="${m.la}" pathLength="1"/><path class="b" d="${m.lb}" pathLength="1"/></g>` : '';
+  return `<svg class="st-svg" viewBox="${o.view || '0 0 900 940'}"${o.view ? ' preserveAspectRatio="xMidYMid slice"' : ''} aria-hidden="true">${defs}<g mask="url(#${id}m)">${body}</g>${glint}</svg>`;
+}
+function starsHTML(x){
+  const m = caseMark; if (!m) return '';
+  const touch = matchMedia('(pointer:coarse)').matches;
+  const hint = x.hint && (touch && x.hint.touch ? x.hint.touch : x.hint.mouse || x.hint);
+  if (x.mode === 'versions') return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="st st-vers">${(x.items || []).map((v, i) =>
+    `<figure class="st-ver ${v.bg}" style="--i:${i}"><div class="st-tilt">${starSVG(m, { fill: v.fill })}</div><figcaption>${T(v.name)}</figcaption></figure>`).join('')}</div></div>`;
+  if (x.mode === 'crop') return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="st st-crops">
+    <div class="st-crop light">${starSVG(m, { view: '330 120 620 660' })}</div>
+    <div class="st-crop grad">${starSVG(m, { fill: '#fff', view: '-60 260 640 700' })}</div></div></div>`;
+  return `<div class="wrap case-st">${hint ? `<p class="m3d-hint">${T(hint)}</p>` : ''}<div class="st st-hero"><div class="st-tilt">${starSVG(m, { glint: true })}</div></div></div>`;
+}
+// прорисовка стартует, когда знак доезжает до экрана; наклон за курсором — только у крупного знака
+const starReveal = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  starReveal.unobserve(e.target);
+  e.target.classList.add('in');
+}), { threshold: 0.35 });
+function watchStars(el){
+  starReveal.observe(el);
+  if (!el.classList.contains('st-hero') || reduced) return;
+  const tilt = el.querySelector('.st-tilt');
+  el.addEventListener('pointermove', e => {
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    tilt.style.transform = `rotateY(${x * 22}deg) rotateX(${-y * 18}deg) translate(${x * 12}px, ${y * 12}px)`;
+  });
+  el.addEventListener('pointerleave', () => { tilt.style.transform = ''; });
+}
+/* { sky: { items: [{ img, k }], hint } } — звездное небо отклоненных вариантов: знаки разлетаются из центра,
+   плывут каждый по-своему (k: turn — вращается, sway — качается в объеме, breathe — дышит),
+   слоями откликаются на курсор; наведенный выходит вперед, остальные приглушаются */
+const SKY_SPOTS = [[9, 20], [27, 12], [47, 18], [67, 10], [88, 20], [16, 50], [36, 44], [57, 47], [78, 42], [94, 58],
+  [6, 82], [24, 80], [44, 78], [63, 84], [82, 80], [72, 64], [30, 64], [52, 72], [12, 34], [90, 86]];
+function skyHTML(x){
+  const touch = matchMedia('(pointer:coarse)').matches;
+  const hint = x.hint && (touch && x.hint.touch ? x.hint.touch : x.hint.mouse || x.hint);
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="sky" role="img" aria-label="${uesc(pick(x.label) || 'отклоненные варианты знака')}">${x.items.map((s, i) => {
+    const [l, t] = SKY_SPOTS[i % SKY_SPOTS.length], d = .4 + (i * 37 % 10) / 10;
+    return `<span class="sky-it ${s.k || 'turn'}" style="--l:${l}%;--t:${t}%;--d:${d.toFixed(2)};--i:${i};--s:${s.s || 1};--dur:${(7 + i * 13 % 6).toFixed(1)}s"><i><img src="${s.img}" alt="" loading="lazy" draggable="false"></i></span>`;
+  }).join('')}</div>${hint ? `<p class="camp-cap">${T(hint)}</p>` : ''}</div>`;
+}
+function watchSky(el){
+  starReveal.observe(el);
+  if (reduced) return;
+  let raf = 0, tx = 0, ty = 0, cx = 0, cy = 0;
+  const step = () => {
+    cx += (tx - cx) * .08; cy += (ty - cy) * .08;
+    el.style.setProperty('--mx', cx.toFixed(3)); el.style.setProperty('--my', cy.toFixed(3));
+    raf = Math.abs(tx - cx) + Math.abs(ty - cy) > .002 ? requestAnimationFrame(step) : 0;
+  };
+  el.addEventListener('pointermove', e => {
+    const r = el.getBoundingClientRect();
+    tx = (e.clientX - r.left) / r.width - .5; ty = (e.clientY - r.top) / r.height - .5;
+    if (!raf) raf = requestAnimationFrame(step);
+  });
+  el.addEventListener('pointerleave', () => { tx = ty = 0; if (!raf) raf = requestAnimationFrame(step); });
+  el.addEventListener('pointerover', e => el.classList.toggle('focus', !!e.target.closest('.sky-it')));
+}
+// { grads: { items: [[цвет, цвет], ...] } } — фирменные градиенты: полосы проявляются слева направо, подписи — коды цветов на концах
+function gradsHTML(x){
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="st-grads">${x.items.map((g, i) =>
+    `<div class="st-grad" style="--g1:${g[0]};--g2:${g[1]};--i:${i}"><span>${g[0]}</span><span>${g[1]}</span></div>`).join('')}</div></div>`;
+}
 function sheetHTML(rows, bg, cls){
   return `<div class="wrap camp-rowbox"><div class="case-sheet${cls ? ' ' + cls : ''}" style="--sheet:${bg || '#E9E9E7'}">${
     rows.map(r => `<div class="camp-row">${(Array.isArray(r) ? r : [r]).map(campCell).join('')}</div>`).join('')}</div></div>`;
@@ -2004,6 +2102,7 @@ function renderCase(k, keepScroll){
   else if (p.headed) for (let i = 0; i < story.length; i += 2) blocks.push([story[i], story[i + 1] || '']);
   else blocks = story.map((par, i) => [p.labels ? p.labels[i] || '' : i === 0 ? p.tag || '' : '', par]);
   const gallery = p.gallery || [];
+  caseMark = p.mark || null;   // векторы знака для блоков { stars }
   let body = '', g = 0;
   // schemeCols: все блоки схемы одной строкой, колонками (как текст кампаний)
   if (p.schemeCols) {
@@ -2081,6 +2180,8 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   caseContent.querySelectorAll('.m3d').forEach(watchMark);
+  caseContent.querySelectorAll('.st, .st-grads').forEach(watchStars);
+  caseContent.querySelectorAll('.sky').forEach(watchSky);
   // листалка прямо в галерее кейса (без рядов макетов watchCampaigns ее не найдет)
   if (!caseContent.querySelector('.camp-row')) caseContent.querySelectorAll('.case-body .slides').forEach(watchSlides);
   const au = caseContent.querySelector('.au-mount');

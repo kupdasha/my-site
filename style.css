@@ -1647,3 +1647,66 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 
 /* превью, которое нужно показать целиком (cardRatio): карточка в пропорциях ролика, без приближения */
 .work .media.whole video,.work .media.whole img{transform:none}
+
+/* ---------- MTS STARS: живой знак-лента, звездное небо вариантов, градиенты ---------- */
+.case-st{margin-bottom:clamp(56px,7vw,104px)}
+.st-hero{display:grid;place-items:center;aspect-ratio:16/9;perspective:1200px;touch-action:pan-y}
+.st-hero .st-tilt{width:min(44%,520px);transition:transform .7s var(--ease);will-change:transform}
+.st-svg{display:block;width:100%;height:auto;overflow:visible}
+.st-draw{fill:none;stroke:#fff;stroke-width:100;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 2;stroke-dashoffset:1.07;transition:stroke-dashoffset 1.7s var(--ease-io)}
+.st-draw.b{transition-delay:.55s}
+.st.in .st-draw{stroke-dashoffset:0}
+.st-glint path{fill:none;stroke:#fff;stroke-width:20;stroke-linecap:round;stroke-dasharray:.03 .97;opacity:0;transition:opacity .8s 2.4s;animation:st-run 6s linear infinite}
+.st-glint path.b{animation-duration:8.5s;animation-direction:reverse}
+.st.in .st-glint path{opacity:.8}
+@keyframes st-run{to{stroke-dashoffset:-1}}
+.st-vers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1vw,16px)}
+.st-ver{margin:0;opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .9s var(--ease);transition-delay:calc(var(--i) * 120ms)}
+.st-vers.in .st-ver{opacity:1;transform:none}
+.st-ver .st-tilt{display:grid;place-items:center;aspect-ratio:4/3;border-radius:var(--r-img);background:#fff;box-shadow:inset 0 0 0 1px #E4E5E8}
+.st-ver.soft .st-tilt{background:#F4F4F5;box-shadow:none}
+.st-ver.dark .st-tilt{background:#3C3C3B;box-shadow:none}
+.st-ver.grad .st-tilt{background:linear-gradient(135deg,#FF001F,#9A1A9E 55%,#2A23FF);box-shadow:none}
+.st-ver .st-svg{width:42%}
+.st-ver figcaption{font-size:16px;opacity:.55;margin-top:12px}
+.st-crops{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1vw,16px)}
+.st-crop{aspect-ratio:4/3;border-radius:var(--r-img);overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px #E4E5E8}
+.st-crop.grad{background:linear-gradient(135deg,#FF001F,#9A1A9E 55%,#2A23FF);box-shadow:none}
+.st-crop .st-svg{width:100%;height:100%;animation:st-drift 18s var(--ease-io) infinite alternate}
+@keyframes st-drift{to{transform:scale(1.08) rotate(-4deg)}}
+.st-grads{display:grid;gap:clamp(8px,1vw,16px)}
+.st-grad{display:flex;justify-content:space-between;align-items:flex-end;height:clamp(120px,14vw,200px);padding:clamp(14px,1.6vw,24px);border-radius:var(--r-img);color:#fff;font-size:16px;
+  background:linear-gradient(90deg,var(--g1),var(--g2));clip-path:inset(0 100% 0 0 round var(--r-img));transition:clip-path 1.4s var(--ease-io) calc(var(--i) * 200ms)}
+.st-grads.in .st-grad{clip-path:inset(0 0 0 0 round var(--r-img))}
+.sky{position:relative;aspect-ratio:16/9;border-radius:var(--r-img);background:#1E1E1C;overflow:hidden;--mx:0;--my:0}
+.sky-it{position:absolute;left:50%;top:50%;width:calc(9.5% * var(--s));aspect-ratio:1;opacity:0;
+  transform:translate(-50%,-50%) translate(calc(var(--mx) * var(--d) * -70px),calc(var(--my) * var(--d) * -50px));
+  transition:left 1.3s var(--ease),top 1.3s var(--ease),opacity .8s;transition-delay:calc(var(--i) * 45ms)}
+.sky.in .sky-it{left:var(--l);top:var(--t);opacity:1}
+.sky.in.focus .sky-it:not(:hover){opacity:.3;transition-delay:0s}
+.sky-it i{display:block;width:100%;height:100%;perspective:600px;animation:sky-float var(--dur) ease-in-out infinite alternate;animation-delay:calc(var(--i) * -.9s)}
+.sky-it img{display:block;width:100%;height:100%;object-fit:contain;transition:scale .5s var(--ease);user-select:none;-webkit-user-drag:none}
+.sky-it:hover img{scale:1.45}
+.sky-it.turn img{animation:sky-spin calc(var(--dur) * 5) linear infinite}
+.sky-it.sway img{animation:sky-sway calc(var(--dur) * .9) ease-in-out infinite alternate}
+.sky-it.breathe img{animation:sky-breathe calc(var(--dur) * .6) ease-in-out infinite alternate}
+.sky-it:nth-child(even).turn img{animation-direction:reverse}
+@keyframes sky-float{from{transform:translateY(-7%)}to{transform:translateY(7%)}}
+@keyframes sky-spin{to{rotate:360deg}}
+@keyframes sky-sway{from{transform:rotateY(-40deg)}to{transform:rotateY(40deg)}}
+@keyframes sky-breathe{from{transform:scale(.88) rotate(-6deg)}to{transform:scale(1.06) rotate(6deg)}}
+@media (max-width:700px){
+  .st-hero{aspect-ratio:1}
+  .st-hero .st-tilt{width:72%}
+  .st-vers,.st-crops{grid-template-columns:1fr}
+  .st-ver .st-svg{width:36%}
+  .sky{aspect-ratio:4/5}
+  .sky-it{width:calc(17% * var(--s))}
+  .sky.in .sky-it{left:calc(var(--l) * .8 + 10%);top:calc(var(--t) * .86 + 7%)}
+}
+@media (prefers-reduced-motion:reduce){
+  .st-draw{transition:none;stroke-dashoffset:0}
+  .st-glint,.st-crop .st-svg,.sky-it i,.sky-it img{animation:none}
+  .st-grad{transition:none;clip-path:none}
+  .sky-it{transition:none;left:var(--l);top:var(--t);opacity:1}
+}
