@@ -1825,8 +1825,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'мерч',
         short: ['Капсула бренда «Нате, носите» и проекта «Где моё внимание?» в поддержку людей с СДВГ',
                 'Футболки для тех, кто начал читать это описание и отвлекся'],
-        image: 'img/sdvg/cover.jpg',
-        heroImage: 'img/sdvg/hero.jpg',   // в шапке кейса — широкий кадр
+        image: 'img/sdvg/cover-full.jpg',   // исходник без пересжатия
         link:  'https://kupdasha.ru/merch',
         schemeCols: true,   // задача, роль и решение — колонками в одну строку
         scheme: {
