@@ -853,7 +853,7 @@ function renderWorks(){
     // cardRatio — пропорции карточки в сетке, когда превью нужно показать целиком, а обложка кейса другая
     const ratio = p.cardRatio || p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');   // у видео всегда 16:9
     return `
-    <button class="work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}" data-k="${k}" data-reveal>
+    <button class="work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}" data-k="${k}" data-reveal${p.cardWidth ? ` style="--cw:${p.cardWidth}"` : ''}>
       <span class="media${p.cardRatio ? ' whole' : ''}" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
       <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}

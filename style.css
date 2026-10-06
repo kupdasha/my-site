@@ -1740,3 +1740,8 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
   .st-pages img{transition:none;opacity:1;transform:none}
   .sky-it{transition:none;left:var(--l);top:var(--t);opacity:1}
 }
+
+/* cardWidth: карточка уже своей колонки (картинка и подписи вместе); справа — прижата к правому краю */
+.work[style*="--cw"]{width:var(--cw)}
+.work.right[style*="--cw"]{justify-self:end}
+@media (max-width:760px){.work[style*="--cw"]{width:100%}}
