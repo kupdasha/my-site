@@ -1288,14 +1288,14 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .ev-g-title{font-weight:500;font-size:clamp(24px,2.4vw,32px)}
 .ev-g-title .yr{margin-left:.35em}
 .ev-g-close{width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;border:0;cursor:pointer}
-.ev-g-group{padding:clamp(24px,3vw,40px) 0 0}
-.ev-g-group:last-child{padding-bottom:clamp(56px,7vw,96px)}
-.ev-g-cap{font-weight:500;font-size:18px;margin-bottom:14px;opacity:.7}
 /* плитка: ряды одной высоты, ширина — по пропорциям кадра */
-.ev-g-grid{display:flex;flex-wrap:wrap;gap:10px}
+.ev-g-grid{display:flex;flex-wrap:wrap;gap:24px 12px;padding:clamp(16px,2vw,24px) 0 clamp(56px,7vw,96px)}
 .ev-g-grid::after{content:"";flex:10 1 0}
-.ev-g-tile{flex:var(--ar) 1 calc(var(--ar) * 180px);min-width:0;padding:0;border:0;background:var(--soft);border-radius:var(--r-img);overflow:hidden;cursor:zoom-in}
-.ev-g-tile img{display:block;width:100%;aspect-ratio:var(--ar);object-fit:cover;transition:transform .8s var(--ease)}
-.ev-g-tile:hover img{transform:scale(1.03)}
+.ev-g-tile{flex:var(--ar) 1 calc(var(--ar) * 180px);min-width:0;padding:0;border:0;background:none;text-align:left;color:inherit;font:inherit;cursor:zoom-in}
+.ev-g-tile img{display:block;width:100%;aspect-ratio:var(--ar);object-fit:cover;border-radius:var(--r-img);background:var(--soft);transition:opacity .4s var(--ease)}
+.ev-g-tile:hover img{opacity:.88}
+/* подпись — одной строкой под фото, мелко и серым */
+.ev-g-cap{display:block;margin-top:8px;font-size:16px;line-height:1.3;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .viewer{z-index:100}
 @media (max-width:760px){.ev-g-tile{flex-basis:calc(var(--ar) * 110px)}}
+.ev-g-cap .hang-q,.ev figcaption .hang-q{margin-left:0}   /* в обрезанной подписи кавычка не висит, иначе ее срежет */
