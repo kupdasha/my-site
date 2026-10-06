@@ -307,7 +307,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { row: [ 'img/vk/vk-adb-billboard-2.jpg' ] },
               { row: [ 'img/vk/vk-adb-billboard-3.jpg' ] },
               { caption: ['процесс съемок', 'бэкстейдж: как это снимали'], row: [
-                'img/vk/vk-adb-backstage-1.jpg', 'img/vk/vk-adb-backstage-2.jpg', 'img/vk/vk-adb-backstage-3.jpg' ] },
+                'img/vk/vk-adb-backstage-1.jpg', 'img/vk/vk-adb-backstage-3.jpg' ] },
               { row: [ 'img/vk/vk-adb-backstage-4.jpg', 'img/vk/vk-adb-backstage-5.jpg' ] },
               { row: [ { video: 'img/vk/vk-adb-backstage.mp4', ratio: 2 } ] },
             ],
@@ -388,11 +388,23 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           {
             title:    'VK Видео: смотри в любой ситуации',
             task:     'Привлечь внимание к новой функции VK Видео — офлайн-режиму, который позволяет смотреть контент в любых условиях.',
-            solution: 'Кампания показывает разные ситуации: дети смотрят мультики, кардио в спортзале, обед, полет в самолете. Она запускалась параллельно с видеороликом, поэтому макеты и ролик воспринимаются как одно целое.',
+            solution: 'Кампания показывает разные ситуации: дети смотрят мультики, кардио в спортзале, обед, полет в самолете. Она запускалась параллельно с видеороликом, поэтому макеты и ролик воспринимаются как одно целое. Для каждого героя сделали ресайзы под наружную рекламу — сити-форматы, пиллары и билборды — и под digital.',
             gallery: [
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/665f46205231597.66b73481b1a75.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4d11c9205231597.66b73481b12b0.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4f1dbc205231597.66b73481b0c49.jpg',
+              /* наружка по героям: в каждом ряду сити-формат 1,2 × 1,8, пиллар 1,4 × 3 и билборд 3,7 × 2,7 */
+              { caption: ['наружная реклама: сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7. Дети смотрят мультики', 'наружка: сити-формат, пиллар, билборд. Мультики'], row: [
+                'img/vk/vk-video-boy-city.jpg', 'img/vk/vk-video-boy-pillar.jpg', 'img/vk/vk-video-boy-billboard.jpg' ] },
+              { caption: ['обед', 'обед'], row: [
+                'img/vk/vk-video-noodles-city.jpg', 'img/vk/vk-video-noodles-pillar.jpg', 'img/vk/vk-video-noodles-billboard.jpg' ] },
+              { caption: ['полет в самолете', 'в самолете'], row: [
+                'img/vk/vk-video-plane-city.jpg', 'img/vk/vk-video-plane-pillar.jpg', 'img/vk/vk-video-plane-billboard.jpg' ] },
+              { caption: ['digital: кардио в спортзале и мультики', 'digital-ресайзы'], row: [
+                'img/vk/vk-video-girl-story.jpg', 'img/vk/vk-video-girl-square.jpg', 'img/vk/vk-video-girl-screen-2.jpg' ] },
+              { row: [ 'img/vk/vk-video-girl-screen.jpg', 'img/vk/vk-video-boy-wide.jpg' ] },
+              { caption: ['на улицах города', 'а вот так это висело в городе'], row: [
+                'img/vk/vk-video-street-1.jpg', 'img/vk/vk-video-street-2.jpg', { video: 'img/vk/vk-video-street.mp4', ratio: 9 / 16 } ] },
               'vk:-220754053_456240309',
             ],
             links: [
