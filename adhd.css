@@ -12,6 +12,7 @@
 .ad-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
 /* на широком экране абзац — в две колонки, чтобы не тянулся длинной лентой */
 @media (min-width:900px){.ad-text{max-width:none;column-count:2;column-gap:clamp(24px,3vw,48px);font-size:clamp(19px,1.5vw,22px)}}
+@media (min-width:761px) and (max-width:1199px){.ad-label,.ad-title,.ad-text{grid-column:1 / -1}.ad-label{grid-row:auto}}
 @media (max-width:760px){.ad-label,.ad-title,.ad-text{grid-column:1 / -1}.ad-label{grid-row:auto}}
 .ad-cap{font-size:16px;opacity:.6;margin-top:16px;max-width:60ch;text-wrap:balance}
 .ad-cap.top{margin:0 0 8px}
@@ -88,7 +89,8 @@
 .ad-orb-notes{display:grid}
 .ad-orb-note{grid-area:1 / 1;font-size:clamp(16px,2.4cqw,20px);line-height:1.3;text-wrap:balance;opacity:0;transform:translateY(8px);transition:opacity .45s var(--ease),transform .6s var(--ease)}
 .ad-orb-note.on{opacity:.75;transform:none}
-@container (max-width:460px){.ad-orbit{--R:37cqw;--s:23cqw}.ad-orb-title{font-size:20px}.ad-orb-note{font-size:16px}}
+/* на телефоне в центре только подпись к детали: заголовок не помещается между кружками */
+@container (max-width:460px){.ad-orb-ring{--R:39cqw;--s:20cqw}.ad-orb-core{width:40cqw}.ad-orb-title{display:none}.ad-orb-note{font-size:16px}.ad-ch.in .ad-orb.on .ad-orb-in{transform:scale(1.1)}}
 
 /* ---------- что вышло ---------- */
 .ad-finals{display:grid;gap:clamp(32px,4vw,56px)}
