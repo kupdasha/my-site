@@ -6,11 +6,11 @@
 <title>Таплинк Купяши</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@400&display=swap" rel="stylesheet">
 <style>
-/* одна колонка; главная кнопка — магнит, россыпь искр вокруг ложится по ее силовым линиям, как опилки */
+/* один экран: имя, четыре равные кнопки, сетка соцсетей 3×3; снизу экран наполнен «жидкостью» из искр, она переливается при наклоне */
 :root{
-  --bg:#FFFFFF; --ink:#1D222A; --muted:rgba(29,34,42,.55); --soft:#F1F2F4;
+  --bg:#FFFFFF; --ink:#1D222A; --muted:rgba(29,34,42,.5); --soft:#F1F2F4;
   --accent:#E2FB5A; --accent-text:#1D222A;
   --btn:#1D222A; --btn-text:#FFFFFF; --btn-hover:#E2FB5A; --btn-hover-text:#1D222A;
   --font:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -19,25 +19,24 @@
   color-scheme:light;
 }
 :root[data-mode="fun"]{
-  --bg:#0E0F12; --ink:#F4F4F6; --muted:rgba(244,244,246,.55); --soft:#1C1D23;
+  --bg:#0E0F12; --ink:#F4F4F6; --muted:rgba(244,244,246,.5); --soft:#1C1D23;
   --btn:#E2FB5A; --btn-text:#1D222A; --btn-hover:#F4F4F6; --btn-hover-text:#0E0F12;
   color-scheme:dark;
 }
-html,body{background:var(--bg);color:var(--ink)}
-body{font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased;transition:background .5s var(--ease),color .5s var(--ease)}
+html,body{background:var(--bg);color:var(--ink);overflow-x:hidden}
+body{font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased;transition:background .5s var(--ease)}
 a{color:inherit}
 *{box-sizing:border-box}
 
 #field{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
-html,body{overflow-x:hidden}
-/* весь таплинк — один экран: --k сжимает отступы и высоты, если экран низкий (считает скрипт) */
-.tl{--k:1;position:relative;min-height:100svh;display:flex;flex-direction:column;padding:calc(10px*var(--k)) 16px calc(16px*var(--k))}
-.col{position:relative;z-index:1;flex:1;width:100%;max-width:420px;margin-inline:auto;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:calc(16px*var(--k))}
+/* --k поджимает отступы и высоты, если экран низкий (считает скрипт) */
+.tl{--k:1;position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;padding:calc(10px*var(--k)) 16px calc(12px*var(--k))}
+.col{position:relative;z-index:3;flex:1;width:100%;max-width:400px;display:flex;flex-direction:column;justify-content:center;gap:calc(26px*var(--k))}
 
-.top{position:relative;z-index:2;width:100%;max-width:420px;margin-inline:auto;display:flex;justify-content:flex-end}
+.top{position:relative;z-index:2;display:flex;justify-content:center}
 .switch{display:flex;align-items:center;gap:10px;height:40px;padding:0 2px;border:0;background:none;font:500 16px/1 var(--font);color:var(--ink);cursor:pointer}
-.switch>span{opacity:.45;transition:opacity .45s var(--ease);padding-bottom:2px}
-.switch>span:first-child{opacity:1}
+.switch>span{width:84px;opacity:.45;transition:opacity .45s var(--ease);padding-bottom:2px}
+.switch>span:first-child{text-align:right;opacity:1}
 :root[data-mode="fun"] .switch>span:first-child{opacity:.45}
 :root[data-mode="fun"] .switch>span:last-child{opacity:1}
 .switch>i{position:relative;width:60px;height:34px;border-radius:99px;flex:none;
@@ -49,28 +48,69 @@ html,body{overflow-x:hidden}
 @keyframes track{to{background-position:300% 0}}
 
 .intro{text-align:center}
-h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line-height:1;letter-spacing:-.015em}
-.bio{margin:calc(12px*var(--k)) 0 0;font-family:var(--font-read);font-weight:400;font-size:max(16px,calc(17.5px*var(--k)));line-height:1.36;text-wrap:pretty}
+h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line-height:1;letter-spacing:-.015em}
+.bio{margin:calc(12px*var(--k)) 0 0;font-family:var(--font-read);font-weight:400;font-size:17px;line-height:1.34;text-wrap:pretty}
 .bio a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .bio a:hover{background:var(--accent);color:var(--accent-text);text-decoration:none}
 
-.btn{display:flex;align-items:center;justify-content:center;width:100%;border-radius:99px;font-weight:500;text-decoration:none;text-align:center;transition:transform .35s var(--ease),background .35s,color .35s}
-.btn:active{transform:scale(.97)}
+/* четыре равные главные кнопки */
+.actions{display:flex;flex-direction:column;align-items:center;gap:calc(10px*var(--k))}
+.btn{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:calc(50px*var(--k));padding:0 20px 3px;border-radius:99px;background:var(--btn);color:var(--btn-text);font-size:18px;font-weight:500;text-decoration:none;text-align:center;white-space:nowrap;isolation:isolate;transition:background .35s,color .35s}
+.btn:hover{background:var(--btn-hover);color:var(--btn-hover-text)}
 .btn:focus-visible,.soc a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-/* вокруг главной кнопки — воздух: здесь опилки и ложатся лучами */
-.btn-main{height:calc(60px*var(--k));padding:0 24px 3px;background:var(--btn);color:var(--btn-text);font-size:20px;margin-block:calc(34px*var(--k))}
-.btn-main:hover{background:var(--btn-hover);color:var(--btn-hover-text)}
-.btn-more{width:auto;flex:1 1 auto;height:calc(46px*var(--k));padding:0 14px 2px;background:var(--soft);color:var(--ink);font-size:16px;white-space:nowrap}
-.btn-more:hover{background:var(--accent);color:var(--accent-text)}
+/* веселая версия: кнопки уже — им есть куда бегать, между ними место для ножек */
+/* веселая версия: кнопки-зверьки по размеру надписи, между ними место для ножек */
+:root[data-mode="fun"] .actions{gap:calc(24px*var(--k))}
+:root[data-mode="fun"] .btn{width:auto;min-width:150px;padding:0 26px 3px;z-index:3;will-change:translate}
 
-.links{display:flex;flex-direction:column;align-items:center;gap:calc(10px*var(--k))}
-.soc{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
-.soc a{display:flex;align-items:center;height:calc(38px*var(--k));padding:0 11px 2px;white-space:nowrap;border-radius:99px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;transition:background .3s,color .3s}
-.soc a:hover{background:var(--accent);color:var(--accent-text)}
-.soc span{font-size:16px;color:var(--muted);padding:0 4px 2px}
+/* ножки — как на сайте (fun.js) */
+.legs{display:none;position:absolute;left:0;right:0;bottom:3px;height:0;z-index:-1;pointer-events:none}
+:root[data-mode="fun"] .legs{display:block}
+.legs i{position:absolute;top:-6px;width:4px;height:var(--leg,20px);margin-left:-2px;border-radius:2px;background:var(--btn);transform-origin:50% 0;transform:rotate(var(--a,0deg));transition:background .35s}
+.legs i::after{content:"";position:absolute;left:-2px;bottom:-3px;width:9px;height:5px;border-radius:3px 4px 2px 2px;background:inherit}
+.btn:hover .legs i{background:var(--btn-hover)}
+.legs i:nth-child(1){left:16%}.legs i:nth-child(2){left:34%}.legs i:nth-child(3){left:66%}.legs i:nth-child(4){left:84%}
 
-.legal{position:relative;z-index:1;width:100%;max-width:420px;margin:calc(14px*var(--k)) auto 0;font-size:16px;line-height:1.3;color:var(--muted);text-align:center;text-wrap:balance}
+/* соцсети — сетка 3×3, как в исходном таплинке */
+.soc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(8px*var(--k))}
+.soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 6px 2px;border-radius:14px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
+/* при наведении — цвет самой соцсети, текст контрастный */
+.soc a:hover{background:var(--brand);color:var(--brand-text,#fff)}
+.soc a[href*="linkedin"]{--brand:#0A66C2}
+.soc a[href*="vk.com"]{--brand:#0077FF}
+.soc a[href*="max.ru"]{--brand:linear-gradient(135deg,#2D7BFF,#8A3FFC)}
+.soc a[href*="t.me"]{--brand:#2AABEE;--brand-text:#0E1A24}
+.soc a[href*="tiktok"]{--brand:#000000}
+.soc a[href*="youtube"]{--brand:#FF0000}
+.soc a[href*="instagram"]{--brand:linear-gradient(45deg,#5B51D8,#833AB4,#C13584,#E1306C)}
+.soc a[href*="unsplash"]{--brand:#111111}
+.soc a[href*="behance"]{--brand:#1769FF}
+:root[data-mode="fun"] .soc a[href*="tiktok"]:hover,:root[data-mode="fun"] .soc a[href*="unsplash"]:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+
+.legal{position:relative;z-index:1;max-width:330px;margin:calc(14px*var(--k)) auto 0;font-size:11px;line-height:1.3;color:var(--muted);text-align:center;text-wrap:balance}
+
+/* планшет и большой экран: все крупнее, колонка шире */
+@media (min-width:600px) and (min-height:640px){
+  .col{max-width:540px;gap:calc(34px*var(--k))}
+  h1{font-size:calc(58px*var(--k))}
+  .bio{font-size:21px;margin-top:calc(16px*var(--k))}
+  .actions{gap:calc(12px*var(--k))}
+  .btn{height:calc(62px*var(--k));font-size:21px}
+  :root[data-mode="fun"] .btn{min-width:200px;padding:0 34px 3px}
+  :root[data-mode="fun"] .actions{gap:calc(28px*var(--k))}
+  .soc{gap:calc(10px*var(--k))}
+  .soc a{height:calc(56px*var(--k));font-size:18px;border-radius:16px}
+  .legal{max-width:440px;font-size:12px}
+}
+/* телефон, повернутый набок: слева имя и описание, справа кнопки и соцсети */
+@media (orientation:landscape) and (max-height:540px){
+  .col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;column-gap:28px;row-gap:calc(14px*var(--k));align-content:center;max-width:860px}
+  .intro{grid-row:1 / span 2;align-self:center;text-align:left}
+  h1{font-size:calc(38px*var(--k))}
+  .actions{grid-column:2}
+  .soc{grid-column:2}
+  .legal{max-width:600px}
+}
 @media (prefers-reduced-motion:reduce){.switch>i{animation:none}}
 </style>
 <style>body{margin:0}</style>
@@ -80,7 +120,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
 <canvas id="field" aria-hidden="true"></canvas>
 <main class="tl" id="tl">
   <div class="top">
-    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию" data-quiet>
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию">
       <span>серьезно</span><i></i><span>повеселее</span>
     </button>
   </div>
@@ -88,28 +128,26 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
   <div class="col">
     <div class="intro">
       <h1 data-text>Даша Купцова</h1>
-      <p class="bio" data-text>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС.</p>
+      <p class="bio" data-text>Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст <a href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">«Одна&nbsp;кавычка»</a></p>
     </div>
 
-    <a class="btn btn-main" id="magnet" href="https://kupdasha.ru/" target="_blank" rel="noopener">заказать дизайн-проект</a>
-
-    <nav class="actions" aria-label="Еще">
-      <a class="btn btn-more" data-quiet href="https://kupdasha.ru/profile" target="_blank" rel="noopener">позвать выступать</a>
-      <a class="btn btn-more" data-quiet href="https://kupdasha.ru/merch" target="_blank" rel="noopener">задизайнить себе мерч</a>
-      <a class="btn btn-more" data-quiet href="https://kupdasha.ru/ai" target="_blank" rel="noopener">ИИ-воркшоп для вашей команды</a>
+    <nav class="actions" aria-label="Главное">
+      <a class="btn" href="https://kupdasha.ru/" target="_blank" rel="noopener" data-serious="заказать дизайн-проект" data-fun="что умею?"><span class="t">заказать дизайн-проект</span></a>
+      <a class="btn" href="https://kupdasha.ru/profile" target="_blank" rel="noopener" data-serious="позвать выступать" data-fun="позвать"><span class="t">позвать выступать</span></a>
+      <a class="btn" href="https://kupdasha.ru/merch" target="_blank" rel="noopener" data-serious="задизайнить себе мерч" data-fun="приодеться"><span class="t">задизайнить себе мерч</span></a>
+      <a class="btn" href="https://kupdasha.ru/ai" target="_blank" rel="noopener" data-serious="ИИ-воркшоп для вашей команды" data-fun="ИИшнуться"><span class="t">ИИ-воркшоп для вашей команды</span></a>
     </nav>
 
-    <nav class="soc" aria-label="Соцсети и подкаст">
-      <a data-quiet href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
-      <a data-quiet href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
-      <a data-quiet href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
-      <a data-quiet href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
-      <a data-quiet href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
-      <a data-quiet href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
-      <a data-quiet href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
-      <a data-quiet href="https://onekavychka.mave.digital/" target="_blank" rel="noopener">подкаст «Одна&nbsp;кавычка»</a>
-      <a data-quiet href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
-      <a data-quiet href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
+    <nav class="soc" aria-label="Соцсети">
+      <a href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
+      <a href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
+      <a href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
+      <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
+      <a href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
+      <a href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
     </nav>
   </div>
 
@@ -118,178 +156,355 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(32px,9.5vw,46px)*var(--k));line
 
 <script>
 (() => {
-  /* ---------- версия: серьезно / повеселее ---------- */
   const root = document.documentElement, sw = document.getElementById('switch');
+  const page = document.getElementById('tl');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const touch = matchMedia('(pointer: coarse)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* ---------- версия: серьезно / повеселее ---------- */
   let fun = false;
-  const setMode = on => {
+  function setMode(on) {
     fun = on; root.dataset.mode = on ? 'fun' : 'serious';
     sw.setAttribute('aria-checked', on);
     try { localStorage.setItem('tl-mode', on ? 'fun' : 'serious'); } catch (e) {}
-  };
+  }
   let saved = null; try { saved = localStorage.getItem('tl-mode'); } catch (e) {}
   setMode(saved === 'fun');
 
   /* ================================================================
-     ОПИЛКИ: та же россыпь искр, что на первом экране сайта, но каждая
-     искра — крошечная стрелка компаса. Главная кнопка — магнит: искры
-     вокруг вытягиваются в черточки и ложатся по ее силовым линиям.
-     Палец или курсор — второй полюс: линии тянутся от кнопки к нему.
-     Наклон телефона поворачивает общее поле, касание пускает волну.
+     ЖИДКОСТЬ ИЗ ИСКР
+     Та же россыпь радужных искр, что на первом экране сайта. Нижняя
+     часть экрана налита «жидкостью»: под ее поверхностью искры крупнее
+     и ярче, перелив течет, со дна поднимаются пузырьки. Наклон телефона
+     — жидкость переливается и плещется, как в стакане. На компьютере
+     поверхность тянется за курсором, клик или касание — всплеск.
      ================================================================ */
-  const FIELD = {
-    cell: 11,        // шаг россыпи, px
-    magnet: 2400,    // сила кнопки
-    finger: 1500,    // сила пальца или курсора
-    tilt: 9,         // сила наклона телефона
-    maxLen: 9,       // самая длинная черточка у магнита, px
-    calm: [3, 30],   // искры гаснут ближе 3px к тексту и кнопкам и разгораются к 30px
-    turn: 7,         // как быстро опилки разворачиваются (больше — резче)
-    light: { glow: .5, vivid: .48, alpha: .9 },
-    dark:  { glow: .62, vivid: .42, alpha: .9 },
+  const LIQ = {
+    cell: 10,        // шаг россыпи, px
+    level: .52,      // уровень жидкости: доля высоты экрана от верха
+    slosh: 2600,     // как быстро бегут волны по поверхности
+    spring: 5,       // как сильно поверхность стремится выровняться
+    damp: 1.1,       // затухание волн
+    maxSlope: .75,   // самый сильный наклон поверхности
+    bubbles: 26,
+    drops: 140,      // брызги над поверхностью
+    light: { glow: .5, vivid: .5, air: .32 },
+    dark:  { glow: .62, vivid: .42, air: .38 },
   };
 
   const cv = document.getElementById('field'), ctx = cv.getContext('2d');
-  const page = document.getElementById('tl'), magnetEl = document.getElementById('magnet');
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const BINS = 24;
-
-  // радуга без оранжевого, как в shimmer.js: от желтого через зеленый и голубой к пурпурному и обратно
-  function rainbow(x, glow, vivid) {
+  function rainbow(x, glow, vivid, lift = 0) {   // радуга без оранжевого, как в shimmer.js
     const h = .15 + .75 * (1 - Math.abs((x - Math.floor(x)) * 2 - 1));
-    const c = [0, 4, 2].map(o => Math.min(1, Math.max(0, Math.abs(((h * 6 + o) % 6 + 6) % 6 - 3) - 1)));
-    return 'rgb(' + c.map(v => Math.round(255 * Math.min(1, Math.max(0, glow + vivid * (v * 2 - 1))))).join(',') + ')';
+    return 'rgb(' + [0, 4, 2].map(o => {
+      const v = clamp(Math.abs(((h * 6 + o) % 6 + 6) % 6 - 3) - 1, 0, 1);
+      return Math.round(255 * clamp(glow + lift + vivid * (v * 2 - 1), 0, 1));
+    }).join(',') + ')';
   }
-  let palette = [];
-  const paint = () => { const s = fun ? FIELD.dark : FIELD.light; palette = Array.from({ length: BINS }, (_, i) => rainbow(i / BINS, s.glow, s.vivid)); };
+  let pal = [], palCrest = [];
+  function paint() {
+    const s = fun ? LIQ.dark : LIQ.light;
+    pal = Array.from({ length: BINS }, (_, i) => rainbow(i / BINS, s.glow, s.vivid));
+    palCrest = Array.from({ length: BINS }, (_, i) => rainbow(i / BINS, s.glow, s.vivid, fun ? .12 : -.06));
+  }
   paint();
 
-  let dpr, vw, vh, cols, rows, ang, solids = [], mag = null;
+  let dpr, vw, vh, n, u, v, quiet = [];
+  const colW = 8;
   function measure() {
     dpr = Math.min(2, devicePixelRatio || 1);
     vw = innerWidth; vh = innerHeight;
     cv.width = vw * dpr; cv.height = vh * dpr;
-    const H = Math.max(document.documentElement.scrollHeight, vh);
-    cols = Math.ceil(vw / FIELD.cell) + 1; rows = Math.ceil(H / FIELD.cell) + 1;
-    ang = new Float32Array(cols * rows);
-    for (let i = 0; i < ang.length; i++) ang[i] = Math.random() * Math.PI;
-    const sy = scrollY;
-    // где искры затихают: строки текста (по самим строкам, а не по блоку) и кнопки-капсулы
-    solids = [];
-    const add = (r, rad) => { if (r.width && r.height) solids.push([(r.left + r.right) / 2, (r.top + r.bottom) / 2 + sy, r.width / 2, r.height / 2, rad]); };
-    document.querySelectorAll('[data-quiet]').forEach(el => { const r = el.getBoundingClientRect(); add(r, Math.min(r.height / 2, 99)); });
-    { const r = magnetEl.getBoundingClientRect(); add(r, r.height / 2); solids[solids.length - 1].push(1); }   // у магнита опилки подходят вплотную
+    n = Math.ceil(vw / colW) + 1;
+    if (!u || u.length !== n) { u = new Float32Array(n); v = new Float32Array(n); }
+    // строки текста, рядом с которыми искры затихают
+    quiet = [];
     document.querySelectorAll('[data-text]').forEach(el => {
       const rg = document.createRange(); rg.selectNodeContents(el);
-      [...rg.getClientRects()].forEach(r => add(r, 6));
+      [...rg.getClientRects()].forEach(r => { if (r.width) quiet.push([(r.left + r.right) / 2, (r.top + r.bottom) / 2, r.width / 2, r.height / 2]); });
     });
-    const m = magnetEl.getBoundingClientRect(), rad = m.height / 2;
-    mag = { x0: m.left + rad, x1: m.right - rad, y: m.top + sy + rad, r: rad };
   }
 
-  // поле в точке страницы: от кнопки-капсулы наружу, к пальцу внутрь, плюс наклон
-  let fingerOn = false, fx = 0, fy = 0, fpow = 0, tx = 0, ty = 0;
-  function field(x, y) {
-    const nx = Math.max(mag.x0, Math.min(mag.x1, x)), dx = x - nx, dy = y - mag.y;
-    const d2 = Math.max(dx * dx + dy * dy, mag.r * mag.r);
-    let vx = FIELD.magnet * dx / d2, vy = FIELD.magnet * dy / d2;
-    if (fpow > 0.01) {
-      const ex = x - fx, ey = y - fy, e2 = Math.max(ex * ex + ey * ey, 400);
-      vx -= fpow * FIELD.finger * ex / e2; vy -= fpow * FIELD.finger * ey / e2;
+  // наклон: tiltX — вбок, tiltY — к себе / от себя
+  let tiltX = 0, tiltY = 0, sensor = false;
+  let px = -1, py = -1, pvx = 0, pvy = 0, lastMove = 0;
+  let slope = 0, base = LIQ.level;
+  const surfaceAt = x => {
+    const i = clamp(x / colW, 0, n - 1), i0 = Math.floor(i), f = i - i0;
+    const d = u[i0] * (1 - f) + u[Math.min(n - 1, i0 + 1)] * f;
+    return base * vh + slope * (x - vw / 2) + d;
+  };
+  function splash(x, power) {
+    const c = Math.round(x / colW);
+    for (let k = -4; k <= 4; k++) { const i = c + k; if (i >= 0 && i < n) v[i] += power * Math.cos(k / 4 * Math.PI / 2); }
+  }
+
+  const drops = [];
+  const bub = Array.from({ length: LIQ.bubbles }, () => ({ x: Math.random(), y: .7 + Math.random() * .3, r: 1.5 + Math.random() * 2.5, s: 18 + Math.random() * 40, w: Math.random() * 6 }));
+
+  function simulate(dt, t) {
+    // куда хочет лечь поверхность
+    let want, wantBase;
+    if (sensor) {
+      want = -Math.tan(clamp(tiltX, -1.2, 1.2));
+      wantBase = LIQ.level - (1 - clamp(Math.sin(tiltY), 0, 1)) * .22;   // положили телефон — жидкость растекается выше
+    } else {
+      want = px < 0 ? 0 : -(px - vw / 2) / vw * .45;
+      wantBase = LIQ.level;
     }
-    return [vx + tx * FIELD.tilt, vy + ty * FIELD.tilt];
-  }
-
-  const waves = [];
-  let t0 = performance.now(), prev = t0, phase = 0;
-  function frame(now) {
-    const dt = Math.min(.05, (now - prev) / 1000); prev = now;
-    const t = (now - t0) / 1000;
-    fpow += ((fingerOn ? 1 : 0) - fpow) * Math.min(1, dt * 4);
-    phase += dt * .05 + (tx * tx + ty * ty) * dt * .2;   // перелив течет быстрее, когда телефон наклонен
-    render(t, dt);
-    if (!still) requestAnimationFrame(frame);
+    want = clamp(want + Math.sin(t * .7) * .035, -LIQ.maxSlope, LIQ.maxSlope);   // легкое покачивание, даже если ничего не трогать
+    // поверхность меняет наклон — разница уходит в волны, жидкость плещется
+    const ns = slope + (want - slope) * Math.min(1, dt * 6), nb = base + (wantBase - base) * Math.min(1, dt * 3);
+    for (let i = 0; i < n; i++) u[i] -= (ns - slope) * (i * colW - vw / 2) + (nb - base) * vh;
+    slope = ns; base = nb;
+    const steps = Math.ceil(dt / (1 / 120)), h = dt / steps;
+    for (let s = 0; s < steps; s++) {
+      for (let i = 0; i < n; i++) {
+        const l = u[i > 0 ? i - 1 : 0], r = u[i < n - 1 ? i + 1 : n - 1];
+        v[i] += (LIQ.slosh * (l + r - 2 * u[i]) / (colW * colW) * 6 - LIQ.spring * u[i] - LIQ.damp * v[i]) * h;
+      }
+      let mean = 0;
+      for (let i = 0; i < n; i++) { u[i] += v[i] * h; mean += u[i]; }
+      mean /= n; for (let i = 0; i < n; i++) u[i] -= mean;   // объем жидкости не меняется
+    }
+    // курсор, скользящий у поверхности, гонит волну
+    if (px >= 0 && performance.now() - lastMove < 80) {
+      const d = py - surfaceAt(px);
+      if (Math.abs(d) < 70) splash(px, clamp(pvy * .6 + Math.abs(pvx) * .15, -260, 260) * (1 - Math.abs(d) / 70));
+    }
+    // гребни, которые быстро идут вверх, срываются брызгами
+    for (let i = 1; i < n - 1; i++) {
+      if (v[i] < -140 && drops.length < LIQ.drops && Math.random() < -v[i] / 2600) {
+        const x = i * colW + (Math.random() - .5) * colW;
+        drops.push({ x, y: surfaceAt(x) - 2, vx: (Math.random() - .5) * 80 + slope * -60, vy: v[i] * (.6 + Math.random() * .5), r: 1.4 + Math.random() * 1.6 });
+      }
+    }
+    for (let j = drops.length - 1; j >= 0; j--) {
+      const d = drops[j];
+      d.vy += 900 * dt; d.x += d.vx * dt; d.y += d.vy * dt;
+      if (d.vy > 0 && d.y > surfaceAt(d.x)) { splash(d.x, 18); drops.splice(j, 1); }
+    }
   }
 
   function render(t, dt) {
-    const s = fun ? FIELD.dark : FIELD.light, sy = scrollY, c = FIELD.cell;
+    const s = fun ? LIQ.dark : LIQ.light, c = LIQ.cell;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, vw, vh);
-    ctx.lineCap = 'round'; ctx.lineWidth = 1.7;
-    const paths = Array.from({ length: BINS * 3 }, () => new Path2D());
-    const r0 = Math.max(0, Math.floor(sy / c)), r1 = Math.min(rows - 1, Math.ceil((sy + vh) / c));
-    const k = still ? 1 : Math.min(1, dt * FIELD.turn);
-    for (let r = r0; r <= r1; r++) {
+    const air = Array.from({ length: BINS }, () => new Path2D());
+    const deep = Array.from({ length: BINS * 3 }, () => new Path2D());
+    const crest = Array.from({ length: BINS }, () => new Path2D());
+    const cols = Math.ceil(vw / c) + 1, rows = Math.ceil(vh / c) + 1;
+    const surf = new Float32Array(cols + 1);
+    for (let q = 0; q <= cols; q++) surf[q] = surfaceAt(q * c);
+    for (let r = 0; r < rows; r++) {
       for (let q = 0; q < cols; q++) {
-        const x = q * c + (r & 1 ? c / 2 : 0), y = r * c;
-        // расстояние до ближайшего текста или кнопки: искры у краев плавно гаснут, жесткой рамки нет
-        let dmin = 1e9;
-        for (const b of solids) {
-          const qx = Math.abs(x - b[0]) - b[2] + b[4], qy = Math.abs(y - b[1]) - b[3] + b[4];
-          const d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - b[4];
-          const dd = b[5] ? (d < 4 ? -1 : 1e9) : d;   // у магнита — только не залезать на саму кнопку
-          if (dd < dmin) dmin = dd;
+        let x = q * c + (r & 1 ? c / 2 : 0), y = r * c;
+        // у текста искры плавно гаснут
+        let qd = 1e9;
+        for (const b of quiet) {
+          const dx = Math.abs(x - b[0]) - b[2], dy = Math.abs(y - b[1]) - b[3];
+          const d = Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) + Math.min(Math.max(dx, dy), 0);
+          if (d < qd) qd = d;
         }
-        if (dmin < FIELD.calm[0]) continue;
-        const qz = Math.min(1, (dmin - FIELD.calm[0]) / (FIELD.calm[1] - FIELD.calm[0])), quiet = qz * qz * (3 - 2 * qz);
-        const [vx, vy] = field(x, y);
-        const f = Math.hypot(vx, vy);
-        // опилки без головы и хвоста: поворачиваем по кратчайшему пути в пределах полуоборота
-        const i = r * cols + q, want = Math.atan2(vy, vx);
-        let d = want - ang[i]; d -= Math.round(d / Math.PI) * Math.PI; ang[i] += d * k;
-        let len = quiet * FIELD.maxLen * Math.pow(Math.min(1, Math.max(0, (f - 9) / 45)), .8);   // вдали — точки, у магнита — черточки
-        for (const w of waves) { const wd = Math.abs(Math.hypot(x - w.x, y - w.y) - w.r); if (wd < 40) len += (1 - wd / 40) * 6 * w.a; }
-        const tw = .55 + .45 * Math.sin(t * (1.3 + (i * 7919 % 13) / 9) + i);   // каждая искра мерцает в своем ритме
-        if (tw * quiet < .2 && len < 1) continue;
-        const ux = Math.cos(ang[i]) * len / 2, uy = Math.sin(ang[i]) * len / 2;
-        const bin = ((Math.floor((x * .0016 + y * .0009 + phase) * BINS) % BINS) + BINS) % BINS;
-        const P = paths[bin * 3 + Math.min(2, Math.floor(quiet * 3))];
-        P.moveTo(x - ux, y - sy - uy); P.lineTo(x + ux + .01, y - sy + uy);
+        if (qd < 4) continue;
+        const calm = qd > 26 ? 1 : (qd - 4) / 22;
+        const i = r * cols + q;
+        const depth = y - (r & 1 ? (surf[q] + surf[q + 1]) / 2 : surf[q]);
+        const bin0 = (x * .0016 + y * .0007 + t * .06);
+        if (depth < -2) {
+          // над жидкостью: мелкие мерцающие искры, как на сайте
+          const tw = .5 + .5 * Math.sin(t * (1.1 + (i * 7919 % 13) / 10) + i);
+          if (tw * calm < .35) continue;
+          const bin = ((Math.floor(bin0 * BINS) % BINS) + BINS) % BINS;
+          air[bin].rect(x - .8, y - .8, 1.6, 1.6);
+        } else if (depth < 9) {
+          // гребень волны
+          const bin = ((Math.floor((bin0 + .1) * BINS) % BINS) + BINS) % BINS;
+          const rr = 2.3 * calm + .4;
+          crest[bin].moveTo(x + rr, y); crest[bin].arc(x, y, rr, 0, 6.283);
+        } else {
+          // в глубине: искры крупнее и колышутся
+          const k = Math.min(1, depth / 140);
+          x += Math.sin(y * .045 + t * 1.6) * 1.6 * k;
+          const rr = (1 + 1.1 * k + .5 * Math.sin(t * 2 + i)) * (.35 + .65 * calm);
+          const bin = ((Math.floor((bin0 + depth * .0012) * BINS) % BINS) + BINS) % BINS;
+          const lvl = depth < 40 ? 2 : depth < 110 ? 1 : 0;
+          const P = deep[bin * 3 + lvl];
+          P.moveTo(x + rr, y); P.arc(x, y, rr, 0, 6.283);
+        }
       }
     }
-    paths.forEach((P, n) => { ctx.globalAlpha = s.alpha * [.3, .62, 1][n % 3]; ctx.strokeStyle = palette[Math.floor(n / 3)]; ctx.stroke(P); });
-    for (let j = waves.length - 1; j >= 0; j--) { const w = waves[j]; w.r += dt * 520; w.a = Math.max(0, 1 - w.r / 700); if (w.a <= 0) waves.splice(j, 1); }
+    ctx.globalAlpha = s.air; air.forEach((P, b) => { ctx.fillStyle = pal[b]; ctx.fill(P); });
+    deep.forEach((P, k) => { ctx.globalAlpha = [.55, .75, .95][k % 3]; ctx.fillStyle = pal[Math.floor(k / 3)]; ctx.fill(P); });
+    ctx.globalAlpha = 1; crest.forEach((P, b) => { ctx.fillStyle = palCrest[b]; ctx.fill(P); });
+    // пузырьки: поднимаются со дна и лопаются у поверхности
+    ctx.lineWidth = 1.3;
+    for (const b of bub) {
+      b.y -= b.s * dt / vh;
+      const x = b.x * vw + Math.sin(t * 2 + b.w) * 4, y = b.y * vh;
+      if (y < surfaceAt(x) + 6) { b.y = 1 + Math.random() * .1; b.x = Math.random(); continue; }
+      ctx.globalAlpha = .8;
+      ctx.strokeStyle = pal[((Math.floor((x * .0016 + t * .06) * BINS) % BINS) + BINS) % BINS];
+      ctx.beginPath(); ctx.arc(x, y, b.r, 0, 6.283); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    for (const d of drops) {
+      ctx.fillStyle = palCrest[((Math.floor((d.x * .0016 + d.y * .0007 + t * .06 + .1) * BINS) % BINS) + BINS) % BINS];
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 6.283); ctx.fill();
+    }
   }
 
-  /* курсор и палец — второй полюс; клик и касание пускают волну, как на сайте */
-  const pt = e => { fx = e.clientX; fy = e.clientY + scrollY; };
-  addEventListener('pointermove', e => { pt(e); if (e.pointerType === 'mouse') fingerOn = true; }, { passive: true });
-  addEventListener('pointerdown', e => { pt(e); fingerOn = true; waves.push({ x: fx, y: fy, r: 0, a: 1 }); }, { passive: true });
-  addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') fingerOn = false; });
-  addEventListener('pointercancel', () => { fingerOn = false; });
-  document.addEventListener('mouseleave', () => { fingerOn = false; });
+  /* ================================================================
+     КНОПКИ НА НОЖКАХ (веселая версия) — по мотивам fun.js.
+     Бегают по всему экрану, куда захотят: выбирают место, бегут,
+     приседают, отдыхают и бегут дальше. Наклон телефона — бегут под
+     уклон; курсор рядом — убегают; под курсором дрожат на цыпочках;
+     в жидкости покачиваются на волнах. Друг на друга не налезают.
+     ================================================================ */
+  const RUN = { speed: 170, fleeSpeed: 300, rest: [600, 2200], margin: 6 };
+  const runners = [...document.querySelectorAll('.actions .btn')].map(el => {
+    const legs = document.createElement('span');
+    legs.className = 'legs'; legs.setAttribute('aria-hidden', 'true');
+    legs.innerHTML = '<i></i><i></i><i></i><i></i>';
+    el.appendChild(legs);
+    const r = { el, label: el.querySelector('.t'), legs: [...legs.children], x: 0, y: 0, tx: 0, ty: 0, rot: 0, phase: Math.random() * 6,
+                state: 'rest', sq: 0, dir: 1, speed: RUN.speed, until: performance.now() + 400 + Math.random() * 1600, caught: false, home: null };
+    el.addEventListener('pointerenter', () => { r.caught = true; });
+    el.addEventListener('pointerleave', () => { r.caught = false; r.state = 'rest'; r.until = performance.now() + 500; });
+    return r;
+  });
+  const setLegs = (r, a, len) => r.legs.forEach((l, i) => { l.style.setProperty('--a', a[i].toFixed(1) + 'deg'); l.style.setProperty('--leg', len.toFixed(1) + 'px'); });
+  // переименовать кнопки под версию
+  function labels() { runners.forEach(r => { r.label.textContent = fun ? r.el.dataset.fun : r.el.dataset.serious; }); }
+  // где кнопка стоит без сдвига (ее «дом» в раскладке)
+  function measureRunners() {
+    runners.forEach(r => {
+      const b = r.el.getBoundingClientRect();
+      r.home = { x: b.left - r.x, y: b.top - r.y, w: b.width, h: b.height };
+    });
+  }
+  const M = RUN.margin;
+  // куда можно встать: весь экран, не вылезая за края
+  const clampX = (r, x) => clamp(x, M - r.home.x, vw - M - r.home.x - r.home.w);
+  const clampY = (r, y) => clamp(y, M + 4 - r.home.y, vh - M - 22 - r.home.y - r.home.h);   // снизу место для ножек
+  const overlaps = (r, x, y, pad) => runners.some(o => o !== r && o.home &&
+    Math.abs((r.home.x + x + r.home.w / 2) - (o.home.x + o.tx + o.home.w / 2)) < (r.home.w + o.home.w) / 2 + pad &&
+    Math.abs((r.home.y + y + r.home.h / 2) - (o.home.y + o.ty + o.home.h / 2)) < (r.home.h + o.home.h) / 2 + pad + 18);
+  function pickSpot(r) {
+    let best = null;
+    for (let k = 0; k < 14; k++) {
+      const x = clampX(r, Math.random() * vw - r.home.x - r.home.w / 2), y = clampY(r, Math.random() * vh - r.home.y - r.home.h / 2);
+      if (!overlaps(r, x, y, 8)) { best = [x, y]; break; }
+    }
+    if (!best) best = [0, 0];   // некуда — домой
+    r.tx = best[0]; r.ty = best[1]; r.speed = RUN.speed; r.state = 'run';
+  }
+  function stepRunners(dt, now) {
+    if (!fun || !runners[0].home) return;
+    const gx = sensor ? Math.sin(tiltX) : 0, gy = sensor ? Math.sin(tiltY - 1) : 0;   // наклон относительно обычного хвата (~57°)
+    const downhill = sensor && Math.hypot(gx, gy) > .18;
+    runners.forEach(r => {
+      const hx = r.home.x + r.x, hy = r.home.y + r.y;
+      if (r.caught && !touch) {              // пойманная — на цыпочках дрожит
+        r.phase += dt * 40;
+        setLegs(r, [0, 1, 2, 3].map(i => Math.sin(r.phase + i) * 7), 22);
+      } else {
+        if (downhill && (r.state !== 'run' || r.speed !== RUN.fleeSpeed)) {
+          r.tx = clampX(r, r.x + gx * vw); r.ty = clampY(r, r.y + gy * vh);
+          if (Math.hypot(r.tx - r.x, r.ty - r.y) > 4) { r.state = 'run'; r.speed = RUN.speed * 1.3; }
+        }
+        if (!touch && px >= 0) {             // курсор рядом — удирает от него
+          const cx = hx + r.home.w / 2, cy = hy + r.home.h / 2, dx = cx - px, dy = cy - py, d = Math.hypot(dx, dy);
+          if (d < r.home.w / 2 + 70 && r.speed !== RUN.fleeSpeed) {
+            r.tx = clampX(r, r.x + dx / d * 220); r.ty = clampY(r, r.y + dy / d * 160); r.speed = RUN.fleeSpeed; r.state = 'run';
+          }
+        }
+        if (r.state === 'run') {
+          const dx = r.tx - r.x, dy = r.ty - r.y, d = Math.hypot(dx, dy), stepLen = r.speed * dt;
+          if (Math.abs(dx) > 1) r.dir = Math.sign(dx);
+          if (d <= stepLen) { r.x = r.tx; r.y = r.ty; r.state = 'rest'; r.speed = RUN.speed; r.until = now + RUN.rest[0] + Math.random() * (RUN.rest[1] - RUN.rest[0]); }
+          else { r.x += dx / d * stepLen; r.y += dy / d * stepLen; }
+          r.phase += dt * r.speed / 10; r.sq += (0 - r.sq) * .2;
+          setLegs(r, [0, 1, 2, 3].map(i => Math.sin(r.phase + (i % 2) * Math.PI) * 30 * r.dir), 22);
+        } else {
+          r.sq += (3 - r.sq) * .12;
+          setLegs(r, [24, 10, -10, -24].map((a, i) => a + Math.sin(now / 260 + r.phase + i) * 5), 22 - r.sq * 1.2);
+          if (now > r.until && !downhill) pickSpot(r);
+        }
+      }
+      // соседи не налезают друг на друга: мягко расталкиваются
+      runners.forEach(o => {
+        if (o === r || !o.home) return;
+        const ax = r.home.x + r.x + r.home.w / 2, ay = r.home.y + r.y + r.home.h / 2, bx = o.home.x + o.x + o.home.w / 2, by = o.home.y + o.y + o.home.h / 2;
+        const ox = (r.home.w + o.home.w) / 2 + 6 - Math.abs(ax - bx), oy = (r.home.h + o.home.h) / 2 + 20 - Math.abs(ay - by);
+        if (ox > 0 && oy > 0) { if (ox < oy) r.x += Math.sign(ax - bx || 1) * ox * .25; else r.y += Math.sign(ay - by || 1) * oy * .25; }
+      });
+      r.x = clampX(r, r.x); r.y = clampY(r, r.y);
+      // в жидкости покачивается на волнах
+      const cx = r.home.x + r.x + r.home.w / 2, bottom = r.home.y + r.y + r.home.h;
+      let lift = 0, tiltW = 0;
+      if (bottom > surfaceAt(cx)) {
+        lift = clamp(u[clamp(Math.round(cx / colW), 0, n - 1)] * .3, -5, 5);
+        tiltW = clamp((surfaceAt(cx + 50) - surfaceAt(cx - 50)) / 100 * 14, -6, 6);
+      }
+      const hop = r.state === 'run' ? -Math.abs(Math.sin(r.phase)) * 3 : r.sq;
+      r.rot += ((r.state === 'run' ? r.dir * 2 : 0) + tiltW - r.rot) * .15;
+      r.el.style.translate = `${r.x.toFixed(1)}px ${(r.y + hop + lift).toFixed(1)}px`;
+      r.el.style.rotate = `${r.rot.toFixed(2)}deg`;
+    });
+  }
+  function resetRunners() { runners.forEach(r => { r.x = r.y = r.tx = r.ty = 0; r.rot = 0; r.state = 'rest'; r.el.style.translate = ''; r.el.style.rotate = ''; }); }
 
-  /* наклон телефона поворачивает поле; на айфоне датчик включается после первого касания */
+  /* ---------- ввод ---------- */
+  addEventListener('pointermove', e => {
+    const now = performance.now(), dt = Math.max(8, now - lastMove) / 1000;
+    if (px >= 0) { pvx = (e.clientX - px) / dt; pvy = (e.clientY - py) / dt; }
+    px = e.clientX; py = e.clientY; lastMove = now;
+  }, { passive: true });
+  addEventListener('pointerdown', e => { px = e.clientX; py = e.clientY; splash(e.clientX, 420); }, { passive: true });
+  document.addEventListener('mouseleave', () => { px = -1; });
   addEventListener('deviceorientation', e => {
     if (e.beta == null || e.gamma == null) return;
-    const ang0 = (screen.orientation && screen.orientation.angle) || 0;
-    let x = Math.sin(e.gamma * Math.PI / 180), y = Math.sin((e.beta - 45) * Math.PI / 180);   // держат телефон под ~45°
-    if (ang0 === 90) [x, y] = [y, -x]; else if (ang0 === 270 || ang0 === -90) [x, y] = [-y, x];
-    tx += (x - tx) * .2; ty += (y - ty) * .2;
+    sensor = true;
+    const a = (screen.orientation && screen.orientation.angle) || 0;
+    let x = e.gamma * Math.PI / 180, y = e.beta * Math.PI / 180;
+    if (a === 90) [x, y] = [y, -x]; else if (a === 270 || a === -90) [x, y] = [-y, x];
+    tiltX += (x - tiltX) * .25; tiltY += (y - tiltY) * .25;
   });
+  // на айфоне датчик наклона включается только после касания
   addEventListener('pointerdown', () => {
     const D = window.DeviceOrientationEvent;
     if (D && typeof D.requestPermission === 'function') D.requestPermission().catch(() => {});
   }, { once: true });
 
   sw.addEventListener('click', () => {
-    setMode(!fun); paint();
-    const r = sw.getBoundingClientRect();
-    waves.push({ x: r.left + r.width / 2, y: r.top + r.height / 2 + scrollY, r: 0, a: 1 });
-    if (still) render(0, 0);
+    setMode(!fun); paint(); splash(vw / 2, 700); labels();
+    resetRunners();
+    requestAnimationFrame(relayout);
   });
 
-  /* таплинк помещается в один экран: если не влез — поджимаем отступы и высоты */
-  const tl = page;
+  /* ---------- один экран ---------- */
   function fit() {
-    let k = 1; tl.style.setProperty('--k', k);
-    while (k > .5 && document.documentElement.scrollHeight > innerHeight + 1) { k -= .04; tl.style.setProperty('--k', k.toFixed(2)); }
+    let k = 1; page.style.setProperty('--k', k);
+    while (k > .5 && document.documentElement.scrollHeight > innerHeight + 1) { k -= .04; page.style.setProperty('--k', k.toFixed(2)); }
   }
-  fit(); measure();
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { fit(); measure(); if (still) render(0, 0); });
-  let rt, lw = innerWidth;
-  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { fit(); measure(); if (still) render(0, 0); }, 150); });
-  if (still) { render(0, 0); addEventListener('scroll', () => render(0, 0), { passive: true }); }
-  else requestAnimationFrame(frame);
+
+  let prev = performance.now(), t0 = prev;
+  function frame(now) {
+    const dt = Math.min(.05, (now - prev) / 1000); prev = now;
+    const t = (now - t0) / 1000;
+    simulate(dt, t); stepRunners(dt, now); render(t, dt);
+    requestAnimationFrame(frame);
+  }
+  function relayout() { const keep = runners.map(r => [r.x, r.y]); resetRunners(); fit(); measure(); measureRunners();
+    if (fun) runners.forEach((r, i) => { r.x = r.tx = clampX(r, keep[i][0]); r.y = r.ty = clampY(r, keep[i][1]); });
+    if (still) render(0, 0); }
+  labels();
+  relayout();
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(relayout);
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(relayout, 150); });
+  if (!still) requestAnimationFrame(frame);
 })();
 </script>
 </body>
