@@ -388,7 +388,8 @@ function liveCarousel(box){
   };
   const tick = () => {
     clearTimeout(timer);
-    if (seen && !held && !still()) timer = setTimeout(() => go(k + 1), CAR_MS);
+    // на первой карточке задерживаемся дольше: ее успевают рассмотреть
+    if (seen && !held && !still()) timer = setTimeout(() => go(k + 1), k ? CAR_MS : CAR_MS * 1.6);
   };
   box.querySelector('.prev').addEventListener('click', () => go(k - 1));
   box.querySelector('.next').addEventListener('click', () => go(k + 1));
@@ -410,7 +411,11 @@ function liveCarousel(box){
     H.openViewer(imgs.map(i => i.currentSrc || i.src), cards.indexOf(b), imgs);
   });
   new ResizeObserver(() => { drawDots(); go(Math.min(k, last())); }).observe(view);
-  onScreen(box, v => { seen = v; tick(); });
+  // лента трогается, только когда видна почти целиком, и каждый раз начинает с первой — самой эффектной — карточки
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !seen) { seen = true; go(0); }
+    else if (!e.isIntersecting && seen) { seen = false; clearTimeout(timer); }
+  }, { threshold: .6 }).observe(view);
 }
 
 const KINDS = {
