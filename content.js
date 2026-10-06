@@ -295,11 +295,21 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           {
             title:    'VK AdBlogger',
             task:     'Запустить новую платформу VK AdBlogger, которая делает работу бизнеса и авторов контента проще и эффективнее: бренды быстрее повышают узнаваемость, а авторы монетизируют творчество и получают больше рекламных предложений.',
-            solution: 'Разработали рекламную кампанию с топовыми инфлюенсерами — Эльдаром Джараховым, Артемием Лебедевым и Миланой Некрасовой. Кампания рассказывает, что благодаря многоуровневым фильтрам и подробной аналитике бизнес легко находит подходящих авторов и оценивает перспективы сотрудничества.',
+            solution: 'Разработали рекламную кампанию с топовыми инфлюенсерами — Эльдаром Джараховым, Артемием Лебедевым и Миланой Некрасовой. Кампания рассказывает, что благодаря многоуровневым фильтрам и подробной аналитике бизнес легко находит подходящих авторов и оценивает перспективы сотрудничества. Я вела проект целиком: писала брифы на ретушь, супервизировала съемки, курировала фоторетушь и подготовку к тиражу.',
+            note:     'Из-за NDA не могу показать документацию проекта.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/f9163c205231597.66eaff21d705e.png',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/0aebec205231597.66eaff21d684c.png',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/5e387e205231597.66eaff21d6331.png',
+              /* в каждом ряду один порядок: Джарахов, Лебедев, Некрасова */
+              { row: [ 'img/vk/vk-adb-wide-1.jpg', 'img/vk/vk-adb-wide-2.jpg', 'img/vk/vk-adb-wide-3.jpg' ] },
+              { caption: ['ресайзы под соцсети, сторис и баннерные сети', 'одна съемка — все форматы'], row: [
+                'img/vk/vk-adb-square-1.jpg', 'img/vk/vk-adb-square-2.jpg', 'img/vk/vk-adb-square-3.jpg' ] },
+              { row: [ 'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg' ] },
+              { row: [ 'img/vk/vk-adb-billboard-1.jpg' ] },
+              { row: [ 'img/vk/vk-adb-billboard-2.jpg' ] },
+              { row: [ 'img/vk/vk-adb-billboard-3.jpg' ] },
+              { caption: ['процесс съемок', 'бэкстейдж: как это снимали'], row: [
+                'img/vk/vk-adb-backstage-1.jpg', 'img/vk/vk-adb-backstage-2.jpg', 'img/vk/vk-adb-backstage-3.jpg' ] },
+              { row: [ 'img/vk/vk-adb-backstage-4.jpg', 'img/vk/vk-adb-backstage-5.jpg' ] },
+              { row: [ { video: 'img/vk/vk-adb-backstage.mp4', ratio: 2 } ] },
             ],
             links: [
               { text: 'платформа VK AdBlogger', link: 'https://adblogger.vk.com/' },
