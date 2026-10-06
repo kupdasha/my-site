@@ -71,6 +71,7 @@ function search(s){
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span>
     </div>
     <div class="au-s-lead"><span>${H.T(s.lead)}</span>${s.tabs.map((t, i) => `<button class="au-s-tab${i ? '' : ' on'}" data-k="${i}" data-q="${esc(t.query)}" data-color="${t.color || 'green'}">${H.T(t.word)}</button>`).join('')}</div>
+    ${s.hint ? `<p class="au-s-hint">${H.T(s.hint)}</p>` : ''}
     <div class="au-s-shots">${s.tabs.map((t, i) => `<img class="${i ? '' : 'on'}" src="${t.img}" alt="" loading="lazy">`).join('')}</div>
   </div>
   ${s.note ? `<p class="au-cap">${H.T(s.note)}</p>` : ''}`;
@@ -182,6 +183,7 @@ function cities(c){
   </div>`).join('')}</div>`;
 }
 
+const ARROW_SVG = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
 // проблема → решение: «сейчас» и «предлагаю», под каждым свои картинки
 const fixMedia = m => !m ? '' : m.cities ? cities(m) : `<div class="au-row${m.length > 2 ? ' stack' : ''}">${m.map(src => `<button class="au-cell au-zoomable" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div>`;
 function fix(f){
@@ -192,7 +194,9 @@ function fix(f){
     <div class="au-fix-col next"><span class="au-fix-tag">${H.T(L[1])}</span><p>${H.T(f.next)}</p>${slide ? '' : fixMedia(f.after)}</div>
   </div>
   ${slide ? `<div class="au-cmps n1">${compare([{ before: f.before[0], after: f.after[0], labels: L }])}</div>` : ''}
-  ${f.pairs ? `<div class="au-pairs">${f.pairs.map(pr => pr.map((src, k) => `<button class="au-pair-cell au-zoomable${k ? ' next' : ''}" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')).join('')}</div>` : ''}`;
+  ${f.pairs ? `<div class="au-pairs">${f.pairs.map(pr => `<div class="au-pair-row">${
+    pr.map((src, k) => `<button class="au-pair-cell au-zoomable${k ? ' next' : ''}" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')
+  }<span class="au-pair-arrow" aria-hidden="true">${ARROW_SVG}</span></div>`).join('')}</div>` : ''}`;
 }
 
 /* ---------- глава ---------- */
@@ -344,7 +348,7 @@ function countUp(el){
 // фото чуть отстают от прокрутки — появляется глубина
 function parallax(mount){
   const box = mount.closest('#case') || window;
-  const items = [...mount.querySelectorAll('.au-aud-photo img, .au-plus figure img, .au-pair-cell img, .au-g-profile img')];
+  const items = [...mount.querySelectorAll('.au-aud-photo img, .au-plus figure img, .au-g-profile img')];
   if (!items.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let raf = 0;
   const run = () => {
@@ -401,6 +405,11 @@ export async function mountAudit(mount, p, helpers){
   mount.querySelectorAll('.au-whint').forEach(liveKeys);
   mount.querySelectorAll('.world').forEach(H.watchWorld);
   // ряды одной высоты: пропорции ячейки берутся из самой картинки
+  mount.querySelectorAll('.au-pair-row').forEach(row => {
+    const img = row.querySelector('img');
+    const set = () => img.naturalWidth && row.style.setProperty('--ar', img.naturalWidth / img.naturalHeight);
+    img.complete ? set() : img.addEventListener('load', set, { once: true });
+  });
   mount.querySelectorAll('.au-cell img, .au-chat img').forEach(img => {
     const set = () => img.naturalWidth && img.parentNode.style.setProperty('--ar', img.naturalWidth / img.naturalHeight);
     img.complete ? set() : img.addEventListener('load', set, { once: true });
