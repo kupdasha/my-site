@@ -1471,3 +1471,34 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .ev-g-head:first-child{margin-top:0}
   .ev-g-head .yr{margin-left:.3em;opacity:.5}
 }
+
+/* ---------- Живой 3D-знак в кейсе (элемент { mark3d }, см. Штурман дизайн) ----------
+   Обложка агентства: серый фон, белая модульная сетка, надпись во всю ширину,
+   по центру серебряный знак (рисует mark3d.js), слева слоган и кнопка-капля, справа направления */
+.case-m3d{margin-bottom:clamp(56px,7vw,104px)}
+.m3d{position:relative;aspect-ratio:16/9;max-height:88vh;width:100%;overflow:hidden;border-radius:var(--r-img);background:var(--m3d-bg);color:#1A1A1A;cursor:pointer;touch-action:pan-y;
+  --gx:5.5%;--gt:10%;--gb:89%}
+.m3d-grid{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(#fff,#fff) 0 var(--gt)/100% 1px no-repeat,linear-gradient(#fff,#fff) 0 var(--gb)/100% 1px no-repeat,
+    linear-gradient(#fff,#fff) var(--gx) 0/1px 100% no-repeat,linear-gradient(#fff,#fff) calc(100% - var(--gx)) 0/1px 100% no-repeat}
+.m3d-word{position:absolute;left:var(--gx);right:var(--gx);top:calc(var(--gt) + 1.6%);width:calc(100% - 2 * var(--gx));height:auto;pointer-events:none}
+.m3d canvas,.m3d-poster{position:absolute;inset:0;width:100%;height:100%}
+.m3d-poster{object-fit:contain;transition:opacity .6s}
+.m3d.live .m3d-poster{opacity:0}
+.m3d-slogan{position:absolute;left:calc(var(--gx) + 2.4%);top:47%;max-width:15em;font-size:clamp(16px,1.35vw,20px);line-height:1.3;pointer-events:none}
+.m3d-pill{position:absolute;left:calc(var(--gx) + 2.4%);top:66%;display:block;width:clamp(124px,11vw,160px);color:#0B0026}
+.m3d-pill svg{display:block;width:100%;height:auto;overflow:visible}
+.m3d-pill path{fill:var(--m3d-accent)}
+.m3d-pill .m3d-arr{fill:none;stroke:#0B0026;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s var(--ease)}
+.m3d-pill span{position:absolute;left:12.5%;top:50%;transform:translateY(-50%);font-size:clamp(16px,1.2vw,18px);line-height:1}
+.m3d-pill:hover .m3d-arr{transform:translateX(3px)}
+.m3d-dirs{position:absolute;right:calc(var(--gx) + 1.6%);top:33%;list-style:none;margin:0;padding:0;font-size:clamp(22px,3.1vw,44px);line-height:1.18;letter-spacing:-.01em;pointer-events:none}
+.m3d-dirs li{color:rgba(26,26,26,.22);transition:color .7s var(--ease)}
+.m3d-dirs li.on{color:#1A1A1A}
+@media (max-width:760px){
+  .m3d{aspect-ratio:4/5;--gx:4%;--gt:7%;--gb:93%}
+  .m3d-slogan{top:auto;bottom:calc(100% - var(--gb) + 76px);left:calc(var(--gx) + 12px);right:calc(var(--gx) + 12px);max-width:none}
+  .m3d-pill{top:auto;bottom:calc(100% - var(--gb) + 14px);left:calc(var(--gx) + 12px)}
+  .m3d-dirs{display:none}
+}
+@media (prefers-reduced-motion:reduce){.m3d-dirs li{transition:none}}

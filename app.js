@@ -1824,6 +1824,10 @@ function galleryItem(x){
   if (x && x.float3d) return float3dHTML(x.float3d);
   if (x && x.icons2d) return icons2dHTML(x.icons2d);
   if (x && x.logos) return logoWallHTML(x.logos);
+  if (x && x.mark3d) return mark3dHTML(x.mark3d);
+  // { colors } — палитра с копированием кода, как в brandkit; { slides } — презентация-листалка
+  if (x && x.colors) return brandkitHTML({ colors: x.colors });
+  if (x && x.slides) return campSlides(x);
   if (x && x.formula) return formulaHTML(x.formula);
   if (x && x.login) return loginHTML(x.login);
   if (x && x.mail) return mailHTML(x.mail);
@@ -1857,6 +1861,42 @@ const worldWatcher = new IntersectionObserver(es => es.forEach(e => {
     .then(m => m.mountWorld(e.target)).catch(err => console.warn('3D-пространство не загрузилось', err));
 }), { rootMargin: '400px 0px' });
 function watchWorld(el){ worldWatcher.observe(el); }
+
+/* ЖИВОЙ 3D-ЗНАК (элемент { mark3d } в галерее, см. «упаковку агентства Штурман дизайн»):
+   обложка агентства — серый фон, белая сетка, надпись, слоган, кнопка-капля и список направлений,
+   по центру серебряный знак из блендера поворачивается за курсором. Сам 3D — в mark3d.js, грузится у экрана */
+const PILL = 'M143.16 52.4C147.22 48.35 149.25 46.32 150.52 44.25C154.56 37.66 154.56 29.36 150.52 22.78C149.25 20.7 147.22 18.68 143.16 14.63L138.85 10.33C134.81 6.3 132.79 4.28 130.72 3.02C124.15 -1.01 115.87 -1.01 109.3 3.02C107.23 4.28 105.21 6.3 101.17 10.33L91.18 20.3C88.63 22.84 85.18 24.27 81.58 24.27H73.26C70.36 24.27 68 21.91 68 19V19C68 16.1 65.64 13.74 62.74 13.74H19.95C8.93 13.74 0 22.68 0 33.69V33.69C0 44.71 8.93 53.65 19.95 53.65H62.56C65.56 53.65 68 51.21 68 48.2V48.2C68 45.2 70.44 42.76 73.44 42.76H81.58C85.18 42.76 88.63 44.18 91.17 46.72L101.17 56.7C105.21 60.73 107.23 62.75 109.3 64.01C115.87 68.03 124.15 68.03 130.72 64.01C132.79 62.75 134.81 60.73 138.85 56.7L143.16 52.4Z';
+function mark3dHTML(m){
+  const touch = matchMedia('(pointer:coarse)').matches;
+  const hint = m.hint && (touch ? m.hint.touch : m.hint.mouse);
+  return `<div class="wrap case-m3d"><div class="m3d" data-model="${m.model}" style="--m3d-bg:${m.bg || '#BFBFBD'};--m3d-accent:${m.accent || '#B3F843'}">
+    <i class="m3d-grid" aria-hidden="true"></i>
+    ${m.word ? `<img class="m3d-word" src="${m.word}" alt="${T(m.label || '')}">` : ''}
+    ${m.poster ? `<img class="m3d-poster" src="${m.poster}" alt="">` : ''}
+    <canvas aria-hidden="true"></canvas>
+    ${m.slogan ? `<p class="m3d-slogan">${T(m.slogan)}</p>` : ''}
+    ${m.button ? `<a class="m3d-pill" href="${m.button.link}" target="_blank" rel="noopener"><svg viewBox="0 0 155 68" aria-hidden="true"><path d="${PILL}"/><path class="m3d-arr" d="M111 34h19M122 25l9 9-9 9"/></svg><span>${T(m.button.text)}</span></a>` : ''}
+    ${m.list ? `<ul class="m3d-dirs" aria-hidden="true">${m.list.map((x, i) => `<li style="--i:${i}">${T(x)}</li>`).join('')}</ul>` : ''}
+  </div>${hint ? `<p class="case-note world-hint">${T(hint)}</p>` : ''}</div>`;
+}
+const markWatcher = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  markWatcher.unobserve(e.target);
+  import(SCRIPT_BASE + 'mark3d.js?v=' + Math.floor(Date.now() / 36e5))
+    .then(m => m.mountMark(e.target)).catch(err => console.warn('3D-знак не загрузился', err));
+}), { rootMargin: '400px 0px' });
+// список направлений: подсвечивается по очереди, пока блок на экране
+function watchMark(el){
+  markWatcher.observe(el);
+  const li = [...el.querySelectorAll('.m3d-dirs li')]; if (!li.length) return;
+  let k = 0, t = 0;
+  const step = () => { li.forEach((x, i) => x.classList.toggle('on', i === k)); k = (k + 1) % li.length; };
+  step();
+  new IntersectionObserver(([e]) => {
+    clearInterval(t);
+    if (e.isIntersecting && !matchMedia('(prefers-reduced-motion: reduce)').matches) t = setInterval(step, 1500);
+  }).observe(el);
+}
 
 function renderCase(k, keepScroll){
   // следующий проект — без отдельных страниц (page) и без самого себя
@@ -1945,6 +1985,9 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.ui-papers, .ui-login, .ui-mail, .ui-laptop').forEach(el => gdReveal.observe(el));
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   caseContent.querySelectorAll('.world').forEach(watchWorld);
+  caseContent.querySelectorAll('.m3d').forEach(watchMark);
+  // листалка прямо в галерее кейса (без рядов макетов watchCampaigns ее не найдет)
+  if (!caseContent.querySelector('.camp-row')) caseContent.querySelectorAll('.case-body .slides').forEach(watchSlides);
   const au = caseContent.querySelector('.au-mount');
   if (au) import(SCRIPT_BASE + 'audit.js?v=' + Math.floor(Date.now() / 36e5))
     .then(m => m.mountAudit(au, p, { T, pick, worldHTML, watchWorld, openViewer, base: SCRIPT_BASE }))
