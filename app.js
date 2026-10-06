@@ -1084,7 +1084,9 @@ function shotHTML(src){
 function heroHTML(p){
   const m = parseMedia(legacyVideo(p));
   if (m && m.type === 'file') return `<video src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} muted loop playsinline autoplay></video>`;
-  const poster = p.image ? `<img src="${p.image}" alt=""${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
+  // heroImage — своя картинка в шапке кейса, если она отличается от обложки в сетке
+  const himg = p.heroImage || p.image;
+  const poster = himg ? `<img src="${himg}" alt=""${p.pos && !p.heroImage ? ` style="object-position:${p.pos}"` : ''}>` : '';
   // Vimeo запускается сам поверх обложки; тяжелые плееры (Rutube, VK, Kinescope) грузятся по нажатию —
   // до этого видна обложка с кнопкой, и кейс открывается сразу
   if (m && m.type === 'vimeo') return poster + `<iframe class="hero-frame" src="${embedURL(m, false)}" allow="${FRAME_ALLOW}" allowfullscreen onload="setTimeout(()=>this.classList.add('ready'),400)"></iframe>`;
