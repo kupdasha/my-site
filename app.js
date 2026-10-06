@@ -1827,6 +1827,8 @@ function galleryItem(x){
   if (x && x.icons2d) return icons2dHTML(x.icons2d);
   if (x && x.logos) return logoWallHTML(x.logos);
   if (x && x.mark3d) return mark3dHTML(x.mark3d);
+  // { sheet: [[…], […]], bg } — ряды макетов на серой подложке (светлые картинки не сливаются с белым фоном)
+  if (x && x.sheet) return sheetHTML(x.sheet, x.bg);
   // { colors } — палитра с копированием кода, как в brandkit; { slides } — презентация-листалка
   if (x && x.colors) return brandkitHTML({ colors: x.colors });
   if (x && x.slides) return campSlides(x);
@@ -1880,6 +1882,10 @@ function mark3dHTML(m){
     ${m.button ? `<a class="m3d-pill" href="${m.button.link}" target="_blank" rel="noopener"><svg viewBox="0 0 155 68" aria-hidden="true"><path d="${PILL}"/><path class="m3d-arr" d="M111 34h19M122 25l9 9-9 9"/></svg><span>${T(m.button.text)}</span></a>` : ''}
     ${m.list ? `<ul class="m3d-dirs" aria-hidden="true">${m.list.map((x, i) => `<li style="--i:${i}">${T(x)}</li>`).join('')}</ul>` : ''}
   </div>${hint ? `<p class="case-note world-hint">${T(hint)}</p>` : ''}</div>`;
+}
+function sheetHTML(rows, bg, cls){
+  return `<div class="wrap camp-rowbox"><div class="case-sheet${cls ? ' ' + cls : ''}" style="--sheet:${bg || '#E9E9E7'}">${
+    rows.map(r => `<div class="camp-row">${(Array.isArray(r) ? r : [r]).map(campCell).join('')}</div>`).join('')}</div></div>`;
 }
 const markWatcher = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
@@ -1945,7 +1951,9 @@ function renderCase(k, keepScroll){
   // по нажатию увеличиваются и листаются стрелками
   // deckTitle — крупная надпись над презентацией
   if (p.deck && p.deckTitle) body += `<div class="wrap"><h2 class="deck-title">${T(p.deckTitle)}</h2></div>`;
-  if (Array.isArray(p.deck)) body += p.deck.map(s => campRow([s])).join('');
+  // deckBg — слайды лентой сверху вниз на серой подложке
+  if (Array.isArray(p.deck) && p.deckBg) body += sheetHTML(p.deck, p.deckBg, 'deck-sheet');
+  else if (Array.isArray(p.deck)) body += p.deck.map(s => campRow([s])).join('');
   else if (p.deck) body += `<div class="wrap case-deck">${shotHTML(p.deck)}</div>`;
   // links: [] — ссылок в конце нет; поле не указано — ссылка на старую страницу
   const links = p.links || [{ text: W.more, link: p.link }];

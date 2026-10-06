@@ -2,8 +2,9 @@
    ЖИВОЙ 3D-ЗНАК В КЕЙСЕ (элемент { mark3d } в галерее, см. «упаковку агентства Штурман дизайн»)
    Серебряный знак из блендера поворачивается вслед за курсором по всему экрану,
    на телефоне — вслед за пальцем; по нажатию делает полный оборот, как в исходной анимации.
-   Модель — img/…/mark.bin: [число вершин, число индексов] + координаты Int16 + индексы Uint16
-   (выгружена из .blend с упрощением вдвое — так файл весит 120 КБ вместо 3D-библиотек и декодеров).
+   Модель — img/…/mark.bin: [число вершин, число индексов] + координаты Int16 + индексы Uint16 + нормали Int8.
+   Контур знака взят из кривых «Shturman motion.blend» и «надут» в круглые трубки, потом в Блендере
+   перестроен мелким вокселем и сглажен — так края ровные, без ступенек исходного ремеша.
    Хром отражает студию из полос — свои светлые и темные «софтбоксы», как в исходном рендере.
    Рисует только пока блок виден на экране.
    ================================================================ */
@@ -28,12 +29,14 @@ function studio(THREE, renderer){
   const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
   const g = c.getContext('2d');
   const sky = g.createLinearGradient(0, 0, 0, 512);
-  sky.addColorStop(0, '#FFFFFF'); sky.addColorStop(.45, '#E6E6E4'); sky.addColorStop(.56, '#7A7A78'); sky.addColorStop(1, '#2E2E2C');
+  sky.addColorStop(0, '#FFFFFF'); sky.addColorStop(.45, '#E6E6E4'); sky.addColorStop(.56, '#8A8A88'); sky.addColorStop(1, '#3C3C3A');
   g.fillStyle = sky; g.fillRect(0, 0, 1024, 512);
-  // полосы-софтбоксы: [где по кругу, ширина, яркость]
-  [[40, 40, '#FFFFFF'], [130, 34, '#1E1E1E'], [230, 30, '#FFFFFF'], [300, 90, '#D8D8D6'], [420, 44, '#FFFFFF'],
-   [530, 46, '#161616'], [640, 30, '#FFFFFF'], [700, 40, '#5A5A58'], [800, 64, '#FFFFFF'], [868, 14, '#B3F843'], [900, 44, '#1C1C1C']]
-    .forEach(([x, w, col]) => { g.fillStyle = col; g.globalAlpha = .85; g.fillRect(x, 60, w, 330); });
+  // мягкие софтбоксы: светлые и темные полосы с размытыми краями — блики на хроме ложатся плавно
+  g.filter = 'blur(18px)';
+  [[60, 90, '#FFFFFF'], [200, 50, '#383836'], [330, 130, '#FFFFFF'], [530, 60, '#464644'], [660, 80, '#FFFFFF'],
+   [800, 70, '#363634'], [930, 60, '#F4F4F2']]
+    .forEach(([x, w, col]) => { g.fillStyle = col; g.globalAlpha = .9; g.fillRect(x, 70, w, 300); });
+  g.filter = 'none';
   g.globalAlpha = 1;
   const tex = new THREE.CanvasTexture(c);
   tex.mapping = THREE.EquirectangularReflectionMapping; tex.colorSpace = THREE.SRGBColorSpace;
@@ -52,7 +55,13 @@ async function loadMark(THREE, url){
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setIndex(new THREE.BufferAttribute(new Uint16Array(buf, off, ni), 1));
-  geo.computeVertexNormals();
+  // после индексов могут идти готовые нормали (Int8): у «надутых» трубок они точные, без складок
+  const nOff = off + ni * 2;
+  if (buf.byteLength >= nOff + nv * 3) {
+    const n8 = new Int8Array(buf, nOff, nv * 3), nrm = new Float32Array(nv * 3);
+    for (let i = 0; i < n8.length; i++) nrm[i] = n8[i] / 127;
+    geo.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+  } else geo.computeVertexNormals();
   return geo;
 }
 
@@ -69,7 +78,8 @@ export async function mountMark(box){
   camera.position.set(0, 0, 9);
 
   const geo = await loadMark(THREE, box.dataset.model);
-  const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: TUNE.metal, metalness: 1, roughness: TUNE.rough, envMapIntensity: 1.05 }));
+  const mat = new THREE.MeshStandardMaterial({ color: TUNE.metal, metalness: 1, roughness: TUNE.rough, envMapIntensity: 1.05 });
+  const mesh = new THREE.Mesh(geo, mat);
   const pivot = new THREE.Group(); pivot.add(mesh); scene.add(pivot);
   // мягкий блик сверху слева — как свет в исходной сцене
   const key = new THREE.DirectionalLight('#FFFFFF', 1.4); key.position.set(-3, 4, 5); scene.add(key);

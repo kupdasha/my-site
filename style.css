@@ -1510,3 +1510,12 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 /* переносы строк: без одиноких слов в последней строке, короткие приписки — ровными строками */
 p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .clients-note,.sec-note,.ev-g-head{text-wrap:balance}
+/* серая подложка под рядами макетов и лентой слайдов (sheet, deckBg) — светлые картинки не сливаются с белой страницей */
+.case-sheet{background:var(--sheet);border-radius:var(--r-img);padding:clamp(12px,2.4vw,40px);display:flex;flex-direction:column;gap:clamp(8px,1.2vw,20px)}
+.case-sheet .camp-shot{background:none}
+.deck-sheet{gap:clamp(12px,2vw,32px)}
+@media (max-width:760px){
+  .case-sheet{padding:10px;border-radius:4px}
+  .case-sheet .camp-row:not(.collage){flex-direction:column;overflow:visible;scroll-snap-type:none}
+  .case-sheet .camp-row:not(.collage)>.camp-shot{flex:none;width:100%;height:auto}
+}
