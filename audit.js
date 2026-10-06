@@ -130,6 +130,14 @@ function rows(list){
     <div class="au-row">${r.row.map(src => `<button class="au-cell au-zoomable" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div></div>`).join('');
 }
 
+// коллаж: картинки вперемешку колонками, длинные страницы обрезаны сверху; увеличиваются по нажатию
+function collage(list){
+  const cell = src => `<button class="au-clg-cell au-zoomable" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`;
+  // три колонки по очереди (на телефоне CSS собирает их в две)
+  const cols = [0, 1, 2].map(k => list.filter((_, i) => i % 3 === k));
+  return `<div class="au-collage">${cols.map(c => `<div class="au-clg-col">${c.map(cell).join('')}</div>`).join('')}</div>`;
+}
+
 // подсказка к 3D: клавиши и мышь (на телефоне — палец)
 function worldHint(w){
   const touch = matchMedia('(pointer:coarse)').matches;
@@ -389,6 +397,7 @@ function chapter(ch, p){
   if (ch.palette)   viz += palette(ch.palette);
   if (ch.screens)   viz += screens(ch.screens);
   if (ch.rows)      viz += rows(ch.rows);
+  if (ch.collage)   viz += collage(ch.collage);
   return `<section class="au-ch${ch.color ? ' c-' + ch.color : ''}">
     <div class="wrap">
       <div class="au-head">
