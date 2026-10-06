@@ -12,16 +12,18 @@ const rnd = (a, b) => a + Math.random() * (b - a);
 const onScreen = (el, cb, margin = '0px') =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: margin }).observe(el);
 
-const head = ch => `<div class="ad-head">
+// hint — подсказка к живой схеме: стоит в той же колонке, что и текст главы
+const head = (ch, hint) => `<div class="ad-head">
   <span class="case-label ad-label">${H.T(ch.label)}</span>
   <h2 class="ad-title">${H.T(ch.title)}</h2>
   ${ch.text ? `<p class="ad-text">${H.T(ch.text)}</p>` : ''}
+  ${hint ? `<p class="ad-cap ad-head-cap">${H.T(hint)}</p>` : ''}
 </div>`;
 const cap = (t, cls) => t ? `<p class="ad-cap${cls ? ' ' + cls : ''}">${H.T(t)}</p>` : '';
 
 /* ---------- мысли: одна в фокусе, остальные расплываются и дрейфуют ---------- */
 function thoughtsHTML(c){
-  return `${cap(c.hint, 'top')}<div class="ad-thoughts" aria-label="${c.items.map(x => H.pick(x)).join(', ')}">
+  return `<div class="ad-thoughts" aria-label="${c.items.map(x => H.pick(x)).join(', ')}">
     ${c.items.map((t, i) => `<span class="ad-th" style="--i:${i}" aria-hidden="true">${H.T(t)}</span>`).join('')}
   </div>`;
 }
@@ -29,7 +31,8 @@ function liveThoughts(box){
   const els = [...box.querySelectorAll('.ad-th')];
   const n = els.length;
   let pos = [], seen = false, raf = 0, t0 = performance.now();
-  let fx = 0, fy = 0, gx = 0, gy = 0, hover = false, jumpAt = 0, stealUntil = 0;
+  // fk — фраза в фокусе: она всегда полностью резкая, остальные расплываются тем сильнее, чем дальше от нее
+  let fk = 0, mine = 0, hover = false, jumpAt = 0, stealUntil = 0, blur = els.map(() => 3), op = els.map(() => .5);
   // раскладка: ячейки сетки, внутри — случайный сдвиг, чтобы не выглядело таблицей
   const lay = () => {
     // поле внутри отступа: с запасом на дрейф, чтобы фразы не уезжали за край
@@ -39,42 +42,46 @@ function liveThoughts(box){
       const cw = w / cols, ch = h / rows, c = i % cols, r = Math.floor(i / cols);
       el.style.maxWidth = (cw - 16) + 'px';
       const ew = el.offsetWidth, eh = el.offsetHeight;
-      return { x: P + c * cw + rnd(0, Math.max(0, cw - ew)), y: P + r * ch + rnd(0, Math.max(0, ch - eh)), w: ew, h: eh,
+      return { x: P + c * cw + rnd(0, Math.max(0, cw - ew)), y: P + r * ch + rnd(0, Math.max(0, ch - eh - 28)), w: ew, h: eh,   // запас снизу на дрейф: соседние строки не наезжают
         ph: rnd(0, 6.28), sp: rnd(.25, .5), amp: rnd(6, 16) };
     });
   };
-  const centre = i => [pos[i].x + pos[i].w / 2, pos[i].y + pos[i].h / 2];
-  const jump = () => { const k = Math.floor(Math.random() * n); [gx, gy] = centre(k); };
+  const other = () => { let k; do k = Math.floor(Math.random() * n); while (k === fk && n > 1); return k; };
   const draw = t => {
     const s = (t - t0) / 1000;
-    // само по себе внимание перескакивает; с курсором — держится за ним, но иногда все равно убегает
-    if (!hover && t > jumpAt) { jump(); jumpAt = t + rnd(1300, 2600); }
-    if (hover && t > jumpAt) { if (Math.random() < .45) { jump(); stealUntil = t + 900; } jumpAt = t + rnd(2600, 4200); }
-    const k = hover && t < stealUntil ? .14 : .08;
-    fx += (gx - fx) * k; fy += (gy - fy) * k;
-    const R = Math.max(box.clientWidth, 400) * .22;
-    els.forEach((el, i) => {
+    // само по себе внимание перескакивает; с курсором — держится за фразой под ним, но иногда все равно убегает
+    if (!hover && t > jumpAt) { fk = other(); jumpAt = t + rnd(1300, 2600); }
+    if (hover && t > jumpAt) { if (Math.random() < .35) { fk = other(); stealUntil = t + 900; } jumpAt = t + rnd(3500, 6000); }
+    if (hover && t > stealUntil) fk = mine;
+    const R = Math.max(box.clientWidth, 400) * .3;
+    const cen = els.map((el, i) => {
       const p = pos[i];
       const dx = Math.sin(s * p.sp + p.ph) * p.amp, dy = Math.cos(s * p.sp * .8 + p.ph) * p.amp * .7;
-      const [cx, cy] = [p.x + p.w / 2 + dx, p.y + p.h / 2 + dy];
-      const d = Math.min(1, Math.hypot(cx - fx, cy - fy) / R);
       el.style.transform = `translate(${(p.x + dx).toFixed(1)}px,${(p.y + dy).toFixed(1)}px)`;
-      el.style.filter = d < .08 ? 'none' : `blur(${(d * 3.6).toFixed(2)}px)`;
-      el.style.opacity = (1 - d * .6).toFixed(2);
+      return [p.x + p.w / 2 + dx, p.y + p.h / 2 + dy];
+    });
+    els.forEach((el, i) => {
+      const d = i === fk ? 0 : Math.min(1, .35 + Math.hypot(cen[i][0] - cen[fk][0], cen[i][1] - cen[fk][1]) / R);
+      blur[i] += (d * 3.6 - blur[i]) * .14; op[i] += (1 - d * .6 - op[i]) * .14;
+      el.style.filter = blur[i] < .05 ? 'none' : `blur(${blur[i].toFixed(2)}px)`;
+      el.style.opacity = op[i].toFixed(2);
     });
     if (seen) raf = requestAnimationFrame(draw);
   };
-  const start = () => { lay(); jump(); fx = gx; fy = gy; };
+  const start = () => { lay(); };
   start();
   new ResizeObserver(() => { lay(); }).observe(box);
   if (still()) {   // без движения: все мысли резкие и стоят на местах
     els.forEach((el, i) => { el.style.transform = `translate(${pos[i].x}px,${pos[i].y}px)`; });
     box.classList.add('still'); return;
   }
+  // фраза под курсором — ближайшая к нему по центру
   box.addEventListener('pointermove', e => {
-    const r = box.getBoundingClientRect();
+    const r = box.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    if (!hover) jumpAt = performance.now() + rnd(3500, 6000);
     hover = true;
-    if (performance.now() > stealUntil) { gx = e.clientX - r.left; gy = e.clientY - r.top; }
+    let best = 1e9;
+    pos.forEach((p, i) => { const d = Math.hypot(p.x + p.w / 2 - x, p.y + p.h / 2 - y); if (d < best) { best = d; mine = i; } });
   });
   box.addEventListener('pointerleave', () => { hover = false; jumpAt = 0; });
   onScreen(box, v => {
@@ -349,6 +356,38 @@ function pressHTML(c){
     <b>${H.T(x.name)}</b><span>${H.T(x.note)}</span></a></li>`).join('')}</ul>`;
 }
 
+/* ---------- карусель для соцсетей: карточки лентой, листаются стрелками, пальцем и колесом ---------- */
+function carouselHTML(c){
+  const arrow = d => `<svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="${d}"/></svg>`;
+  return `<div class="ad-car">
+    <div class="ad-car-track" tabindex="0" aria-label="Карусель">${c.items.map((src, i) =>
+      `<button class="ad-car-card" style="--i:${i}" aria-label="Слайд ${i + 1} из ${c.items.length}"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>
+    <div class="ad-car-nav">
+      <button class="ad-car-btn prev" aria-label="Назад">${arrow('M12 4l-6 6 6 6')}</button>
+      <button class="ad-car-btn next" aria-label="Дальше">${arrow('M8 4l6 6-6 6')}</button>
+    </div>
+  </div>${cap(c.hint)}`;
+}
+function liveCarousel(box){
+  const track = box.querySelector('.ad-car-track'), cards = [...track.children];
+  const step = () => cards[0].offsetWidth + parseFloat(getComputedStyle(track).columnGap || 0);
+  const upd = () => {
+    box.classList.toggle('first', track.scrollLeft < 4);
+    box.classList.toggle('last', track.scrollLeft > track.scrollWidth - track.clientWidth - 4);
+  };
+  track.addEventListener('scroll', () => requestAnimationFrame(upd), { passive: true }); upd();
+  box.querySelector('.prev').addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+  box.querySelector('.next').addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+  track.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); track.scrollBy({ left: (e.key === 'ArrowRight' ? 1 : -1) * step(), behavior: 'smooth' }); }
+  });
+  track.addEventListener('click', e => {
+    const b = e.target.closest('.ad-car-card'); if (!b) return;
+    const imgs = cards.map(c => c.querySelector('img'));
+    H.openViewer(imgs.map(i => i.currentSrc || i.src), cards.indexOf(b), imgs);
+  });
+}
+
 const KINDS = {
   thoughts: [thoughtsHTML, liveThoughts, '.ad-thoughts'],
   board:    [boardHTML, liveBoard, '.ad-board'],
@@ -357,6 +396,7 @@ const KINDS = {
   details:  [detailsHTML, liveDetails, '.ad-orbit'],
   final:    [finalHTML, liveFinal, '.ad-final'],
   press:    [pressHTML, null, '.ad-press'],
+  carousel: [carouselHTML, liveCarousel, '.ad-car'],
 };
 
 /* ---------- запуск ---------- */
@@ -380,7 +420,7 @@ export async function mountADHD(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   mount.innerHTML = p.adhd.map(ch => {
     const kind = Object.keys(KINDS).find(k => ch[k]);
-    return `<section class="ad-ch wrap ad-${kind}-ch">${head(ch)}<div class="ad-viz">${kind ? KINDS[kind][0](ch[kind]) : ''}</div></section>`;
+    return `<section class="ad-ch wrap ad-${kind}-ch">${head(ch, kind === 'thoughts' && ch.thoughts.hint)}<div class="ad-viz">${kind ? KINDS[kind][0](ch[kind]) : ''}</div></section>`;
   }).join('');
   mount.querySelectorAll('.ad-ch').forEach(s => reveal.observe(s));
   Object.values(KINDS).forEach(([, live, sel]) => live && mount.querySelectorAll(sel).forEach(live));

@@ -1825,6 +1825,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 'Футболки для тех, кто начал читать это описание и отвлекся'],
         image: 'img/sdvg.jpg',
         link:  'https://kupdasha.ru/merch',
+        schemeCols: true,   // задача, роль и решение — колонками в одну строку
         scheme: {
           task: ['В декабре 2025 года бренд «Нате, носите» и проект «Где моё внимание?» выпустили общую капсулу, которая поддерживает людей с СДВГ. Процент от продажи одежды отправили на помощь проекту: на бесплатные группы поддержки, коучинг и образовательные программы.',
                  'Сделать одежду, в которой люди с СДВГ узнают себя, и заодно собрать денег на помощь: процент от продаж ушел проекту «Где моё внимание?» на группы поддержки, коучинг и обучение.'],
@@ -1947,15 +1948,14 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 { img: 'img/sdvg/det-sleeve.jpg', note: ['Нашивка с надписью на рукаве', 'Надпись на рукаве'] },
               ],
               center: ['люверсы, кольца, булавки', 'есть что теребить'],
-              hint: ['Наведите на деталь — круг остановится, нажмите — чтобы увеличить', 'Наведите на деталь — круг замрет. Нажмите — увеличится'],
             } },
           { label: ['капсула', 'в продаже'],
             title: ['что вышло', 'что получилось'],
             text: ['В производство пошли четыре футболки: «Внутренний критик», «Кто-то крадет у меня время», «В скучном не участвую» и «Футболка для ошибок». Это финальные визуализации, по которым их отшили.',
                    'Из всех скетчей до производства дошли четыре футболки. Вот какими они получились.'],
             final: { items: [
-              { name: 'внутренний критик', media: ['img/sdvg/fin-kritik-video.mp4', 'img/sdvg/fin-kritik-1.jpg', 'img/sdvg/fin-kritik-2.jpg', 'img/sdvg/fin-kritik-3.jpg'] },
-              { name: 'кто-то крадет у меня время', media: ['img/sdvg/fin-vremya-video.mp4', 'img/sdvg/fin-vremya-close.mp4', 'img/sdvg/fin-vremya-back.mp4', 'img/sdvg/fin-vremya-1.jpg'] },
+              { name: 'внутренний критик', media: ['img/sdvg/fin-kritik-1.jpg', 'img/sdvg/fin-kritik-4.jpg', 'img/sdvg/fin-kritik-2.jpg', 'img/sdvg/fin-kritik-3.jpg'] },
+              { name: 'кто-то крадет у меня время', media: ['img/sdvg/fin-vremya-2.jpg', 'img/sdvg/fin-vremya-3.jpg', 'img/sdvg/fin-vremya-4.jpg', 'img/sdvg/fin-vremya-1.jpg'] },
               { name: 'в скучном не участвую', media: ['img/sdvg/fin-skuchno-1.jpg', 'img/sdvg/fin-skuchno-2.jpg', 'img/sdvg/fin-skuchno-3.jpg', 'img/sdvg/fin-skuchno-4.jpg'] },
               { name: 'футболка для ошибок', media: ['img/sdvg/fin-oshibki-1.jpg', 'img/sdvg/fin-oshibki-2.jpg', 'img/sdvg/fin-oshibki-3.jpg', 'img/sdvg/fin-oshibki-4.jpg'] },
             ] } },
@@ -1968,6 +1968,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { name: 'Blueprint', note: ['пост в телеграм-канале', 'пост в телеграм-канале'], link: 'https://t.me/theblueprintnews/82444' },
               { name: '«Бумага»', note: ['всё о Петербурге, пост в телеграм-канале', 'всё о Петербурге'], link: 'https://t.me/paperpaper_ru/64378' },
             ] } },
+          { label: ['соцсети', 'анонс'],
+            title: ['карусель к запуску', 'как мы рассказали о капсуле'],
+            text: ['Карусель для соцсетей «Нате, носите»: к каждой футболке — короткая история и рукописная записка, кому ее подарить.',
+                   'Анонс для соцсетей: каждая футболка со своей историей и запиской, кому ее подарить.'],
+            carousel: { items: [1, 2, 3, 4, 5, 6, 7].map(i => `img/sdvg/carousel-${i}.jpg`) } },
         ],
         links: [],   // ссылки на Forbes, Blueprint и «Бумагу» — в главе «о капсуле написали»
       },

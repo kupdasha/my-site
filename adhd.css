@@ -10,12 +10,10 @@
 .ad-label{grid-column:1 / span 3;grid-row:1}
 .ad-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
 .ad-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
-/* на широком экране абзац — в две колонки, чтобы не тянулся длинной лентой */
-@media (min-width:900px){.ad-text{max-width:none;column-count:2;column-gap:clamp(24px,3vw,48px);font-size:clamp(19px,1.5vw,22px)}}
-@media (min-width:761px) and (max-width:1199px){.ad-label,.ad-title,.ad-text{grid-column:1 / -1}.ad-label{grid-row:auto}}
+.ad-head-cap{grid-column:5 / -1;margin:0}
+@media (max-width:760px){.ad-head-cap{grid-column:1 / -1}}
 @media (max-width:760px){.ad-label,.ad-title,.ad-text{grid-column:1 / -1}.ad-label{grid-row:auto}}
 .ad-cap{font-size:16px;opacity:.6;margin-top:16px;max-width:60ch;text-wrap:balance}
-.ad-cap.top{margin:0 0 8px}
 
 /* появление главы */
 .ad-viz{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease) .15s,transform 1s var(--ease) .15s}
@@ -104,6 +102,21 @@ button.ad-fin:hover img{transform:scale(1.04)}
 .ad-ch.in .ad-fin-group{opacity:1;transform:none}
 @media (max-width:760px){.ad-final{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+/* ---------- карусель для соцсетей ---------- */
+.ad-car-track{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 2 * clamp(10px,1.4vw,20px)) / 3);column-gap:clamp(10px,1.4vw,20px);
+  overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.ad-car-track::-webkit-scrollbar{display:none}
+.ad-car-card{scroll-snap-align:start;aspect-ratio:4/5;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in;padding:0;
+  opacity:0;transform:translateX(40px) rotate(2deg);transition:opacity .7s var(--ease) calc(.15s + var(--i) * .08s),transform 1s var(--ease) calc(.15s + var(--i) * .08s)}
+.ad-ch.in .ad-car-card{opacity:1;transform:none}
+.ad-car-card img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.ad-car-card:hover img{transform:scale(1.03)}
+.ad-car-nav{display:flex;gap:10px;margin-top:16px}   /* слева: справа внизу живут кнопки сайта */
+.ad-car-btn{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--bg);transition:opacity .3s,transform .4s var(--ease)}
+.ad-car-btn:hover{transform:scale(1.06)}
+.ad-car.first .prev,.ad-car.last .next{opacity:.25;pointer-events:none}
+@media (max-width:760px){.ad-car-track{grid-auto-columns:78%}}
+
 /* ---------- о проекте писали ---------- */
 .ad-press{list-style:none;border-top:1px solid var(--line)}
 .ad-press li{border-bottom:1px solid var(--line);opacity:0;transform:translateY(16px);transition:opacity .7s var(--ease) calc(.2s + var(--i) * .12s),transform .9s var(--ease) calc(.2s + var(--i) * .12s)}
@@ -116,5 +129,5 @@ button.ad-fin:hover img{transform:scale(1.04)}
 @media (max-width:640px){.ad-press-a{flex-direction:column;gap:6px}.ad-press-a span{text-align:left}}
 
 @media (prefers-reduced-motion: reduce){
-  .ad-viz,.ad-fin-group,.ad-press li,.ad-orb-in{opacity:1;transform:none;transition:none}
+  .ad-viz,.ad-fin-group,.ad-press li,.ad-orb-in,.ad-car-card{opacity:1;transform:none;transition:none}
 }
