@@ -1299,3 +1299,17 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .viewer{z-index:100}
 @media (max-width:760px){.ev-g-tile{flex-basis:calc(var(--ar) * 110px)}}
 .ev-g-cap .hang-q,.ev figcaption .hang-q{margin-left:0}   /* в обрезанной подписи кавычка не висит, иначе ее срежет */
+
+/* «все выступления»: светло-серое полотно, на нем белые карточки событий — название и фото рядом */
+.ev-gallery{background:#EEEEF0}
+.ev-g-bar{background:#EEEEF0}
+.ev-g-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;padding:clamp(8px,1vw,16px) 0 clamp(56px,7vw,96px)}
+.ev-g-card{background:#FFFFFF;border-radius:24px;padding:clamp(20px,2vw,28px)}
+.ev-g-name{font-weight:500;font-size:clamp(20px,1.7vw,26px);line-height:1.15;margin-bottom:clamp(16px,2vw,28px)}
+.ev-g-name .yr{margin-left:.35em}
+/* фото события — ровной сеткой по 4 в ряд, как в скетче; кадр целиком — по нажатию */
+.ev-g-card .ev-g-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0}
+.ev-g-card .ev-g-grid::after{display:none}
+.ev-g-card .ev-g-tile img{aspect-ratio:4/3;border-radius:10px}
+@media (max-width:900px){.ev-g-cards{grid-template-columns:1fr}}
+@media (max-width:520px){.ev-g-card .ev-g-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}

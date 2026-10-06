@@ -356,11 +356,23 @@ function evOpenViewer(i, from){
 }
 function openGallery(){
   const E = SITE.photos.events;
-  // все фото одной плиткой, вперемешку; под каждым — коротко, где это было
+  // карточки событий: название и фото этого события рядом; порядок — из events.order
+  const groups = [];
+  E.items.forEach((x, i) => {
+    const c = pick(x.caption);
+    let g = groups.find(g => g.c === c);
+    if (!g) groups.push(g = { c, list: [] });
+    g.list.push(i);
+  });
+  const order = (E.order || []).map(pick);
+  groups.sort((a, b) => (order.indexOf(a.c) + 1 || 99) - (order.indexOf(b.c) + 1 || 99));
   evGallery.innerHTML = `<div class="ev-g-bar"><div class="wrap"><h2 class="ev-g-title">${T(E.more)}<sup class="yr">${E.items.length}</sup></h2>
       <button type="button" class="ev-g-close" aria-label="Закрыть"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l12 12M16 4L4 16"/></svg></button></div></div>
-    <div class="wrap"><div class="ev-g-grid">${E.items.map((x, i) =>
-      `<button type="button" class="ev-g-tile" data-i="${i}" style="--ar:${x.ratio || 1.5}"><img src="${x.thumb || x.src}" alt="${esc(pick(x.caption))}" loading="lazy"><span class="ev-g-cap">${T(x.caption)}</span></button>`).join('')}</div></div>`;
+    <div class="wrap"><div class="ev-g-cards">${groups.map(g => `<section class="ev-g-card">
+      <h3 class="ev-g-name">${T(g.c)}<sup class="yr">${g.list.length}</sup></h3>
+      <div class="ev-g-grid">${g.list.map(i =>
+        `<button type="button" class="ev-g-tile" data-i="${i}" style="--ar:${E.items[i].ratio || 1.5}"><img src="${E.items[i].thumb || E.items[i].src}" alt="${esc(g.c)}" loading="lazy"></button>`).join('')}</div>
+    </section>`).join('')}</div></div>`;
   evGallery.scrollTop = 0;
   evGallery.classList.add('open');
   document.body.classList.add('locked');

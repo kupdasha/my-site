@@ -1763,6 +1763,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     events: {
       first: 4,
       more:  ['все выступления', 'все фото со сцены'],
+      /* порядок карточек событий в «всех выступлениях» (названия — как в caption) */
+      order: ['Российский форум индустрии дизайна, Росконгресс', 'Кайференция, PRAGMATICA', 'ШУМ, Росмолодёжь, 2023', 'Telling Stories',
+              'Корпоратив Студии Лебедева', 'HSE Creative HUB', '«Среда», теплоход', 'B&D', 'VK', 'Дизайн-стендап'],
       items: [
         { src: 'img/events/ev-01.jpg', thumb: 'img/events/ev-01-s.jpg', ratio: 1.5, caption: 'Российский форум индустрии дизайна, Росконгресс' },
         { src: 'img/events/ev-02.jpg', thumb: 'img/events/ev-02-s.jpg', ratio: 0.67, caption: '«Среда», теплоход' },
