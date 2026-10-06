@@ -1279,3 +1279,23 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 }
 .ev-link{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.2em;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent)}
 .ev-link:hover{text-decoration-color:currentColor}
+
+/* все выступления: плитка во весь экран поверх страницы, по событиям */
+.ev-gallery{position:fixed;inset:0;z-index:95;background:var(--bg);color:var(--ink);overflow-y:auto;overscroll-behavior:contain;opacity:0;visibility:hidden;transition:opacity .35s var(--ease),visibility 0s .35s}
+.ev-gallery.open{opacity:1;visibility:visible;transition:opacity .35s var(--ease)}
+.ev-g-bar{position:sticky;top:0;z-index:2;background:var(--bg)}
+.ev-g-bar .wrap{display:flex;align-items:center;justify-content:space-between;height:76px}
+.ev-g-title{font-weight:500;font-size:clamp(24px,2.4vw,32px)}
+.ev-g-title .yr{margin-left:.35em}
+.ev-g-close{width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;border:0;cursor:pointer}
+.ev-g-group{padding:clamp(24px,3vw,40px) 0 0}
+.ev-g-group:last-child{padding-bottom:clamp(56px,7vw,96px)}
+.ev-g-cap{font-weight:500;font-size:18px;margin-bottom:14px;opacity:.7}
+/* плитка: ряды одной высоты, ширина — по пропорциям кадра */
+.ev-g-grid{display:flex;flex-wrap:wrap;gap:10px}
+.ev-g-grid::after{content:"";flex:10 1 0}
+.ev-g-tile{flex:var(--ar) 1 calc(var(--ar) * 180px);min-width:0;padding:0;border:0;background:var(--soft);border-radius:var(--r-img);overflow:hidden;cursor:zoom-in}
+.ev-g-tile img{display:block;width:100%;aspect-ratio:var(--ar);object-fit:cover;transition:transform .8s var(--ease)}
+.ev-g-tile:hover img{transform:scale(1.03)}
+.viewer{z-index:100}
+@media (max-width:760px){.ev-g-tile{flex-basis:calc(var(--ar) * 110px)}}

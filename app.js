@@ -345,15 +345,51 @@ document.addEventListener('pointerover', e => {
   showPreviewImage(E.items[talkShown++ % E.items.length].thumb);
 });
 document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.ev-link')) showPreviewImage(''); });
-/* хроника выступлений: нажатие на фото или на «все выступления» открывает все фото по порядку, с подписями */
+/* хроника выступлений: фото в ленте — сразу увеличивается; «все выступления» — плитка всех фото по событиям,
+   нажатие на плитку увеличивает фото (листать можно по всем) */
+const evGallery = document.createElement('div');
+evGallery.className = 'ev-gallery'; evGallery.setAttribute('role', 'dialog'); evGallery.setAttribute('aria-label', 'Все выступления');
+document.body.appendChild(evGallery);
+function evOpenViewer(i, from){
+  const E = SITE.photos.events;
+  openViewer(E.items.map(x => x.src), i, from, E.items.map(x => x.caption));
+}
+function openGallery(){
+  const E = SITE.photos.events;
+  // плитки сгруппированы по событиям, в порядке списка
+  const groups = [];
+  E.items.forEach((x, i) => {
+    const c = pick(x.caption);
+    let g = groups.find(g => g.c === c);
+    if (!g) groups.push(g = { c, list: [] });
+    g.list.push(i);
+  });
+  evGallery.innerHTML = `<div class="ev-g-bar"><div class="wrap"><h2 class="ev-g-title">${T(E.more)}<sup class="yr">${E.items.length}</sup></h2>
+      <button type="button" class="ev-g-close" aria-label="Закрыть"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l12 12M16 4L4 16"/></svg></button></div></div>
+    <div class="wrap">${groups.map(g => `<section class="ev-g-group"><h3 class="ev-g-cap">${T(g.c)}</h3><div class="ev-g-grid">${g.list.map(i =>
+      `<button type="button" class="ev-g-tile" data-i="${i}" style="--ar:${E.items[i].ratio || 1.5}"><img src="${E.items[i].thumb || E.items[i].src}" alt="${esc(g.c)}" loading="lazy"></button>`).join('')}</div></section>`).join('')}</div>`;
+  evGallery.scrollTop = 0;
+  evGallery.classList.add('open');
+  document.body.classList.add('locked');
+}
+function closeGallery(){ evGallery.classList.remove('open'); document.body.classList.remove('locked'); }
+evGallery.addEventListener('click', e => {
+  if (e.target.closest('.ev-g-close')) { closeGallery(); return; }
+  const t = e.target.closest('.ev-g-tile');
+  if (!t) return;
+  const from = [];
+  evGallery.querySelectorAll('.ev-g-tile').forEach(b => from[+b.dataset.i] = b.querySelector('img'));
+  evOpenViewer(+t.dataset.i, from);
+});
+addEventListener('keydown', e => { if (e.key === 'Escape' && evGallery.classList.contains('open') && !viewer.classList.contains('open')) closeGallery(); });
 document.addEventListener('click', e => {
-  const f = e.target.closest('.ev, .ev-all');
-  const E = SITE.photos && SITE.photos.events;
-  if (!f || !E) return;
-  const i = f.classList.contains('ev') ? +f.dataset.i : 0;
+  if (!SITE.photos || !SITE.photos.events) return;
+  if (e.target.closest('.ev-all')) { e.preventDefault(); openGallery(); return; }
+  const f = e.target.closest('.ev');
+  if (!f) return;
   const from = [];
   document.querySelectorAll('.ev img').forEach((img, k) => from[k] = img);
-  openViewer(E.items.map(x => x.src), i, from, E.items.map(x => x.caption));
+  evOpenViewer(+f.dataset.i, from);
 });   // подписи к фото в просмотре (у хроники выступлений)
 function viewShow(){
   const count = viewList.length > 1 ? `${viewAt + 1} из ${viewList.length}` : '';
