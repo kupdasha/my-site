@@ -53,9 +53,9 @@ function journey(j){
     <span class="au-j-line" aria-hidden="true"></span>
     ${j.map((s, i) => `<div class="au-stop ${s.color}" style="--i:${i}">
       <span class="au-dot" aria-hidden="true"></span>
-      <span class="au-track">${H.T(s.track)}</span>
+      ${s.track ? `<span class="au-track">${H.T(s.track)}</span>` : ''}
       <b class="au-goal">${H.T(s.goal)}</b>
-      <span class="au-page">${H.T(s.page)}</span>
+      ${s.page ? `<span class="au-page">${H.T(s.page)}</span>` : ''}
       <p>${H.T(s.fix)}</p>
     </div>`).join('')}
   </div>`;
@@ -132,7 +132,7 @@ function rows(list){
 
 // коллаж-сетка: снимки кейса (shot) и длинные страницы сайта (page) — страница прокручивается при наведении, по нажатию открывается целиком
 function collage(list){
-  return `<div class="au-bento">${list.map((it, i) => `<button class="au-bn au-zoomable ${it.page ? 'page' : 'shot'} ${'abcde'[i]}" style="--i:${i}" aria-label="Увеличить"><img src="${it.page || it.shot}" alt="" loading="lazy"></button>`).join('')}</div>`;
+  return `<div class="au-bento">${list.map((it, i) => `<button class="au-bn au-zoomable ${it.page ? 'page' : 'shot'}${it.scroll ? ' tall' : ''} ${'abcde'[i]}" style="--i:${i}" aria-label="Увеличить"><img src="${it.page || it.shot}" alt="" loading="lazy"></button>`).join('')}</div>`;
 }
 
 // подсказка к 3D: клавиши и мышь (на телефоне — палец)
@@ -305,7 +305,7 @@ function donut(d){
 }
 
 // таблица показателей по вкладкам: один показатель за раз, страны строками, два года рядом
-function indTable(t){
+function indTable(t, compact){
   const num = v => parseFloat(String(v).replace(',', '.'));
   const panel = (g, gi) => {
     const vals = t.rows.flatMap(r => r.vals[gi]).map(num).filter(v => !isNaN(v)), max = Math.max(...vals);
@@ -319,11 +319,23 @@ function indTable(t){
         <span class="au-it-dir ${dir}" aria-hidden="true">${dir ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>' : ''}</span>
       </div>`; }).join('')}</div>`;
   };
-  return `<div class="au-it">
+  return `<div class="au-it${compact ? ' compact' : ''}">
     <div class="au-it-tabs" role="tablist">${t.groups.map((g, gi) => `<button class="au-it-tab${gi ? '' : ' on'}" data-k="${gi}" role="tab">${H.T(g.name)}</button>`).join('')}</div>
     <div class="au-it-head"><span class="au-it-sub">${t.groups.map((g, gi) => `<span data-k="${gi}"${gi ? '' : ' class="on"'}>${H.T(g.sub || '')}</span>`).join('')}</span>${t.years.map((y, k) => `<span class="au-it-y y${k}">${y}</span>`).join('')}<span></span></div>
     <div class="au-it-body">${t.groups.map(panel).join('')}</div>
     ${t.source ? `<p class="au-it-src">${H.T(t.source)}</p>` : ''}
+  </div>`;
+}
+
+// та же таблица показателей на телефоне: вкладки и две колонки, без поворота экрана
+function phoneInd(c, p){
+  const t = p.audit.find(x => x.indTable).indTable;
+  return `<div class="au-pi">
+    <div class="au-phone au-pi-phone"><div class="au-phone-scr">
+      ${c.nav ? `<img class="au-pi-nav" src="${c.nav}" alt="">` : ''}
+      <div class="au-pi-body"><p class="au-pi-ttl">${H.T(c.title)}</p>${indTable(t, true)}</div>
+    </div></div>
+    <ul class="au-zp-steps au-pi-steps">${c.steps.map((s, i) => `<li style="--i:${i}">${H.T(s)}</li>`).join('')}</ul>
   </div>`;
 }
 
@@ -382,7 +394,7 @@ function screens(c){
   const img = (src, cls = '') => `<img class="${cls}" src="${src}" alt="" loading="lazy" decoding="async">`;
   // bare: true — график крупно, без монитора
   if (c.bare) return `<div class="au-scr bare"><div class="au-flat">${img(c.desk)}</div></div>`;
-  return `<div class="au-scr${c.phone ? '' : ' solo'}">
+  return `<div class="au-scr${c.phone || c.phoneLive ? '' : ' solo'}${c.phoneLive ? ' has-live' : ''}">
     <div class="au-mon">
       <div class="au-mon-scr">
         ${c.nav ? img(c.nav, 'au-mon-nav') : ''}
@@ -390,9 +402,31 @@ function screens(c){
       </div>
       <span class="au-mon-neck" aria-hidden="true"></span><span class="au-mon-base" aria-hidden="true"></span>
     </div>
-    ${c.phone ? `<div class="au-phone au-scr-phone"><div class="au-phone-scr">${c.phoneNav ? img(c.phoneNav, 'au-scr-pnav') : ''}${img(c.phone, 'au-scr-pchart')}</div></div>` : ''}
+    ${c.phoneLive ? `<div class="au-phone au-scr-phone live"><div class="au-phone-scr">${c.phoneNav ? img(c.phoneNav, 'au-scr-pnav') : ''}${mobCurve(c.phoneLive)}</div></div>`
+      : c.phone ? `<div class="au-phone au-scr-phone"><div class="au-phone-scr">${c.phoneNav ? img(c.phoneNav, 'au-scr-pnav') : ''}${img(c.phone, 'au-scr-pchart')}</div></div>` : ''}
   </div>
   ${c.altNote ? `<p class="au-cap">${H.T(c.altNote)}</p>` : ''}`;
+}
+
+// мобильная версия графика: кривая во всю ширину экрана, под ней страны строками; точка и строка подсвечиваются вместе
+function mobCurve(c){
+  const max = Math.max(...c.items.map(x => x.v)) * 1.18;
+  const pts = c.items.map((x, i) => [.06 + i / (c.items.length - 1) * .88, .92 - x.v / max * .84]);
+  const line = smooth(pts, 1000, 600);
+  const list = [...c.items].map((x, i) => ({ ...x, i })).sort((a, b) => b.v - a.v);
+  return `<div class="au-mc">
+    <p class="au-mc-ttl">${H.T(c.title)}</p>
+    <div class="au-mc-plot">
+      <svg viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="au-mc-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00D900" stop-opacity=".45"/><stop offset="1" stop-color="#00D900" stop-opacity="0"/></linearGradient></defs>
+        <path d="${line} L${pts.at(-1)[0] * 1000},600 L${pts[0][0] * 1000},600Z" fill="url(#au-mc-fill)"/>
+        <path d="${line}" fill="none" stroke="#4FD94F" stroke-width="3" vector-effect="non-scaling-stroke"/>
+      </svg>
+      ${c.items.map((x, i) => `<span class="au-mc-dot" data-k="${i}" style="left:${(pts[i][0] * 100).toFixed(2)}%;top:${(pts[i][1] * 100).toFixed(2)}%"></span>`).join('')}
+    </div>
+    <ul class="au-mc-list">${list.map(x => `<li data-k="${x.i}"><img src="${x.flag}" alt=""><span>${H.T(x.name)}</span><b>${n1(x.v)}%</b></li>`).join('')}</ul>
+    ${c.source ? `<p class="au-mc-src">${H.T(c.source)}</p>` : ''}
+  </div>`;
 }
 
 // палитра айдентики: цвета-полоски раскрываются при наведении, ниже — градиенты
@@ -429,6 +463,7 @@ function chapter(ch, p){
   if (ch.rank)      viz += rank(ch.rank);
   if (ch.donut)     viz += donut(ch.donut);
   if (ch.indTable)  viz += indTable(ch.indTable);
+  if (ch.phoneInd)  viz += phoneInd(ch.phoneInd, p);
   if (ch.phoneTable) viz += phoneTable(ch.phoneTable);
   if (ch.zoomPhone) viz += zoomPhone(ch.zoomPhone);
   if (ch.palette)   viz += palette(ch.palette);
@@ -584,6 +619,15 @@ function liveIndTable(box){
   tabs.forEach(el => el.addEventListener('click', () => c.stop(+el.dataset.k)));
   box.querySelector('.au-it-body').addEventListener('pointerenter', () => c.stop([...tabs].findIndex(t => t.classList.contains('on'))));
 }
+function liveMobCurve(box){
+  const all = [...box.querySelectorAll('[data-k]')], n = box.querySelectorAll('.au-mc-dot').length;
+  const show = i => all.forEach(el => el.classList.toggle('on', el.dataset.k === String(i)));
+  const c = cycle(box, n, show, 1800);
+  box.querySelectorAll('.au-mc-list li').forEach(el => {
+    el.addEventListener('pointerenter', () => c.hold(+el.dataset.k));
+    el.addEventListener('pointerleave', c.free);
+  });
+}
 // второе состояние графика в мониторе: при наведении и само, по очереди
 function liveScreens(box){
   const body = box.querySelector('.au-mon-body.alt'); if (!body) return;
@@ -721,6 +765,7 @@ export async function mountAudit(mount, p, helpers){
   mount.querySelectorAll('.au-rk').forEach(liveRank);
   mount.querySelectorAll('.au-dn').forEach(liveDonut);
   mount.querySelectorAll('.au-it').forEach(liveIndTable);
+  mount.querySelectorAll('.au-mc').forEach(liveMobCurve);
   mount.querySelectorAll('.au-pt').forEach(livePhoneTable);
   mount.querySelectorAll('.au-zp').forEach(liveZoom);
   mount.querySelectorAll('.au-scr').forEach(liveScreens);

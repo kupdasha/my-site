@@ -2177,6 +2177,8 @@ function renderCase(k, keepScroll){
   // audit — аудит как дизайн-кейс: главы с живой инфографикой, их рисует audit.js
   // auditTheme — палитра бренда для схем ('edb' — цвета ЕАБР), по умолчанию — divan.ru
   if (p.audit) body += `<div class="au au-mount${p.auditTheme ? ' au-' + p.auditTheme : ''}"></div>`;
+  // adhd — кейс «Где моё внимание?»: мысли, наброски, версии футболок с живыми анимациями; рисует adhd.js
+  if (p.adhd) body += `<div class="adhd adhd-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2237,6 +2239,10 @@ function renderCase(k, keepScroll){
   if (au) import(SCRIPT_BASE + 'audit.js?v=' + VER)
     .then(m => m.mountAudit(au, p, { T, pick, worldHTML, watchWorld, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('аудит не загрузился', err));
+  const ad = caseContent.querySelector('.adhd-mount');
+  if (ad) import(SCRIPT_BASE + 'adhd.js?v=' + VER)
+    .then(m => m.mountADHD(ad, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс СДВГ не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));

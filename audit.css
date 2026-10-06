@@ -837,3 +837,54 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
   .au-it-name{gap:8px}
   .au-it-head,.au-it-row{padding-left:6px;padding-right:6px}
 }
+
+/* ---------- рост ВВП: живая мобильная версия графика в телефоне ---------- */
+.au-scr.has-live .au-scr-phone{--pw:clamp(240px,21vw,290px)}
+.au-mc{display:flex;flex-direction:column;padding:6px 14px 0;color:var(--eb-navy)}
+.au-mc-ttl{font-weight:500;font-size:17px;line-height:1.2;margin:0 0 8px}
+.au-mc-plot{position:relative;aspect-ratio:10 / 6;margin:0 -4px}
+.au-mc-plot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;clip-path:inset(0 100% 0 0);transition:clip-path 1.6s var(--ease-io) 1s}
+.au-ch.in .au-mc-plot svg{clip-path:inset(-4px -4px -4px -4px)}
+.au-mc-dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;border:3px solid #4FD94F;transition:transform .3s var(--ease),background .3s}
+.au-mc-dot.on{transform:scale(1.6);background:#4FD94F}
+.au-mc-list{list-style:none;margin:8px 0 0;padding:0;display:grid}
+.au-mc-list li{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:8px;padding:5px 8px;border-radius:10px;font-size:16px;line-height:1.2;transition:background .3s}
+.au-mc-list img{width:18px;height:18px;border-radius:50%}
+.au-mc-list b{font-weight:500}
+.au-mc-list li.on{background:var(--eb-cyan-l)}
+.au-mc-src{margin:6px 8px 0;font-size:16px;opacity:.5}
+@media (max-width:760px){
+  .au-scr.has-live .au-mon{display:none}
+  .au-scr.has-live .au-scr-phone{--pw:300px;margin-top:0}
+}
+
+/* ---------- таблица показателей на телефоне ---------- */
+.au-pi{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:center}
+.au-pi-phone{--pw:330px;opacity:0;transform:translateY(32px);transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
+.au-ch.in .au-pi-phone{opacity:1;transform:none}
+.au-pi-phone .au-phone-scr{padding:4px 0 0;gap:0;overflow:hidden}
+.au-pi-nav{width:100%;height:auto;border-radius:0}
+.au-pi-body{padding:6px 10px 0}
+.au-pi-ttl{font-weight:500;font-size:18px;line-height:1.2;margin:0 4px 10px;color:var(--eb-navy)}
+.au-it.compact{padding:0;background:none;box-shadow:none}
+.au-it.compact .au-it-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px;margin:0 -10px 12px;padding:0 10px}
+.au-it.compact .au-it-tabs::-webkit-scrollbar{display:none}
+.au-it.compact .au-it-tab{flex:none;padding:6px 14px 8px;font-size:16px}
+.au-it.compact .au-it-head,.au-it.compact .au-it-row{grid-template-columns:minmax(0,1fr) 2.9em 2.9em 16px;gap:6px;padding:7px 4px}
+.au-it.compact .au-it-head{padding-top:0}
+.au-it.compact .au-it-sub{visibility:hidden}
+.au-it.compact .au-it-bar{display:none}
+.au-it.compact .au-it-name,.au-it.compact .au-it-v{font-size:16px;gap:8px}
+.au-it.compact .au-it-v b{min-width:0}
+.au-it.compact .au-it-name img,.au-it.compact .au-it-noflag{width:18px;height:18px}
+.au-it.compact .au-it-noflag{display:none}
+.au-it.compact .au-it-dir svg{width:16px;height:16px}
+.au-it.compact .au-it-src{margin:8px 4px 0}
+@media (max-width:860px){.au-pi{grid-template-columns:1fr}.au-pi-phone{justify-self:center;--pw:310px}}
+
+/* коллаж: длинная картинка-снимок тоже прокручивается при наведении */
+.au-bn.shot.tall img{object-position:50% 0;transition:object-position 7s cubic-bezier(.45,0,.55,1),transform 1.2s var(--ease)}
+.au-bn.shot.tall:hover img{object-position:50% 100%;transform:none}
+.au-scr-phone.live .au-phone-scr::after{height:14%}
+.au-mc-plot{aspect-ratio:10 / 5.4}
+.au-mc-list li{padding:4px 8px}
