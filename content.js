@@ -791,13 +791,21 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         short: ['Юбилейный знак к 25-летию компании',
                 'Купила 25 манго и объелась'],
         image: 'img/mango.jpg',
-        /* макеты из статьи на «Дизайнерс» (img/mango). Порядок: после задачи, после роли, после решения,
-           после результата, дальше — остальное подряд */
+        /* история кейса: бриф → ресерч → скетчи → финальный знак → носители.
+           Все картинки вырезаны из макета «MANGO 25 лет, исходники.fig» без самих слайдов.
+           Порядок: после задачи — бриф, после роли — ресерч, дальше подряд */
         gallery: [
-          'img/mango/m-01.jpg',                                          // основной и юбилейный логотип
-          /* ресерч: стена логотипов из презентации (img/mango/logos, исходники — PDF 3 и 4 с рабочего стола) */
+          { facts: [
+            { label: 'аудитория', text: 'B2B: компании малого, среднего и крупного бизнеса' },
+            { label: 'главный носитель', text: 'сайт, поэтому знак должен читаться в маленьком размере' },
+            { label: 'характер', text: 'микс технологичности, надежности и человечности' },
+            { label: 'фильтры', text: 'преемственность бренда, адаптивность, универсальность, юридические требования' },
+          ] },
+          /* ресерч: стены логотипов (img/mango/logos) */
+          [
+            { head: { title: 'ресерч', cols: true, text: 'Юбилейные логотипы делают банки, телеком и IT-сервисы, и решения повторяются: цифра рядом со знаком, цифра каллиграфией или много декора. Для открытки нормально, для B2B спорно: знак не должен выглядеть как акция в торговом центре.' } },
           { logos: [
-            { caption: 'ресерч: юбилейные логотипы конкурентов', items: [
+            { caption: 'юбилейные логотипы конкурентов', items: [
               { img: 'img/mango/logos/3-81.jpg', name: 'МегаФон: день рождения', fill: true, big: true },
               { img: 'img/mango/logos/3-45.jpg', name: 'Яндекс 360', wide: true },
               { img: 'img/mango/logos/3-17.jpg', name: 'IVA Technologies' },
@@ -844,26 +852,151 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               { img: 'img/mango/logos/4-29.jpg', name: 'Сбербанк 180 лет', fill: true },
             ] },
           ] },
-          { caption: 'ход работы', collage: { areas: '"a b" "c d"', cols: '1fr 1fr', rows: '1fr 1fr', ratio: '16/9', cells: [
-            { area: 'a', img: 'img/mango/m-04.jpg' }, { area: 'b', img: 'img/mango/m-06.jpg' },
-            { area: 'c', img: 'img/mango/m-07.jpg' }, { area: 'd', img: 'img/mango/m-08.jpg' },
-          ] } },
-          'vimeo:1186471152',                                            // анимация знака
-          { row: ['img/mango/m-05.jpg', 'img/mango/m-09.jpg'], caption: 'носители' },
-          'img/mango/m-10.jpg',
-          { row: ['img/mango/m-11.jpg', 'img/mango/m-12.jpg'], caption: 'мерч' },
-          { row: ['img/mango/m-13.jpg', 'img/mango/m-14.jpg'] },
+          ],
+          /* скетчи: 72 карточки с досок (img/mango/sketches) */
+          [
+            { head: { title: 'скетчи', cols: true, text: 'Дальше — быстрые скетчи: где стоит цифра, как пишется «лет», сфера или сердце, градиент или черный. Каждый вариант сразу проверяли в маленьком размере.' } },
+            { logos: [{ white: true, cols: 6, tcols: 4, pcols: 2, ratio: '3/1', items: [
+              { img: 'img/mango/sketches/s-01.jpg' },
+              { img: 'img/mango/sketches/s-02.jpg' },
+              { img: 'img/mango/sketches/s-03.jpg' },
+              { img: 'img/mango/sketches/s-04.jpg' },
+              { img: 'img/mango/sketches/s-05.jpg' },
+              { img: 'img/mango/sketches/s-06.jpg' },
+              { img: 'img/mango/sketches/s-07.jpg' },
+              { img: 'img/mango/sketches/s-08.jpg' },
+              { img: 'img/mango/sketches/s-09.jpg' },
+              { img: 'img/mango/sketches/s-10.jpg' },
+              { img: 'img/mango/sketches/s-11.jpg' },
+              { img: 'img/mango/sketches/s-12.jpg' },
+              { img: 'img/mango/sketches/s-13.jpg' },
+              { img: 'img/mango/sketches/s-14.jpg' },
+              { img: 'img/mango/sketches/s-15.jpg' },
+              { img: 'img/mango/sketches/s-16.jpg' },
+              { img: 'img/mango/sketches/s-17.jpg' },
+              { img: 'img/mango/sketches/s-18.jpg' },
+              { img: 'img/mango/sketches/s-19.jpg' },
+              { img: 'img/mango/sketches/s-20.jpg' },
+              { img: 'img/mango/sketches/s-21.jpg' },
+              { img: 'img/mango/sketches/s-22.jpg' },
+              { img: 'img/mango/sketches/s-23.jpg' },
+              { img: 'img/mango/sketches/s-24.jpg' },
+              { img: 'img/mango/sketches/s-25.jpg' },
+              { img: 'img/mango/sketches/s-26.jpg' },
+              { img: 'img/mango/sketches/s-27.jpg' },
+              { img: 'img/mango/sketches/s-28.jpg' },
+              { img: 'img/mango/sketches/s-29.jpg' },
+              { img: 'img/mango/sketches/s-30.jpg' },
+              { img: 'img/mango/sketches/s-31.jpg' },
+              { img: 'img/mango/sketches/s-32.jpg' },
+              { img: 'img/mango/sketches/s-33.jpg' },
+              { img: 'img/mango/sketches/s-34.jpg' },
+              { img: 'img/mango/sketches/s-35.jpg' },
+              { img: 'img/mango/sketches/s-36.jpg' },
+              { img: 'img/mango/sketches/s-37.jpg' },
+              { img: 'img/mango/sketches/s-38.jpg' },
+              { img: 'img/mango/sketches/s-39.jpg' },
+              { img: 'img/mango/sketches/s-40.jpg' },
+              { img: 'img/mango/sketches/s-41.jpg' },
+              { img: 'img/mango/sketches/s-42.jpg' },
+              { img: 'img/mango/sketches/s-43.jpg' },
+              { img: 'img/mango/sketches/s-44.jpg' },
+              { img: 'img/mango/sketches/s-45.jpg' },
+              { img: 'img/mango/sketches/s-46.jpg' },
+              { img: 'img/mango/sketches/s-47.jpg' },
+              { img: 'img/mango/sketches/s-48.jpg' },
+              { img: 'img/mango/sketches/s-49.jpg' },
+              { img: 'img/mango/sketches/s-50.jpg' },
+              { img: 'img/mango/sketches/s-51.jpg' },
+              { img: 'img/mango/sketches/s-52.jpg' },
+              { img: 'img/mango/sketches/s-53.jpg' },
+              { img: 'img/mango/sketches/s-54.jpg' },
+              { img: 'img/mango/sketches/s-55.jpg' },
+              { img: 'img/mango/sketches/s-56.jpg' },
+              { img: 'img/mango/sketches/s-57.jpg' },
+              { img: 'img/mango/sketches/s-58.jpg' },
+              { img: 'img/mango/sketches/s-59.jpg' },
+              { img: 'img/mango/sketches/s-60.jpg' },
+              { img: 'img/mango/sketches/s-61.jpg' },
+              { img: 'img/mango/sketches/s-62.jpg' },
+              { img: 'img/mango/sketches/s-63.jpg' },
+              { img: 'img/mango/sketches/s-64.jpg' },
+              { img: 'img/mango/sketches/s-65.jpg' },
+              { img: 'img/mango/sketches/s-66.jpg' },
+              { img: 'img/mango/sketches/s-67.jpg' },
+              { img: 'img/mango/sketches/s-68.jpg' },
+              { img: 'img/mango/sketches/s-69.jpg' },
+              { img: 'img/mango/sketches/s-70.jpg' },
+              { img: 'img/mango/sketches/s-71.jpg' },
+              { img: 'img/mango/sketches/s-72.jpg' },
+            ] }] },
+          ],
+          /* финальный логотип: почему он такой — формула, читаемость, охранное поле, версии, ошибки, исключение */
+          [
+            { head: { title: 'финальный логотип', cols: true, text: 'Из скетчей вырос финальный знак: узнаваемый градиент основного логотипа, юбилейную цифру и силуэт сердца. Он не спорит с основным логотипом, а продолжает его.' } },
+            { logos: [{ white: true, labels: true, cols: 2, pcols: 2, ratio: '3/1', items: [ { img: 'img/mango/rounds/v2-15.jpg', name: 'основной логотип' }, { img: 'img/mango/rounds/final.jpg', name: 'юбилейный' } ] }] },
+            { head: { title: 'концепция', cols: true, text: 'В основе — узнаваемый градиент, который сопровождает бренд все эти годы как символ стабильности, сердце и юбилейная цифра 25. Форма сердца объединяет эффективность и понятные решения для бизнеса с заботой о клиентском опыте и поддержкой роста.' } },
+            { formula: { parts: ['img/mango/guide/part-circle.png', 'img/mango/guide/part-heart.png', 'img/mango/guide/part-25.png'], logo: 'img/mango/guide/logo.png', alt: 'юбилейный логотип MANGO OFFICE',
+              tags: ['надежность', 'технологии', 'поддержка', 'забота', 'человечность'] } },
+            { head: { title: 'читаемость', cols: true, text: 'Главный носитель — сайт, поэтому знак проверяли в маленьком размере. В 32 пикселях у многих вариантов пропадают тонкие линии, слипаются подписи, а 25 превращается в 26. Финальный знак остается читаемым.' } },
+            { sizes: { logo: 'img/mango/guide/logo.png', heights: [88, 56, 32, 20] } },
+            { head: { title: 'охранное поле', cols: true, text: 'Охранное поле равно одному модулю «25». Расстояние между знаком и названием не меняется ни в одной адаптации: это нужно для читаемости и для макетов с кобрендингом.' } },
+            { safe: { logo: 'img/mango/guide/logo.png', mark: 'img/mango/guide/mark.png', ratio: 2000 / 222 } },
+            { head: { title: 'версии', cols: true, text: 'Кроме основной версии есть дополнительные, только для исключительных случаев: тиснение, гравировка по металлу, стеклу и дереву, нашивки на текстиле.' } },
+            { logos: [{ white: true, cols: 3, ratio: '12/5', items: [
+                { img: 'img/mango/guide/ver-1.jpg', fill: true },
+                { img: 'img/mango/guide/ver-2.jpg', fill: true },
+                { img: 'img/mango/guide/ver-3.jpg', fill: true },
+                { img: 'img/mango/guide/ver-4.jpg', fill: true },
+                { img: 'img/mango/guide/ver-5.jpg', fill: true },
+                { img: 'img/mango/guide/ver-6.jpg', fill: true },
+                { img: 'img/mango/guide/ver-7.jpg', fill: true },
+                { img: 'img/mango/guide/ver-8.jpg', fill: true },
+                { img: 'img/mango/guide/ver-9.jpg', fill: true },
+            ] }] },
+            { head: { title: 'ошибки', cols: true, text: 'Нельзя встраивать логотип в текст, использовать только шрифтовую часть, искажать или поворачивать форму, добавлять контур, тени и эффекты, закрашивать векторную версию не фирменным цветом.' } },
+            { logos: [{ white: true, cols: 3, ratio: '12/5', items: [
+                { img: 'img/mango/guide/err-1.jpg', fill: true },
+                { img: 'img/mango/guide/err-2.jpg', fill: true },
+                { img: 'img/mango/guide/err-3.jpg', fill: true },
+                { img: 'img/mango/guide/err-4.jpg', fill: true },
+                { img: 'img/mango/guide/err-5.jpg', fill: true },
+                { img: 'img/mango/guide/err-6.jpg', fill: true },
+                { img: 'img/mango/guide/err-7.jpg', fill: true },
+                { img: 'img/mango/guide/err-8.jpg', fill: true },
+                { img: 'img/mango/guide/err-9.jpg', fill: true },
+            ] }] },
+            { head: { title: 'исключение', cols: true, text: 'Когда на светлом фоне белое оформление выглядит блеклым (например, в группе ВКонтакте), допускается цветной фон и белый логотип.' } },
+            { logos: [{ white: true, cols: 2, ratio: '1400/1056', items: [
+                { img: 'img/mango/guide/exc-1.jpg', fill: true, name: 'основная версия' },
+                { img: 'img/mango/guide/exc-2.jpg', fill: true, name: 'исключение: цветной фон' },
+            ] }] },
+          ],
+          /* носители (img/mango/mockups) */
+          [
+            { head: { title: 'носители', cols: true, text: 'Знак проверили везде, где он будет жить: сайт и личный кабинет, ВКонтакте, рассылки и трансляции, документы, мероприятия, навигация и мерч. Для текстиля — монохромные версии.' } },
+            { row: ['img/mango/mockups/site-screen.jpg', 'img/mango/mockups/car-8.jpg'], caption: 'сайт' },
+            /* окна входа сверстаны: скриншоты были низкого качества */
+            { login: { caption: 'личный кабинет и интернет-магазин', logo: 'img/mango/guide/logo.png', cards: [
+              { title: 'Добро пожаловать\nв Личный кабинет', fields: ['Лицевой счет, логин, почта, телефон', 'Пароль'], linkTop: 'Забыли пароль?', button: 'Войти', color: '#3DA84A' },
+              { title: 'Войти в интернет-магазин', fields: ['Лицевой счет', 'Пароль'], button: 'Войти', color: '#F26722', link: 'Забыли пароль?' },
+            ] } },
+            { laptop: { caption: 'окно трансляции', img: 'img/mango/mockups/windows.jpg' } },
+            { row: ['img/mango/mockups/car-16.jpg'], caption: 'мероприятия' },
+            { row: ['img/mango/mockups/car-17a.jpg', 'img/mango/mockups/car-17b.jpg'], caption: 'навигация и стенды' },
+            { swing: { caption: 'мерч', side: 'img/mango/mockups/car-14.jpg', focus: [0.512, 0.428], img: 'img/mango/mockups/keychain.png' } },
+          ],
         ],
         link:  'https://kupdasha.ru/design',
         links: [],   // ссылки в конце кейса не нужны: суть статьи «о процессе» перенесена в текст ниже
-        twoCols: ['task', 'solution', 'result'],   // длинные блоки — в две колонки
+        twoCols: ['task'],   // длинные блоки — в две колонки
         /* кейс по схеме: задача бизнеса → роль и команда → ключевое решение и защита → результат.
            Пустая строка '' — блок не показывается. */
         scheme: {
-          task:     'К 25-летию MANGO OFFICE нужен был отдельный юбилейный знак: подчеркнуть дату, сохранить связь с брендом и одинаково хорошо работать везде — от сайта и баннеров до мероприятий и корпоративных материалов. Компания делает телефонию, виртуальные АТС и контакт-центры для бизнеса, поэтому аудитория — собственники, руководители, IT-директора и коммерческие команды. Им важны уверенность, современность и порядок.',
+          task:     'К 25-летию MANGO OFFICE нужен был отдельный юбилейный знак: явно показать дату, сохранить связь с действующим логотипом и одинаково хорошо работать везде — от сайта до мерча.',
           role:     'Разработала юбилейный логотип - от концепции до финального знака.',   // ПРОВЕРЬ: роль и команда
-          solution: 'Начала не с эскизов, а с рынка. Юбилейные логотипы делают банки, телеком и IT-сервисы, и решения повторяются: цифра рядом со знаком, цифра каллиграфией или много декора — ленты, сияние, плашки. Для открытки нормально, для B2B спорно: знак не должен выглядеть как акция в торговом центре. Главный фильтр — читаемость. Логотип живет в основном на сайте, то есть в маленьком размере: в 32 пикселях тонкие линии пропадают, подписи слипаются, а 25 превращается в 26. Варианты «как у конкурентов» я тоже показала — они привычны заказчику, но не прошли проверку современностью и читаемостью.',
-          result:   'Собранный и технологичный знак, который говорит клиентам: «нам уже 25 лет, и мы все еще лучшие в том, что делаем». Проверили его на сайте, в рассылках, на мероприятиях, навигации и стендах, в документах и мерче — для текстиля предусмотрены монохромные версии.',   // ВПИШИ: где используется знак, принят ли с первого раза
+          solution: '',   // решение рассказано блоками галереи: ресерч, скетчи, раунды, финальный знак
+          result:   '',   // ВПИШИ: где используется знак, принят ли с первого раза
         },
       },
       {

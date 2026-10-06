@@ -274,7 +274,7 @@ function renderAboutExtras(){
       // серьезная версия: хроника выступлений — несколько фото в ряд, остальные в просмотре
       strip.className = 'photo-strip ev-strip';
       strip.innerHTML = E.items.slice(0, E.first || 4).map((e, k) =>
-        `<figure class="ev" data-i="${k}" data-reveal style="--d:${(k * 0.08).toFixed(2)}s;--ar:${e.ratio || 1.5}"><img src="${e.thumb || e.src}" alt="${esc(pick(e.caption))}" loading="lazy"><figcaption>${T(e.caption)}</figcaption></figure>`).join('')
+        `<figure class="ev" data-i="${k}" data-reveal style="--d:${(k * 0.08).toFixed(2)}s;--ar:${e.ratio || 1.5}"><img src="${e.thumb || e.src}" alt="${uesc(pick(e.caption))}" loading="lazy"><figcaption>${T(e.caption)}</figcaption></figure>`).join('')
         + `<p class="ev-more" data-reveal><button type="button" class="link ev-all">${T(E.more)}</button><sup class="yr">${E.items.length}</sup></p>`;
     } else if (isFun() && SITE.photos.dating) {
       // дружеская версия: колода, как в приложении знакомств
@@ -1180,7 +1180,7 @@ function startThermal(box, t){
    { spin } — градиенты поворачиваются; { float3d } — левитирующие 3D-иконки;
    { icons2d } — анимированные 2D-элементы и правила соединения с 3D
    ================================================================ */
-const blockHead = x => `<div class="case-text"><span class="case-label">${T(x.title)}</span><p>${T(x.text)}</p></div>`;
+const blockHead = x => `<div class="case-text${x.cols ? ' cols2' : ''}"><span class="case-label">${T(x.title)}</span><p>${T(x.text)}</p></div>`;
 // цвета: три полосы съезжаются в одну, сначала смешиваются напрямую (грязь), потом встает фиолетовый мостик
 function blendHTML(b){
   const [c1, c2, c3] = b.items, m = b.between;
@@ -1592,12 +1592,161 @@ function startMorph(box, list){
     else if (!e.isIntersecting){ on = false; cancelAnimationFrame(raf); }
   }).observe(box);
 }
+/* РОЛИКИ КОЛЛАЖОМ (поле { clips: [...], caption } в галерее кейса, см. MANGO OFFICE):
+   тихие mp4 рядом друг с другом, сеткой по два; играют по кругу и встают на паузу вне экрана, не увеличиваются.
+   #t=0.1 в адресе — первый кадр виден сразу, даже если телефон запретил автозапуск.
+   «Вперед-назад» вшито в сами файлы (вторая половина ролика — он же задом наперед) */
+function clipsHTML(x){
+  return `<div class="wrap camp-rowbox">${x.caption ? `<p class="camp-cap">${T(x.caption)}</p>` : ''}<div class="clips">${
+    x.clips.map(src => `<div class="clip"><video src="${src}#t=0.1" muted loop playsinline autoplay preload="auto" disablepictureinpicture></video></div>`).join('')
+  }</div></div>`;
+}
+const clipPlayer = new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
+}), { threshold: 0.2 });
+/* ГАЙДЛАЙН ЗНАКА (см. MANGO OFFICE)
+   { formula: { parts: [картинки], logo, tags: [слова] } } — части знака встают через «+», под ними собирается
+   логотип, следом по одному появляются теги-ценности;
+   { safe: { logo, mark } } — охранное поле: вокруг логотипа расходятся призрачные модули знака (1х),
+   рамка показывает границу. Размер модуля = высота логотипа, считается от ширины блока (cqw) */
+/* ЖИВЫЕ МАКЕТЫ НОСИТЕЛЕЙ (см. MANGO OFFICE): интерфейсы сверстаны, а не сняты скриншотом */
+const uesc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const capHTML = c => c ? `<p class="camp-cap">${T(c)}</p>` : '';
+// { login: { logo, caption, cards: [{ title, fields: [..], button, color, link }] } } — окна входа; \n в title — перенос строки
+function loginHTML(x){
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="ui-scene ui-login">${x.cards.map(c => `
+    <div class="ui-card">
+      <img class="ui-logo" src="${x.logo}" alt="MANGO OFFICE">
+      <p class="ui-title">${c.title.split('\n').map(T).join('<br>')}</p>
+      ${c.fields.map((f, i) => `<label class="ui-field"><span>${uesc(f)}</span><i>${i === c.fields.length - 1 ? '<b class="ui-eye"></b>' : ''}</i></label>`).join('')}
+      ${c.linkTop ? `<span class="ui-link">${uesc(c.linkTop)}</span>` : ''}
+      <span class="ui-btn" style="--c:${c.color}">${uesc(c.button)}</span>
+      ${c.link ? `<span class="ui-link right">${uesc(c.link)}</span>` : ''}
+    </div>`).join('')}</div></div>`;
+}
+// { mail: { img, from, address, subject, caption } } — письмо в почтовом клиенте: список писем и открытое письмо
+function mailHTML(x){
+  const row = (on, w) => `<li class="${on ? 'on' : ''}"><i></i><span><b style="width:${w}%"></b><b style="width:${w - 18}%"></b></span></li>`;
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="ui-scene"><div class="ui-win ui-mail">
+    <div class="ui-bar"><i></i><i></i><i></i></div>
+    <div class="ui-mail-body">
+      <ul class="ui-list">${row(false, 70)}<li class="on"><i class="ball"></i><span><em>${uesc(x.from)}</em><small>${uesc(x.subject)}</small></span></li>${row(false, 64)}${row(false, 76)}${row(false, 58)}${row(false, 68)}</ul>
+      <div class="ui-read">
+        <div class="ui-read-head"><i class="ball"></i><span><em>${uesc(x.from)}</em><small>${uesc(x.address)}</small></span></div>
+        <p class="ui-subj">${T(x.subject)}</p>
+        <div class="ui-letter"><img src="${x.img}" alt="" loading="lazy"></div>
+      </div>
+    </div></div></div></div>`;
+}
+// { laptop: { img, caption } } — серый ноутбук с экраном
+function laptopHTML(x){
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="ui-scene ui-laptop-scene"><div class="ui-laptop">
+    <div class="ui-screen"><img src="${x.img}" alt="" loading="lazy"></div><div class="ui-base"><i></i></div>
+  </div></div></div>`;
+}
+// { papers: { items: [img...], caption } } — листы бумаги парят в воздухе
+function papersHTML(x){
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="ui-scene ui-papers">${x.items.map((src, i) =>
+    `<div class="paper p${i}"><img src="${src}" alt="" loading="lazy"></div>`).join('')}</div></div>`;
+}
+// { swing: { img, side, focus: [x, y], sideRatio, caption } } — брелок качается от движения курсора (маятник);
+// рядом фото-«окно»: точка focus (доли кадра) стоит по центру, картинка катается за курсором — ощущение пространства
+function swingHTML(x){
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="swing-row">
+    ${x.side ? `<div class="pano" style="--fx:${x.focus ? x.focus[0] : .5};--fy:${x.focus ? x.focus[1] : .5};--iar:${x.sideRatio || 16 / 9}"><img src="${x.side}" alt="" loading="lazy" draggable="false"></div>` : ''}
+    <div class="swing"><img class="swing-obj" src="${x.img}" alt="брелок" draggable="false"></div>
+  </div></div>`;
+}
+function watchPano(box){
+  const img = box.querySelector('img');
+  let tx = 0, gx = 0, raf = 0;
+  const step = () => {
+    tx += (gx - tx) * .045;   // мягко догоняет курсор
+    img.style.transform = `translateX(${tx.toFixed(3)}%)`;
+    raf = Math.abs(gx - tx) > .005 ? requestAnimationFrame(step) : 0;
+  };
+  const go = () => { if (!raf) raf = requestAnimationFrame(step); };
+  // отсчет от центра самой фотографии: курсор в центре — логотип в центре
+  box.addEventListener('pointermove', e => {
+    const r = box.getBoundingClientRect();
+    gx = -((e.clientX - r.left) / r.width - .5) * 6;   // проценты ширины картинки, в обратную сторону — глубина
+    go();
+  });
+  box.addEventListener('pointerleave', () => { gx = 0; go(); });
+}
+// читаемость: прячем размеры, которые не помещаются в ширину блока (знак не сжимается, подпись остается правдой)
+function fitSizes(box){
+  const fit = () => {
+    const base = box.clientWidth - parseFloat(getComputedStyle(box).paddingLeft) * 2;
+    box.querySelectorAll('.gd-size').forEach(r => {
+      const free = base - (getComputedStyle(r).flexDirection.startsWith('column') ? 0 : 70);   // подпись сбоку занимает место
+      const img = r.querySelector('img'); if (!img.naturalWidth) return;
+      r.classList.toggle('off', img.naturalWidth / img.naturalHeight * parseFloat(img.style.height) > free);
+    });
+  };
+  box.querySelectorAll('img').forEach(i => i.complete ? fit() : i.addEventListener('load', fit, { once: true }));
+  new ResizeObserver(fit).observe(box);
+}
+function watchSwing(box){
+  const obj = box.querySelector('.swing-obj');
+  let ang = 0, vel = 0, lastX = null, raf = 0, on = false, t0 = performance.now();
+  const step = t => {
+    // маятник: возвращается к покою, затухает; в покое чуть покачивается
+    const idle = Math.sin((t - t0) / 1400) * 1.2;
+    vel += (idle - ang) * 0.008; vel *= 0.97; vel = Math.max(-2.5, Math.min(2.5, vel)); ang = Math.max(-32, Math.min(32, ang + vel));
+    obj.style.transform = `rotate(${ang.toFixed(2)}deg)`;
+    if (on) raf = requestAnimationFrame(step);
+  };
+  box.addEventListener('pointermove', e => {
+    if (lastX != null) vel = Math.max(-2.5, Math.min(2.5, vel - Math.max(-.5, Math.min(.5, (e.clientX - lastX) * 0.025))));   // толчок по скорости курсора: низ брелка уходит туда, куда ведут
+    lastX = e.clientX;
+  });
+  box.addEventListener('pointerleave', () => { lastX = null; });
+  box.addEventListener('click', () => { vel += (Math.random() < .5 ? -1 : 1) * 2; });
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !on){ on = true; raf = requestAnimationFrame(step); }
+    else if (!e.isIntersecting){ on = false; cancelAnimationFrame(raf); }
+  }).observe(box);
+}
+// { facts: [{ label, text }] } — короткие факты колонками в одну строку (бриф)
+function factsHTML(list){
+  return `<div class="wrap"><div class="camp-head scheme-cols facts">${list.map((f, i) =>
+    `<div class="camp-col" style="grid-column:span ${Math.floor(12 / list.length)};--i:${i}"><span class="camp-label">${T(f.label)}</span><p>${T(f.text)}</p></div>`).join('')}</div></div>`;
+}
+// { sizes: { logo, heights: [px...] } } — один знак в нескольких размерах: проверка читаемости, подпись — размер в пикселях
+function sizesHTML(x){
+  return `<div class="wrap"><div class="gd gd-sizes">${x.heights.map((h, i) =>
+    `<div class="gd-size" style="--i:${i}"><img src="${x.logo}" alt="" style="height:${h}px"><span>${h} px</span></div>`).join('')}</div></div>`;
+}
+function formulaHTML(f){
+  return `<div class="wrap"><div class="gd gd-formula">
+    <div class="gd-parts">${f.parts.map((src, i) => `${i ? '<span class="gd-plus" aria-hidden="true">+</span>' : ''}<img src="${src}" alt="" style="--i:${i}">`).join('')}</div>
+    <img class="gd-logo" src="${f.logo}" alt="${(f.alt || '').replace(/"/g, '&quot;')}" style="--i:${f.parts.length}">
+    ${f.tags ? `<div class="gd-tags">${f.tags.map((t, i) => `<span class="gd-tag" style="--i:${i}">${T(t)}</span>`).join('')}</div>` : ''}
+  </div></div>`;
+}
+function safeHTML(x){
+  const r = x.ratio || 9;   // ширина логотипа к его высоте
+  const ghost = side => `<img class="gd-ghost ${side}" src="${x.mark}" alt="" aria-hidden="true">`;
+  return `<div class="wrap"><div class="gd gd-safe"><div class="gd-box" style="--r:${r}">
+    <img class="gd-safe-logo" src="${x.logo}" alt="">
+    ${['l', 'r', 't', 'b'].map(ghost).join('')}
+    <span class="gd-1x">1x</span>
+  </div></div></div>`;
+}
+const gdReveal = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); gdReveal.unobserve(e.target); }
+}), { rootMargin: '0px 0px -15% 0px' });
 /* СТЕНА ЛОГОТИПОВ (поле { logos: [...] } в галерее кейса, см. MANGO OFFICE):
    одинаковые плитки, логотип на белом стоит с полями, fill: true — баннер или фото заполняет плитку,
-   big: true — плитка 2×2, wide: true — плитка на две колонки, pos — какую часть баннера оставить при обрезке. Плитки проявляются волной, по нажатию увеличиваются */
+   big: true — плитка 2×2, wide: true — плитка на две колонки, half: true — на полряда,
+   если обычных плиток нет (только длинные знаки), на планшете стена в 4 колонки;
+   у группы: white: true — белые плитки, разделенные тонкими линиями (без серой подложки),
+   cols — свое число колонок (на телефоне одна), ratio — пропорции плиток, например '12/5'; labels: true — name плитки виден подписью; tcols / pcols — колонки на планшете и телефоне; pos — какую часть баннера оставить при обрезке. Плитки проявляются волной, по нажатию увеличиваются */
 function logoWallHTML(groups){
-  return groups.map(g => `<div class="wrap camp-rowbox">${g.caption ? `<p class="camp-cap">${T(g.caption)}</p>` : ''}<div class="logo-wall">${
-    g.items.map(i => `<button class="lw-tile${i.fill ? ' fill' : ''}${i.big ? ' big' : ''}${i.wide ? ' wide' : ''}" aria-label="${(i.name || 'Увеличить').replace(/"/g, '&quot;')}"><img src="${i.img}" alt="${(i.name || '').replace(/"/g, '&quot;')}"${i.pos ? ` style="object-position:${i.pos}"` : ''} loading="lazy"></button>`).join('')
+  return groups.map(g => `<div class="wrap camp-rowbox">${g.caption ? `<p class="camp-cap">${T(g.caption)}</p>` : ''}<div class="logo-wall${g.items.every(i => i.big || i.wide || i.half) ? ' even' : ''}${g.white ? ' white' : ''}${g.cols ? ' set' : ''}"${g.cols || g.ratio ? ` style="${g.cols ? `--cols:${g.cols};--tcols:${g.tcols || g.cols};--pcols:${g.pcols || 1};` : ''}${g.ratio ? `--ar:${g.ratio}` : ''}"` : ''}>${
+    g.items.map(i => `<button class="lw-tile${i.fill ? ' fill' : ''}${i.big ? ' big' : ''}${i.wide ? ' wide' : ''}${i.half ? ' half' : ''}" aria-label="${(i.name || 'Увеличить').replace(/"/g, '&quot;')}"><img src="${i.img}" alt="${(i.name || '').replace(/"/g, '&quot;')}"${i.pos ? ` style="object-position:${i.pos}"` : ''} loading="lazy">${g.labels && i.name ? `<span class="lw-name">${T(i.name)}</span>` : ''}</button>`).join('')
   }</div></div>`).join('');
 }
 const wallReveal = new IntersectionObserver(es => es.forEach(e => {
@@ -1626,6 +1775,16 @@ function galleryItem(x){
   if (x && x.float3d) return float3dHTML(x.float3d);
   if (x && x.icons2d) return icons2dHTML(x.icons2d);
   if (x && x.logos) return logoWallHTML(x.logos);
+  if (x && x.formula) return formulaHTML(x.formula);
+  if (x && x.login) return loginHTML(x.login);
+  if (x && x.mail) return mailHTML(x.mail);
+  if (x && x.laptop) return laptopHTML(x.laptop);
+  if (x && x.papers) return papersHTML(x.papers);
+  if (x && x.swing) return swingHTML(x.swing);
+  if (x && x.facts) return factsHTML(x.facts);
+  if (x && x.sizes) return sizesHTML(x.sizes);
+  if (x && x.safe) return safeHTML(x.safe);
+  if (x && x.clips) return clipsHTML(x);
   if (x && x.morph) return morphHTML(x);
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   if (x && x.collage) return campCollage(x);
@@ -1730,6 +1889,12 @@ function renderCase(k, keepScroll){
   markArticles(caseContent);
   watchCampaigns(caseContent);
   caseContent.querySelectorAll('.logo-wall').forEach(watchLogoWall);
+  caseContent.querySelectorAll('.gd').forEach(el => gdReveal.observe(el));
+  caseContent.querySelectorAll('.swing').forEach(watchSwing);
+  caseContent.querySelectorAll('.pano').forEach(watchPano);
+  caseContent.querySelectorAll('.gd-sizes').forEach(fitSizes);
+  caseContent.querySelectorAll('.ui-papers, .ui-login, .ui-mail, .ui-laptop').forEach(el => gdReveal.observe(el));
+  caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   const au = caseContent.querySelector('.au-mount');
   if (au) import(SCRIPT_BASE + 'audit.js?v=' + Math.floor(Date.now() / 36e5))
