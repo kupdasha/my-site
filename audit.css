@@ -750,7 +750,6 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-bn img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0;transition:transform 1.2s var(--ease)}
 .au-bn.shot:hover img{transform:scale(1.03)}
 .au-bn.page img{position:absolute;left:9%;top:7%;width:82%;height:93%;object-position:50% 0;box-shadow:0 18px 50px -18px rgba(0,22,91,.35);transition:object-position 6s cubic-bezier(.45,0,.55,1)}
-.au-bn.page:hover img{object-position:50% 100%}
 .au-bn.page::after{content:"";position:absolute;inset:auto 0 0;height:22%;background:linear-gradient(rgba(238,240,243,0),#EEF0F3);pointer-events:none}
 .au-bn.a{grid-column:1 / 8;grid-row:span 2}
 .au-bn.b{grid-column:8 / 13;grid-row:span 3}
@@ -762,7 +761,6 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
   .au-bn.a,.au-bn.c,.au-bn.e{grid-column:1 / -1}
   .au-bn.a{grid-row:1}.au-bn.c{grid-row:4}.au-bn.e{grid-row:5}
   .au-bn.b{grid-column:1;grid-row:2 / 4}.au-bn.d{grid-column:2;grid-row:2 / 4}
-  .au-bn.page:hover img{object-position:50% 0}
 }
 
 /* телефон рядом с монитором: экран начинается выше (челки нет), текст внизу уходит под белый градиент */
@@ -884,7 +882,47 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 
 /* коллаж: длинная картинка-снимок тоже прокручивается при наведении */
 .au-bn.shot.tall img{object-position:50% 0;transition:object-position 7s cubic-bezier(.45,0,.55,1),transform 1.2s var(--ease)}
-.au-bn.shot.tall:hover img{object-position:50% 100%;transform:none}
 .au-scr-phone.live .au-phone-scr::after{height:14%}
 .au-mc-plot{aspect-ratio:10 / 5.4}
 .au-mc-list li{padding:4px 8px}
+
+/* коллаж: длинные страницы прокручиваются сами, туда и обратно, каждая со своим сдвигом */
+@keyframes au-pan{0%,10%{object-position:50% 0}45%,55%{object-position:50% 100%}90%,100%{object-position:50% 0}}
+.au-ch.in .au-bn.page img,.au-ch.in .au-bn.tall img{animation:au-pan 16s cubic-bezier(.45,0,.55,1) infinite;animation-delay:calc(var(--i) * -3.2s)}
+@media (prefers-reduced-motion:reduce){.au-ch.in .au-bn.page img,.au-ch.in .au-bn.tall img{animation:none}}
+
+/* глава «текст рядом с телефоном»: заголовок и текст слева, визуализация справа */
+.au-ch.side .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(32px,6vw,120px);align-items:center}
+.au-ch.side .au-head{display:flex;flex-direction:column;align-items:flex-start;margin:0}
+.au-ch.side .au-pi{display:block}
+@media (max-width:860px){.au-ch.side .wrap{grid-template-columns:1fr}.au-ch.side .au-head{margin-bottom:8px}.au-ch.side .au-pi{display:grid;justify-items:center}}
+
+/* текст страницы внизу телефона уходит под белый градиент: видно, что страница продолжается */
+.au-ph-more{margin:14px 4px 0;font-size:16px;line-height:1.4;color:var(--eb-navy)}
+.au-pi-phone .au-phone-scr::after{content:"";position:absolute;inset:auto 0 0;height:30%;background:linear-gradient(rgba(255,255,255,0),#fff 80%);pointer-events:none}
+.au-scr-phone.live .au-phone-scr::after{height:24%}
+.au-mc-plot{margin:0}
+
+/* ---------- обложки разделов ---------- */
+.au-cov-stage{position:relative;aspect-ratio:2000 / 608;border-radius:var(--r-img);overflow:hidden;background:var(--eb-navy)}
+.au-cov-slide{position:absolute;inset:0;opacity:0;transition:opacity 1s var(--ease)}
+.au-cov-slide.on{opacity:1}
+.au-cov-slide img{width:100%;height:100%;object-fit:cover;border-radius:0;transform:scale(1.06);transition:transform 5s linear}
+.au-cov-slide.on img{transform:scale(1)}
+.au-cov-txt{position:absolute;left:clamp(20px,5vw,80px);top:50%;max-width:min(56%,620px);display:flex;flex-direction:column;gap:clamp(8px,1vw,16px);color:#fff;transform:translateY(calc(-50% + 16px));opacity:0;transition:opacity .7s var(--ease),transform .9s var(--ease)}
+.au-cov-slide.on .au-cov-txt{opacity:1;transform:translateY(-50%);transition-delay:.35s}
+.au-cov-txt b{font-weight:500;font-size:clamp(22px,2.8vw,40px);line-height:1.1}
+.au-cov-txt span{font-size:clamp(16px,1.3vw,19px);line-height:1.45;opacity:.9}
+.au-cov-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.au-cov-tab{position:relative;overflow:hidden;padding:10px 20px 12px;border-radius:999px;background:var(--soft);color:var(--ink);font-size:16px;transition:background .3s,color .3s}
+.au-cov-tab i{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--eb-cyan);transform:scaleX(0);transform-origin:left}
+.au-cov-tab.on{background:var(--eb-navy);color:#fff}
+.au-cov-tab.on i{animation:au-cov-bar 4.2s linear forwards}
+@keyframes au-cov-bar{to{transform:none}}
+@media (max-width:760px){
+  .au-cov-stage{aspect-ratio:4 / 3}
+  .au-cov-slide img{object-position:85% 50%}
+  .au-cov-txt{left:20px;right:20px;max-width:none}
+  .au-cov-slide::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,22,91,.55),rgba(0,22,91,0) 85%)}
+  .au-cov-txt{z-index:1}
+}

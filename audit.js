@@ -333,9 +333,8 @@ function phoneInd(c, p){
   return `<div class="au-pi">
     <div class="au-phone au-pi-phone"><div class="au-phone-scr">
       ${c.nav ? `<img class="au-pi-nav" src="${c.nav}" alt="">` : ''}
-      <div class="au-pi-body"><p class="au-pi-ttl">${H.T(c.title)}</p>${indTable(t, true)}</div>
+      <div class="au-pi-body"><p class="au-pi-ttl">${H.T(c.title)}</p>${indTable(t, true)}${c.more ? `<p class="au-ph-more">${H.T(c.more)}</p>` : ''}</div>
     </div></div>
-    <ul class="au-zp-steps au-pi-steps">${c.steps.map((s, i) => `<li style="--i:${i}">${H.T(s)}</li>`).join('')}</ul>
   </div>`;
 }
 
@@ -411,7 +410,7 @@ function screens(c){
 // мобильная версия графика: кривая во всю ширину экрана, под ней страны строками; точка и строка подсвечиваются вместе
 function mobCurve(c){
   const max = Math.max(...c.items.map(x => x.v)) * 1.18;
-  const pts = c.items.map((x, i) => [.06 + i / (c.items.length - 1) * .88, .92 - x.v / max * .84]);
+  const pts = c.items.map((x, i) => [.05 + i / (c.items.length - 1) * .9, .92 - x.v / max * .84]);
   const line = smooth(pts, 1000, 600);
   const list = [...c.items].map((x, i) => ({ ...x, i })).sort((a, b) => b.v - a.v);
   return `<div class="au-mc">
@@ -426,6 +425,18 @@ function mobCurve(c){
     </div>
     <ul class="au-mc-list">${list.map(x => `<li data-k="${x.i}"><img src="${x.flag}" alt=""><span>${H.T(x.name)}</span><b>${n1(x.v)}%</b></li>`).join('')}</ul>
     ${c.source ? `<p class="au-mc-src">${H.T(c.source)}</p>` : ''}
+    ${c.more ? `<p class="au-ph-more">${H.T(c.more)}</p>` : ''}
+  </div>`;
+}
+
+// обложки разделов: сменяют друг друга вместе с заголовком и текстом раздела; снизу — переключатели
+function covers(list){
+  return `<div class="au-cov">
+    <div class="au-cov-stage">${list.map((c, i) => `<div class="au-cov-slide${i ? '' : ' on'}" data-k="${i}">
+      <img src="${c.img}" alt="" loading="lazy">
+      <div class="au-cov-txt"><b>${H.T(c.title)}</b><span>${H.T(c.text)}</span></div>
+    </div>`).join('')}</div>
+    <div class="au-cov-tabs">${list.map((c, i) => `<button class="au-cov-tab${i ? '' : ' on'}" data-k="${i}"><i></i>${H.T(c.tab || c.title)}</button>`).join('')}</div>
   </div>`;
 }
 
@@ -470,7 +481,8 @@ function chapter(ch, p){
   if (ch.screens)   viz += screens(ch.screens);
   if (ch.rows)      viz += rows(ch.rows);
   if (ch.collage)   viz += collage(ch.collage);
-  return `<section class="au-ch${ch.color ? ' c-' + ch.color : ''}">
+  if (ch.covers)    viz += covers(ch.covers);
+  return `<section class="au-ch${ch.color ? ' c-' + ch.color : ''}${ch.side ? ' side' : ''}">
     <div class="wrap">
       <div class="au-head">
         ${ch.label ? `<span class="case-label au-label">${H.T(ch.label)}</span>` : ''}
@@ -628,6 +640,12 @@ function liveMobCurve(box){
     el.addEventListener('pointerleave', c.free);
   });
 }
+function liveCovers(box){
+  const all = [...box.querySelectorAll('[data-k]')], tabs = box.querySelectorAll('.au-cov-tab');
+  const show = i => all.forEach(el => el.classList.toggle('on', el.dataset.k === String(i)));
+  const c = cycle(box, tabs.length, show, 4200);
+  tabs.forEach(el => el.addEventListener('click', () => c.stop(+el.dataset.k)));
+}
 // второе состояние графика в мониторе: при наведении и само, по очереди
 function liveScreens(box){
   const body = box.querySelector('.au-mon-body.alt'); if (!body) return;
@@ -766,6 +784,7 @@ export async function mountAudit(mount, p, helpers){
   mount.querySelectorAll('.au-dn').forEach(liveDonut);
   mount.querySelectorAll('.au-it').forEach(liveIndTable);
   mount.querySelectorAll('.au-mc').forEach(liveMobCurve);
+  mount.querySelectorAll('.au-cov').forEach(liveCovers);
   mount.querySelectorAll('.au-pt').forEach(livePhoneTable);
   mount.querySelectorAll('.au-zp').forEach(liveZoom);
   mount.querySelectorAll('.au-scr').forEach(liveScreens);
