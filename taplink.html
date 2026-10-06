@@ -222,8 +222,24 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
     quiet = [];
     document.querySelectorAll('[data-text]').forEach(el => {
       const rg = document.createRange(); rg.selectNodeContents(el);
-      [...rg.getClientRects()].forEach(r => { if (r.width) quiet.push([(r.left + r.right) / 2, (r.top + r.bottom) / 2, r.width / 2, r.height / 2]); });
+      [...rg.getClientRects()].forEach(r => { if (r.width) quiet.push([(r.left + r.right) / 2, (r.top + r.bottom) / 2, r.width / 2, r.height / 2, 4, 22]); });
     });
+    // серьезная версия: под кнопками и соцсетями мягкий белый фон — искры там плавно гаснут
+    if (!fun) document.querySelectorAll('.actions, .soc').forEach(el => {
+      const r = el.getBoundingClientRect();
+      quiet.push([(r.left + r.right) / 2, (r.top + r.bottom) / 2, r.width / 2, r.height / 2, 8, 36]);
+    });
+  }
+  // насколько искра у текста или кнопок видна: 0 — не видна, 1 — в полную силу
+  function calmAt(x, y) {
+    let calm = 1;
+    for (const b of quiet) {
+      const dx = Math.abs(x - b[0]) - b[2], dy = Math.abs(y - b[1]) - b[3];
+      const d = Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) + Math.min(Math.max(dx, dy), 0);
+      const k = (d - b[4]) / b[5];
+      if (k < calm) { calm = k; if (calm <= 0) return 0; }
+    }
+    return calm;
   }
 
   // наклон: tiltX — вбок, tiltY — к себе / от себя
@@ -300,15 +316,9 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
     for (let r = 0; r < rows; r++) {
       for (let q = 0; q < cols; q++) {
         let x = q * c + (r & 1 ? c / 2 : 0), y = r * c;
-        // у текста искры плавно гаснут
-        let qd = 1e9;
-        for (const b of quiet) {
-          const dx = Math.abs(x - b[0]) - b[2], dy = Math.abs(y - b[1]) - b[3];
-          const d = Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) + Math.min(Math.max(dx, dy), 0);
-          if (d < qd) qd = d;
-        }
-        if (qd < 4) continue;
-        const calm = qd > 26 ? 1 : (qd - 4) / 22;
+        // у текста (а в серьезной версии и у кнопок) искры плавно гаснут
+        const calm = calmAt(x, y);
+        if (calm <= 0) continue;
         const i = r * cols + q;
         const depth = y - (r & 1 ? (surf[q] + surf[q + 1]) / 2 : surf[q]);
         const bin0 = (x * .0016 + y * .0007 + t * .06);
@@ -327,7 +337,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
           // в глубине: искры крупнее и колышутся
           const k = Math.min(1, depth / 140);
           x += Math.sin(y * .045 + t * 1.6) * 1.6 * k;
-          const rr = (1 + 1.1 * k + .5 * Math.sin(t * 2 + i)) * (.35 + .65 * calm);
+          const rr = (1 + 1.1 * k + .5 * Math.sin(t * 2 + i)) * calm;
           const bin = ((Math.floor((bin0 + depth * .0012) * BINS) % BINS) + BINS) % BINS;
           const lvl = depth < 40 ? 2 : depth < 110 ? 1 : 0;
           const P = deep[bin * 3 + lvl];
@@ -344,7 +354,8 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
       b.y -= b.s * dt / vh;
       const x = b.x * vw + Math.sin(t * 2 + b.w) * 4, y = b.y * vh;
       if (y < surfaceAt(x) + 6) { b.y = 1 + Math.random() * .1; b.x = Math.random(); continue; }
-      ctx.globalAlpha = .8;
+      const bc = calmAt(x, y); if (bc <= .05) continue;
+      ctx.globalAlpha = .8 * bc;
       ctx.strokeStyle = pal[((Math.floor((x * .0016 + t * .06) * BINS) % BINS) + BINS) % BINS];
       ctx.beginPath(); ctx.arc(x, y, b.r, 0, 6.283); ctx.stroke();
     }
