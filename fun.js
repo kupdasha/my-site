@@ -646,7 +646,7 @@ function stringBuffer(freq){
 const lastPluck = {};
 addEventListener('string:pluck', e => {
   if (!on) return;
-  const { k, power } = e.detail, freq = FUN.guitar.freqs[k];
+  const { k, power } = e.detail, freq = FUN.guitar.freqs[k % FUN.guitar.freqs.length];
   if (!freq) return;
   if (!ac || ac.state !== 'running') { if (!hinted) { hinted = true; joke('sound'); } return; }
   const now = performance.now();
@@ -660,10 +660,10 @@ addEventListener('string:pluck', e => {
   src.start();
 });
 function addNotes(){
-  document.querySelectorAll('#dirList .dir .go').forEach((go, k) => {
+  document.querySelectorAll('#otherList .article .go, #dirList .dir .go').forEach((go, k) => {
     if (go.querySelector('.note')) return;
     const n = document.createElement('span');
-    n.className = 'note'; n.textContent = FUN.guitar.notes[k] || '';
+    n.className = 'note'; n.textContent = FUN.guitar.notes[(k + 1) % FUN.guitar.notes.length] || '';
     go.appendChild(n);
   });
 }
@@ -999,7 +999,7 @@ desktop.addEventListener('change', refresh);
 let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { sizeCanvas(); if (bug.mode === 'frame') resetTrail(); setupRunners(); setupFog(); setupSecrets(); }, 200); });
 // места становится больше-меньше по мере появления блоков — пересчитываем
 setInterval(() => { if (on) runners.forEach(freeRange); }, 2000);
-addEventListener('works:rendered', () => { if (on) { setupFog(); setupRunners(); } });   // сменили фильтр проектов
+addEventListener('works:rendered', () => { if (on) { setupFog(); setupRunners(); addNotes(); } });   // сменили фильтр проектов
 setTimeout(refresh, 400);
 requestAnimationFrame(frame);
 })();

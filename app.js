@@ -553,7 +553,11 @@ function renderDirections(){
     <a class="dir" href="${d.cat ? '#works' : d.link}"${d.cat ? ` data-cat="${d.cat}"` : ''}>
       <h3>${T(d.name)}</h3><p>${T(d.text)}</p><span class="go">${ARROW}</span>
     </a>${STRING_HTML}`).join('');
-  strings = $$('#dirList .string').map(el => ({
+  collectStrings();
+}
+/* струны — между строками направлений и между строками «других работ» (в веселой версии) */
+function collectStrings(){
+  strings = $$('#otherList .string, #dirList .string').map(el => ({
     el, svg: el.querySelector('svg'), line: el.querySelector('.line'), ghosts: [...el.querySelectorAll('.ghost')], hist: [],
     amp: 0, vel: 0, at: 0.5, held: false, prev: null, w: 0,
   }));
@@ -682,7 +686,7 @@ function mediaHTML(p){
 
 /* Сетка раскладывается сама, если у проекта не указаны size и side */
 const PATTERN = [['большой', 'слева'], ['маленький', 'слева'], ['средний', 'справа'], ['большой', 'справа'], ['средний', 'слева'], ['маленький', 'справа']];
-let workFilter = '';
+let workFilter = SITE.works.startFilter ?? 'дизайн';   // какая категория выбрана при открытии страницы
 /* проект может быть в нескольких категориях: cat: ['продакшен', '3D'] */
 const inCat = p => !workFilter || [].concat(p.cat).includes(workFilter);
 /* год проекта — маленькой цифрой рядом с названием */
@@ -711,8 +715,11 @@ function renderWorks(){
   // «другие работы» — простым списком под сеткой
   const other = W.items.map((p, k) => [p, k]).filter(([p]) => p.other && inCat(p));
   $('#otherWorks').hidden = !other.length;
-  $('#otherList').innerHTML = other.map(([p, k]) =>
-    `<button class="article" data-k="${k}"><span class="article-source">${T(p.tag || [].concat(p.cat)[0])}</span><span class="article-title">${T(p.title)}${yearHTML(p)}</span><span class="go">${ARROW}</span></button>`).join('');
+  // между строками — струны: в серьезной версии это просто линии, в веселой они звенят и светятся радугой
+  $('#otherList').innerHTML = STRING_HTML + other.map(([p, k]) =>
+    `<button class="article" data-k="${k}"><span class="article-source">${T(p.tag || [].concat(p.cat)[0])}</span><span class="article-title">${T(p.title)}${yearHTML(p)}</span><span class="go">${ARROW}</span></button>${STRING_HTML}`).join('');
+  collectStrings();
+  dispatchEvent(new CustomEvent('strings:rendered'));
 }
 function setFilter(cat){
   workFilter = cat;
