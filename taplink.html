@@ -487,7 +487,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
   /* ---------- один экран ---------- */
   function fit() {
     let k = 1; page.style.setProperty('--k', k);
-    while (k > .5 && document.documentElement.scrollHeight > innerHeight + 1) { k -= .04; page.style.setProperty('--k', k.toFixed(2)); }
+    while (k > .5 && page.offsetHeight > innerHeight + 1) { k -= .04; page.style.setProperty('--k', k.toFixed(2)); }
   }
 
   let prev = performance.now(), t0 = prev;

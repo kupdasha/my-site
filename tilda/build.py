@@ -145,6 +145,22 @@ def js_block(names, note):
             f"<script>(function(){{var B='{CDN}',v=Math.floor(Date.now()/36e5);"
             f"[{files}].forEach(function(f){{document.write('<script src=\"'+B+f+'?v='+v+'\"><\\/script>')}})}})()</script>")
 
+def taplink_block():
+    # таплинк — отдельная страница Тильды из одного блока; вся страница (разметка, тексты, стили, код)
+    # лежит на GitHub в taplink.html, блок только подтягивает ее, поэтому перевставлять его не нужно
+    return ('<!-- ТАПЛИНК. Весь таплинк лежит на GitHub в taplink.html и подключается отсюда. Блок не менять. -->\n'
+            '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>\n'
+            "<script>(function(){var B='" + CDN + "',v=Math.floor(Date.now()/36e5),root=document.getElementById('taplink-root');\n"
+            # пока грузится — фон сразу в цвет выбранной версии, чтобы не мигало
+            "try{if(localStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}\n"
+            "fetch(B+'taplink.html?v='+v).then(function(r){return r.text()}).then(function(html){\n"
+            "var doc=new DOMParser().parseFromString(html,'text/html');\n"
+            "[].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});\n"
+            "[].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});\n"
+            # вставленные так скрипты сами не запускаются — пересоздаем их
+            "[].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});\n"
+            "root.style.minHeight='';root.style.background=''})})()</script>")
+
 BLOCKS = {
     '1 шапка': [
         ('1 оформление', css_block()),
@@ -164,6 +180,10 @@ BLOCKS = {
             css_block(), shared_block(), nda_section,
             f'<!-- Кнопки «связаться» и «наверх», окно кейса, сообщения -->\n{nda_service_html}',
             js_block(['app.js', 'waves.js', 'fun.js', 'shimmer.js'], 'КОД САЙТА.')])),
+    ],
+    # таплинк — своя страница Тильды без общей шапки и подвала
+    '5 таплинк': [
+        ('1 таплинк целиком', taplink_block()),
     ],
     '9 подвал': [
         ('1 служебные кнопки и окно кейса', f'<!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->\n{service_html}'),

@@ -180,6 +180,18 @@
 <!-- КОД САЙТА. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
 <script>(function(){var B='../',v=Math.floor(Date.now()/36e5);['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
 </div>
+<div class="r t-rec" data-record-type="131"><!-- 5 таплинк / 1 таплинк целиком -->
+<!-- ТАПЛИНК. Весь таплинк лежит на GitHub в taplink.html и подключается отсюда. Блок не менять. -->
+<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5),root=document.getElementById('taplink-root');
+try{if(localStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}
+fetch(B+'taplink.html?v='+v).then(function(r){return r.text()}).then(function(html){
+var doc=new DOMParser().parseFromString(html,'text/html');
+[].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});
+[].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});
+[].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});
+root.style.minHeight='';root.style.background=''})})()</script>
+</div>
 <div class="r t-rec" data-record-type="131"><!-- 9 подвал / 1 служебные кнопки и окно кейса -->
 <!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->
 <!-- Кнопка «Связаться», всегда на экране -->
