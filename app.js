@@ -1511,6 +1511,29 @@ function startMorph(box, list){
     else if (!e.isIntersecting){ on = false; cancelAnimationFrame(raf); }
   }).observe(box);
 }
+/* СТЕНА ЛОГОТИПОВ (поле { logos: [...] } в галерее кейса, см. MANGO OFFICE):
+   одинаковые плитки, логотип на белом стоит с полями, fill: true — баннер или фото заполняет плитку,
+   big: true — плитка 2×2, wide: true — плитка на две колонки, pos — какую часть баннера оставить при обрезке. Плитки проявляются волной, по нажатию увеличиваются */
+function logoWallHTML(groups){
+  return groups.map(g => `<div class="wrap camp-rowbox">${g.caption ? `<p class="camp-cap">${T(g.caption)}</p>` : ''}<div class="logo-wall">${
+    g.items.map(i => `<button class="lw-tile${i.fill ? ' fill' : ''}${i.big ? ' big' : ''}${i.wide ? ' wide' : ''}" aria-label="${(i.name || 'Увеличить').replace(/"/g, '&quot;')}"><img src="${i.img}" alt="${(i.name || '').replace(/"/g, '&quot;')}"${i.pos ? ` style="object-position:${i.pos}"` : ''} loading="lazy"></button>`).join('')
+  }</div></div>`).join('');
+}
+const wallReveal = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); wallReveal.unobserve(e.target); }
+}), { rootMargin: '0px 0px -10% 0px' });
+function watchLogoWall(wall){
+  const tiles = [...wall.children];
+  // волна по диагонали: задержка зависит от места плитки в сетке
+  const cols = getComputedStyle(wall).gridTemplateColumns.split(' ').length;
+  tiles.forEach((t, i) => t.style.setProperty('--k', (i % cols) + Math.floor(i / cols)));
+  wallReveal.observe(wall);
+  wall.addEventListener('click', e => {
+    const b = e.target.closest('.lw-tile'); if (!b) return;
+    const imgs = tiles.map(t => t.querySelector('img'));
+    openViewer(imgs.map(i => i.currentSrc || i.src), tiles.indexOf(b), imgs);
+  });
+}
 // элемент галереи кейса: { row, caption } — ряд макетов одной высоты, { collage } — коллаж,
 // { morph } — фигуры перетекают друг в друга, остальное — во всю ширину
 function galleryItem(x){
@@ -1521,6 +1544,7 @@ function galleryItem(x){
   if (x && x.spin) return spinHTML(x.spin);
   if (x && x.float3d) return float3dHTML(x.float3d);
   if (x && x.icons2d) return icons2dHTML(x.icons2d);
+  if (x && x.logos) return logoWallHTML(x.logos);
   if (x && x.morph) return morphHTML(x);
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   if (x && x.collage) return campCollage(x);
@@ -1624,6 +1648,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.bk').forEach(watchBrandkit);
   markArticles(caseContent);
   watchCampaigns(caseContent);
+  caseContent.querySelectorAll('.logo-wall').forEach(watchLogoWall);
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   const au = caseContent.querySelector('.au-mount');
   if (au) import(SCRIPT_BASE + 'audit.js?v=' + Math.floor(Date.now() / 36e5))

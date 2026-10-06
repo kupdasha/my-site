@@ -46,7 +46,7 @@ img{display:block;max-width:none;user-select:none;-webkit-user-drag:none}
 .nav a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s}
 .nav a:hover::after,.nav a.on::after{transform:scaleX(1)}
 .btn-red{display:inline-flex;align-items:center;justify-content:center;background:var(--red2);color:#fff;border-radius:62.4375rem;transition:background .25s,transform .25s}
-.btn-red:hover{background:#A8001A}
+.btn-red:hover,.btn-red.hov{background:#A8001A}
 .btn-red:active{transform:scale(.97)}
 .hdr .open{position:absolute;left:75.9375rem;top:1.5625rem;width:12.9375rem;height:2.625rem;font-size:1rem;padding-bottom:0.125rem}
 
@@ -58,22 +58,29 @@ img{display:block;max-width:none;user-select:none;-webkit-user-drag:none}
 [data-rise].in{opacity:1;transform:none}
 
 /* ---------- первый экран ---------- */
-.hero{height:48.75rem;position:relative}
-.hero h1{position:absolute;top:12.25rem;font-size:3.25rem;font-weight:500;letter-spacing:-.01em;line-height:1.1}
+/* первый экран: карта на подиуме по прокрутке поворачивается ребром и становится монетой (раскадровка 1–3) */
+.hero-pin{height:112.125rem;position:relative}
+.hero{position:sticky;top:5.75rem;height:43.375rem}
+.hero h1{position:absolute;top:15.6875rem;font-size:3.25rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;z-index:2}
 .hero h1 span{display:inline-block;transition:transform 1.3s cubic-bezier(.2,.8,.2,1),opacity 1s}
-.hero .h-l{left:1rem}
-.hero .h-r{left:58.875rem}
+.hero .h-l{left:3.25rem}
+.hero .h-r{left:60.875rem}
 .hero:not(.ready) .h-l span{transform:translateX(13.75rem);opacity:0}
 .hero:not(.ready) .h-r span{transform:translateX(-13.75rem);opacity:0}
-.hero .sub{position:absolute;left:1rem;top:21.75rem;font-family:Roboto;font-size:1.25rem;font-weight:500;line-height:1.4;transition:opacity 1s .7s,transform 1s .7s}
+.hero .sub{position:absolute;left:1.0625rem;top:38.25rem;font-family:Roboto;font-size:1.25rem;font-weight:500;line-height:1.4;transition:opacity 1s .7s,transform 1s .7s}
 .hero:not(.ready) .sub{opacity:0;transform:translateY(1rem)}
-.stage{position:absolute;left:26.5625rem;top:10.625rem;width:37rem;height:40rem;perspective:87.5rem}
-.stage .coin3d{position:absolute;left:0;top:0;width:37rem;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.stage .main{width:37rem;animation:float 6s ease-in-out infinite}
-.stage .mirror{position:absolute;left:9.0625rem;top:17.5rem;width:17.1875rem;pointer-events:none;animation:floatM 6s ease-in-out infinite}
-@keyframes floatM{0%,100%{transform:translateY(0)}50%{transform:translateY(.875rem)}}
-.hero:not(.ready) .stage{opacity:0;transform:translateY(3.75rem) scale(.94)}
-.stage{transition:opacity 1.2s,transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.stage{position:absolute;inset:0;perspective:87.5rem;transition:opacity 1.2s,transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.hero:not(.ready) .stage{opacity:0;transform:translateY(3.75rem) scale(.96)}
+.tilt{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.tilt img{position:absolute;will-change:transform,opacity}
+.s-glow{left:14.5938rem;top:28.6562rem;width:58.75rem}
+.s-pedestal{left:29.0625rem;top:25.25rem;width:32.2812rem}
+.s-card{left:38.2188rem;top:8.3438rem;width:13.0625rem}
+.s-edge{left:43.2188rem;top:8.7188rem;width:4.0938rem;opacity:0}
+.s-coin{left:36.0312rem;top:8.75rem;width:18.9688rem;opacity:0}
+.traveler{position:fixed;left:0;top:0;z-index:40;pointer-events:none;opacity:0;transform-origin:0 0;will-change:transform}
+.traveler img{position:absolute;left:0;top:0;width:100%}
+.traveler .tv-top{opacity:0}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-0.875rem)}}
 
 /* ---------- монетная колонна: ВЭД / сбережения ---------- */
@@ -97,8 +104,8 @@ img{display:block;max-width:none;user-select:none;-webkit-user-drag:none}
 .services.open .pill:not(.act){opacity:.3}
 .menu{position:absolute;top:2.3125rem;width:14.8125rem;padding:0.625rem 0;background:var(--menu);border-radius:0 1.125rem 1.125rem 1.125rem;color:#fff;font-size:0.9375rem;opacity:0;transform:translateY(-0.375rem);pointer-events:none;transition:opacity .25s,transform .3s;z-index:5}
 .menu a{display:block;padding:0.625rem 1.375rem;transition:padding .25s,color .25s}
-.menu a:hover{padding-left:1.875rem;color:#fff}
-.menu a:hover::before{content:"";position:absolute;left:1.125rem;margin-top:0.5625rem;width:0.3125rem;height:0.3125rem;border-radius:50%;background:var(--red)}
+.menu a:hover,.menu a.hov{padding-left:1.875rem;color:#fff}
+.menu a.hov::before,.menu a:hover::before{content:"";position:absolute;left:1.125rem;margin-top:0.5625rem;width:0.3125rem;height:0.3125rem;border-radius:50%;background:var(--red)}
 .services.open .menu{opacity:1;transform:none;pointer-events:auto}
 .state{position:absolute;inset:0;pointer-events:none}
 .state>*{position:absolute;transition:opacity .55s,transform .7s cubic-bezier(.2,.7,.2,1)}
@@ -257,6 +264,141 @@ img{display:block;max-width:none;user-select:none;-webkit-user-drag:none}
 .page.on .ngrid .ncard{animation:card .9s cubic-bezier(.2,.7,.2,1) forwards}
 @keyframes card{to{opacity:1;transform:none}}
 
+/* ---------- живые макеты (?demo=…) ---------- */
+html.demo,html.demo body{overflow:hidden}
+.demo .ftr{display:none}
+.demo-services .hdr,.demo-services .hero-pin,.demo-services .traveler,.demo-services .pulse,.demo-services .bento{display:none}
+.demo-services .pin{height:48.5625rem}
+.demo-services .pin .sticky{position:relative;top:0;height:48.5625rem;min-height:0}
+.demo-services .pin .box{top:0;margin-top:0}
+.demo .page.on{animation:none}
+.demo-credit .calc{margin-bottom:5.625rem}
+.fcur{position:fixed;left:0;top:0;width:1.5rem;z-index:99;pointer-events:none;opacity:0;transition:opacity .3s;will-change:transform}
+.fcur img{width:100%;transition:transform .15s}
+.fcur.on{opacity:1}
+.fcur.press img{transform:scale(.82)}
+.ripple{position:fixed;width:3.5rem;height:3.5rem;margin:-1.75rem 0 0 -1.75rem;border-radius:50%;border:2px solid var(--red);z-index:98;pointer-events:none;animation:ripple .7s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes ripple{from{transform:scale(.2);opacity:1}to{transform:scale(1.6);opacity:0}}
+.v-pay{display:inline-block;transform-origin:100% 50%}
+.v-pay.bump{animation:bump .6s cubic-bezier(.2,.7,.2,1)}
+@keyframes bump{30%{transform:scale(1.18);color:var(--red)}}
+
+/* ================= ТЕЛЕФОН И ПЛАНШЕТ ВЕРТИКАЛЬНО (класс mob ставит скрипт при ширине до 820) =================
+   Здесь размеры в обычных пикселях: 1rem = 16px. Живые демо (?demo=) остаются десктопными. */
+html.mob{font-size:16px;overflow-x:clip}
+.mob body{overflow-x:clip}
+.mob .wrap{width:auto}
+.mob .hdr .wrap{height:60px}
+.mob .logo{left:16px;top:17px;width:150px;height:26px}
+.mob .nav{display:none}
+.mob .hdr .open{left:auto;right:16px;top:12px;width:auto;height:36px;padding:0 16px 2px;font-size:14px}
+
+/* первый экран: карта на подиуме, сцена целиком уменьшается под экран */
+.mob .hero-pin{height:calc(100svh - 60px + 900px)}
+.mob .hero{top:60px;height:calc(100svh - 60px);min-height:520px;overflow:hidden}
+.mob .hero h1{font-size:34px;left:16px;right:16px}
+.mob .hero .h-l{top:20px}
+.mob .hero .h-r{top:60px}
+.mob .hero:not(.ready) .h-l span,.mob .hero:not(.ready) .h-r span{transform:translateY(24px)}
+.mob .hero .sub{top:auto;bottom:20px;left:16px;font-size:16px}
+.mob .tilt{inset:auto;left:50%;top:54%;width:1440px;height:694px;margin:-397px 0 0 -720px;scale:var(--ms,.6)}
+
+/* колонна монет: монеты справа, тексты слева, кнопки внизу */
+.mob .pin{height:1800px;position:relative;z-index:2}
+.mob .pin .sticky{background:var(--bg)}
+.mob .pin .sticky{top:60px;height:calc(100svh - 60px);min-height:0}
+.mob .pin .box{position:absolute;inset:0;width:auto;height:auto;margin:0}
+.mob .pick{left:16px;top:16px;font-size:28px;line-height:1.1}
+.mob .column{left:auto;right:4px;top:20px;width:350px;height:777px;transform-origin:100% 0;scale:var(--cs,.32)}
+.mob .st-title{left:16px;top:110px;font-size:28px}
+.mob .st-text{left:16px;top:156px;width:50%;font-size:16px}
+.mob .st-right{left:16px;right:16px;width:auto;top:auto;bottom:150px;font-size:15px;color:#3c4148}
+.mob .st-btn{left:16px;top:auto;bottom:100px;width:170px;height:38px;font-size:13px}
+.mob .progress{display:none}
+.mob .services{left:16px;right:16px;top:auto;bottom:16px}
+.mob .services h3{font-size:16px;margin-bottom:8px}
+.mob .services .pills{gap:8px;flex-wrap:wrap}
+.mob .pill{height:34px;padding:0 14px 2px;font-size:13px}
+.mob .menu{top:auto;bottom:42px;width:230px;font-size:15px;border-radius:16px}
+
+/* курсы валют */
+.mob .pulse{height:auto;padding:28px 16px 48px}
+.mob .pulse h2{position:static;font-size:30px;margin-bottom:16px}
+.mob .rates{position:relative;left:auto;top:auto;width:auto;padding:20px 16px 22px;border-radius:20px}
+.mob .rates .top{margin-bottom:20px}
+.mob .rates h4{font-size:18px}
+.mob .sel>button{height:36px;font-size:13px;gap:10px;padding:0 12px}
+.mob .grid{grid-template-columns:1.5fr 1fr 1fr 1fr;font-size:13px}
+.mob .grid .h{font-size:12px;padding-bottom:10px}
+.mob .grid .num{font-size:14px}.mob .grid .num.small{font-size:13px}
+.mob .cur{gap:8px}.mob .cur svg{width:24px;height:24px}
+.mob .cur b{font-size:14px}.mob .cur small{display:none}
+.mob .tabs{font-size:13px;gap:10px;margin:8px 0 18px}
+.mob .rates .note{font-size:12px}
+.mob .fly{display:none}
+.mob .fly:nth-of-type(2),.mob .fly:nth-of-type(3){display:block;width:104px!important;top:0!important;z-index:0}
+.mob .fly:nth-of-type(2){left:auto!important;right:-18px}
+.mob .fly:nth-of-type(3){left:-30px!important;top:auto!important;bottom:-20px}
+.mob .rates{z-index:1}
+
+/* плитки */
+.mob .bento{height:auto;display:grid;gap:12px;padding:0 16px 48px}
+.mob .b-dark,.mob .b-news,.mob .b-red{position:relative;left:auto;top:auto;width:auto}
+.mob .b-dark{height:440px;border-radius:22px}
+.mob .b-dark h3{left:20px;top:22px;font-size:30px}
+.mob .b-dark p{left:20px;right:20px;top:140px;font-size:16px}
+.mob .lk{left:12px;right:12px;width:auto;bottom:12px;height:56px;font-size:16px;padding:0 8px 0 16px}
+.mob .lk i{width:40px;height:40px}
+.mob .b-news{height:230px;overflow:hidden}
+.mob .b-news h3{left:20px;top:22px;font-size:30px}
+.mob .b-news .nc1{left:52%;top:-30px;width:150px}
+.mob .b-news .nc2{left:66%;top:90px;width:120px}
+.mob .b-news .arr{left:20px;bottom:20px}
+.mob .b-red{height:220px}
+.mob .b-red small{left:20px;top:20px;font-size:13px}
+.mob .b-red .arr{right:20px;top:20px}
+.mob .b-red h3{left:20px;bottom:18px;font-size:32px}
+
+/* подвал */
+.mob .ftr{padding-top:36px;font-size:15px}
+.mob .ftr .wrap{padding:0 16px}
+.mob .ftr .brand{margin-bottom:32px}
+.mob .ftr .brand img{width:44px}
+.mob .ftr .brand b{font-size:30px}
+.mob .cols{grid-template-columns:1fr 1fr;gap:28px 16px}
+.mob .cols .app{grid-column:1 / -1}
+.mob .app p{font-size:20px}
+.mob .cols2{grid-template-columns:1fr 1fr;gap:24px 16px;margin:36px -16px 0;padding:32px 16px}
+.mob .legal{margin:0 -16px;padding:32px 16px;font-size:13px}
+.mob .legal .ln{flex-wrap:wrap;gap:12px 24px}
+.mob .legal .ln span{margin-left:0}
+
+/* калькулятор */
+.mob .crumbs{padding:20px 16px 0;font-size:16px}
+.mob .tag{padding:18px 16px 0}
+.mob .ptitle{padding:6px 16px 0;font-size:30px}
+.mob .seg{position:relative;right:auto;top:auto;display:inline-flex;margin:16px 16px 0;font-size:13px}
+.mob .seg button{height:36px;padding:0 12px 2px}
+.mob .calc{height:auto;margin:16px 16px 48px;padding:20px 16px 22px;display:flex;flex-direction:column;gap:10px}
+.mob .calc > *{position:relative!important;left:auto!important;top:auto!important;right:auto;width:auto!important}
+.mob .calc h4{font-size:18px}
+.mob .calc .rh{order:5;margin-top:16px}
+.mob .pay{order:6;padding-bottom:16px}.mob .need{order:7;height:auto}.mob .rate{order:8}.mob .conds{order:9}.mob .getm{order:10;height:48px;margin-top:6px}
+.mob .field{height:auto;padding:14px 14px 30px}
+.mob .field b{font-size:22px}
+.mob .ticks{height:16px;margin-bottom:6px}
+.mob .need div{flex-wrap:wrap;gap:10px 20px;font-size:15px}
+.mob .fine{font-size:11px}
+
+/* новости */
+.mob .news-head{margin:0 16px 6px;padding-bottom:24px}
+.mob .news-head .crumbs,.mob .news-head .tag,.mob .news-head .ptitle{padding-left:0}
+.mob .ngrid{grid-template-columns:1fr;gap:16px;padding:16px 16px 56px}
+.mob .ncard{height:auto;padding-bottom:58px}
+.mob .ncard .im{height:200px}
+.mob .ncard h4{min-height:0;font-size:17px}
+.mob .ncard p{font-size:13px}
+.mob .ncard .more{height:28px;font-size:12px;padding:0 16px 2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -278,15 +420,22 @@ img{display:block;max-width:none;user-select:none;-webkit-user-drag:none}
 
 <!-- ================= ГЛАВНАЯ ================= -->
 <main class="page" data-page="main">
-  <section class="hero wrap">
+  <section class="hero-pin">
+  <div class="hero wrap">
     <h1 class="h-l"><span>лучшие стороны</span></h1>
     <h1 class="h-r"><span>одного капитала</span></h1>
     <p class="sub">банк для бизнеса<br>и частных лиц</p>
-    <div class="stage"><div class="coin3d">
-      <img class="mirror" src="img/coin-mirror.webp" alt="">
-      <img class="main" src="img/hero-coin.webp" alt="Монета с логотипом банка на подиуме">
+    <div class="stage"><div class="tilt">
+      <img class="s-glow" src="img/s-glow.webp" alt="">
+      <img class="s-pedestal" src="img/s-pedestal.webp" alt="">
+      <img class="s-card" src="img/s-card.webp" alt="Карта банка на подиуме">
+      <img class="s-edge" src="img/s-edge.webp" alt="">
+      <img class="s-coin" src="img/s-coin.webp" alt="">
     </div></div>
+  </div>
   </section>
+  <!-- монета, которая улетает с подиума в колонну услуг -->
+  <div class="traveler"><img class="tv-coin" src="img/s-coin.webp" alt=""><img class="tv-top" src="img/coin-top.webp" alt=""></div>
 
   <section class="pin" id="services">
     <div class="sticky"><div class="box">
@@ -496,6 +645,9 @@ var clamp=function(v,a,b){return Math.max(a,Math.min(b,v))};
 var ease=function(t){return 1-Math.pow(1-t,3)};
 var rem=function(){return parseFloat(getComputedStyle(document.documentElement).fontSize)};
 var fmt=function(n){return Math.round(n).toLocaleString('ru-RU').replace(/,/g,' ')};
+/* ?demo=services или ?demo=credit — живой макет для страницы проекта: один экран, курсор показывает сам */
+var DEMO=(location.search.match(/demo=(\w+)/)||[])[1]||'';
+if(DEMO){ document.documentElement.classList.add('demo','demo-'+DEMO); if(location.hash!==(DEMO==='credit'?'#credit':'#main')) history.replaceState(null,'',DEMO==='credit'?'#credit':'#main'); }
 
 /* логотип: вставляем svg, чтобы цветок крутился отдельно от надписи */
 fetch('img/logo.svg').then(function(r){return r.text()}).then(function(t){
@@ -523,7 +675,7 @@ function show(){
 document.addEventListener('click',function(e){
   var a=e.target.closest('a[href^="#"]'); if(!a) return;
   var to=a.dataset.to;
-  if(to){ e.preventDefault(); if(location.hash!=='#main') location.hash='main'; setTimeout(function(){ var el=document.getElementById(to); if(el) window.scrollTo({top:el.getBoundingClientRect().top+scrollY-(to==='footer'?0:92*rem()/16),behavior:'smooth'}); },60); }
+  if(to){ e.preventDefault(); if(location.hash!=='#main') location.hash='main'; setTimeout(function(){ var el=document.getElementById(to); if(el) window.scrollTo({top:el.getBoundingClientRect().top+scrollY-(to==='footer'?0:hdrH()),behavior:'smooth'}); },60); }
   else if(a.getAttribute('href')==='#'+current){ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); }
 });
 window.addEventListener('hashchange',show);
@@ -534,32 +686,83 @@ var io=new IntersectionObserver(function(es){es.forEach(function(e){ if(e.isInte
 function observe(){ $$('.page.on [data-rise]:not(.in)').forEach(function(el){io.observe(el)}); }
 
 /* ---------- первый экран: монета следует за курсором ---------- */
-var stage=$('.coin3d');
+var stage=$('.tilt');
 $('.hero').addEventListener('mousemove',function(e){
   var r=this.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
-  stage.style.transform='rotateY('+(x*14)+'deg) rotateX('+(-y*10)+'deg)';
+  stage.style.transform='rotateY('+(x*8)+'deg) rotateX('+(-y*5)+'deg)';
 });
 $('.hero').addEventListener('mouseleave',function(){stage.style.transform=''});
 
 /* ---------- прокрутка: падающая монета, колонна, монеты вокруг курсов ---------- */
 var pin=$('.pin'), mid=$('.c-mid'), ctop=$('.c-top'), cbot=$('.c-bottom'), states=$$('.state'), bar=$('.progress i');
 var flies=$$('.fly'); var pulse=$('.pulse');
-function tick(){
-  if(current!=='main') return;
-  var vh=innerHeight, R=rem()/16;
+/* первый экран по шагам раскадровки:
+   0–0.1 карта стоит; 0.1–0.42 поворачивается; 0.36–0.6 видно ребро; 0.55–0.8 из ребра разворачивается монета;
+   потом, пока колонна услуг въезжает в экран, монета улетает с подиума и становится верхней монетой колонны */
+var heroPin=$('.hero-pin'), sCard=$('.s-card'), sEdge=$('.s-edge'), sCoin=$('.s-coin'), trav=$('.traveler'), tvTop=$('.tv-top');
+function seg(m,a,b){ return clamp((m-a)/(b-a),0,1); }
+/* мобильная вёрстка: высота шапки и масштаб сцен считаются по экрану */
+var hdrEl=$('.hdr');
+function hdrH(){ return hdrEl.offsetHeight; }
+function mobileFit(){
+  var W=innerWidth, H=innerHeight, mob=W<=820 && !DEMO;
+  document.documentElement.classList.toggle('mob', mob);
+  if(!mob) return;
+  var st=document.documentElement.style;
+  st.setProperty('--ms', Math.min(W*.94/560, (H-260)/560).toFixed(3));
+  st.setProperty('--cs', Math.max(.28, Math.min(.5, (H-hdrH()-300)/777, (W*.48)/350)).toFixed(3));
+}
+mobileFit(); addEventListener('resize', mobileFit);
+function heroTick(vh,R){
+  var HH=hdrH(), HE=$('.hero').offsetHeight;
+  var hr=heroPin.getBoundingClientRect(), span=heroPin.offsetHeight-HE;
+  var m=clamp((HH-hr.top)/span,0,1);
+  var c1=seg(m,.1,.42), e1=seg(m,.36,.42), e2=seg(m,.55,.6), k1=seg(m,.55,.8);
+  sCard.style.opacity=1-e1;
+  sCard.style.transform='rotateY('+(ease(c1)*80)+'deg)';
+  sEdge.style.opacity=Math.min(e1,1-e2);
+  sEdge.style.transform='rotateY('+((seg(m,.36,.6)-.5)*30)+'deg)';
+  var coinOn=e2;
+  sCoin.style.transform='rotateY('+(-80+ease(k1)*80)+'deg) translateY('+(-seg(m,.85,1)*1)+'rem)';
+  /* полет в колонну */
   var pr=pin.getBoundingClientRect();
-  /* пока колонна въезжает в экран, средняя монета раскручивается */
-  var ent=clamp(1-(pr.top-92*R)/vh,0,1), spin=(1-ease(ent))*360;
-  /* колонна: прогресс 0…1, пока секция прилипла */
-  var total=pin.offsetHeight-pr.height; var span=pin.offsetHeight-(vh-92*R);
-  var p=clamp((92*R-pr.top)/span,0,1);
-  var flipT=clamp((p-.42)/.16,0,1); var ang=ease(flipT)*180;
-  mid.style.transform='rotateY('+(ang+spin)+'deg) translateY('+(Math.sin(flipT*Math.PI)*-1.2)+'rem)';
-  ctop.style.transform='rotate('+(Math.sin(p*Math.PI*2)*7+(1-ent)*-25)+'deg) translateY('+(Math.sin(flipT*Math.PI)*-1.5)+'rem)';
-  cbot.style.transform='rotate('+(Math.sin(p*Math.PI*2)*-7+(1-ent)*25)+'deg) translateY('+(Math.sin(flipT*Math.PI)*1.5)+'rem)';
+  var t=clamp(1-(pr.top-HH)/HE,0,1);
+  if(t>0&&t<1){
+    var A=sCoin.getBoundingClientRect(), B=ctop.getBoundingClientRect(), e=ease(t);
+    /* прямоугольник монеты на подиуме без поворота */
+    var aw=sCoin.offsetWidth, ah=sCoin.offsetHeight, ax=A.left+A.width/2-aw/2, ay=A.top+A.height/2-ah/2;
+    var bw=B.width, scale=(aw+(bw-aw)*e)/aw;
+    var x=ax+((B.left+B.width/2)-(ax+aw/2))*e - aw*scale/2 + aw/2 - Math.sin(t*Math.PI)*9*R*16;
+    var y=ay+((B.top+B.height/2)-(ay+ah/2))*e - ah*scale/2 + ah/2;
+    trav.style.width=aw+'px'; trav.style.height=ah+'px';
+    trav.style.transform='translate('+x+'px,'+y+'px) scale('+scale+') rotate('+(Math.sin(t*Math.PI)*-18)+'deg)';
+    tvTop.style.opacity=seg(t,.55,.95); trav.firstChild.style.opacity=1-seg(t,.55,.95);
+    trav.style.opacity=1; sCoin.style.opacity=0; ctop.style.opacity=0;
+  } else {
+    trav.style.opacity=0; sCoin.style.opacity=t>=1?0:coinOn; ctop.style.opacity=t>=1||!coinOn?1:0;
+  }
+}
+/* p — прогресс колонны 0…1 (на середине монета переворачивается), ent — въезд в экран, wob — покачивание */
+function pinRender(p,ent,wob){
+  var spin=(1-ease(ent))*360;
+  var flipT=clamp((p-.42)/.16,0,1), ang=ease(flipT)*180, lift=Math.sin(flipT*Math.PI);
+  mid.style.transform='rotateY('+(ang+spin)+'deg) translateY('+(lift*-1.2+wob*.3)+'rem)';
+  ctop.style.transform='rotate('+(Math.sin(p*Math.PI*2)*7+(1-ent)*-25+wob*3)+'deg) translateY('+(lift*-1.5+wob*-.4)+'rem)';
+  cbot.style.transform='rotate('+(Math.sin(p*Math.PI*2)*-7+(1-ent)*25-wob*3)+'deg) translateY('+(lift*1.5+wob*.4)+'rem)';
   var idx=p<.5?0:1;
   states.forEach(function(s,i){s.classList.toggle('on',i===idx)});
   bar.style.left=(idx?18.25:0)+'rem';
+}
+function tick(){
+  if(current!=='main'||DEMO) return;
+  var vh=innerHeight, R=rem()/16, HH=hdrH();
+  heroTick(vh,R);
+  var pr=pin.getBoundingClientRect();
+  /* пока колонна въезжает в экран, средняя монета раскручивается */
+  var ent=clamp(1-(pr.top-HH)/vh,0,1);
+  /* колонна: прогресс 0…1, пока секция прилипла */
+  var span=pin.offsetHeight-$('.pin .sticky').offsetHeight;
+  pinRender(clamp((HH-pr.top)/span,0,1), ent, 0);
   /* монеты вокруг курсов падают сверху и раскладываются */
   var qr=pulse.getBoundingClientRect(); var q=clamp((vh-qr.top)/(vh*1.1),0,1);
   flies.forEach(function(f,i){
@@ -574,11 +777,13 @@ addEventListener('resize',tick);
 
 /* меню услуг: при наведении остальное притухает */
 var services=$('.services'), menu=$('.menu');
+function openMenu(b){ $$('[data-menu]').forEach(function(x){x.classList.toggle('act',x===b)}); menu.style.left=b.offsetLeft+'px'; services.classList.add('open'); pin.classList.add('dim'); }
+function closeMenu(){ services.classList.remove('open'); pin.classList.remove('dim'); }
 $$('[data-menu]').forEach(function(b){
-  var open=function(){ $$('[data-menu]').forEach(function(x){x.classList.toggle('act',x===b)}); menu.style.left=b.offsetLeft+'px'; services.classList.add('open'); pin.classList.add('dim'); };
+  var open=function(){openMenu(b)};
   b.addEventListener('mouseenter',open); b.addEventListener('focus',open); b.addEventListener('click',open);
 });
-services.addEventListener('mouseleave',function(){services.classList.remove('open');pin.classList.remove('dim')});
+services.addEventListener('mouseleave',closeMenu);
 
 /* ---------- курсы ---------- */
 var rkind='cash', rtab=2;
@@ -664,8 +869,112 @@ function buildNews(){
   });
 }
 
+/* ---------- живые макеты: курсор сам показывает экран ----------
+   Пока мышь посетителя внутри окна, показ на паузе — можно нажимать самому. */
+function Stop(){}
+function startDemo(){
+  var cur=document.createElement('div'); cur.className='fcur'; cur.innerHTML='<img src="img/cursor.png" alt="">'; document.documentElement.appendChild(cur);
+  var cx=innerWidth*.92, cy=innerHeight*.96, gen=0, visible=true, demoP=.2, t0=performance.now();
+  function setCur(x,y){ cx=x; cy=y; cur.style.transform='translate('+x+'px,'+y+'px)'; }
+  setCur(cx,cy);
+  function smooth(k){ return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2; }
+  /* таймер, который стоит, пока окно не видно, и обрывается при новом запуске */
+  function anim(ms,g,step){ return new Promise(function(res,rej){ var el=0,last=performance.now(); (function f(now){ if(g!==gen) return rej(new Stop()); if(visible) el+=now-last; last=now; var k=clamp(el/ms,0,1); if(step) step(k); if(k<1) requestAnimationFrame(f); else res(); })(last); }); }
+  function wait(ms,g){ return anim(ms,g); }
+  function moveTo(x,y,ms,g){ var x0=cx,y0=cy,dx=x-x0,dy=y-y0,d=Math.hypot(dx,dy); return anim(ms||Math.min(950,320+d*.8),g,function(k){ var e=smooth(k), arc=Math.sin(k*Math.PI)*Math.min(36,d*.08); setCur(x0+dx*e,y0+dy*e-arc); }); }
+  function at(el,fx,fy){ var r=el.getBoundingClientRect(); return [r.left+r.width*fx, r.top+r.height*fy]; }
+  function go(el,fx,fy,ms,g){ var p=at(el,fx,fy); return moveTo(p[0],p[1],ms,g); }
+  function ripple(){ var r=document.createElement('i'); r.className='ripple'; r.style.left=cx+'px'; r.style.top=cy+'px'; document.documentElement.appendChild(r); setTimeout(function(){r.remove()},700); }
+  async function click(g){ cur.classList.add('press'); ripple(); await wait(150,g); cur.classList.remove('press'); }
+
+  /* камера: приближает экран к элементу (масштаб s), курсор едет вместе с ним */
+  var cam={s:1,x:0,y:0}, body=document.body;
+  body.style.transformOrigin='0 0';
+  function camApply(){ body.style.transform=cam.s===1&&!cam.x&&!cam.y?'':'translate('+cam.x+'px,'+cam.y+'px) scale('+cam.s+')'; }
+  function camTarget(el,s,fx,fy){
+    var r=el.getBoundingClientRect(), W=innerWidth, H=innerHeight;
+    var px=(r.left+r.width*(fx==null?.5:fx)-cam.x)/cam.s, py=(r.top+r.height*(fy==null?.5:fy)-cam.y)/cam.s;
+    var x=W/2-s*px, y=H/2-s*py;
+    return {s:s, x:clamp(x,W-s*W,0), y:clamp(y,H-s*H,0)};
+  }
+  function camTo(el,s,ms,g,follow,fx,fy){
+    var a={s:cam.s,x:cam.x,y:cam.y}, b=el?camTarget(el,s,fx,fy):{s:1,x:0,y:0};
+    return anim(ms,g,function(k){ var e=smooth(k); cam.s=a.s+(b.s-a.s)*e; cam.x=a.x+(b.x-a.x)*e; cam.y=a.y+(b.y-a.y)*e; camApply(); if(follow){ var p=at(follow[0],follow[1],follow[2]); setCur(p[0],p[1]); } });
+  }
+  /* камера мягко следует за элементом, не меняя масштаб */
+  function camFollow(el){ var t=camTarget(el,cam.s); cam.x+=(t.x-cam.x)*.12; cam.y+=(t.y-cam.y)*.12; camApply(); }
+  function bump(){ var b=$('.v-pay'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
+
+  /* блок услуг: наведение на «для бизнеса», меню, «частным клиентам», переворот монеты */
+  async function servicesShow(g){
+    var pills=$$('[data-menu]'), items=$$('.menu a'), away=at($('.st-right'),.55,1.55);
+    cur.classList.add('on'); await wait(500,g);
+    await go(pills[0],.84,.42,null,g); openMenu(pills[0]); await wait(700,g);
+    for(var i=0;i<3;i++){ await go(items[i],.32,.5,380,g); items[i].classList.add('hov'); await wait(520,g); items[i].classList.remove('hov'); }
+    await go(pills[1],.5,.45,520,g); openMenu(pills[1]); await wait(900,g);
+    await go(items[3],.32,.5,420,g); items[3].classList.add('hov'); await wait(600,g); items[3].classList.remove('hov');
+    await moveTo(away[0],away[1],650,g); closeMenu(); await wait(500,g);
+    await anim(1500,g,function(k){ demoP=.2+.6*smooth(k); });
+    await wait(1700,g);
+    await go(pills[0],.84,.42,null,g); openMenu(pills[0]); await wait(1200,g);
+    await moveTo(away[0],away[1],650,g); closeMenu(); await wait(400,g);
+    await anim(1500,g,function(k){ demoP=.8-.6*smooth(k); });
+    await wait(1200,g);
+  }
+  /* калькулятор: тянем ползунки, переключаем вид кредита */
+  function knob(r){ return r.querySelector('.knob'); }
+  async function dragSum(to,ms,g){
+    var c=DATA.credit[kind]; await go(knob(rs),.55,.6,null,g); cur.classList.add('press'); await wait(160,g);
+    var a=tFromSum(cs.sum,c), b=tFromSum(to,c);
+    await anim(ms,g,function(k){ var e=smooth(k); cs.sum=k<1?roundSum(sumFromT(a+(b-a)*e,c)):to; renderCalc(); camFollow(knob(rs)); var p=at(knob(rs),.55,.6); setCur(p[0],p[1]); });
+    cur.classList.remove('press');
+  }
+  async function dragTerm(to,ms,g){
+    await go(knob(rt),.55,.6,null,g); cur.classList.add('press'); await wait(160,g);
+    var a=cs.years;
+    await anim(ms,g,function(k){ var y=a+(to-a)*smooth(k); cs.years=Math.round(y); renderCalc(); camFollow(knob(rt)); var tr=rt.querySelector('.track').getBoundingClientRect(), kp=at(knob(rt),.55,.6); setCur(tr.left+tr.width*(y-1)/14+kp[0]-at(knob(rt),.5,.5)[0], kp[1]); });
+    cur.classList.remove('press');
+  }
+  async function creditShow(g){
+    var segs=$$('.seg button'), gm=$('.getm'), f1=$('.f1'), f2=$('.f2'), pay=$('.pay');
+    cur.classList.add('on'); await wait(1900,g);
+    /* сумма: наезд на ползунок, тянем, смотрим на платеж */
+    await camTo(f1,1.8,900,g,[knob(rs),.55,.6]);
+    await dragSum(4500000,1300,g);
+    await camTo(pay,2.1,800,g,[pay,.9,.75]); bump(); await wait(900,g);
+    /* срок */
+    await camTo(f2,1.8,800,g,[knob(rt),.55,.6]);
+    await dragTerm(7,1100,g);
+    await camTo(pay,2.1,800,g,[pay,.9,.75]); bump(); await wait(900,g);
+    /* вид кредита */
+    await camTo(segs[1],2.2,900,g,[segs[1],.5,.6]); await click(g); setKind(1,true); await wait(500,g);
+    await camTo(null,1,900,g); await wait(700,g); bump();
+    await camTo(f1,1.5,700,g,[knob(rs),.55,.6]);
+    await dragSum(12000000,1200,g);
+    await camTo(pay,1.9,700,g,[pay,.9,.75]); bump(); await wait(700,g);
+    /* кнопка */
+    await camTo(gm,2.4,900,g,[gm,.62,.62]); gm.classList.add('hov'); await wait(500,g); await click(g); await wait(500,g); gm.classList.remove('hov');
+    await camTo(null,1,900,g);
+    await go(segs[0],.5,.6,null,g); await click(g); setKind(0,true); await wait(500,g); bump(); await wait(1300,g);
+  }
+  async function run(){
+    var g=++gen;
+    try{ for(;;){ await (DEMO==='credit'?creditShow(g):servicesShow(g)); } }
+    catch(e){ if(!(e instanceof Stop)) console.error(e); }
+  }
+  function reset(){ if(typeof cam!=='undefined'){ cam.s=1; cam.x=0; cam.y=0; document.body.style.transition='transform .5s'; camApply(); setTimeout(function(){document.body.style.transition=''},520); } cur.classList.remove('on','press'); $$('.hov').forEach(function(x){x.classList.remove('hov')}); if(DEMO==='services') closeMenu(); }
+  var inside=false;
+  document.addEventListener('mouseover',function(){ if(inside) return; inside=true; gen++; reset(); });
+  document.addEventListener('mouseout',function(e){ if(e.relatedTarget) return; inside=false; setTimeout(function(){ if(!inside) run(); },700); });
+  /* страница проекта сообщает, видно ли окно: за краем экрана показ стоит */
+  addEventListener('message',function(e){ if(e.data&&'nvVisible' in e.data) visible=!!e.data.nvVisible; });
+  if(DEMO==='services') (function loop(now){ if(visible) pinRender(demoP,1,Math.sin((now-t0)/900)); requestAnimationFrame(loop); })(t0);
+  setTimeout(run,400);
+}
+
 document.documentElement.classList.add('loaded');
 show();
+if(DEMO) startDemo();
 })();
 </script>
 </body>

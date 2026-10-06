@@ -399,6 +399,20 @@ img,video{display:block;max-width:100%}
 .camp-shot.pre[data-fx="wipe"] img,.camp-shot.pre[data-fx="slide"] img{transform:scale(1.14) translateX(6%)}
 .camp-shot.pre.in{opacity:1;transform:none;clip-path:inset(0 0 0 0)}
 .camp-shot.pre.in[data-fx] img{transform:none}   /* после появления картинка стоит ровно, без сдвига и приближения */
+/* стена логотипов (logos): плитки одной высоты, светлые в обеих темах — логотипы рассчитаны на белый */
+.logo-wall{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:1fr;grid-auto-flow:dense;gap:clamp(4px,.5vw,8px)}
+.lw-tile{position:relative;aspect-ratio:3/2;overflow:hidden;border-radius:var(--r-img);background:#F4F4F5;padding:0;cursor:zoom-in;
+  opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease) calc(var(--k) * 60ms),transform 1s var(--ease) calc(var(--k) * 60ms)}
+.logo-wall.in .lw-tile{opacity:1;transform:none}
+.lw-tile img{position:absolute;inset:14% 12%;width:76%;height:72%;object-fit:contain;mix-blend-mode:multiply}   /* белый фон логотипа сливается с плиткой */
+.lw-tile.fill img{inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:normal}
+.lw-tile.big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+.lw-tile.wide{grid-column:span 2;aspect-ratio:auto}
+.lw-tile.big:not(.fill) img{inset:22%;width:56%;height:56%}
+.lw-tile.wide:not(.fill) img{inset:16% 10%;width:80%;height:68%}
+@media (max-width:900px){.logo-wall{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:520px){.logo-wall{grid-template-columns:repeat(2,minmax(0,1fr))}.lw-tile img{inset:12%;width:76%;height:76%}}
+@media (prefers-reduced-motion:reduce){.lw-tile{transition:none;opacity:1;transform:none}}
 /* схема кейса одной строкой (schemeCols) */
 .scheme-cols{border-top:0;padding-top:0;margin-bottom:clamp(56px,7vw,104px)}
 /* коллаж (collage): сетка по схеме из content.js, подпись над каждым фото */
@@ -897,6 +911,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .hero{min-height:88svh}
   .h2{font-size:clamp(30px,9vw,72px)}
   .contact .h2{font-size:clamp(30px,10.4vw,44px)}   /* «или подружимся?» не шире экрана даже на 320 */
+  .case-title{font-size:clamp(32px,11vw,40px)}   /* длинное слово в названии кейса («интерактивные») влезает в 320 */
   .topic{grid-template-columns:1fr}   /* темы и биография на странице спикера — в одну колонку, текст не сжимается в столбик */
   .switch{font-size:15px;height:40px;gap:8px}
   .btn{height:52px;padding:0 22px 4px;font-size:17px}

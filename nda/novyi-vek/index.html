@@ -7,36 +7,51 @@
 <title>Новый век — проект под NDA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../nda.css">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@300;400&family=Onest:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../nda.css?v=13">
+<link rel="stylesheet" href="case/case.css?v=13">
 </head>
 <body>
 <!-- Страница проекта «Новый век» внутри раздела NDA. Тексты — в ../nda.js (NDA.novyiVek), прототип — site.html -->
 <div class="page">
   <a class="back" href="../">← <span data-t="back"></span></a>
-  <h1 data-t="title"></h1>
-  <div class="tags"></div>
+  <!-- первый экран: знак собирается и становится серебряным (case/case.js) -->
+  <div id="hero"></div>
   <p class="lead" data-t="lead"></p>
   <div class="facts"></div>
   <div class="story"></div>
+
+  <!-- история ребрендинга: собирается из NDA.novyiVek.brand (case/case.js) -->
+  <div id="brand"></div>
+
+  <!-- дизайн сайта: покадровые концепции -->
+  <section class="site-head"><h2></h2><p class="txt mute"></p></section>
 
   <section class="proto">
     <div class="head"><h2 data-t="protoTitle"></h2><p class="mute" data-t="protoText"></p></div>
     <div class="ptabs"></div>
     <div class="frame"><iframe title="Прототип сайта «Новый век»" loading="lazy"></iframe></div>
-    <a class="full" href="site.html" data-t="full"></a>
+    <a class="full" href="site.html?v=13" data-t="full"></a>
   </section>
 
-  <section class="mocks">
-    <h2 data-t="mockTitle"></h2>
-    <div class="mgrid"></div>
+  <div class="lives"></div>
+
+  <section class="newsrow">
+    <div class="nr-sticky"><div class="nr-band">
+      <h2 data-t="newsTitle"></h2>
+      <div class="nr-track"></div>
+    </div></div>
   </section>
 
   <div class="end"><a href="../">← <span data-t="back"></span></a></div>
 </div>
-<script src="../nda.js"></script>
+<script src="../nda.js?v=13"></script>
+<script src="https://cdn.jsdelivr.net/npm/flubber@0.4.2/build/flubber.min.js"></script>
+<script src="case/logo-data.js?v=13"></script>
+<script src="case/case.js?v=13"></script>
 <script>
 ndaGate(function(){
+  try{ nvCase(); }catch(e){ console.error(e); }
   var T = NDA.novyiVek, $ = function(s){return document.querySelector(s)};
   document.querySelectorAll('[data-t]').forEach(function(el){ el.textContent = T[el.dataset.t]; });
   $('.tags').innerHTML = T.tags.map(function(t){return '<span>'+t+'</span>'}).join('');
@@ -47,7 +62,7 @@ ndaGate(function(){
 
   /* прототип: вкладки переключают страницы внутри окна */
   var frame = $('.frame iframe');
-  frame.src = 'site.html#main';
+  frame.src = 'site.html?v=13#main';
   $('.ptabs').innerHTML = T.tabs.map(function(t,i){return '<button data-go="'+t.go+'"'+(i===0?' class="on"':'')+'>'+t.label+'</button>'}).join('');
   var tabs = document.querySelectorAll('.ptabs button');
   function mark(go){ tabs.forEach(function(b){ b.classList.toggle('on', b.dataset.go===go); }); }
@@ -62,21 +77,37 @@ ndaGate(function(){
     }
   });
 
-  /* макеты: клик — во весь размер */
-  $('.mgrid').innerHTML = T.mocks.map(function(m){
-    return '<figure'+(m.tall?' class="tall"':'')+'><div class="im"><img src="'+m.src+'" alt="'+m.caption+'" loading="lazy"></div><figcaption>'+m.caption+'</figcaption></figure>';
+  /* живые экраны: окна с прототипом, где курсор сам всё показывает */
+  $('.lives').innerHTML = T.live.map(function(m){
+    return '<section class="live"><div class="head"><h2>'+m.title+'</h2><p class="mute">'+m.text+'</p></div>'+
+      '<div class="lframe" style="aspect-ratio:'+m.ratio+'"><iframe src="site.html?v=13&demo='+m.demo+'" title="'+m.title+'" loading="lazy"></iframe></div>'+
+      '<p class="hint">'+T.liveHint+'</p></section>';
   }).join('');
-  document.querySelectorAll('.mgrid figure').forEach(function(f){
-    f.addEventListener('click', function(){
-      var v = document.createElement('div'); v.className = 'viewer';
-      v.innerHTML = '<img src="'+f.querySelector('img').src+'" alt="">';
-      document.body.appendChild(v); requestAnimationFrame(function(){ v.classList.add('on'); });
-      document.body.style.overflow = 'hidden';
-      var close = function(){ v.classList.remove('on'); document.body.style.overflow=''; setTimeout(function(){v.remove()},300); document.removeEventListener('keydown',esc); };
-      var esc = function(e){ if(e.key==='Escape') close(); };
-      v.addEventListener('click', close); document.addEventListener('keydown', esc);
-    });
-  });
+  /* живые экраны работают, только пока видны */
+  var lives = document.querySelectorAll('.live');
+  function tell(sec, on){ var f=sec.querySelector('iframe'); if(f.contentWindow) f.contentWindow.postMessage({nvVisible:on},'*'); }
+  if(window.IntersectionObserver){
+    var lio = new IntersectionObserver(function(es){ es.forEach(function(e){ tell(e.target, e.isIntersecting); }); });
+    lives.forEach(function(sec){ lio.observe(sec); sec.querySelector('iframe').addEventListener('load', function(){ var r=sec.getBoundingClientRect(); tell(sec, r.bottom>0 && r.top<innerHeight); }); });
+  }
+
+  /* новости: карточки в один ряд едут справа налево вместе с прокруткой */
+  $('.nr-track').innerHTML = T.news.map(function(n){
+    return '<article class="nr-card"><div class="nr-im"><img src="'+n.img+'" alt="" loading="lazy"></div><div class="nr-d">'+n.date+'</div><h3>'+n.title+'</h3><p>'+n.text+'</p><span class="nr-more">'+T.more+'</span></article>';
+  }).join('');
+  var row=$('.newsrow'), band=$('.nr-band'), track=$('.nr-track'), cards=track.querySelectorAll('.nr-card');
+  function slide(){
+    var r=row.getBoundingClientRect(), span=row.offsetHeight-innerHeight;
+    var p=Math.max(0, Math.min(1, -r.top/span));
+    var from=band.clientWidth*0.55, to=-(track.scrollWidth-band.clientWidth+parseFloat(getComputedStyle(band).paddingLeft)*2);
+    var x=from+(to-from)*p;
+    track.style.transform='translateX('+x+'px)';
+    /* картинки внутри карточек чуть отстают — глубина */
+    cards.forEach(function(c){ var cr=c.getBoundingClientRect(), k=(cr.left+cr.width/2)/innerWidth-.5; c.firstChild.firstChild.style.transform='translateX('+(k*-28)+'px) scale(1.12)'; });
+  }
+  addEventListener('scroll', function(){ requestAnimationFrame(slide); }, {passive:true});
+  addEventListener('resize', slide);
+  slide();
 });
 </script>
 </body>

@@ -61,17 +61,28 @@ h2{font-size:clamp(28px,3.4vw,44px);font-weight:500;line-height:1.1;letter-spaci
 .frame{border-radius:18px;overflow:hidden;background:#CED7DF;aspect-ratio:1440/860;position:relative}
 .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .full{display:inline-block;margin-top:14px;font-size:16px}
-.mocks{margin-top:120px}
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px 24px;margin-top:28px}
-.mgrid figure{cursor:zoom-in}
-.mgrid figure.tall{grid-column:1 / -1}
-.mgrid .im{border-radius:14px;overflow:hidden;background:var(--soft)}
-.mgrid figure.tall .im{max-height:80vh;overflow:auto}
-.mgrid figcaption{font-size:16px;color:var(--mute);margin-top:10px}
-@media (max-width:760px){.mgrid{grid-template-columns:1fr}}
-.viewer{position:fixed;inset:0;z-index:90;background:rgba(29,34,42,.92);overflow:auto;padding:32px var(--pad);cursor:zoom-out;opacity:0;transition:opacity .3s}
-.viewer.on{opacity:1}
-.viewer img{margin:0 auto;max-width:min(1440px,100%)}
+/* живые экраны */
+.live{margin-top:110px}
+.live .head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:24px}
+.live .head p{max-width:560px}
+.lframe{position:relative;border-radius:18px;overflow:hidden;background:#CED7DF}
+.lframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.hint{font-size:16px;color:var(--mute);margin-top:12px}
+
+/* новости: лента по прокрутке */
+.newsrow{height:320vh;margin-top:110px}
+.nr-sticky{position:sticky;top:76px;height:calc(100vh - 76px);display:flex;align-items:center}
+.nr-band{width:100%;background:#CED7DF;border-radius:18px;padding:40px 40px 48px;overflow:hidden}
+.nr-band h2{margin-bottom:32px}
+.nr-track{display:flex;gap:24px;width:max-content;will-change:transform}
+.nr-card{width:clamp(260px,28vw,380px);flex:none;background:#fff;border-radius:22px;overflow:hidden;font-family:Onest,var(--font);padding-bottom:64px;position:relative;min-height:440px}
+.nr-im{height:210px;overflow:hidden;background:#cdd6e0}
+.nr-im img{width:100%;height:100%;object-fit:cover;transform:scale(1.12);will-change:transform}
+.nr-d{padding:16px 20px 0;font-size:13px;color:#D90016}
+.nr-card h3{padding:10px 20px 0;font-size:18px;font-weight:500;line-height:1.3}
+.nr-card p{padding:10px 20px 0;font-size:14px;line-height:1.45;color:#555}
+.nr-more{position:absolute;left:20px;bottom:20px;height:28px;padding:0 16px 2px;border-radius:999px;background:#000;color:#fff;font-size:12px;display:flex;align-items:center}
+@media (prefers-reduced-motion:reduce){.newsrow{height:auto}.nr-sticky{position:static;height:auto}.nr-band{overflow-x:auto}.nr-track{transform:none!important}}
 .end{margin-top:110px;padding-top:28px;border-top:1px solid var(--line)}
 
 /* ---------- интерфейс как на основном сайте ----------
