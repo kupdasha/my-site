@@ -1275,6 +1275,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .spec{padding:clamp(24px,3vw,40px) 0;border-top:1px solid var(--line);margin-bottom:clamp(24px,3vw,40px)}
 .spec-title{font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.15;margin-bottom:clamp(20px,2.5vw,32px)}
 .spec-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,2.5vw,36px) clamp(16px,2vw,28px)}
+.spec-viz{display:block;width:100%;height:auto;aspect-ratio:16/9;margin-bottom:16px;background:var(--soft);overflow:hidden}
 .spec-item dt{font-size:16px;opacity:.55;margin-bottom:8px}
 .spec-item dd{margin:0;font-family:var(--font-read);font-size:18px;line-height:1.5}
 .spec-colors{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px;font-family:var(--font);font-size:16px}
