@@ -695,6 +695,8 @@ function mediaHTML(p){
 const PATTERN = [['большой', 'слева'], ['маленький', 'слева'], ['средний', 'справа'], ['большой', 'справа'], ['средний', 'слева'], ['маленький', 'справа']];
 let workFilter = SITE.works.startFilter ?? 'дизайн';   // какая категория выбрана при открытии страницы
 /* проект может быть в нескольких категориях: cat: ['продакшен', '3D'] */
+/* «другие работы»: other: true — внизу списком; promote: ['3D'] — но в этой категории крупной карточкой */
+const isOther = p => p.other && !(workFilter && [].concat(p.promote || []).includes(workFilter));
 const inCat = p => !workFilter || [].concat(p.cat).includes(workFilter);
 /* год проекта — маленькой цифрой рядом с названием */
 const yearHTML = p => p.year ? `<sup class="yr">${T(p.year)}</sup>` : '';
@@ -707,7 +709,7 @@ function renderWorks(){
   $('#workFiltersEnd').innerHTML = chips;
   let n = 0;
   $('#workList').innerHTML = W.items.map((p, k) => {
-    if (p.other || !inCat(p)) return '';
+    if (isOther(p) || !inCat(p)) return '';
     const [size, side] = p.size ? [p.size, p.side] : PATTERN[n % PATTERN.length];
     n++;
     const ratio = p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');   // у видео всегда 16:9
@@ -720,7 +722,7 @@ function renderWorks(){
   }).join('');
   $$('#workList .media').forEach(watchMedia);
   // «другие работы» — простым списком под сеткой
-  const other = W.items.map((p, k) => [p, k]).filter(([p]) => p.other && inCat(p));
+  const other = W.items.map((p, k) => [p, k]).filter(([p]) => isOther(p) && inCat(p));
   $('#otherWorks').hidden = !other.length;
   // между строками — струны: в серьезной версии это просто линии, в веселой они звенят и светятся радугой
   $('#otherList').innerHTML = STRING_HTML + other.map(([p, k]) =>
