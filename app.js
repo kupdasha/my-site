@@ -1226,6 +1226,38 @@ function campRow(items, caption, narrow){
   return `<div class="wrap camp-rowbox${narrow ? ' narrow' : ''}">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row">${items.map(campCell).join('')}</div></div>`;
 }
 // коллаж: ячейки раскладываются по схеме areas, у каждой подпись сверху; фото увеличиваются по нажатию
+// презентация-листалка: слайды в ленте с прилипанием, стрелки по бокам, счетчик «3 из 30»
+function campSlides(g){
+  const cap = g.caption ? `<p class="camp-cap">${T(g.caption)}</p>` : '';
+  const arrow = d => `<svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="${d}"/></svg>`;
+  return `<div class="wrap camp-rowbox">${cap}<div class="slides" tabindex="0" aria-label="Презентация">
+    <div class="slides-track">${g.slides.map((src, i) => `<button class="slide" aria-label="Слайд ${i + 1}"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div>
+    <button class="slides-nav prev" aria-label="Предыдущий слайд">${arrow('M12 4l-6 6 6 6')}</button>
+    <button class="slides-nav next" aria-label="Следующий слайд">${arrow('M8 4l6 6-6 6')}</button>
+    <p class="slides-count">1 из ${g.slides.length}</p>
+  </div></div>`;
+}
+function watchSlides(box){
+  const track = box.querySelector('.slides-track'), slides = [...track.children], count = box.querySelector('.slides-count');
+  const at = () => Math.round(track.scrollLeft / track.clientWidth);
+  const go = i => track.scrollTo({ left: Math.max(0, Math.min(slides.length - 1, i)) * track.clientWidth, behavior: 'smooth' });
+  const show = () => {
+    const i = at();
+    count.textContent = `${i + 1} из ${slides.length}`;
+    box.classList.toggle('first', i === 0); box.classList.toggle('last', i === slides.length - 1);
+  };
+  track.addEventListener('scroll', () => requestAnimationFrame(show), { passive: true });
+  show();
+  box.addEventListener('click', e => {
+    const nav = e.target.closest('.slides-nav');
+    if (nav) return go(at() + (nav.classList.contains('next') ? 1 : -1));
+    const s = e.target.closest('.slide');
+    if (s) { const imgs = slides.map(x => x.querySelector('img')); openViewer(imgs.map(i => i.currentSrc || i.src), slides.indexOf(s), imgs); }
+  });
+  box.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); go(at() + (e.key === 'ArrowRight' ? 1 : -1)); }
+  });
+}
 function campCollage(g){
   const c = g.collage;
   const cap = g.caption ? `<p class="camp-cap">${g.link ? `<a class="link" href="${g.link}">${T(g.caption)}</a>` : T(g.caption)}</p>` : '';
@@ -1241,7 +1273,8 @@ function campGallery(c){
   let pile = [];
   const flush = () => { for (let i = 0; i < pile.length; i += cols) out.push(campRow(pile.slice(i, i + cols))); pile = []; };
   (c.gallery || []).forEach(g => {
-    if (g && g.collage) { flush(); out.push(campCollage(g)); }
+    if (g && g.slides) { flush(); out.push(campSlides(g)); }
+    else if (g && g.collage) { flush(); out.push(campCollage(g)); }
     else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption)); }
     else if (parseMedia(g).type === 'image') pile.push(g);
     else { flush(); out.push(campRow([g])); }
@@ -1283,6 +1316,7 @@ function watchCampaigns(root){
   // ряды бывают и в меню кампаний (.camps), и прямо в галерее обычного кейса
   const camps = root.querySelector('.camps');
   const box = camps || (root.querySelector('.camp-row') && root.querySelector('.case-body')); if (!box) return;
+  box.querySelectorAll('.slides').forEach(watchSlides);
   // пропорции ячейки берутся из самой картинки — так ряд из разных форматов выходит одной высоты
   box.querySelectorAll('.camp-shot img').forEach(img => {
     const set = () => {
