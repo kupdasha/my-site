@@ -600,11 +600,11 @@ img,video{display:block;max-width:100%}
 @media (max-width:760px){
   /* ряд макетов на телефоне — лента, которую листают пальцем: каждый макет крупно и целиком, без полей.
      Ширина — 84% экрана, но высокие картинки не выше 62% экрана; следующий макет выглядывает справа */
-  .camp-row:not(.collage){flex-wrap:nowrap;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+  .camp-row:not(.collage):not(.compact){flex-wrap:nowrap;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
     margin:0 calc(-1 * var(--pad));padding:0 var(--pad);scroll-padding:0 var(--pad)}
-  .camp-row:not(.collage)::-webkit-scrollbar{display:none}
-  .camp-row:not(.collage)>.camp-shot{flex:0 0 auto;width:min(84vw, 62dvh * var(--ar));scroll-snap-align:start}
-  .camp-row:not(.collage)>.camp-shot:only-child{width:100%}
+  .camp-row:not(.collage):not(.compact)::-webkit-scrollbar{display:none}
+  .camp-row:not(.collage):not(.compact)>.camp-shot{flex:0 0 auto;width:min(84vw, 62dvh * var(--ar));scroll-snap-align:start}
+  .camp-row:not(.collage):not(.compact)>.camp-shot:only-child{width:100%}
   /* коллаж на телефоне — столбиком: пропорции и сетка из content.js (они в style у элемента) отключаются */
   .collage{aspect-ratio:auto!important;grid-template:none!important}
   .collage-cell{flex:none}
@@ -1267,6 +1267,10 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 @media (max-width:760px){.camp-rowbox.small>.camp-row{width:auto}.camp-rowbox.small>.camp-cap{margin-left:0}}
 /* фото в коллаже обрезаются по ячейке */
 .collage.cover .camp-shot img{object-fit:cover}
+/* compact — ресайзы плотным блоком: все картинки одной небольшой высоты, переносятся по строкам;
+   длинные баннеры и LED-ленты не шире половины блока — встают по две в строку */
+.camp-row.compact{flex-wrap:wrap;--h:clamp(110px,15vw,210px);--g:clamp(8px,1vw,16px)}
+.camp-row.compact>.camp-shot{flex:none;width:min(calc(50% - var(--g) / 2), calc(var(--h) * var(--ar)));height:auto}
 /* блок-памятка (spec): требования списком в три колонки, цвета — плашками */
 .spec{padding:clamp(24px,3vw,40px) 0;border-top:1px solid var(--line);margin-bottom:clamp(24px,3vw,40px)}
 .spec-title{font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.15;margin-bottom:clamp(20px,2.5vw,32px)}
@@ -1631,14 +1635,14 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .deck-sheet{gap:clamp(12px,2vw,32px)}
 @media (max-width:760px){
   .case-sheet{padding:10px;border-radius:4px}
-  .case-sheet .camp-row:not(.collage){flex-direction:column;overflow:visible;scroll-snap-type:none}
-  .case-sheet .camp-row:not(.collage)>.camp-shot{flex:none;width:100%;height:auto}
+  .case-sheet .camp-row:not(.collage):not(.compact){flex-direction:column;overflow:visible;scroll-snap-type:none}
+  .case-sheet .camp-row:not(.collage):not(.compact)>.camp-shot{flex:none;width:100%;height:auto}
 }
 .case-sheet.narrow{padding:0;width:calc(66.67% + clamp(16px,2vw,28px) / 3);margin-left:auto}
 @media (max-width:760px){
   .case-sheet.narrow{width:auto}
-  .case-sheet.keep .camp-row:not(.collage){flex-direction:row}
-  .case-sheet.keep .camp-row:not(.collage)>.camp-shot{flex:var(--ar) 1 0;width:auto}
+  .case-sheet.keep .camp-row:not(.collage):not(.compact){flex-direction:row}
+  .case-sheet.keep .camp-row:not(.collage):not(.compact)>.camp-shot{flex:var(--ar) 1 0;width:auto}
 }
 
 /* превью, которое нужно показать целиком (cardRatio): карточка в пропорциях ролика, без приближения */

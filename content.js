@@ -301,11 +301,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             gallery: [
               /* в каждом ряду один порядок: Джарахов, Лебедев, Некрасова */
               { row: [ 'img/vk/vk-adb-wide-1.jpg', 'img/vk/vk-adb-wide-2.jpg', 'img/vk/vk-adb-wide-3.jpg' ] },
-              { caption: ['ресайзы под соцсети, сторис и баннерные сети', 'одна съемка — все форматы'], row: [
-                'img/vk/vk-adb-square-1.jpg', 'img/vk/vk-adb-square-2.jpg', 'img/vk/vk-adb-square-3.jpg' ] },
-              { row: [ 'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg' ] },
-              /* узкие баннеры небольшого разрешения — лесенкой (stairs: true), каждый в половину ширины */
-              { caption: ['баннеры', 'узкие баннеры'], row: [ 'img/vk/vk-adb-billboard-1.jpg', 'img/vk/vk-adb-billboard-2.jpg', 'img/vk/vk-adb-billboard-3.jpg' ], stairs: true },
+              /* compact — все ресайзы одним плотным блоком: картинки одной небольшой высоты переносятся по строкам */
+              { caption: ['ресайзы под соцсети, сторис и баннерные сети', 'одна съемка — все форматы'], compact: [
+                'img/vk/vk-adb-square-1.jpg', 'img/vk/vk-adb-square-2.jpg', 'img/vk/vk-adb-square-3.jpg',
+                'img/vk/vk-adb-story-1.jpg', 'img/vk/vk-adb-story-2.jpg', 'img/vk/vk-adb-story-3.jpg',
+                'img/vk/vk-adb-billboard-1.jpg', 'img/vk/vk-adb-billboard-2.jpg', 'img/vk/vk-adb-billboard-3.jpg' ] },
               /* spec — требования к фотосъемке из продакшен-брифа, коротко; colors — плашки цветов с кодом */
               { spec: {
                 title: ['требования к фотосъемке', 'что мы попросили у фотографа'],
@@ -370,11 +370,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/822882205231597.672489274b333.jpg',
               /* ресайзы: в каждом ряду сцены в одном порядке — школьники, взрослые, студенты */
               { caption: ['ресайзы под соцсети и digital. Самым сложным тогда были ретушь и подготовка к печати: в те годы мы делали их еще вручную — со Stable Diffusion и ретушером. Команда — три человека: я как лид, дизайнер и ретушер',
-                           'ресайзы. Самое сложное — ретушь и подготовка к печати: тогда всё еще делали вручную, со Stable Diffusion и ретушером. Нас было трое: я как лид, дизайнер и ретушер'], row: [
-                'img/vk/vk-cyber-square-2.jpg', 'img/vk/vk-cyber-square-3.jpg', 'img/vk/vk-cyber-square-1.jpg' ] },
-              { row: [ 'img/vk/vk-cyber-portrait-3.jpg', 'img/vk/vk-cyber-portrait-1.jpg', 'img/vk/vk-cyber-portrait-2.jpg' ] },
-              { row: [ 'img/vk/vk-cyber-story-2.jpg', 'img/vk/vk-cyber-story-3.jpg', 'img/vk/vk-cyber-story-1.jpg' ] },
-              { row: [ 'img/vk/vk-cyber-wide-2.jpg', 'img/vk/vk-cyber-wide-1.jpg', 'img/vk/vk-cyber-wide-3.jpg' ] },
+                           'ресайзы. Самое сложное — ретушь и подготовка к печати: тогда всё еще делали вручную, со Stable Diffusion и ретушером. Нас было трое: я как лид, дизайнер и ретушер'], compact: [
+                'img/vk/vk-cyber-square-2.jpg', 'img/vk/vk-cyber-square-3.jpg', 'img/vk/vk-cyber-square-1.jpg',
+                'img/vk/vk-cyber-portrait-3.jpg', 'img/vk/vk-cyber-portrait-1.jpg', 'img/vk/vk-cyber-portrait-2.jpg',
+                'img/vk/vk-cyber-story-2.jpg', 'img/vk/vk-cyber-story-3.jpg', 'img/vk/vk-cyber-story-1.jpg',
+                'img/vk/vk-cyber-wide-2.jpg', 'img/vk/vk-cyber-wide-1.jpg', 'img/vk/vk-cyber-wide-3.jpg' ] },
               /* slides — презентация-листалка: слайды листаются вправо-влево (стрелки, свайп, клавиши),
                  по нажатию слайд открывается крупно. Слайд с контактами сотрудницы VK убран */
               { caption: ['тулкит: собрали его для подрядчиков и партнеров, чтобы они грамотно использовали элементы key visual и сердце в своих материалах', 'тулкит: всё, чтобы партнеры правильно ставили key visual и сердце у себя'],
@@ -405,14 +405,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/665f46205231597.66b73481b1a75.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4d11c9205231597.66b73481b12b0.jpg',
               'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4f1dbc205231597.66b73481b0c49.jpg',
-              /* наружка по героям: в каждом ряду сити-формат 1,2 × 1,8, пиллар 1,4 × 3 и билборд 3,7 × 2,7 */
-              { caption: ['наружная реклама: сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7', 'наружка: сити-формат, пиллар, билборд'], row: [
-                'img/vk/vk-video-boy-city.jpg', 'img/vk/vk-video-boy-pillar.jpg', 'img/vk/vk-video-boy-billboard.jpg' ] },
-              { caption: ['обед', 'обед'], row: [
-                'img/vk/vk-video-noodles-city.jpg', 'img/vk/vk-video-noodles-pillar.jpg', 'img/vk/vk-video-noodles-billboard.jpg' ] },
-              { caption: ['полет в самолете', 'в самолете'], row: [
-                'img/vk/vk-video-plane-city.jpg', 'img/vk/vk-video-plane-pillar.jpg', 'img/vk/vk-video-plane-billboard.jpg' ] },
-              { caption: ['digital: кардио в спортзале', 'digital-ресайзы: спортзал'], row: [
+              /* наружка по героям (мультики, обед, самолет): сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7; потом digital со спортзалом */
+              { caption: ['ресайзы: наружная реклама по героям — сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7 — и digital с кардио в спортзале', 'наружка по героям и digital'], compact: [
+                'img/vk/vk-video-boy-city.jpg', 'img/vk/vk-video-boy-pillar.jpg', 'img/vk/vk-video-boy-billboard.jpg',
+                'img/vk/vk-video-noodles-city.jpg', 'img/vk/vk-video-noodles-pillar.jpg', 'img/vk/vk-video-noodles-billboard.jpg',
+                'img/vk/vk-video-plane-city.jpg', 'img/vk/vk-video-plane-pillar.jpg', 'img/vk/vk-video-plane-billboard.jpg',
                 'img/vk/vk-video-girl-story.jpg', 'img/vk/vk-video-girl-square.jpg', 'img/vk/vk-video-girl-screen-2.jpg', 'img/vk/vk-video-girl-screen.jpg' ] },
               { caption: ['на улицах города', 'а вот так это висело в городе'], row: [
                 'img/vk/vk-video-street-1.jpg', 'img/vk/vk-video-street-2.jpg', { video: 'img/vk/vk-video-street.mp4', ratio: 9 / 16 } ] },
@@ -441,10 +438,8 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             solution: 'В основу легла концепция притяжения людей с одинаковыми увлечениями, как магнитов: два персонажа находят друг друга, а в композицию органично включены ключевые элементы интерфейса приложения. Кампания выходила параллельно с динамичным видеороликом, в котором пара сближается благодаря совпадению музыкальных интересов, визуально «притягиваясь» друг к другу.',
             gallery: [
               'https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/ac9008205231597.66b72e32c40cc.jpg',
-              { caption: ['ресайзы под разные площадки', 'один визуал — много размеров'], row: [
-                'img/vk/vk-dating-master.jpg', 'img/vk/vk-dating-square.jpg', 'img/vk/vk-dating-vertical.jpg', 'img/vk/vk-dating-wide.jpg',
-              ] },
-              { row: [ 'img/vk/vk-dating-banner.jpg' ] },
+              { caption: ['ресайзы под разные площадки', 'один визуал — много размеров'], compact: [
+                'img/vk/vk-dating-master.jpg', 'img/vk/vk-dating-square.jpg', 'img/vk/vk-dating-vertical.jpg', 'img/vk/vk-dating-wide.jpg', 'img/vk/vk-dating-banner.jpg' ] },
               'vk:-180262371_456239366',
             ],
           },
@@ -490,15 +485,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               /* ролик не 16:9 — объектом: { video: 'kinescope:ID', ratio: ширина / высота } */
               { caption: ['анимации для экранов', 'Персик в движении'], row: [ 'kinescope:vKXcDJ9RFA6x2SnWCW7PwL', 'kinescope:otRxgzFCKqoNGiFvq59hP3', 'kinescope:6VBLbUMmkiQTKoNatgS9WS' ] },
               { row: [ { video: 'kinescope:t3knnieArqzGQcd2imZGx9', ratio: 400 / 56 } ] },
-              { caption: ['ресайзы: активности на зонах', 'один кот — много поз'], row: [ 'img/vk/vk-corp-persik-ippolit.jpg', 'img/vk/vk-corp-kostum.jpg' ] },
-              { row: [ 'img/vk/vk-corp-koncert.jpg', 'img/vk/vk-corp-tubing.jpg' ] },
-              { caption: ['экраны 3840 × 1330', 'большие экраны'], row: [ 'img/vk/vk-corp-screen-1.jpg', 'img/vk/vk-corp-screen-2.jpg' ] },
-              { row: [ 'img/vk/vk-corp-screen-3.jpg', 'img/vk/vk-corp-screen-4.jpg' ] },
-              { caption: ['LED-лента 5464 × 768', 'очень длинный экран'], row: [ 'img/vk/vk-corp-led-1.jpg' ] },
-              { row: [ 'img/vk/vk-corp-led-2.jpg' ] },
-              { row: [ 'img/vk/vk-corp-led-3.jpg' ] },
-              { caption: ['баннеры интранета 2000 × 415', 'для внутреннего портала'], row: [ 'img/vk/vk-corp-intranet-1.jpg', 'img/vk/vk-corp-intranet-2.jpg' ] },
-              { row: [ 'img/vk/vk-corp-intranet-3.jpg', 'img/vk/vk-corp-intranet-4.jpg', 'img/vk/vk-corp-intranet-5.jpg' ] },
+              { caption: ['ресайзы: активности на зонах, экраны 3840 × 1330, LED-лента 5464 × 768 и баннеры интранета 2000 × 415', 'один кот — много поз и форматов'], compact: [
+                'img/vk/vk-corp-persik-ippolit.jpg', 'img/vk/vk-corp-kostum.jpg', 'img/vk/vk-corp-koncert.jpg', 'img/vk/vk-corp-tubing.jpg',
+                'img/vk/vk-corp-screen-1.jpg', 'img/vk/vk-corp-screen-2.jpg', 'img/vk/vk-corp-screen-3.jpg', 'img/vk/vk-corp-screen-4.jpg',
+                'img/vk/vk-corp-led-1.jpg', 'img/vk/vk-corp-led-2.jpg', 'img/vk/vk-corp-led-3.jpg',
+                'img/vk/vk-corp-intranet-1.jpg', 'img/vk/vk-corp-intranet-2.jpg', 'img/vk/vk-corp-intranet-3.jpg', 'img/vk/vk-corp-intranet-4.jpg', 'img/vk/vk-corp-intranet-5.jpg' ] },
             ],
           },
         ],

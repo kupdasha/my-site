@@ -1447,6 +1447,7 @@ function campGallery(c){
   const flush = () => { for (let i = 0; i < pile.length; i += cols) out.push(campRow(pile.slice(i, i + cols))); pile = []; };
   (c.gallery || []).forEach(g => {
     if (g && g.spec) { flush(); out.push(campSpec(g.spec)); }
+    else if (g && g.compact) { flush(); out.push(`<div class="wrap camp-rowbox">${g.caption ? `<p class="camp-cap">${T(g.caption)}</p>` : ''}<div class="camp-row compact">${g.compact.map(campCell).join('')}</div></div>`); }
     else if (g && g.slides) { flush(); out.push(campSlides(g)); }
     else if (g && g.collage) { flush(); out.push(campCollage(g)); }
     else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption, g.narrow, g.small, g.stairs)); }
