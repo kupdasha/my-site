@@ -2065,18 +2065,19 @@ function watchStars(el){
   });
   el.addEventListener('pointerleave', () => { tilt.style.transform = ''; });
 }
-/* { sky: { items: [{ img, k }], hint } } — звездное небо отклоненных вариантов: знаки разлетаются из центра,
+/* { sky: { items: [{ img, k }], hint, top } } (top — подсказка над блоком) — звездное небо отклоненных вариантов: знаки разлетаются из центра,
    плывут каждый по-своему (k: turn — вращается, sway — качается в объеме, breathe — дышит),
    слоями откликаются на курсор; наведенный выходит вперед, остальные приглушаются */
-const SKY_SPOTS = [[12, 24], [36, 20], [61, 26], [86, 21], [24, 55], [49, 52], [74, 57], [92, 82], [12, 82], [37, 84], [63, 85],
-  [6, 52], [50, 88], [30, 40], [70, 40]];
+const SKY_SPOTS = [[16, 27], [39, 22], [62, 29], [85, 23], [10, 72], [30, 76], [50, 69], [70, 77], [90, 70],
+  [50, 48], [26, 48], [74, 48]];
 function skyHTML(x){
   const touch = matchMedia('(pointer:coarse)').matches;
   const hint = x.hint && (touch && x.hint.touch ? x.hint.touch : x.hint.mouse || x.hint);
-  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="sky" role="img" aria-label="${uesc(pick(x.label) || 'отклоненные варианты знака')}">${x.items.map((s, i) => {
+  const top = x.top && hint ? `<p class="m3d-hint">${T(hint)}</p>` : '';
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}${top}<div class="sky" role="img" aria-label="${uesc(pick(x.label) || 'отклоненные варианты знака')}">${x.items.map((s, i) => {
     const [l, t] = SKY_SPOTS[i % SKY_SPOTS.length], d = .4 + (i * 37 % 10) / 10;
     return `<span class="sky-it ${s.k || 'turn'}" style="--l:${l}%;--t:${t}%;--d:${d.toFixed(2)};--i:${i};--s:${s.s || 1};--dur:${(7 + i * 13 % 6).toFixed(1)}s"><i><img src="${s.img}" alt="" loading="lazy" draggable="false"></i></span>`;
-  }).join('')}</div>${hint ? `<p class="camp-cap">${T(hint)}</p>` : ''}</div>`;
+  }).join('')}</div>${hint && !x.top ? `<p class="camp-cap">${T(hint)}</p>` : ''}</div>`;
 }
 function watchSky(el){
   starReveal.observe(el);
