@@ -567,13 +567,20 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-rk-col{display:flex;flex-direction:column}
 .au-rk-year{height:44px;font-weight:500;font-size:clamp(20px,2vw,28px);text-align:center}
 .au-rk-it{height:46px;margin:5px 0;border-radius:999px;background:var(--soft);text-align:center;font-size:clamp(16px,1.4vw,20px);line-height:1.05;padding:0 6px 2px;overflow:hidden;
-  opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease) calc(.2s + var(--k) * .5s + var(--i) * .05s),transform .7s var(--ease) calc(.2s + var(--k) * .5s + var(--i) * .05s),background .35s,color .35s}
+  opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease) calc(.2s + var(--k) * .5s + var(--i) * .05s),transform .7s var(--ease) calc(.2s + var(--k) * .5s + var(--i) * .05s),background .35s,color .35s,filter .35s,box-shadow .35s}
 .au-ch.in .au-rk-it{opacity:1;transform:none}
 .au-rk-it.on{background:var(--eb-grad);color:var(--eb-navy);font-weight:500}
 .au-rk-link{margin-top:44px;width:100%;height:calc(var(--n) * 56px);overflow:visible;clip-path:inset(-10px 100% -10px 0);transition:clip-path 1.2s var(--ease-io) 1s}
 .au-ch.in .au-rk-link{clip-path:inset(-10px -10px -10px 0)}
 .au-rk-link path{fill:none;stroke:var(--ink);stroke-opacity:.2;stroke-width:2;transition:stroke .35s,stroke-opacity .35s,stroke-width .35s}
-.au-rk-link path.on{stroke:var(--eb-cyan);stroke-opacity:1;stroke-width:5}
+.au-rk-link path.on{stroke:var(--c, var(--eb-cyan));stroke-opacity:1;stroke-width:5}
+/* цвета стран из макета: все плашки цветные, при выборе остальные притухают */
+.au-rk-it.tint{background:var(--c);color:var(--eb-navy)}
+.au-rk-it.tint.on{background:var(--c);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--eb-navy)}
+:root[data-theme="dark"] .au-rk-it.tint.on{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--c)}
+.au-rk:has(.on) .au-rk-it.tint:not(.on){filter:opacity(.4)}
+.au-rk-link path[style]{stroke:var(--c);stroke-opacity:.35}
+.au-rk-link path[style].on{stroke-opacity:1}
 @media (max-width:600px){.au-rk{grid-template-columns:minmax(0,1fr) minmax(10px,.22fr) minmax(0,1fr) minmax(10px,.22fr) minmax(0,1fr)}.au-rk-it{padding:0 2px 2px}}
 
 /* ---------- телефон (общая рамка) ---------- */
@@ -676,3 +683,15 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
   .au-pal-grads{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion:reduce){.au-pal-grads span{animation:none}}
+/* шторка «прототип / макет» на белых макетах: линия и кнопка темно-синие, подписи на подложке */
+.au-edb .au-cmp{background:#fff}
+.au-edb .au-cmp-handle{background:var(--eb-navy)}
+.au-edb .au-cmp-handle svg{background:var(--eb-navy);color:#fff}
+.au-edb .au-cmp-lab.l{background:#EEF0F3}
+.au-edb .au-cmp-lab.r{background:var(--eb-mint-l)}
+/* в кейсе ЕАБР ряды макетов на телефоне — по две картинки, а не столбиком на много экранов */
+@media (max-width:600px){
+  .au-edb .au-row{flex-direction:row;flex-wrap:wrap}
+  .au-edb .au-cell{flex:1 1 calc(50% - 8px);width:auto;aspect-ratio:auto}
+  .au-edb .au-cell img{height:auto}
+}

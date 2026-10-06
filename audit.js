@@ -275,10 +275,11 @@ function shift(c){
 // рейтинг по годам: столбики стран и линии, кто куда переместился; наведите на страну
 function rank(r){
   const N = r.cols[0].list.length;
+  const c = name => r.colors && r.colors[name] ? ` style="--c:${r.colors[name]}"` : '';   // цвет страны, как в макете
   const link = (a, b) => `<svg class="au-rk-link" viewBox="0 0 100 ${N * 10}" preserveAspectRatio="none" aria-hidden="true">${
-    a.list.map((name, i) => { const j = b.list.indexOf(name); return `<path data-n="${esc(name)}" d="M0,${i * 10 + 5} C50,${i * 10 + 5} 50,${j * 10 + 5} 100,${j * 10 + 5}" vector-effect="non-scaling-stroke"/>`; }).join('')}</svg>`;
+    a.list.map((name, i) => { const j = b.list.indexOf(name); return `<path data-n="${esc(name)}"${c(name)} d="M0,${i * 10 + 5} C50,${i * 10 + 5} 50,${j * 10 + 5} 100,${j * 10 + 5}" vector-effect="non-scaling-stroke"/>`; }).join('')}</svg>`;
   return `<div class="au-rk" style="--n:${N}" data-on="${esc(r.start || '')}">${r.cols.map((c, k) => `${k ? link(r.cols[k - 1], c) : ''}
-    <div class="au-rk-col" style="--k:${k}"><span class="au-rk-year">${c.year}</span>${c.list.map((name, i) => `<button class="au-rk-it" data-n="${esc(name)}" style="--i:${i}">${H.T(name)}</button>`).join('')}</div>`).join('')}
+    <div class="au-rk-col" style="--k:${k}"><span class="au-rk-year">${c.year}</span>${c.list.map((name, i) => `<button class="au-rk-it${r.colors ? ' tint' : ''}" data-n="${esc(name)}" style="--i:${i}${r.colors && r.colors[name] ? ';--c:' + r.colors[name] : ''}">${H.T(name)}</button>`).join('')}</div>`).join('')}
   </div>
   ${r.note ? `<p class="au-cap">${H.T(r.note)}</p>` : ''}`;
 }
