@@ -1750,7 +1750,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     courses: [
       { school: 'Bang Bang Education', title: '"Как управлять дизайнерами"' },
       { school: 'MADS',                title: 'AI and Creativity' },
-      { school: 'Endy Education',      title: 'Brand Insider. Full Part' },
+      { school: 'Endy Education',      title: 'Brand Design Insider: полное погружение' },
     ],
   },
 
