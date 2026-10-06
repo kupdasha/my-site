@@ -1520,6 +1520,8 @@ function renderCase(k, keepScroll){
   while (g < gallery.length) body += galleryItem(gallery[g++]);
   // кампании внутри кейса: меню, у каждой — текст в три колонки (название, задача, решение) и макеты рядами
   if (p.campaigns && p.campaigns.length) body += campaignsHTML(p.campaigns, W.campaigns);
+  // audit — аудит как дизайн-кейс: главы с живой инфографикой, их рисует audit.js
+  if (p.audit) body += '<div class="au au-mount"></div>';
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -1560,6 +1562,10 @@ function renderCase(k, keepScroll){
   markArticles(caseContent);
   watchCampaigns(caseContent);
   caseContent.querySelectorAll('.world').forEach(watchWorld);
+  const au = caseContent.querySelector('.au-mount');
+  if (au) import(SCRIPT_BASE + 'audit.js?v=' + Math.floor(Date.now() / 36e5))
+    .then(m => m.mountAudit(au, p, { T, pick, worldHTML, watchWorld, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('аудит не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
