@@ -110,6 +110,9 @@ function typograf(input){
   s = s.replace(shortWord, '$1 ').replace(shortWord, '$1 '); // § 62: предлоги и союзы — к следующему слову
   s = s.replace(/\s(?=(же|ли|ль|бы|б|ж)(?=$|[\s .,!?:;)»]))/gi, ' '); // частицы — к предыдущему
   s = s.replace(/(\d)\s(?=[а-яёa-z%])/gi, '$1 ');             // 60 минут
+  // названия брендов не рвутся между строками: MANGO OFFICE, The Ventures Japan, VK Инклюзия
+  s = s.replace(/(?<=(?:^|[\s\u00a0«„(])[A-Z][A-Za-z0-9&'’.]*)[ \t]+(?=[A-Z])/g, '\u00a0');
+  s = s.replace(/(?<=(?:^|[\s\u00a0«„(])[A-Z]{2,})[ \t]+(?=[А-ЯЁ])/g, '\u00a0');
   return s;
 }
 function nestQuotes(s){
