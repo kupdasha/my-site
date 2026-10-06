@@ -130,12 +130,9 @@ function rows(list){
     <div class="au-row">${r.row.map(src => `<button class="au-cell au-zoomable" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div></div>`).join('');
 }
 
-// коллаж: картинки вперемешку колонками, длинные страницы обрезаны сверху; увеличиваются по нажатию
+// коллаж-сетка: снимки кейса (shot) и длинные страницы сайта (page) — страница прокручивается при наведении, по нажатию открывается целиком
 function collage(list){
-  const cell = src => `<button class="au-clg-cell au-zoomable" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`;
-  // три колонки по очереди (на телефоне CSS собирает их в две)
-  const cols = [0, 1, 2].map(k => list.filter((_, i) => i % 3 === k));
-  return `<div class="au-collage">${cols.map(c => `<div class="au-clg-col">${c.map(cell).join('')}</div>`).join('')}</div>`;
+  return `<div class="au-bento">${list.map((it, i) => `<button class="au-bn au-zoomable ${it.page ? 'page' : 'shot'} ${'abcde'[i]}" style="--i:${i}" aria-label="Увеличить"><img src="${it.page || it.shot}" alt="" loading="lazy"></button>`).join('')}</div>`;
 }
 
 // подсказка к 3D: клавиши и мышь (на телефоне — палец)
@@ -292,6 +289,44 @@ function rank(r){
   ${r.note ? `<p class="au-cap">${H.T(r.note)}</p>` : ''}`;
 }
 
+// кольцо долей: фигуры долей прямо из «ЕАБР.fig»; наведение на долю или строку легенды подсвечивает обе
+function donut(d){
+  return `<div class="au-dn">
+    <div class="au-dn-ring">
+      <svg viewBox="0 0 398 398" aria-hidden="true">${d.parts.map((p, i) => `<g class="au-dn-part" data-k="${i}" transform="translate(${p.at})"><path d="${p.d}" fill="${p.color}"/></g>`).join('')}</svg>
+      <div class="au-dn-mid">
+        <img class="au-dn-logo" src="${d.logo}" alt="ЕАБР">
+        ${d.parts.map((p, i) => `<span class="au-dn-info" data-k="${i}"><b>${p.value}</b><span>${H.T(p.name)}</span></span>`).join('')}
+      </div>
+    </div>
+    <ul class="au-dn-legend">${d.parts.map((p, i) => `<li data-k="${i}" style="--c:${p.color}"><i></i><b>${p.value}</b><span>${H.T(p.name)}</span></li>`).join('')}</ul>
+  </div>
+  ${d.note ? `<p class="au-cap">${H.T(d.note)}</p>` : ''}`;
+}
+
+// таблица показателей по вкладкам: один показатель за раз, страны строками, два года рядом
+function indTable(t){
+  const num = v => parseFloat(String(v).replace(',', '.'));
+  const panel = (g, gi) => {
+    const vals = t.rows.flatMap(r => r.vals[gi]).map(num).filter(v => !isNaN(v)), max = Math.max(...vals);
+    return `<div class="au-it-panel${gi ? '' : ' on'}" data-k="${gi}">${t.rows.map(r => {
+      const [a, b] = r.vals[gi], na = num(a), nb = num(b);
+      const cell = (v, n, cls) => `<span class="au-it-v ${cls}">${g.bars && !isNaN(n) ? `<span class="au-it-bar"><i style="--w:${(n / max * 100).toFixed(1)}%"></i></span>` : ''}<b>${v}</b></span>`;
+      const dir = isNaN(na) || isNaN(nb) || na === nb ? '' : nb > na ? 'up' : 'down';
+      return `<div class="au-it-row${r.total ? ' total' : ''}">
+        <span class="au-it-name">${r.flag ? `<img src="${r.flag}" alt="">` : '<span class="au-it-noflag"></span>'}<span>${H.T(r.name)}</span></span>
+        ${cell(a, na, 'y0')}${cell(b, nb, 'y1')}
+        <span class="au-it-dir ${dir}" aria-hidden="true">${dir ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>' : ''}</span>
+      </div>`; }).join('')}</div>`;
+  };
+  return `<div class="au-it">
+    <div class="au-it-tabs" role="tablist">${t.groups.map((g, gi) => `<button class="au-it-tab${gi ? '' : ' on'}" data-k="${gi}" role="tab">${H.T(g.name)}</button>`).join('')}</div>
+    <div class="au-it-head"><span class="au-it-sub">${t.groups.map((g, gi) => `<span data-k="${gi}"${gi ? '' : ' class="on"'}>${H.T(g.sub || '')}</span>`).join('')}</span>${t.years.map((y, k) => `<span class="au-it-y y${k}">${y}</span>`).join('')}<span></span></div>
+    <div class="au-it-body">${t.groups.map(panel).join('')}</div>
+    ${t.source ? `<p class="au-it-src">${H.T(t.source)}</p>` : ''}
+  </div>`;
+}
+
 // таблица → телефон: слева таблица как на сайте, справа та же таблица карточками на телефоне
 function phoneTable(t){
   const head = `<tr><th rowspan="2">${H.T(t.first)}</th>${t.groups.map(g => `<th colspan="${t.years.length}">${H.T(g.name)}${g.sub ? `<small>${H.T(g.sub)}</small>` : ''}</th>`).join('')}</tr>
@@ -392,6 +427,8 @@ function chapter(ch, p){
   if (ch.columns)   viz += columns(ch.columns);
   if (ch.shift)     viz += shift(ch.shift);
   if (ch.rank)      viz += rank(ch.rank);
+  if (ch.donut)     viz += donut(ch.donut);
+  if (ch.indTable)  viz += indTable(ch.indTable);
   if (ch.phoneTable) viz += phoneTable(ch.phoneTable);
   if (ch.zoomPhone) viz += zoomPhone(ch.zoomPhone);
   if (ch.palette)   viz += palette(ch.palette);
@@ -530,6 +567,23 @@ function livePhoneTable(box){
     el.addEventListener('pointerleave', c.free);
   });
 }
+function liveDonut(box){
+  const all = [...box.querySelectorAll('[data-k]')], n = box.querySelectorAll('.au-dn-part').length;
+  const show = i => { box.classList.toggle('hot', i != null); all.forEach(el => el.classList.toggle('on', el.dataset.k === String(i))); };
+  const c = cycle(box, n, show, 2000);
+  all.forEach(el => {
+    el.addEventListener('pointerenter', () => c.hold(+el.dataset.k));
+    el.addEventListener('pointerleave', c.free);
+  });
+}
+function liveIndTable(box){
+  const all = [...box.querySelectorAll('.au-it-tab, .au-it-panel, .au-it-sub [data-k]')];
+  const show = i => all.forEach(el => el.classList.toggle('on', el.dataset.k === String(i)));
+  const tabs = box.querySelectorAll('.au-it-tab');
+  const c = cycle(box, tabs.length, show, 3200);
+  tabs.forEach(el => el.addEventListener('click', () => c.stop(+el.dataset.k)));
+  box.querySelector('.au-it-body').addEventListener('pointerenter', () => c.stop([...tabs].findIndex(t => t.classList.contains('on'))));
+}
 // второе состояние графика в мониторе: при наведении и само, по очереди
 function liveScreens(box){
   const body = box.querySelector('.au-mon-body.alt'); if (!body) return;
@@ -665,6 +719,8 @@ export async function mountAudit(mount, p, helpers){
   mount.querySelectorAll('.au-tc').forEach(liveTextChart);
   mount.querySelectorAll('.au-cv').forEach(liveCurve);
   mount.querySelectorAll('.au-rk').forEach(liveRank);
+  mount.querySelectorAll('.au-dn').forEach(liveDonut);
+  mount.querySelectorAll('.au-it').forEach(liveIndTable);
   mount.querySelectorAll('.au-pt').forEach(livePhoneTable);
   mount.querySelectorAll('.au-zp').forEach(liveZoom);
   mount.querySelectorAll('.au-scr').forEach(liveScreens);
