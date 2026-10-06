@@ -1370,9 +1370,11 @@ function campCell(src){
   if (src && src.video) {
     let html = campCell(src.video);
     if (src.loop) html = html.replace(/data-src="[^"]*"/, `data-src="${embedURL(parseMedia(src.video), true)}"`);
-    const cls = 'camp-shot frame' + (src.blend ? ' blend' : '') + (src.frame ? ' cropped' : '');
+    const cls = 'camp-shot frame' + (src.blend ? ' blend' : '') + (src.tint ? ' tint' : '') + (src.frame ? ' cropped' : '');
     return html.replace('class="camp-shot frame"', `class="${cls}" style="--ar:${src.ratio || 16 / 9}${src.frame ? ';--fr:' + src.frame : ''}"`);
   }
+  // { img, tint: true } — светлая картинка с белыми полями: легкое затемнение отделяет ее от белого фона
+  if (src && src.img) return campCell(src.img).replace('class="camp-shot"', `class="camp-shot${src.tint ? ' tint' : ''}"`);
   const m = parseMedia(src);
   if (m.type === 'image') return `<button class="camp-shot" aria-label="Увеличить"><img src="${m.src}" alt="" loading="lazy"></button>`;
   if (m.type === 'file') return `<div class="camp-shot frame"><video src="${m.src}" muted loop playsinline autoplay></video></div>`;
@@ -1766,6 +1768,64 @@ function factsHTML(list){
   return `<div class="wrap"><div class="camp-head scheme-cols facts">${list.map((f, i) =>
     `<div class="camp-col" style="grid-column:span ${Math.floor(12 / list.length)};--i:${i}"><span class="camp-label">${T(f.label)}</span><p>${T(f.text)}</p></div>`).join('')}</div></div>`;
 }
+// { stats: { total: { value, text }, items: [{ value, label }], tags: [...], source } } — исследование аудитории:
+// большое число считается от нуля, полоски долей растут, черты портрета появляются по очереди (см. Яндекс Доставку)
+function statsHTML(s){
+  return `<div class="wrap"><div class="ys">
+    ${s.total ? `<div class="ys-total"><b class="ys-num" data-to="${s.total.value}">${fmtNum(s.total.value)}</b><p>${T(s.total.text)}</p></div>` : ''}
+    <div class="ys-bars">${s.items.map((x, i) => `
+      <div class="ys-bar" style="--i:${i};--v:${x.value}%">
+        <b class="ys-val"><span class="ys-num" data-to="${x.value}">${x.value}</span>%</b>
+        <span class="ys-track"><i></i></span>
+        <span class="ys-label">${T(x.label)}</span>
+      </div>`).join('')}</div>
+    ${s.tags ? `<ul class="ys-tags">${s.tags.map((t, i) => `<li style="--i:${i}">${T(t)}</li>`).join('')}</ul>` : ''}
+    ${s.source ? `<p class="camp-cap ys-source">${T(s.source)}</p>` : ''}
+  </div></div>`;
+}
+const fmtNum = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+// числа считаются от нуля, когда блок доезжает до экрана
+function countUp(box){
+  const nums = [...box.querySelectorAll('.ys-num')];
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  nums.forEach(el => el.textContent = '0');
+  const t0 = performance.now(), dur = 1600;
+  const step = t => {
+    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    nums.forEach(el => el.textContent = fmtNum(+el.dataset.to * e));
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const ysReveal = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  ysReveal.unobserve(e.target);
+  e.target.classList.add('in');
+  if (e.target.classList.contains('ys')) countUp(e.target);
+}), { rootMargin: '0px 0px -15% 0px' });
+// { steps: { items: [{ tag, title, text }] } } — процесс цепочкой: шаги появляются по очереди, между ними стрелки
+function stepsHTML(x){
+  const arrow = '<svg class="yst-arrow" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h40M33 3l10 9-10 9"/></svg>';
+  return `<div class="wrap"><div class="yst" style="--n:${x.items.length}">${x.items.map((s, i) => `${i ? arrow : ''}
+    <div class="yst-step" style="--i:${i}">${s.tag ? `<span class="yst-tag">${T(s.tag)}</span>` : ''}<b>${T(s.title)}</b><p>${T(s.text)}</p></div>`).join('')}</div></div>`;
+}
+// { rules: { cols, items: [{ key, text }] } } — короткие правила сеткой: крупное слово и строка пояснения
+function rulesHTML(x){
+  return `<div class="wrap"><div class="yru" style="--cols:${x.cols || 3}">${x.items.map((r, i) =>
+    `<div class="yru-item" style="--i:${i}"><b>${T(r.key)}</b><p>${T(r.text)}</p></div>`).join('')}</div></div>`;
+}
+// { zoom: { labels: ['исходник', 'ретушь'], items: [{ title, text, before, after, ratio }] } } — ретушь крупно:
+// слева что поправлено, справа исходник → стрелка → результат; картинки увеличиваются по нажатию
+function zoomHTML(z){
+  const [la, lb] = (z.labels || [['исходник', 'было'], ['ретушь', 'стало']]).map(pick);
+  const arrow = '<svg class="zm-arrow" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h40M33 3l10 9-10 9"/></svg>';
+  const shot = (src, label, r) => `<figure class="zm-fig"><figcaption>${T(label)}</figcaption><button class="camp-shot zm-shot" style="--ar:${r}" aria-label="Увеличить"><img src="${src}" alt="${uesc(label)}" loading="lazy"></button></figure>`;
+  return `<div class="wrap">${z.caption ? `<p class="camp-cap">${T(z.caption)}</p>` : ''}${z.items.map((x, i) => `
+    <div class="zm" style="--i:${i}">
+      <div class="zm-text">${x.title ? `<b>${T(x.title)}</b>` : ''}<p>${T(x.text)}</p></div>
+      <div class="zm-pair${(x.ratio || 1.5) < 1 ? ' tall' : ''}"${x.width ? ` style="--w:${x.width}"` : ''}>${shot(x.before, la, x.ratio || 1.5)}${arrow}${shot(x.after, lb, x.ratio || 1.5)}</div>
+    </div>`).join('')}</div>`;
+}
 // { sizes: { logo, heights: [px...] } } — один знак в нескольких размерах: проверка читаемости, подпись — размер в пикселях
 function sizesHTML(x){
   return `<div class="wrap"><div class="gd gd-sizes">${x.heights.map((h, i) =>
@@ -1841,6 +1901,12 @@ function galleryItem(x){
   if (x && x.papers) return papersHTML(x.papers);
   if (x && x.swing) return swingHTML(x.swing);
   if (x && x.facts) return factsHTML(x.facts);
+  if (x && x.stats) return statsHTML(x.stats);
+  if (x && x.zoom) return zoomHTML(x.zoom);
+  if (x && x.steps) return stepsHTML(x.steps);
+  if (x && x.rules) return rulesHTML(x.rules);
+  // { bigTitle, sub } — крупный заголовок блока и строка пояснения под ним
+  if (x && x.bigTitle) return `<div class="wrap"><h2 class="deck-title big-title">${T(x.bigTitle)}</h2>${x.sub ? `<p class="case-sub big-sub">${T(x.sub)}</p>` : ''}</div>`;
   if (x && x.sizes) return sizesHTML(x.sizes);
   if (x && x.safe) return safeHTML(x.safe);
   if (x && x.clips) return clipsHTML(x);
@@ -1968,6 +2034,7 @@ function renderCase(k, keepScroll){
   caseContent.innerHTML = `
     <div class="wrap case-head">
       <div class="case-ttl"><h1 class="case-title split" id="caseTitle"></h1>${yearHTML(p)}</div>
+      ${p.badge ? `<p class="case-badge">${T(p.badge)}</p>` : ''}
       ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
       ${p.note ? `<p class="case-note" data-reveal>${T(p.note)}</p>` : ''}
     </div>
@@ -1999,6 +2066,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.pano').forEach(watchPano);
   caseContent.querySelectorAll('.gd-sizes').forEach(fitSizes);
   caseContent.querySelectorAll('.ui-papers, .ui-login, .ui-mail, .ui-laptop').forEach(el => gdReveal.observe(el));
+  caseContent.querySelectorAll('.ys, .zm, .yst, .yru').forEach(el => ysReveal.observe(el));
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   caseContent.querySelectorAll('.m3d').forEach(watchMark);
