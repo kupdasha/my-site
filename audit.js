@@ -337,6 +337,8 @@ function zoomPhone(z){
 // nav / phoneNav — шапка сайта, phone — мобильная версия. Всё — SVG из «ЕАБР.fig»
 function screens(c){
   const img = (src, cls = '') => `<img class="${cls}" src="${src}" alt="" loading="lazy" decoding="async">`;
+  // bare: true — график крупно, без монитора
+  if (c.bare) return `<div class="au-scr bare"><div class="au-flat">${img(c.desk)}</div></div>`;
   return `<div class="au-scr${c.phone ? '' : ' solo'}">
     <div class="au-mon">
       <div class="au-mon-scr">

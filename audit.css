@@ -729,3 +729,15 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-zp-port.img img,.au-zp-land.img img{width:100%;height:auto;border-radius:0}
 .au-zp-land.img{padding:10px 14px;display:grid;place-items:center}
 .au-zp-land.img img{max-height:100%;object-fit:contain}
+
+/* график крупно, без монитора: только макет из Figma на белом */
+.au-flat{background:#fff;border-radius:clamp(14px,1.6vw,24px);padding:clamp(12px,2.4vw,40px);box-shadow:0 0 0 1px var(--line)}
+.au-flat img{width:100%;height:auto;border-radius:0;clip-path:inset(0 100% 0 0);transition:clip-path 1.6s var(--ease-io) .3s}
+.au-ch.in .au-flat img{clip-path:inset(0 0 0 0)}
+:root[data-theme="dark"] .au-flat{box-shadow:none}
+/* телефон с таблицей: пропорции под макет, чтобы и стоя, и лежа экран был заполнен без белых полей */
+.au-zp .au-zp-phone{aspect-ratio:9/17.2}
+.au-zp .au-zp-stage{height:calc(var(--pw) * 1.92 + 20px)}
+.au-zp .au-zp-land{width:calc(var(--pw) * 1.911 - 20px)}
+.au-zp-land.img{padding:0}
+.au-zp-land.img img{width:100%;height:100%;object-fit:contain}
