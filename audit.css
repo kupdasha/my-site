@@ -868,7 +868,7 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-it.compact .au-it-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px;margin:0 -10px 12px;padding:0 10px}
 .au-it.compact .au-it-tabs::-webkit-scrollbar{display:none}
 .au-it.compact .au-it-tab{flex:none;padding:6px 14px 8px;font-size:16px}
-.au-it.compact .au-it-head,.au-it.compact .au-it-row{grid-template-columns:minmax(0,1fr) 2.9em 2.9em 16px;gap:6px;padding:7px 4px}
+.au-it.compact .au-it-head,.au-it.compact .au-it-row{grid-template-columns:minmax(0,1fr) 2.6em 2.6em 14px;gap:6px;padding:7px 4px}
 .au-it.compact .au-it-head{padding-top:0}
 .au-it.compact .au-it-sub{visibility:hidden}
 .au-it.compact .au-it-bar{display:none}
@@ -878,7 +878,8 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-it.compact .au-it-noflag{display:none}
 .au-it.compact .au-it-dir svg{width:16px;height:16px}
 .au-it.compact .au-it-src{margin:8px 4px 0}
-@media (max-width:860px){.au-pi{grid-template-columns:1fr}.au-pi-phone{justify-self:center;--pw:310px}}
+
+@media (max-width:700px){.au-pi{grid-template-columns:1fr}.au-pi-phone{justify-self:center;--pw:310px}}
 
 /* коллаж: длинная картинка-снимок тоже прокручивается при наведении */
 .au-bn.shot.tall img{object-position:50% 0;transition:object-position 7s cubic-bezier(.45,0,.55,1),transform 1.2s var(--ease)}
@@ -895,7 +896,7 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
 .au-ch.side .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(32px,6vw,120px);align-items:center}
 .au-ch.side .au-head{display:flex;flex-direction:column;align-items:flex-start;margin:0}
 .au-ch.side .au-pi{display:block}
-@media (max-width:860px){.au-ch.side .wrap{grid-template-columns:1fr}.au-ch.side .au-head{margin-bottom:8px}.au-ch.side .au-pi{display:grid;justify-items:center}}
+@media (max-width:700px){.au-ch.side .wrap{grid-template-columns:1fr}.au-ch.side .au-head{margin-bottom:8px}.au-ch.side .au-pi{display:grid;justify-items:center}}
 
 /* текст страницы внизу телефона уходит под белый градиент: видно, что страница продолжается */
 .au-ph-more{margin:14px 4px 0;font-size:16px;line-height:1.4;color:var(--eb-navy)}
@@ -927,3 +928,23 @@ img.au-city-logo{height:clamp(22px,2vw,30px);width:auto;border-radius:0}
   .au-cov-slide::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,22,91,.55),rgba(0,22,91,0) 85%)}
   .au-cov-txt{z-index:1}
 }
+
+.au-flat[style*="--shift"] img{transform:translateX(var(--shift))}
+/* планшет: монитор и телефон рядом, телефон не закрывает легенду графика */
+@media (min-width:761px) and (max-width:1100px){
+  .au-scr.has-live .au-scr-phone{--pw:230px}
+  .au-scr.has-live .au-mon{width:calc(100% - 250px)}
+}
+/* инвестиции: на компьютере и планшете — макет из Figma, на телефоне — живые столбцы с итогами */
+.au-viz:has(.au-scr.bare) > .au-col{display:none}
+@media (max-width:600px){
+  .au-viz:has(.au-scr.bare) > .au-col{display:flex;margin-bottom:44px;gap:8px}
+  .au-viz:has(> .au-col) .au-scr.bare{display:none}
+  .au-col-bar b{font-size:16px}
+}
+/* глава «текст рядом с телефоном»: заголовок не шире колонки */
+.au-ch.side .au-head{min-width:0}
+.au-ch.side .au-head>*{max-width:100%}
+@media (max-width:700px){.au-ch.side .au-title{font-size:clamp(28px,8vw,40px)}}
+/* динамика на телефоне: длинные названия помещаются в плашку */
+@media (max-width:600px){.au-rk-it{letter-spacing:-.02em;padding:0 2px 2px}.au-rk-it.on{font-weight:400}}

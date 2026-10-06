@@ -392,7 +392,8 @@ function zoomPhone(z){
 function screens(c){
   const img = (src, cls = '') => `<img class="${cls}" src="${src}" alt="" loading="lazy" decoding="async">`;
   // bare: true — график крупно, без монитора
-  if (c.bare) return `<div class="au-scr bare"><div class="au-flat">${img(c.desk)}</div></div>`;
+  // shift — сдвиг графика вправо внутри рамки, если справа в макете пусто
+  if (c.bare) return `<div class="au-scr bare"><div class="au-flat"${c.shift ? ` style="--shift:${c.shift}"` : ''}>${img(c.desk)}</div></div>`;
   return `<div class="au-scr${c.phone || c.phoneLive ? '' : ' solo'}${c.phoneLive ? ' has-live' : ''}">
     <div class="au-mon">
       <div class="au-mon-scr">
