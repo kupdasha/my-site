@@ -1660,6 +1660,12 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .st-glint path{fill:none;stroke:#fff;stroke-width:20;stroke-linecap:round;stroke-dasharray:.03 .97;opacity:0;transition:opacity .8s 2.4s;animation:st-run 6s linear infinite}
 .st-glint path.b{animation-duration:8.5s;animation-direction:reverse}
 .st.in .st-glint path{opacity:.8}
+/* страницы брендбука: маленькие, без увеличения, появляются волной */
+.st-pages{margin-bottom:clamp(40px,5vw,72px);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(6px,.8vw,12px)}
+.st-pages img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;box-shadow:0 0 0 1px #E4E5E8;opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i) * 60ms)}
+.st-pages.in img{opacity:1;transform:none}
+@media (max-width:900px){.st-pages{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.st-pages{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @keyframes st-run{to{stroke-dashoffset:-1}}
 .st-vers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1vw,16px)}
 .st-ver{margin:0;opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .9s var(--ease);transition-delay:calc(var(--i) * 120ms)}
@@ -1679,8 +1685,8 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .st-grad{display:flex;justify-content:space-between;align-items:flex-end;height:clamp(120px,14vw,200px);padding:clamp(14px,1.6vw,24px);border-radius:var(--r-img);color:#fff;font-size:16px;
   background:linear-gradient(90deg,var(--g1),var(--g2));clip-path:inset(0 100% 0 0 round var(--r-img));transition:clip-path 1.4s var(--ease-io) calc(var(--i) * 200ms)}
 .st-grads.in .st-grad{clip-path:inset(0 0 0 0 round var(--r-img))}
-.sky{position:relative;aspect-ratio:16/9;border-radius:var(--r-img);background:#1E1E1C;overflow:hidden;--mx:0;--my:0}
-.sky-it{position:absolute;left:50%;top:50%;width:calc(9.5% * var(--s));aspect-ratio:1;opacity:0;
+.sky{position:relative;aspect-ratio:16/9;border-radius:var(--r-img);background:#fff;box-shadow:inset 0 0 0 1px #E4E5E8;overflow:hidden;--mx:0;--my:0}
+.sky-it{position:absolute;left:50%;top:50%;width:calc(12% * var(--s));aspect-ratio:1;opacity:0;
   transform:translate(-50%,-50%) translate(calc(var(--mx) * var(--d) * -70px),calc(var(--my) * var(--d) * -50px));
   transition:left 1.3s var(--ease),top 1.3s var(--ease),opacity .8s;transition-delay:calc(var(--i) * 45ms)}
 .sky.in .sky-it{left:var(--l);top:var(--t);opacity:1}
@@ -1702,12 +1708,13 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
   .st-vers,.st-crops{grid-template-columns:1fr}
   .st-ver .st-svg{width:36%}
   .sky{aspect-ratio:4/5}
-  .sky-it{width:calc(17% * var(--s))}
+  .sky-it{width:calc(21% * var(--s))}
   .sky.in .sky-it{left:calc(var(--l) * .8 + 10%);top:calc(var(--t) * .86 + 7%)}
 }
 @media (prefers-reduced-motion:reduce){
   .st-draw{transition:none;stroke-dashoffset:0}
   .st-glint,.st-crop .st-svg,.sky-it i,.sky-it img{animation:none}
   .st-grad{transition:none;clip-path:none}
+  .st-pages img{transition:none;opacity:1;transform:none}
   .sky-it{transition:none;left:var(--l);top:var(--t);opacity:1}
 }

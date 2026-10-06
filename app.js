@@ -1941,6 +1941,7 @@ function galleryItem(x){
   if (x && x.stars) return starsHTML(x.stars);
   if (x && x.sky) return skyHTML(x.sky);
   if (x && x.grads) return gradsHTML(x.grads);
+  if (x && x.pages) return pagesHTML(x.pages);
   // { sheet: [[…], […]], bg } — ряды макетов на серой подложке (светлые картинки не сливаются с белым фоном)
   // cls: 'keep' — ряд не складывается в столбик на телефоне, 'narrow' — без подложки, в правых двух третях
   if (x && x.sheet) return sheetHTML(x.sheet, x.bg, x.cls);
@@ -2067,8 +2068,8 @@ function watchStars(el){
 /* { sky: { items: [{ img, k }], hint } } — звездное небо отклоненных вариантов: знаки разлетаются из центра,
    плывут каждый по-своему (k: turn — вращается, sway — качается в объеме, breathe — дышит),
    слоями откликаются на курсор; наведенный выходит вперед, остальные приглушаются */
-const SKY_SPOTS = [[9, 20], [27, 12], [47, 18], [67, 10], [88, 20], [16, 50], [36, 44], [57, 47], [78, 42], [94, 58],
-  [6, 82], [24, 80], [44, 78], [63, 84], [82, 80], [72, 64], [30, 64], [52, 72], [12, 34], [90, 86]];
+const SKY_SPOTS = [[12, 24], [36, 20], [61, 26], [86, 21], [24, 55], [49, 52], [74, 57], [92, 82], [12, 82], [37, 84], [63, 85],
+  [6, 52], [50, 88], [30, 40], [70, 40]];
 function skyHTML(x){
   const touch = matchMedia('(pointer:coarse)').matches;
   const hint = x.hint && (touch && x.hint.touch ? x.hint.touch : x.hint.mouse || x.hint);
@@ -2093,6 +2094,11 @@ function watchSky(el){
   });
   el.addEventListener('pointerleave', () => { tx = ty = 0; if (!raf) raf = requestAnimationFrame(step); });
   el.addEventListener('pointerover', e => el.classList.toggle('focus', !!e.target.closest('.sky-it')));
+}
+// { pages: { items: [img...], caption } } — страницы брендбука маленьким коллажем: без увеличения, появляются волной
+function pagesHTML(x){
+  return `<div class="wrap camp-rowbox">${capHTML(x.caption)}<div class="st-pages">${x.items.map((src, i) =>
+    `<img src="${src}" alt="" loading="lazy" style="--i:${i}">`).join('')}</div></div>`;
 }
 // { grads: { items: [[цвет, цвет], ...] } } — фирменные градиенты: полосы проявляются слева направо, подписи — коды цветов на концах
 function gradsHTML(x){
@@ -2219,7 +2225,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   caseContent.querySelectorAll('.m3d').forEach(watchMark);
-  caseContent.querySelectorAll('.st, .st-grads').forEach(watchStars);
+  caseContent.querySelectorAll('.st, .st-grads, .st-pages').forEach(watchStars);
   caseContent.querySelectorAll('.sky').forEach(watchSky);
   // листалка прямо в галерее кейса (без рядов макетов watchCampaigns ее не найдет)
   if (!caseContent.querySelector('.camp-row')) caseContent.querySelectorAll('.case-body .slides').forEach(watchSlides);
