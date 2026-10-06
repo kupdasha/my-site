@@ -33,6 +33,8 @@ if (window.__kdApp) return; window.__kdApp = true;
 }
 
 // папка, откуда пришел app.js: на Тильде это GitHub, в прототипе — сама папка сайта
+// версия файлов для ?v=: на сайте меняется раз в час, на локальном превью — при каждой загрузке
+const VER = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? Date.now() : Math.floor(Date.now() / 36e5);
 const SCRIPT_BASE = (document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/app\.js(\?|$)/.test(s)) || '').replace(/app\.js(\?.*)?$/, '');
 
 const TUNE = {
@@ -1983,7 +1985,7 @@ function worldHTML(w){
 const worldWatcher = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   worldWatcher.unobserve(e.target);
-  import(SCRIPT_BASE + 'world.js?v=' + Math.floor(Date.now() / 36e5))
+  import(SCRIPT_BASE + 'world.js?v=' + VER)
     .then(m => m.mountWorld(e.target)).catch(err => console.warn('3D-пространство не загрузилось', err));
 }), { rootMargin: '400px 0px' });
 function watchWorld(el){ worldWatcher.observe(el); }
@@ -2113,7 +2115,7 @@ function sheetHTML(rows, bg, cls){
 const markWatcher = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   markWatcher.unobserve(e.target);
-  import(SCRIPT_BASE + 'mark3d.js?v=' + Math.floor(Date.now() / 36e5))
+  import(SCRIPT_BASE + 'mark3d.js?v=' + VER)
     .then(m => m.mountMark(e.target)).catch(err => console.warn('3D-знак не загрузился', err));
 }), { rootMargin: '400px 0px' });
 // список направлений: подсвечивается по очереди, пока блок на экране; при наведении на направление
@@ -2232,7 +2234,7 @@ function renderCase(k, keepScroll){
   // листалка прямо в галерее кейса (без рядов макетов watchCampaigns ее не найдет)
   if (!caseContent.querySelector('.camp-row')) caseContent.querySelectorAll('.case-body .slides').forEach(watchSlides);
   const au = caseContent.querySelector('.au-mount');
-  if (au) import(SCRIPT_BASE + 'audit.js?v=' + Math.floor(Date.now() / 36e5))
+  if (au) import(SCRIPT_BASE + 'audit.js?v=' + VER)
     .then(m => m.mountAudit(au, p, { T, pick, worldHTML, watchWorld, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('аудит не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);

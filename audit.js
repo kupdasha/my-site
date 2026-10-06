@@ -208,7 +208,7 @@ function fix(f){
 }
 
 /* ---------- схемы для кейса ЕАБР: сухие цифры банка превращаются в графики ----------
-   Цвета — из айдентики ЕАБР (бюро «Щука»), см. .au-edb в audit.css */
+   Цвета — из айдентики ЕАБР, см. .au-edb в audit.css */
 const n1 = v => String(v).replace('.', ',');
 const pct = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1).replace('.', ',');
 
@@ -645,7 +645,7 @@ let cssReady;
 function loadCSS(base){
   if (!cssReady) cssReady = new Promise(res => {
     const l = document.createElement('link');
-    l.rel = 'stylesheet'; l.href = base + 'audit.css?v=' + Math.floor(Date.now() / 36e5);
+    l.rel = 'stylesheet'; l.href = base + 'audit.css?v=' + (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? Date.now() : Math.floor(Date.now() / 36e5));
     l.onload = l.onerror = res; document.head.appendChild(l);
   });
   return cssReady;
