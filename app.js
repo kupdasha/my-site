@@ -2127,7 +2127,8 @@ function renderCase(k, keepScroll){
   // кампании внутри кейса: меню, у каждой — текст в три колонки (название, задача, решение) и макеты рядами
   if (p.campaigns && p.campaigns.length) body += campaignsHTML(p.campaigns, W.campaigns);
   // audit — аудит как дизайн-кейс: главы с живой инфографикой, их рисует audit.js
-  if (p.audit) body += '<div class="au au-mount"></div>';
+  // auditTheme — палитра бренда для схем ('edb' — цвета ЕАБР), по умолчанию — divan.ru
+  if (p.audit) body += `<div class="au au-mount${p.auditTheme ? ' au-' + p.auditTheme : ''}"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками

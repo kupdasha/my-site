@@ -199,6 +199,146 @@ function fix(f){
   }<span class="au-pair-arrow" aria-hidden="true">${ARROW_SVG}</span></div>`).join('')}</div>` : ''}`;
 }
 
+/* ---------- схемы для кейса ЕАБР: сухие цифры банка превращаются в графики ----------
+   Цвета — из айдентики ЕАБР (бюро «Щука»), см. .au-edb в audit.css */
+const n1 = v => String(v).replace('.', ',');
+const pct = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1).replace('.', ',');
+
+// абзац → график: цифры в тексте подсвечиваются по очереди, из каждой вырастает полоска.
+// В тексте цифра отмечена так: [[8,7%|0]] — номер полоски после черты
+function textChart(c){
+  const max = Math.max(...c.bars.map(b => Math.abs(b.v)));
+  const neg = c.bars.some(b => b.v < 0);
+  const text = H.T(c.text).replace(/\[\[(.+?)\|(\d+)\]\]/g, (_, s, k) => `<mark class="au-tc-mark" data-k="${k}" style="--k:${k}">${s}</mark>`);
+  return `<div class="au-tc">
+    <div class="au-tc-src"><span class="au-tc-tag">${H.T(c.from)}</span><p>${text}</p></div>
+    <span class="au-tc-arrow" aria-hidden="true">${ARROW_SVG}</span>
+    <div class="au-tc-chart${neg ? ' neg' : ''}"><span class="au-tc-tag">${H.T(c.to)}</span>
+      ${c.bars.map((b, k) => `<div class="au-tc-bar${b.v < 0 ? ' minus' : ''}" data-k="${k}" style="--k:${k};--w:${(Math.abs(b.v) / max * 100).toFixed(1)}%">
+        <span class="au-tc-name">${H.T(b.name)}</span>
+        <span class="au-tc-track"><i></i><b>${pct(b.v)}%</b></span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// плавная кривая через точки: x и y в долях 0…1
+function smooth(pts, w, h){
+  const P = pts.map(([x, y]) => [x * w, y * h]);
+  let d = `M${P[0][0]},${P[0][1]}`;
+  for (let i = 0; i < P.length - 1; i++) {
+    const [x0, y0] = P[Math.max(0, i - 1)], [x1, y1] = P[i], [x2, y2] = P[i + 1], [x3, y3] = P[Math.min(P.length - 1, i + 2)];
+    d += ` C${(x1 + (x2 - x0) / 6).toFixed(1)},${(y1 + (y2 - y0) / 6).toFixed(1)} ${(x2 - (x3 - x1) / 6).toFixed(1)},${(y2 - (y3 - y1) / 6).toFixed(1)} ${x2},${y2}`;
+  }
+  return d;
+}
+
+// рост ВВП: кривая с градиентом, у каждой страны точка; наведите на точку или на строку списка
+function curve(c){
+  const max = Math.max(...c.items.map(x => x.v)) * 1.15;
+  const pts = c.items.map((x, i) => [(i + .5) / c.items.length, 1 - x.v / max]);
+  const line = smooth(pts, 1000, 400);
+  return `<div class="au-cv">
+    <div class="au-cv-plot">
+      <svg viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="au-cv-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--eb-mint)" stop-opacity=".55"/><stop offset="1" stop-color="var(--eb-cyan)" stop-opacity="0"/></linearGradient>
+        <linearGradient id="au-cv-line" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="var(--eb-green)"/><stop offset="1" stop-color="var(--eb-cyan)"/></linearGradient></defs>
+        <path class="au-cv-area" d="${line} L${pts.at(-1)[0] * 1000},400 L${pts[0][0] * 1000},400Z" fill="url(#au-cv-fill)"/>
+        <path class="au-cv-line" d="${line}" pathLength="1" fill="none" stroke="url(#au-cv-line)" stroke-width="4" vector-effect="non-scaling-stroke"/>
+      </svg>
+      ${c.items.map((x, i) => `<button class="au-cv-dot${i ? i === c.items.length - 1 ? ' r' : '' : ' l'}" data-k="${i}" style="--k:${i};left:${(pts[i][0] * 100).toFixed(2)}%;top:${(pts[i][1] * 100).toFixed(2)}%" aria-label="${esc(x.name)} ${n1(x.v)}%"><span class="au-cv-tip">${H.T(x.name)} <b>${n1(x.v)}%</b></span></button>`).join('')}
+    </div>
+    <ul class="au-cv-list">${c.items.map((x, i) => `<li data-k="${i}" style="--k:${i}"><i style="background:var(--eb-c${i % 6})"></i><span>${H.T(x.name)}</span><b>${n1(x.v)}%</b></li>`).join('')}</ul>
+  </div>
+  ${c.note ? `<p class="au-cap">${H.T(c.note)}</p>` : ''}`;
+}
+
+// столбцы по годам: растут из нуля, цифры отсчитываются
+function columns(c){
+  const max = Math.max(...c.items.map(x => x.v));
+  return `<div class="au-col">${c.items.map((x, i) => `<div class="au-col-it" style="--i:${i};--h:${(x.v / max * 100).toFixed(1)}%">
+      <span class="au-col-bar"><b>${n1(x.v)}</b></span><span class="au-col-year">${x.year}</span>
+    </div>`).join('')}</div>
+  ${c.note ? `<p class="au-cap">${H.T(c.note)}</p>` : ''}`;
+}
+
+// сдвиги: что выросло, что сократилось — полоски вправо и влево от нуля
+function shift(c){
+  const max = Math.max(...c.items.map(x => Math.abs(x.v)));
+  return `<div class="au-sh">${c.items.map((x, i) => `<div class="au-sh-row${x.v < 0 ? ' minus' : ''}" style="--i:${i};--w:${(Math.abs(x.v) / max * 50).toFixed(2)}%">
+      <span class="au-sh-name">${H.T(x.name)}${x.note ? `<small>${H.T(x.note)}</small>` : ''}</span>
+      <span class="au-sh-track"><i></i><b>${pct(x.v)}%</b></span>
+    </div>`).join('')}</div>
+  ${c.note ? `<p class="au-cap">${H.T(c.note)}</p>` : ''}`;
+}
+
+// рейтинг по годам: столбики стран и линии, кто куда переместился; наведите на страну
+function rank(r){
+  const N = r.cols[0].list.length;
+  const link = (a, b) => `<svg class="au-rk-link" viewBox="0 0 100 ${N * 10}" preserveAspectRatio="none" aria-hidden="true">${
+    a.list.map((name, i) => { const j = b.list.indexOf(name); return `<path data-n="${esc(name)}" d="M0,${i * 10 + 5} C50,${i * 10 + 5} 50,${j * 10 + 5} 100,${j * 10 + 5}" vector-effect="non-scaling-stroke"/>`; }).join('')}</svg>`;
+  return `<div class="au-rk" style="--n:${N}" data-on="${esc(r.start || '')}">${r.cols.map((c, k) => `${k ? link(r.cols[k - 1], c) : ''}
+    <div class="au-rk-col" style="--k:${k}"><span class="au-rk-year">${c.year}</span>${c.list.map((name, i) => `<button class="au-rk-it" data-n="${esc(name)}" style="--i:${i}">${H.T(name)}</button>`).join('')}</div>`).join('')}
+  </div>
+  ${r.note ? `<p class="au-cap">${H.T(r.note)}</p>` : ''}`;
+}
+
+// таблица → телефон: слева таблица как на сайте, справа та же таблица карточками на телефоне
+function phoneTable(t){
+  const head = `<tr><th rowspan="2">${H.T(t.first)}</th>${t.groups.map(g => `<th colspan="${t.years.length}">${H.T(g.name)}${g.sub ? `<small>${H.T(g.sub)}</small>` : ''}</th>`).join('')}</tr>
+    <tr>${t.groups.map(() => t.years.map(y => `<th>${y}</th>`).join('')).join('')}</tr>`;
+  const body = t.rows.map((r, i) => `<tr data-k="${i}"${r.total ? ' class="total"' : ''}><td>${H.T(r.name)}</td>${r.vals.map(v => `<td>${v}</td>`).join('')}</tr>`).join('');
+  const num = v => parseFloat(String(v).replace(',', '.'));
+  const card = (r, i) => `<div class="au-pt-card${i ? '' : ' on'}" data-k="${i}">${t.groups.map((g, gi) => {
+      const a = r.vals[gi * 2], b = r.vals[gi * 2 + 1], m = Math.max(num(a), num(b)) || 1;
+      return `<div class="au-pt-ind"><span class="au-pt-g">${H.T(g.name)}</span>${isNaN(num(a)) ? `<span class="au-pt-empty">${H.T(t.empty)}</span>` :
+        t.years.map((y, yi) => { const v = yi ? b : a; return `<span class="au-pt-y"><span>${y}</span><span class="au-pt-bar"><i style="--w:${(num(v) / m * 100).toFixed(1)}%"></i></span><b>${v}</b></span>`; }).join('')}</div>`;
+    }).join('')}</div>`;
+  return `<div class="au-pt">
+    <div class="au-pt-desk"><span class="au-tc-tag">${H.T(t.labels[0])}</span><div class="au-pt-scroll"><table>${head}${body}</table></div></div>
+    <div class="au-pt-mob"><span class="au-tc-tag">${H.T(t.labels[1])}</span>
+      <div class="au-phone"><div class="au-phone-scr">
+        <p class="au-pt-ttl">${H.T(t.title)}</p>
+        <div class="au-pt-chips">${t.rows.map((r, i) => `<button class="au-pt-chip${i ? '' : ' on'}" data-k="${i}">${H.T(r.short || r.name)}</button>`).join('')}</div>
+        <div class="au-pt-cards">${t.rows.map(card).join('')}</div>
+      </div></div>
+    </div>
+  </div>
+  ${t.note ? `<p class="au-cap">${H.T(t.note)}</p>` : ''}`;
+}
+
+// «увеличить»: на телефоне график целиком, по кнопке телефон поворачивается и график раскрывается на весь экран
+function zoomPhone(z){
+  const max = Math.max(...z.items.map(x => x.v));
+  const bars = cls => `<div class="au-zp-bars ${cls}">${z.items.map((x, i) => `<span style="--i:${i};--h:${(x.v / max * 100).toFixed(1)}%"><i></i><em>${x.year}</em></span>`).join('')}</div>`;
+  return `<div class="au-zp">
+    <div class="au-zp-stage">
+      <div class="au-phone au-zp-phone"><div class="au-phone-scr">
+        <div class="au-zp-port">
+          <p class="au-pt-ttl">${H.T(z.title)}</p>
+          ${bars('mini')}
+          <div class="au-zp-foot"><button class="au-zp-btn">${H.T(z.button)}</button><span>${H.T(z.source)}</span></div>
+          <span class="au-zp-lines" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+        <div class="au-zp-land">
+          <p class="au-pt-ttl">${H.T(z.title)}</p>
+          ${bars('big')}
+        </div>
+      </div></div>
+    </div>
+    <ul class="au-zp-steps">${z.steps.map((s, i) => `<li style="--i:${i}">${H.T(s)}</li>`).join('')}</ul>
+  </div>`;
+}
+
+// палитра айдентики: цвета-полоски раскрываются при наведении, ниже — градиенты
+function palette(p){
+  return `<div class="au-pal">
+    <div class="au-pal-row">${p.colors.map((c, i) => `<button class="au-pal-c${dark(c.hex) ? ' dk' : ''}" style="--c:${c.hex};--i:${i}"><span>${H.T(c.name)}</span><b>${c.hex}</b></button>`).join('')}</div>
+    <div class="au-pal-grads">${p.grads.map((g, i) => `<span style="--i:${i};background:linear-gradient(120deg,${g.join(',')})"></span>`).join('')}</div>
+  </div>`;
+}
+const dark = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); return r * .299 + g * .587 + b * .114 < 140; };
+
 /* ---------- глава ---------- */
 function chapter(ch, p){
   let viz = '';
@@ -217,6 +357,14 @@ function chapter(ch, p){
   if (ch.lowercase) viz += lowercase(ch.lowercase);
   if (ch.glass)     viz += glass(ch.glass);
   if (ch.world && p.world) viz += worldHint(p.world) + H.worldHTML({ ...p.world, hint: null });
+  if (ch.textChart) viz += textChart(ch.textChart);
+  if (ch.curve)     viz += curve(ch.curve);
+  if (ch.columns)   viz += columns(ch.columns);
+  if (ch.shift)     viz += shift(ch.shift);
+  if (ch.rank)      viz += rank(ch.rank);
+  if (ch.phoneTable) viz += phoneTable(ch.phoneTable);
+  if (ch.zoomPhone) viz += zoomPhone(ch.zoomPhone);
+  if (ch.palette)   viz += palette(ch.palette);
   if (ch.rows)      viz += rows(ch.rows);
   return `<section class="au-ch${ch.color ? ' c-' + ch.color : ''}">
     <div class="wrap">
@@ -287,6 +435,76 @@ function liveCompare(el){
     if (!en.isIntersecting || played) return; o.disconnect();
     el.classList.add('sweep'); setTimeout(() => el.classList.remove('sweep'), 2600);
   }, { threshold: 0.6 }).observe(el);
+}
+
+/* ---------- оживление схем ЕАБР ---------- */
+const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+// перебор по кругу, пока никто не трогает; наведение или нажатие — останавливает
+function cycle(box, count, show, ms = 2200){
+  let k = 0, t = 0, held = false;
+  const go = i => { k = i; show(i); };
+  const loop = () => { clearTimeout(t); if (held || still()) return; t = setTimeout(() => { go((k + 1) % count); loop(); }, ms); };
+  box.closest('.au-ch').addEventListener('au:in', () => setTimeout(() => { go(0); loop(); }, 1400), { once: true });
+  return {
+    hold: i => { held = true; clearTimeout(t); go(i); },
+    free: () => { held = false; loop(); },
+    stop: i => { held = true; clearTimeout(t); go(i); },
+  };
+}
+// абзац ↔ полоски: наведение на цифру подсвечивает полоску и наоборот
+function liveTextChart(box){
+  const all = [...box.querySelectorAll('[data-k]')];
+  const on = k => all.forEach(el => el.classList.toggle('hot', k != null && el.dataset.k === String(k)));
+  box.addEventListener('pointerover', e => { const el = e.target.closest('[data-k]'); on(el ? el.dataset.k : null); });
+  box.addEventListener('pointerleave', () => on(null));
+}
+function liveCurve(box){
+  const dots = [...box.querySelectorAll('.au-cv-dot')], li = [...box.querySelectorAll('.au-cv-list li')];
+  const show = i => [dots, li].forEach(a => a.forEach((el, j) => el.classList.toggle('on', j === i)));
+  const c = cycle(box, dots.length, show);
+  [...dots, ...li].forEach(el => {
+    el.addEventListener('pointerenter', () => c.hold(+el.dataset.k));
+    el.addEventListener('pointerleave', c.free);
+    el.addEventListener('click', () => c.stop(+el.dataset.k));
+  });
+}
+function liveRank(box){
+  const names = [...new Set([...box.querySelectorAll('.au-rk-it')].map(b => b.dataset.n))];
+  const show = i => {
+    box.dataset.on = names[i];
+    box.querySelectorAll('[data-n]').forEach(el => el.classList.toggle('on', el.dataset.n === names[i]));
+  };
+  const c = cycle(box, names.length, show, 2000);
+  box.querySelectorAll('.au-rk-it').forEach(el => {
+    const i = names.indexOf(el.dataset.n);
+    el.addEventListener('pointerenter', () => c.hold(i));
+    el.addEventListener('pointerleave', c.free);
+    el.addEventListener('click', () => c.stop(i));
+  });
+}
+function livePhoneTable(box){
+  const chips = [...box.querySelectorAll('.au-pt-chip')], cards = [...box.querySelectorAll('.au-pt-card')], rows = [...box.querySelectorAll('tbody tr, table tr[data-k]')];
+  const show = i => {
+    chips.forEach((el, j) => el.classList.toggle('on', j === i));
+    cards.forEach((el, j) => el.classList.toggle('on', j === i));
+    rows.forEach(el => el.classList.toggle('on', el.dataset.k === String(i)));
+    const ch = chips[i], strip = ch.parentNode;
+    strip.scrollTo({ left: ch.offsetLeft - strip.clientWidth / 2 + ch.offsetWidth / 2, behavior: still() ? 'auto' : 'smooth' });
+  };
+  const c = cycle(box, chips.length, show, 2600);
+  chips.forEach((el, i) => el.addEventListener('click', () => c.stop(i)));
+  rows.forEach(el => {
+    el.addEventListener('pointerenter', () => c.hold(+el.dataset.k));
+    el.addEventListener('pointerleave', c.free);
+  });
+}
+// телефон сам поворачивается туда и обратно; кнопка «увеличить» делает то же по нажатию
+function liveZoom(box){
+  let t = 0, auto = true;
+  const set = big => box.classList.toggle('big', big);
+  const loop = () => { clearTimeout(t); if (!auto || still()) return; t = setTimeout(() => { set(!box.classList.contains('big')); loop(); }, box.classList.contains('big') ? 3600 : 2600); };
+  box.closest('.au-ch').addEventListener('au:in', () => setTimeout(loop, 600), { once: true });
+  box.querySelector('.au-zp-phone').addEventListener('click', () => { auto = false; clearTimeout(t); set(!box.classList.contains('big')); });
 }
 
 // подсветка клавиш, когда по комнате ходят
@@ -377,7 +595,7 @@ function animate(mount){
   mount.querySelectorAll('.au-fr-stage li').forEach((li, k) => { li.classList.add('au-fly'); li.style.setProperty('--fd', (k % 4) * 0.1 + 's'); bit.observe(li); });
   mount.querySelectorAll('.au-city, .au-stop, .au-note, .au-fix-col, .au-chat').forEach(el => bit.observe(el));
   // цифры
-  mount.querySelectorAll('.au-note b, .au-bar-val .v').forEach(el => { el.dataset.count = el.textContent; bit.observe(el); });
+  mount.querySelectorAll('.au-note b, .au-bar-val .v, .au-col-bar b, .au-cv-list b').forEach(el => { el.dataset.count = el.textContent; bit.observe(el); });
   parallax(mount);
 }
 
@@ -403,6 +621,11 @@ export async function mountAudit(mount, p, helpers){
   mount.querySelectorAll('.au-search').forEach(liveSearch);
   mount.querySelectorAll('.au-cmp').forEach(liveCompare);
   mount.querySelectorAll('.au-whint').forEach(liveKeys);
+  mount.querySelectorAll('.au-tc').forEach(liveTextChart);
+  mount.querySelectorAll('.au-cv').forEach(liveCurve);
+  mount.querySelectorAll('.au-rk').forEach(liveRank);
+  mount.querySelectorAll('.au-pt').forEach(livePhoneTable);
+  mount.querySelectorAll('.au-zp').forEach(liveZoom);
   mount.querySelectorAll('.world').forEach(H.watchWorld);
   // ряды одной высоты: пропорции ячейки берутся из самой картинки
   mount.querySelectorAll('.au-pair-row').forEach(row => {
