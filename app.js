@@ -368,11 +368,8 @@ function openGallery(){
   groups.sort((a, b) => (order.indexOf(a.c) + 1 || 99) - (order.indexOf(b.c) + 1 || 99));
   evGallery.innerHTML = `<div class="ev-g-bar"><div class="wrap"><h2 class="ev-g-title">${T(E.more)}<sup class="yr">${E.items.length}</sup></h2>
       <button type="button" class="ev-g-close" aria-label="Закрыть"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l12 12M16 4L4 16"/></svg></button></div></div>
-    <div class="wrap"><div class="ev-g-cards">${groups.map(g => `<section class="ev-g-card">
-      <h3 class="ev-g-name">${T(g.c)}<sup class="yr">${g.list.length}</sup></h3>
-      <div class="ev-g-grid">${g.list.map(i =>
-        `<button type="button" class="ev-g-tile" data-i="${i}" style="--ar:${E.items[i].ratio || 1.5}"><img src="${E.items[i].thumb || E.items[i].src}" alt="${esc(g.c)}" loading="lazy"></button>`).join('')}</div>
-    </section>`).join('')}</div></div>`;
+    <div class="wrap"><div class="ev-g-flow">${groups.map(g => g.list.map((i, n) =>
+      `<button type="button" class="ev-g-tile${n ? '' : ' first'}" data-i="${i}" style="--ar:${E.items[i].ratio || 1.5}"><img src="${E.items[i].thumb || E.items[i].src}" alt="${esc(g.c)}" loading="lazy">${n ? '' : `<span class="ev-g-chip">${T((E.labels || {})[g.c] || g.c)}<sup class="yr">${g.list.length}</sup></span>`}</button>`).join('')).join('')}</div></div>`;
   evGallery.scrollTop = 0;
   evGallery.classList.add('open');
   document.body.classList.add('locked');

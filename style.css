@@ -1300,16 +1300,15 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 @media (max-width:760px){.ev-g-tile{flex-basis:calc(var(--ar) * 110px)}}
 .ev-g-cap .hang-q,.ev figcaption .hang-q{margin-left:0}   /* в обрезанной подписи кавычка не висит, иначе ее срежет */
 
-/* «все выступления»: светло-серое полотно, на нем белые карточки событий — название и фото рядом */
+/* «все выступления»: один поток крупных фото рядами одной высоты (без обрезки); фото одного события идут подряд,
+   на первом — метка с коротким названием и числом фото */
 .ev-gallery{background:#EEEEF0}
 .ev-g-bar{background:#EEEEF0}
-.ev-g-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;padding:clamp(8px,1vw,16px) 0 clamp(56px,7vw,96px)}
-.ev-g-card{background:#FFFFFF;border-radius:24px;padding:clamp(20px,2vw,28px)}
-.ev-g-name{font-weight:500;font-size:clamp(20px,1.7vw,26px);line-height:1.15;margin-bottom:clamp(16px,2vw,28px)}
-.ev-g-name .yr{margin-left:.35em}
-/* фото события — ровной сеткой по 4 в ряд, как в скетче; кадр целиком — по нажатию */
-.ev-g-card .ev-g-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0}
-.ev-g-card .ev-g-grid::after{display:none}
-.ev-g-card .ev-g-tile img{aspect-ratio:4/3;border-radius:10px}
-@media (max-width:900px){.ev-g-cards{grid-template-columns:1fr}}
-@media (max-width:520px){.ev-g-card .ev-g-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ev-g-flow{display:flex;flex-wrap:wrap;gap:8px;padding:clamp(8px,1vw,16px) 0 clamp(56px,7vw,96px)}
+.ev-g-flow::after{content:"";flex:20 1 0}
+.ev-g-flow .ev-g-tile{position:relative;flex:var(--ar) 1 calc(var(--ar) * 220px);max-width:calc(var(--ar) * 400px)}
+.ev-g-flow .ev-g-tile img{aspect-ratio:var(--ar);border-radius:14px}
+.ev-g-chip{position:absolute;left:10px;top:10px;max-width:calc(100% - 20px);padding:6px 12px 8px;border-radius:99px;background:#FFFFFF;color:#1D222A;font-size:16px;font-weight:500;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px -6px rgba(14,15,18,.3)}
+.ev-g-chip .yr{margin-left:.3em}
+.ev-g-flow .ev-g-tile.first{margin-left:0}
+@media (max-width:760px){.ev-g-flow .ev-g-tile{flex-basis:calc(var(--ar) * 150px)}}
