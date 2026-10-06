@@ -707,9 +707,13 @@ function renderWorks(){
     `<button class="chip${f.key === workFilter ? ' on' : ''}" data-cat="${f.key}">${T(f.text)}</button>`).join('');
   $('#workFilters').innerHTML = chips;
   $('#workFiltersEnd').innerHTML = chips;
+  // «другие работы» из одного проекта не показываем: такой проект встает в общую сетку
+  let other = W.items.map((p, k) => [p, k]).filter(([p]) => isOther(p) && inCat(p));
+  const solo = other.length === 1 ? other[0][0] : null;
+  if (solo) other = [];
   let n = 0;
   $('#workList').innerHTML = W.items.map((p, k) => {
-    if (isOther(p) || !inCat(p)) return '';
+    if ((isOther(p) && p !== solo) || !inCat(p)) return '';
     const [size, side] = p.size ? [p.size, p.side] : PATTERN[n % PATTERN.length];
     n++;
     const ratio = p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');   // у видео всегда 16:9
@@ -721,8 +725,7 @@ function renderWorks(){
     </button>`;
   }).join('');
   $$('#workList .media').forEach(watchMedia);
-  // «другие работы» — простым списком под сеткой
-  const other = W.items.map((p, k) => [p, k]).filter(([p]) => isOther(p) && inCat(p));
+  // «другие работы» — простым списком под сеткой (фильтры под ним остаются всегда)
   $('#otherWorks').hidden = !other.length;
   // между строками — струны: в серьезной версии это просто линии, в веселой они звенят и светятся радугой
   $('#otherList').innerHTML = STRING_HTML + other.map(([p, k]) =>
