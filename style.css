@@ -1503,6 +1503,12 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .m3d-pill{top:auto;bottom:calc(100% - var(--gb) + 14px);left:calc(var(--gx) + 12px)}
   .m3d-dirs{display:none}
 }
+@media (min-width:761px) and (max-width:1100px){
+  .m3d{aspect-ratio:4/3;--gt:8%;--gb:92%}
+  .m3d-slogan{top:50%;max-width:9.5em}
+  .m3d-pill{top:70%}
+  .m3d-dirs{top:46%;font-size:clamp(22px,3.4vw,32px)}
+}
 @media (prefers-reduced-motion:reduce){.m3d-dirs li{transition:none}}
 /* приписка про NDA стоит сразу под названиями компаний, чтобы было видно, что она про них;
    строка с описанием клиента при наведении — ниже нее */
@@ -1520,6 +1526,12 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
   .case-sheet{padding:10px;border-radius:4px}
   .case-sheet .camp-row:not(.collage){flex-direction:column;overflow:visible;scroll-snap-type:none}
   .case-sheet .camp-row:not(.collage)>.camp-shot{flex:none;width:100%;height:auto}
+}
+.case-sheet.narrow{padding:0;width:calc(66.67% + clamp(16px,2vw,28px) / 3);margin-left:auto}
+@media (max-width:760px){
+  .case-sheet.narrow{width:auto}
+  .case-sheet.keep .camp-row:not(.collage){flex-direction:row}
+  .case-sheet.keep .camp-row:not(.collage)>.camp-shot{flex:var(--ar) 1 0;width:auto}
 }
 
 /* превью, которое нужно показать целиком (cardRatio): карточка в пропорциях ролика, без приближения */

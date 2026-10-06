@@ -1829,7 +1829,8 @@ function galleryItem(x){
   if (x && x.logos) return logoWallHTML(x.logos);
   if (x && x.mark3d) return mark3dHTML(x.mark3d);
   // { sheet: [[…], […]], bg } — ряды макетов на серой подложке (светлые картинки не сливаются с белым фоном)
-  if (x && x.sheet) return sheetHTML(x.sheet, x.bg);
+  // cls: 'keep' — ряд не складывается в столбик на телефоне, 'narrow' — без подложки, в правых двух третях
+  if (x && x.sheet) return sheetHTML(x.sheet, x.bg, x.cls);
   // { colors } — палитра с копированием кода, как в brandkit; { slides } — презентация-листалка
   if (x && x.colors) return brandkitHTML({ colors: x.colors });
   if (x && x.slides) return campSlides(x);

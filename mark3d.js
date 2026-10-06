@@ -19,7 +19,8 @@ const TUNE = {
   spin: 1400,         // длительность полного оборота по нажатию, мс
   size: 0.6,          // высота знака от высоты блока
   drop: 0.1,          // на сколько знак ниже центра (доля высоты блока) — чтобы надпись сверху читалась, как на обложке
-  tall: [0.4, -0.03], // на вертикальном блоке (телефон): высота знака и сдвиг — знак между надписью и подписями
+  tall: [0.42, -0.06],
+  mid: [0.48, 0.12],   // на почти квадратном блоке (планшет, 4:3): высота знака и сдвиг // на вертикальном блоке (телефон): высота знака и сдвиг — знак между надписью и подписями
   metal: '#F4F4F2',   // цвет серебра
   rough: 0.16,        // шероховатость: меньше — зеркальнее
   lime: '#B3F843',    // цвет бликов подсветки
@@ -99,7 +100,7 @@ export async function mountMark(box){
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     // знак занимает TUNE.size высоты блока, но не вылезает по ширине на узком экране
-    const [k, drop] = camera.aspect < 1 ? TUNE.tall : [TUNE.size, TUNE.drop];
+    const [k, drop] = camera.aspect < 1 ? TUNE.tall : camera.aspect < 1.5 ? TUNE.mid : [TUNE.size, TUNE.drop];
     const fit = 2 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * k);
     camera.position.z = Math.max(fit, fit / Math.min(1, camera.aspect * 1.05));
     camera.updateProjectionMatrix();
@@ -120,6 +121,11 @@ export async function mountMark(box){
   // на телефоне — вслед за пальцем по самому блоку (вертикальная прокрутка не мешает)
   box.addEventListener('pointermove', e => { if (touch && e.pointerType !== 'mouse') aim(e.clientX, e.clientY); }, { passive: true });
   box.addEventListener('click', () => { spin = { t0: performance.now(), from: pivot.rotation.y }; });
+  // на телефоне направлений справа нет — знак загорается, пока палец на блоке
+  if (touch) {
+    box.addEventListener('pointerdown', () => box.classList.add('hot'), { passive: true });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => box.addEventListener(t, () => setTimeout(() => box.classList.remove('hot'), 600), { passive: true }));
+  }
 
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function draw(now = performance.now()){
