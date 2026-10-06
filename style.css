@@ -1452,3 +1452,22 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .ev img.ev-out{transform:translateY(-6%) scale(.96);opacity:.35}
 .ev figcaption{transition:opacity .4s var(--ease) calc(var(--k,0) * 70ms),transform .4s var(--ease) calc(var(--k,0) * 70ms)}
 .ev figcaption.swap{opacity:0;transform:translateY(6px)}
+
+/* «Обо мне»: меньше воздуха между первым блоком и «в жизни и на сцене»; ссылка в тексте переносится как обычный текст */
+#photos.sec{padding-top:clamp(40px,5vw,72px)}
+.ev-link{display:inline;text-align:inherit}
+/* на планшете лента выступлений — два на два, иначе четыре фото в ряд выходят мелкими */
+@media (min-width:761px) and (max-width:1024px){
+  .ev{flex:1 1 calc(50% - 10px)}
+  .ev img{aspect-ratio:4/3}
+}
+/* «все выступления» на телефоне: по два кадра в ряд, а не по одному во всю ширину */
+@media (max-width:760px){.ev-g-flow .ev-g-tile{flex-basis:calc(var(--ar) * 100px);max-width:calc(var(--ar) * 240px)}.ev-g-flow{gap:6px}.ev-g-chip{left:6px;top:6px;padding:4px 10px 6px}}
+/* на телефоне фото узкие и метка на них не помещается — название события стоит строкой над его фото */
+.ev-g-head{display:none}
+@media (max-width:760px){
+  .ev-g-chip{display:none}
+  .ev-g-head{display:block;flex-basis:100%;margin:18px 0 2px;font-size:16px;font-weight:500;line-height:1.3}
+  .ev-g-head:first-child{margin-top:0}
+  .ev-g-head .yr{margin-left:.3em;opacity:.5}
+}

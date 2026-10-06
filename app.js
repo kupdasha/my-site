@@ -336,7 +336,7 @@ let viewCaps = [];
 function linkTalks(){
   const note = document.querySelector('#community .sec-note'), E = SITE.photos && SITE.photos.events;
   if (!note || !E || isFun() || note.querySelector('.ev-link')) return;
-  note.innerHTML = note.innerHTML.replace(/(выступаю(?:\s|&nbsp;)+на(?:\s|&nbsp;)+конференциях(?:\s|&nbsp;)+и(?:\s|&nbsp;)+митапах)/, '<button type="button" class="ev-link ev-all">$1</button>');
+  note.innerHTML = note.innerHTML.replace(/(выступаю(?:\s|&nbsp;)+на(?:\s|&nbsp;)+конференциях(?:\s|&nbsp;)+и(?:\s|&nbsp;)+митапах)/, '<span class="ev-link ev-all" role="button" tabindex="0">$1</span>');   // span, а не button: кнопка не переносится внутри строки
 }
 let talkShown = 0;
 document.addEventListener('pointerover', e => {
@@ -416,7 +416,7 @@ function openGallery(){
   groups.sort((a, b) => (order.indexOf(a.c) + 1 || 99) - (order.indexOf(b.c) + 1 || 99));
   evGallery.innerHTML = `<div class="ev-g-bar"><div class="wrap"><h2 class="ev-g-title">${T(E.more)}<sup class="yr">${E.items.length}</sup></h2>
       <button type="button" class="ev-g-close" aria-label="Закрыть"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l12 12M16 4L4 16"/></svg></button></div></div>
-    <div class="wrap"><div class="ev-g-flow">${groups.map(g => g.list.map((i, n) =>
+    <div class="wrap"><div class="ev-g-flow">${groups.map(g => `<p class="ev-g-head">${T((E.labels || {})[g.c] || g.c)}<sup class="yr">${g.list.length}</sup></p>` + g.list.map((i, n) =>
       `<button type="button" class="ev-g-tile${n ? '' : ' first'}" data-i="${i}" style="--ar:${E.items[i].ratio || 1.5}"><img src="${E.items[i].thumb || E.items[i].src}" alt="${esc(g.c)}" loading="lazy">${n ? '' : `<span class="ev-g-chip">${T((E.labels || {})[g.c] || g.c)}<sup class="yr">${g.list.length}</sup></span>`}</button>`).join('')).join('')}</div></div>`;
   evGallery.scrollTop = 0;
   evGallery.classList.add('open');
@@ -431,6 +431,7 @@ evGallery.addEventListener('click', e => {
   evGallery.querySelectorAll('.ev-g-tile').forEach(b => from[+b.dataset.i] = b.querySelector('img'));
   evOpenViewer(+t.dataset.i, from);
 });
+addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('span.ev-all')) { e.preventDefault(); openGallery(); } });
 addEventListener('keydown', e => { if (e.key === 'Escape' && evGallery.classList.contains('open') && !viewer.classList.contains('open')) closeGallery(); });
 document.addEventListener('click', e => {
   if (!SITE.photos || !SITE.photos.events) return;
