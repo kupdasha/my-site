@@ -1281,11 +1281,22 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .spec-colors{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px;font-family:var(--font);font-size:16px}
 .spec-sw{display:inline-block;width:20px;height:20px;border-radius:6px;background:var(--c);margin-right:8px;vertical-align:-4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
 @media (max-width:900px){.spec-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:760px){.spec-list{grid-template-columns:1fr}}
+/* телефон: пункты памятки — лентой, которую листают пальцем; следующий выглядывает справа */
+@media (max-width:760px){
+  .spec-list{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:16px;
+    margin:0 calc(-1 * var(--pad));padding:0 var(--pad);scroll-padding:0 var(--pad)}
+  .spec-list::-webkit-scrollbar{display:none}
+  .spec-item{flex:0 0 78vw;scroll-snap-align:start}
+}
 /* лесенка (stairs): узкие баннеры друг под другом, каждый следующий сдвинут влево — верхний справа, нижний слева */
 .camp-row.stairs{flex-direction:column}
 .camp-row.stairs>.camp-shot{flex:none;width:50%;margin-left:calc((var(--n) - 1 - var(--k, 0)) / max(var(--n) - 1, 1) * 50%)}
-@media (max-width:760px){.camp-row.stairs>.camp-shot{width:80%;margin-left:calc((var(--n) - 1 - var(--k, 0)) / max(var(--n) - 1, 1) * 20%)}}
+@media (max-width:760px){
+  .camp-row:not(.collage):not(.compact).stairs>.camp-shot{width:80%;margin-left:calc((var(--n) - 1 - var(--k, 0)) / max(var(--n) - 1, 1) * 20%)}
+  .camp-row:not(.collage):not(.compact).stairs{margin:0;padding:0;overflow:visible}   /* лесенка — не лента: остается в границах экрана */
+  /* ленты в кейсе с кампаниями: макеты одной высоты (не выше ширины экрана), чтобы квадраты и сторис стояли ровно */
+  .camps .camp-row:not(.collage):not(.compact):not(.stairs)>.camp-shot:not(:only-child){width:min(84vw, min(62dvh, 84vw) * var(--ar))}
+}
 @media (max-width:760px){
   .spin,.two-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .strip-parts i{padding:10px}
