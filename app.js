@@ -985,10 +985,15 @@ function setClient(k){
 const clientPreview = document.createElement('div');
 clientPreview.className = 'client-preview'; clientPreview.setAttribute('aria-hidden', 'true');
 document.body.appendChild(clientPreview);
-const previewOf = w => { const m = parseMedia(legacyVideo(w)); return w.image || (m && m.type === 'drive' ? `https://drive.google.com/thumbnail?id=${m.id}&sz=w800` : ''); };
+// listPreview — свое превью для строки «других работ» (картинка или тихий ролик mp4); иначе легкая копия обложки
+const previewOf = w => { const m = parseMedia(legacyVideo(w)); return w.listPreview || w.thumb || w.image || (m && m.type === 'drive' ? `https://drive.google.com/thumbnail?id=${m.id}&sz=w800` : ''); };
 function showPreviewImage(img){
   clientPreview.classList.toggle('show', !!img);
-  if (img && clientPreview.dataset.src !== img) { clientPreview.dataset.src = img; clientPreview.innerHTML = `<img src="${img}" alt="">`; }
+  if (img && clientPreview.dataset.src !== img) {
+    clientPreview.dataset.src = img;
+    clientPreview.classList.toggle('square', /\.mp4(\?|$)/.test(img));
+    clientPreview.innerHTML = /\.mp4(\?|$)/.test(img) ? `<video src="${img}" muted loop playsinline autoplay preload="auto"></video>` : `<img src="${img}" alt="">`;
+  }
 }
 function showClientPreview(c){
   const w = c && c.project && SITE.works.items.find(x => x.title === c.project);

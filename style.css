@@ -1866,3 +1866,6 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 /* Кейс-страница целиком в окне кейса (поле embed): окно на всю высоту под полоской «назад», прокрутка внутри */
 .case.embed{overflow:hidden}
 .case-embed{display:block;width:100%;height:calc(100dvh - var(--case-bar, 76px));border:0;background:var(--bg)}
+
+/* превью-ролик у строки «других работ» (listPreview) — квадратный */
+.client-preview video{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-img);background:var(--soft)}
