@@ -194,6 +194,122 @@ var doc=new DOMParser().parseFromString(html,'text/html');
 [].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});
 root.style.minHeight='';root.style.background=''})})()</script>
 </div>
+<div class="r t-rec" data-record-type="131"><!-- 6 страница Обо мне / 1 страница Обо мне целиком -->
+<!-- ОФОРМЛЕНИЕ САЙТА: шрифты и стили. Это код, тексты здесь не правятся. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5);document.write('<link rel="stylesheet" href="'+B+'style.css?v='+v+'">')})()</script>
+
+<!-- Шапка -->
+<header class="head" id="head">
+  <div class="wrap">
+    <span class="logo" data-text="name"></span>
+    <nav class="nav" id="nav"></nav>
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    </button>
+  </div>
+</header>
+
+<!-- ТЕКСТЫ И ПРОЕКТЫ сайта лежат на GitHub в content.js и подключаются отсюда. -->
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5);document.write('<script src="'+B+'content.js?v='+v+'"><\/script>')})()</script>
+
+<!-- Обо мне -->
+  <section class="about-page" id="about" data-page="about">
+    <div class="wrap">
+      <h1 class="h1 split" data-text="about.title"></h1>
+      <div class="about">
+        <div class="portrait" data-reveal id="portrait"><img id="photo" alt="Дарья Купцова" loading="lazy"></div>
+        <div>
+          <p class="big" data-reveal data-text="about.big"></p>
+          <p class="txt" data-reveal style="--d:.1s" data-text="about.text"></p>
+          <div class="facts" id="facts"></div>
+          <h3 class="facts-title" data-reveal data-text="about.coursesTitle"></h3>
+          <div class="facts" id="courses"></div>
+        </div>
+      </div>
+
+      <!-- Клиенты: все имена сразу, под курсором увеличиваются -->
+      <div class="clients">
+        <h3 class="clients-title" data-reveal data-text="clients.title"></h3>
+        <div class="clients-wall" id="clients"></div>
+        <p class="clients-what" id="clientsWhat" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Фотографии -->
+  <section class="sec" id="photos">
+    <div class="wrap">
+      <div class="sec-head"><h2 class="h2" data-reveal data-text="photos.title"></h2></div>
+      <div class="photo-strip" id="photoStrip"></div>
+    </div>
+  </section>
+
+  <!-- В профессиональном сообществе: выступления, жюри, статьи и подкаст одним блоком -->
+  <section class="sec" id="community">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="community.title"></h2>
+        <p class="sec-note" data-reveal data-text="community.note"></p>
+      </div>
+
+      <!-- две колонки: последние статьи и подкаст -->
+      <div class="comm">
+        <div class="comm-col" data-reveal>
+          <h3 class="comm-title" data-text="articles.title"></h3>
+          <div class="articles articles-compact" id="articleList"></div>
+          <p class="pod-links"><a class="link" data-href="articles.all.link" data-text="articles.all.text"></a></p>
+        </div>
+        <div class="comm-col" data-reveal>
+          <h3 class="comm-title" data-text="podcast.title"></h3>
+          <div class="pod-player" id="podPlayer"></div>
+          <p class="pod-links" id="podLinks"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Контакт -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <!-- Конец страницы: написать или переключиться на дружескую версию.
+           Тумблер справа работает как в шапке и возвращает в начало страницы -->
+      <div class="ty" data-reveal>
+        <h2 class="h2" data-text="contact.title"></h2>
+        <p class="lead" data-text="contact.lead"></p>
+        <div class="ty-row">
+          <div class="ctas contact-links" id="contactLinks"></div>
+        </div>
+        <!-- радужный перелив только под тумблером -->
+        <div class="ty-switch" data-waves data-colors="#E2FB5A,#B9F5C8,#BCD6FE,#E3D2FD" data-speed=".8">
+          <button class="switch switch-big" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+            <span data-text="contact.switch"></span><i></i>
+          </button>
+        </div>
+      </div>
+      <div class="ttt" id="ttt" data-reveal></div>
+      <footer class="foot">
+        <span data-text="footer.left"></span>
+      </footer>
+    </div>
+  </section>
+
+<!-- Кнопки «связаться» и «наверх», сообщения -->
+<!-- Кнопка «Связаться», всегда на экране -->
+<!-- Маленькая кнопка «наверх» -->
+<button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
+<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- КОД САЙТА. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{};['app.js','waves.js','fun.js'].forEach(function(f){if(L[f])return;L[f]=1;document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
+</div>
 <div class="r t-rec" data-record-type="131"><!-- 9 подвал / 1 служебные кнопки и окно кейса -->
 <!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->
 <script>(function(){if(document.getElementById('case'))return;document.write("<!-- Кнопка «Связаться», всегда на экране -->\n<!-- Маленькая кнопка «наверх» -->\n<button class=\"to-top\" id=\"toTop\" aria-label=\"Наверх\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 16V4M5 9l5-5 5 5\"/><\/svg><\/button>\n<a class=\"fab tease\" id=\"fab\" data-href=\"telegram\"><span data-text=\"contactButton\" class=\"spell\"><\/span><\/a>\n\n<!-- Страница кейса: заполняется при клике на проект -->\n<div class=\"case\" id=\"case\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"caseTitle\">\n  <div class=\"case-bar\"><div class=\"wrap\">\n    <button class=\"case-back\" id=\"caseBack\">\n      <svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M16 10H4M9 5l-5 5 5 5\"/><\/svg>\n      <span data-text=\"works.back\"><\/span>\n    <\/button>\n  <\/div><\/div>\n  <div id=\"caseContent\"><\/div>\n<\/div>\n\n<div class=\"toasts\" id=\"toasts\" aria-live=\"polite\"><\/div>")})()</script>

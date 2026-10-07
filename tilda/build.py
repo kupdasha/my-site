@@ -113,6 +113,11 @@ nda_section = between('<!-- Проекты под NDA:', '<!-- Контакт --
 service_html = between('<!-- Кнопка «Связаться»', '<script src=')
 # у страницы NDA свое окно кейса: кнопка «назад» ведет к проектам под NDA
 nda_service_html = between('<!-- Кнопка «Связаться»', '<script src=', nda_html)
+# страница «Обо мне» (about.html): все ее разделы целиком; data-page="about" — по нему код узнает страницу на Тильде
+about_html = read('about.html')
+about_sections = between('<!-- Обо мне -->', '</main>', about_html).replace(
+    '<section class="about-page" id="about">', '<section class="about-page" id="about" data-page="about">', 1)
+about_service_html = between('<!-- Кнопка «Связаться»', '<script src=', about_html)
 
 
 # ---------- блоки ----------
@@ -195,6 +200,13 @@ BLOCKS = {
     # таплинк — своя страница Тильды без общей шапки и подвала
     '5 таплинк': [
         ('1 таплинк целиком', taplink_block()),
+    ],
+    # страница «Обо мне» — тоже один самодостаточный блок (адрес страницы на Тильде: /about)
+    '6 страница Обо мне': [
+        ('1 страница Обо мне целиком', '\n\n'.join([
+            css_block(), shared_block(), about_sections,
+            f'<!-- Кнопки «связаться» и «наверх», сообщения -->\n{about_service_html}',
+            js_block(['app.js', 'waves.js', 'fun.js'], 'КОД САЙТА.')])),
     ],
     '9 подвал': [
         ('1 служебные кнопки и окно кейса', once_block(service_html, 'Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах.')),
