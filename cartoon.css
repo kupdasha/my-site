@@ -1,0 +1,65 @@
+/* ================================================================
+   КЕЙС «МУЛЬТИК СОЗДАННЫЙ КОДОМ»: рабочий плеер и сторис (cartoon.js)
+   Плеер темный в обеих версиях сайта — так выглядел сам инструмент.
+   ================================================================ */
+.ct-wrap{margin-bottom:clamp(56px,7vw,104px)}
+
+/* ---------- рабочий плеер ---------- */
+.ct-player,.ct-wrap:has(.ct-player)>.camp-cap{max-width:calc((100svh - 340px) * 16 / 9 + 48px);margin-inline:auto}
+.ct-player{--pb:#0E0F12;--pt:#F4F4F6;--pl:#2A2C33;--pm:#9A9DA6;--pk:#1D2027;
+  background:var(--pb);color:var(--pt);border-radius:var(--r-img);padding:clamp(14px,2vw,24px);display:grid;gap:14px}
+.ct-eps{display:flex;flex-wrap:wrap;gap:8px}
+.ct-player button{font:inherit;font-size:16px;font-weight:500;color:var(--pt);background:var(--pk);border:0;border-radius:4px;
+  padding:9px 16px 11px;cursor:pointer;transition:background .2s var(--ease),color .2s var(--ease)}
+.ct-player button:hover{background:#2A2E37}
+.ct-player button:focus-visible,.ct-player input:focus-visible,.ct-phone:focus-visible,.ct-item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ct-ep{min-width:44px}
+.ct-player .ct-ep[aria-current=true],.ct-player .ct-btn-main{background:var(--accent);color:var(--accent-text)}
+.ct-player .ct-btn-main{min-width:104px}
+.ct-screen{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#000;cursor:pointer}
+.ct-screen img,.ct-phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s var(--ease)}
+.ct-screen img.on,.ct-phone img.on{opacity:1}
+.ct-subs{display:grid;gap:14px}
+.ct-sub{margin:0 auto;text-align:center;font-size:clamp(17px,1.6vw,21px);line-height:1.4;max-width:46em;min-height:2.8em;text-wrap:balance}
+.ct-pace{height:2px;background:var(--pl)}
+.ct-pace i{display:block;height:2px;width:0;background:var(--accent)}
+.ct-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.ct-scrub{flex:1 1 200px;min-width:140px;accent-color:var(--accent)}
+.ct-clock,.ct-tempo,.ct-title{font-size:16px;color:var(--pm);font-variant-numeric:tabular-nums}
+.ct-tempo{display:flex;align-items:center;gap:9px}
+.ct-tempo input{width:100px;accent-color:var(--accent)}
+.ct-title{margin:0}
+
+/* ---------- сторис ---------- */
+/* телефон тянется на высоту правой колонки (ширина — из пропорций 9:16), поэтому плашка внизу и сторис кончаются на одном уровне */
+.ct-st{display:flex;gap:clamp(24px,4vw,64px);align-items:stretch}
+.ct-phone{position:relative;aspect-ratio:9/16;flex:none;width:auto;min-height:600px;border-radius:22px;overflow:hidden;background:#000;cursor:pointer;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.ct-bars{position:absolute;z-index:2;top:10px;left:10px;right:10px;display:flex;gap:4px}
+.ct-bars span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
+.ct-bars i{display:block;height:100%;width:0;background:#fff}
+.ct-side{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:clamp(20px,2.5vw,32px)}   /* список — по верху сторис, плашка — по низу */
+.ct-list{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.ct-list li{border-bottom:1px solid var(--line)}
+.ct-item{font:inherit;font-size:clamp(22px,2.2vw,32px);font-weight:500;line-height:1.15;color:var(--ink);background:none;border:0;
+  padding:12px 0 14px;width:100%;text-align:left;cursor:pointer;opacity:.35;transition:opacity .3s var(--ease)}
+.ct-item:hover,.ct-item[aria-current=true]{opacity:1}
+.ct-hit{background:var(--accent);color:var(--accent-text);border-radius:var(--r-img);padding:clamp(20px,2.6vw,36px);display:grid;gap:12px}
+.ct-num{display:block;font-weight:500;font-size:clamp(64px,9vw,136px);line-height:.9;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.ct-hit-text{margin:0;font-size:clamp(18px,1.6vw,22px);line-height:1.3;max-width:22em}
+.ct-hit-go{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:8px}
+.ct-go{display:inline-flex;align-items:center;gap:8px;flex:none;background:#1D222A;color:#F4F4F6;text-decoration:none;font-size:16px;font-weight:500;border-radius:4px;padding:10px 20px 13px}
+.ct-go:hover{background:#000;color:#fff}
+.ct-go:focus-visible{outline:2px solid #1D222A;outline-offset:3px}
+.ct-ig{width:18px;height:18px;flex:none;margin-top:2px}
+.ct-hit-go{flex-wrap:nowrap;align-items:center}   /* кнопка и оговорка про Instagram на одном уровне */
+.ct-hit-note{margin:0;display:grid;gap:4px;font-size:16px;line-height:1.35}
+/* планшет и телефон: оговорка уходит под кнопку, телефон со сторис чуть ниже */
+@media (max-width:1000px){.ct-hit-go{flex-wrap:wrap;align-items:flex-start}.ct-phone{min-height:520px}}
+@media (max-width:700px){
+  .ct-st{flex-direction:column}
+  .ct-phone{width:min(100%,340px);min-height:0;margin:0 auto}
+  .ct-tempo{display:none}
+  .ct-eps{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px}   /* все девять сцен в одну строку */
+  .ct-player .ct-ep{min-width:0;padding:9px 0 11px}
+}

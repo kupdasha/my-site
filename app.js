@@ -2126,6 +2126,8 @@ function galleryItem(x){
   if (x && x.fold) return foldHTML(x.fold);
   if (x && x.pipe) return pipeHTML(x.pipe);
   if (x && x.frames) return framesHTML(x.frames);
+  // { ctPlayer } — рабочий плеер со сценами, { ctStories } — сторис по очереди; оба рисует cartoon.js (см. «мультик созданный кодом»)
+  if (x && (x.ctPlayer || x.ctStories)) return `<div class="ct-mount"></div>`;
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   if (x && x.collage) return campCollage(x);
   // { film: 'img/….mp4', poster, caption } — ролик для просмотра: со звуком и плеером, сам не запускается, грузится по нажатию;
@@ -2498,6 +2500,11 @@ function renderCase(k, keepScroll){
   if (kv) import(SCRIPT_BASE + 'kav.js?v=' + VER)
     .then(m => m.mountKav(kv, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс «Одна кавычка» не загрузился', err));
+  const cts = (p.gallery || []).flat().filter(x => x && (x.ctPlayer || x.ctStories));
+  const ctm = caseContent.querySelectorAll('.ct-mount');
+  if (ctm.length) import(SCRIPT_BASE + 'cartoon.js?v=' + VER)
+    .then(m => ctm.forEach((el, i) => m.mountCartoon(el, cts[i], { T, pick, openViewer, base: SCRIPT_BASE })))
+    .catch(err => console.warn('кейс мультика не загрузился', err));
   const ab = caseContent.querySelector('.ab-mount');
   if (ab) import(SCRIPT_BASE + 'akbars.js?v=' + VER)
     .then(m => m.mountAkbars(ab, p, { T, pick, openViewer, base: SCRIPT_BASE }))
