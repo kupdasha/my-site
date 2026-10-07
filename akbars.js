@@ -22,7 +22,7 @@ const head = ch => `<div class="ab-head">
 </div>`;
 const cap = t => t ? `<p class="ab-cap">${H.T(t)}</p>` : '';
 const img = (src, c = '') => `<img class="${c}" src="${src}" alt="" loading="lazy" draggable="false">`;
-// вкладки — кнопки с заливкой; у текущей под надписью бежит полоска таймера
+// вкладки — не кнопки, а строка надписей сверху: текущая темная, под ней бежит полоска таймера
 const tabs = (names, c = '') => `<div class="ab-tabs${c}" role="tablist">${names.map((n, i) =>
   `<button class="ab-tab" role="tab" aria-selected="${i === 0}" data-i="${i}"><span>${H.T(n)}</span><i class="ab-tick"></i></button>`).join('')}</div>`;
 
@@ -84,7 +84,7 @@ const piece = (it, i) => {
 const shelf = (items, c = '') => `<div class="ab-shelf${c}" style="--n:${items.length}">${items.map(piece).join('')}</div>`;
 
 function ideasHTML(c){
-  return `<div class="ab-paper ab-ideas">
+  return `<div class="ab-ideas">
     ${tabs(c.groups.map(g => g.name))}
     <div class="ab-stage">${c.groups.map((g, i) => `<div class="ab-scene${i ? '' : ' on'}">
         ${shelf(g.items, g.items.length === 1 ? ' ab-solo' : '')}
@@ -116,12 +116,10 @@ function scenes(box, c, ms){
 }
 function liveIdeas(box, c){ scenes(box, c, 5600); }
 
-/* ---------- круги правок: ступени слева, на полке — что показывали заказчику ---------- */
+/* ---------- круги правок: этапы строкой сверху, на полке — что показывали заказчику ---------- */
 function roundsHTML(c){
-  return `<div class="ab-paper ab-rounds">
-    <div class="ab-steps">
-      ${tabs(c.steps.map(s => s.name), ' ab-col')}
-    </div>
+  return `<div class="ab-rounds">
+    ${tabs(c.steps.map(s => s.name))}
     <div class="ab-stage">${c.steps.map((s, i) => `<div class="ab-scene${i ? '' : ' on'}">
         ${shelf(s.items, s.items.length > 4 ? ' ab-many' : '')}
         <div class="ab-note">
@@ -133,78 +131,68 @@ function roundsHTML(c){
 }
 function liveRounds(box, c){ scenes(box, c, 6000); }
 
-/* ---------- три уровня: одна форма, меняются металл и отделка ---------- */
+/* ---------- три уровня: три медали рядом, переключается отделка ---------- */
+// рендеры небольшие, поэтому медали не крупно по одной, а втроем, с подписями
 function levelsHTML(c){
-  const L = c.levels;
-  return `<div class="ab-paper ab-levels">
-    <div class="ab-lv-side">
-      ${tabs(L.map(l => l.name), ' ab-col')}
-      <p class="ab-metal" aria-live="polite">${H.T(L[0].metal)}</p>
-      <div class="ab-finish" role="group">${c.finishes.map((f, i) =>
-        `<button class="ab-fin" aria-pressed="${i === 0}" data-f="${i}">${H.T(f)}</button>`).join('')}</div>
-    </div>
-    <div class="ab-lv-stage">
-      <button class="ab-big" data-zoom="${L[0].a}" aria-label="Увеличить">${img(L[0].a)}</button>
-      <div class="ab-lv-dots">${L.map(l => `<span>${img(l.a)}</span>`).join('')}</div>
-    </div>
+  return `<div class="ab-levels">
+    ${tabs(c.finishes)}
+    <div class="ab-shelf ab-trio" style="--n:${c.levels.length}">${c.levels.map((l, i) => `<figure class="ab-piece" style="--d:${i}">
+        <button class="ab-coin" data-zoom="${l.a}" aria-label="Увеличить">${img(l.a, 'ab-face')}</button>
+        <figcaption><b>${H.T(l.name)}</b>${H.T(l.metal)}</figcaption>
+      </figure>`).join('')}</div>
   </div>${cap(c.hint)}`;
 }
 function liveLevels(box, c){
-  const L = c.levels, big = box.querySelector('.ab-big'), pic = big.querySelector('img');
-  const metal = box.querySelector('.ab-metal'), fins = [...box.querySelectorAll('.ab-fin')];
-  const dots = [...box.querySelectorAll('.ab-lv-dots span')];
-  let lv = 0, fin = 0, t = 0;
-  // все варианты заранее, чтобы монета не мигала пустотой
+  const L = c.levels, coins = [...box.querySelectorAll('.ab-coin')];
+  const ts = [];
+  // все варианты заранее, чтобы монеты не мигали пустотой
   L.forEach(l => [l.a, l.b].forEach(s => { const i = new Image(); i.src = s; }));
-  const draw = () => {
-    const src = fin ? L[lv].b : L[lv].a;
-    metal.innerHTML = H.T(L[lv].metal);
-    fins.forEach((b, i) => b.setAttribute('aria-pressed', i === fin));
-    dots.forEach((d, i) => d.classList.toggle('on', i === lv));
-    big.dataset.zoom = src;
-    if (still()) { pic.src = src; return; }
-    // монета поворачивается ребром — и выходит уже другой
-    clearTimeout(t);
-    big.classList.add('turn');
-    t = setTimeout(() => { pic.src = src; big.classList.remove('turn'); }, 260);
-  };
-  cycle(box, L.length, i => { lv = i; draw(); }, c.ms || 3400);
-  fins.forEach((b, i) => b.addEventListener('click', () => { fin = i; draw(); }));
+  cycle(box, c.finishes.length, f => coins.forEach((b, i) => {
+    const src = f ? L[i].b : L[i].a, pic = b.querySelector('img');
+    b.dataset.zoom = src;
+    if (still() || pic.getAttribute('src') === src) { pic.src = src; return; }
+    // монеты по очереди поворачиваются ребром — и выходят в другой отделке
+    clearTimeout(ts[i]);
+    ts[i] = setTimeout(() => {
+      b.classList.add('turn');
+      ts[i] = setTimeout(() => { pic.src = src; b.classList.remove('turn'); }, 260);
+    }, i * 140);
+  }), c.ms || 4200);
   zoomable(box);
 }
 
-/* ---------- чертеж: рендер стирается в линии, по краям — размеры ---------- */
+/* ---------- чертеж: все три вещи в масштабе, рендер стирается в линии, по краям — размеры ---------- */
 function planHTML(c){
-  return `<div class="ab-paper ab-plan">
-    ${tabs(c.items.map(it => it.name))}
-    <div class="ab-board">${c.items.map((it, i) => `<div class="ab-scene${i ? '' : ' on'}">
-        <div class="ab-obj" style="aspect-ratio:${it.ratio};--h:${it.h || '62%'}">
+  return `<div class="ab-plan">
+    <div class="ab-board">
+      ${c.items.map(it => `<figure class="ab-part">
+        <div class="ab-obj" style="aspect-ratio:${it.ratio};--cm:${it.cm}">
           ${img(it.img, 'ab-render')}
           <i class="ab-lines" style="--mask:url('${new URL(it.line, location.href).href}')"></i>
           ${it.x ? `<span class="ab-dim ab-dx"><b>${H.T(it.x)}</b></span>` : ''}
           ${it.y ? `<span class="ab-dim ab-dy"><b>${H.T(it.y)}</b></span>` : ''}
         </div>
-        ${it.note ? `<p class="ab-about">${H.T(it.note)}</p>` : ''}
-      </div>`).join('')}
+        <figcaption>${H.T(it.name)}</figcaption>
+      </figure>`).join('')}
       <i class="ab-cut" aria-hidden="true"></i>
     </div>
+    ${c.note ? `<p class="ab-about">${H.T(c.note)}</p>` : ''}
   </div>${cap(c.hint)}`;
 }
-function livePlan(box, c){
+function livePlan(box){
   const board = box.querySelector('.ab-board');
-  const scenes = [...box.querySelectorAll('.ab-scene')];
-  let x = 50, auto = true, seen = false, raf = 0, t0 = 0;
   const objs = [...box.querySelectorAll('.ab-obj')];
+  let x = 50, auto = true, seen = false, raf = 0, t0 = 0;
   // граница общая для всей доски, а каждой вещи — свое место разреза
   const put = v => {
     x = clamp(v, 0, 100); board.style.setProperty('--x', x + '%');
     const r = board.getBoundingClientRect(), at = r.left + r.width * x / 100;
     objs.forEach(o => { const b = o.getBoundingClientRect(); if (b.width) o.style.setProperty('--lx', clamp((at - b.left) / b.width * 100, 0, 100) + '%'); });
   };
-  // граница сама ходит туда-сюда, пока не тронули
+  // граница сама ходит от края до края, пока не тронули
   const tick = t => {
     if (!t0) t0 = t;
-    put(50 + Math.sin((t - t0) / 1500) * 26);
+    put(50 + Math.sin((t - t0) / 1800) * 44);
     if (auto && seen) raf = requestAnimationFrame(tick);
   };
   const go = () => { cancelAnimationFrame(raf); if (auto && seen && !still()) raf = requestAnimationFrame(tick); };
@@ -214,14 +202,10 @@ function livePlan(box, c){
   };
   board.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || board.hasPointerCapture(e.pointerId)) { auto = false; cancelAnimationFrame(raf); move(e); } });
   board.addEventListener('pointerdown', e => { auto = false; cancelAnimationFrame(raf); board.setPointerCapture(e.pointerId); move(e); });
-  onScreen(board, v => { seen = v; go(); });
-  put(still() ? 50 : x);
-  cycle(box, scenes.length, i => {
-    scenes.forEach((s, j) => s.classList.toggle('on', i === j));
-    // размеры прорисовываются заново у каждой вещи
-    scenes[i].classList.remove('drawn'); void scenes[i].offsetWidth; scenes[i].classList.add('drawn');
-    put(x);
-  }, c.ms || 7000);
+  // размеры прорисовываются, когда доска показалась
+  onScreen(board, v => { seen = v; if (v) board.classList.add('drawn'); go(); });
+  addEventListener('resize', () => put(x));
+  put(x);
 }
 
 /* ---------- подставка: финальная вращается, рядом — три металла ---------- */
@@ -257,7 +241,7 @@ function boxHTML(c){
     <div class="ab-paper ab-foil">
       ${tabs(c.foils.map(f => f.name))}
       <div class="ab-lids">${c.foils.map((f, i) => `<button class="ab-lid${i ? '' : ' on'}" data-zoom="${f.img}" aria-label="Увеличить">${img(f.img)}</button>`).join('')}<i class="ab-sweep"></i></div>
-      ${c.chips ? `<div class="ab-inside">${c.inside ? `<span>${H.T(c.inside)}</span>` : ''}<ul class="ab-chips">${c.chips.map((t, i) => `<li style="--d:${i * 90}ms">${H.T(t)}</li>`).join('')}</ul></div>` : ''}
+      ${c.inside ? `<p class="ab-about">${H.T(c.inside)}</p>` : ''}
     </div>
   </div>${cap(c.hint)}`;
 }

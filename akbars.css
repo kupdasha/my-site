@@ -23,20 +23,23 @@
 .ab-night{position:relative;border-radius:var(--r-img);color:#F2F2EF;--ink:#F2F2EF;--bg:var(--ab-night);overflow:hidden;
   background:radial-gradient(90% 80% at 50% 38%,#3A3A3A 0,#1E1E1E 55%,var(--ab-night) 100%)}
 
-/* ---------- вкладки: кнопки с заливкой, у текущей — полоска таймера ---------- */
-.ab-tabs{display:flex;flex-wrap:wrap;gap:8px}
-.ab-tab{position:relative;height:48px;padding:0 22px 3px;border-radius:99px;font-size:18px;font-weight:500;line-height:1;white-space:nowrap;
-  background:rgba(29,34,42,.07);color:var(--ab-ink);cursor:pointer;transition:background .35s,color .35s,transform .35s var(--ease)}
-.ab-tab:hover{background:rgba(29,34,42,.14)}
-.ab-tab[aria-selected="true"]{background:var(--ab-ink);color:#fff}
-.ab-tab:active{transform:scale(.97)}
-.ab-tick{position:absolute;left:22px;right:22px;bottom:8px;height:2px;border-radius:1px;overflow:hidden;opacity:0}
-.ab-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%;transform:scaleX(0)}
-.ab-tab.run .ab-tick{opacity:.5}
+/* ---------- вкладки: не кнопки, а строка надписей сверху; текущая темная, под ней — полоска таймера ---------- */
+.ab-tabs{display:flex;flex-wrap:wrap;column-gap:clamp(20px,2.6vw,40px);row-gap:4px;border-bottom:1.5px solid color-mix(in srgb,currentColor 14%,transparent);margin-bottom:clamp(28px,4vw,56px)}
+.ab-tab{position:relative;padding:0 0 14px;margin-bottom:-1.5px;font-size:clamp(20px,1.7vw,26px);font-weight:500;line-height:1.15;white-space:nowrap;color:inherit;
+  background:none;opacity:.38;cursor:pointer;transition:opacity .35s}
+.ab-tab:hover{opacity:.75}
+.ab-tab[aria-selected="true"]{opacity:1}
+/* линия под текущей: сплошная, пока листают руками; бежит, пока листается само */
+.ab-tick{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;transition:opacity .3s}
+.ab-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%}
+.ab-tab[aria-selected="true"] .ab-tick{opacity:1}
 .ab-tab.run .ab-tick::after{animation:abTick var(--ms) linear both}
-@keyframes abTick{to{transform:none}}
-.ab-col{flex-direction:column;align-items:flex-start}
-.ab-col .ab-tab{white-space:normal;text-align:left;height:auto;min-height:48px;padding:12px 22px 14px}
+@keyframes abTick{from{transform:scaleX(0)}to{transform:none}}
+@media (max-width:760px){
+  .ab-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad)}
+  .ab-tabs::-webkit-scrollbar{display:none}
+  .ab-tab{flex:none}
+}
 
 /* ---------- сцены: все лежат друг на друге, видна одна ---------- */
 .ab-stage,.ab-board{display:grid;grid-template-columns:minmax(0,1fr)}
@@ -71,75 +74,60 @@
 .ab-two.flip .ab-face{transform:rotateY(-180deg)}
 .ab-two.flip .ab-back{transform:rotateY(0)}
 /* выбранная идея: тег — единственный контурный элемент */
-.ab-chip,.ab-chips li{display:inline-block;font-size:16px;line-height:1;padding:8px 14px 10px;border:1.5px solid currentColor;border-radius:999px;opacity:1}
+.ab-chip{display:inline-block;font-size:16px;line-height:1;padding:8px 14px 10px;border:1.5px solid currentColor;border-radius:999px;opacity:1}
 .ab-pick figcaption{opacity:1}
 
 /* ---------- идеи ---------- */
-.ab-ideas{padding:clamp(20px,3vw,44px)}
-.ab-ideas .ab-stage{margin-top:clamp(28px,4vw,56px)}
-.ab-ideas .ab-about{align-self:center;text-align:center}
+.ab-ideas .ab-about,.ab-rounds .ab-about{align-self:center;text-align:center}
 
-/* ---------- круги правок ---------- */
-.ab-rounds{display:grid;grid-template-columns:minmax(220px,.36fr) minmax(0,1fr);gap:clamp(20px,3vw,48px);padding:clamp(20px,3vw,44px)}
-.ab-note{display:flex;align-items:flex-start;justify-content:space-between;gap:clamp(16px,2.4vw,40px)}
-.ab-wear{flex:none;width:clamp(150px,16vw,240px);aspect-ratio:900/679;padding:0;border-radius:var(--r-img);overflow:hidden;cursor:zoom-in;background:#fff}
+/* ---------- круги правок: этапов шесть — надписи чуть мельче, чтобы встали в одну строку ---------- */
+.ab-rounds .ab-tabs{column-gap:clamp(16px,2vw,32px)}
+.ab-rounds .ab-tab{font-size:clamp(18px,1.45vw,22px)}
+.ab-note{display:flex;align-items:center;justify-content:center;gap:clamp(16px,2.4vw,40px)}
+.ab-wear{flex:none;width:clamp(150px,14vw,210px);aspect-ratio:900/679;padding:0;border-radius:var(--r-img);overflow:hidden;cursor:zoom-in;background:#fff}
 .ab-wear img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
 .ab-wear:hover img{transform:scale(1.05)}
-@media (max-width:860px){
-  .ab-rounds{grid-template-columns:minmax(0,1fr)}
-  .ab-rounds .ab-col{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;margin:0 calc(clamp(20px,3vw,44px) * -1);padding:0 clamp(20px,3vw,44px) 6px;scrollbar-width:none}
-  .ab-rounds .ab-col .ab-tab{white-space:nowrap;flex:none}
-}
+.ab-rounds .ab-note .ab-about{text-align:left}
 @media (max-width:560px){.ab-note{flex-direction:column}.ab-wear{width:100%}}
 
-/* ---------- три уровня: монета поворачивается ребром ---------- */
-.ab-levels{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(20px,3vw,48px);align-items:center;padding:clamp(20px,3vw,48px)}
-.ab-lv-side{display:flex;flex-direction:column;gap:clamp(18px,2vw,28px)}
-.ab-metal{font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.35;margin:0;min-height:2.7em;max-width:22ch}
-.ab-finish{display:flex;flex-wrap:wrap;gap:8px}
-.ab-fin{height:auto;min-height:40px;padding:8px 16px 10px;border-radius:99px;font-size:16px;line-height:1.2;text-align:left;cursor:pointer;
-  background:rgba(29,34,42,.07);color:var(--ab-ink);transition:background .35s,color .35s}
-.ab-fin:hover{background:rgba(29,34,42,.14)}
-.ab-fin[aria-pressed="true"]{background:var(--ab-ink);color:#fff}
-.ab-lv-stage{display:flex;flex-direction:column;align-items:center;gap:24px;perspective:1100px}
-.ab-big{display:block;width:100%;height:clamp(300px,42vw,580px);padding:0;cursor:zoom-in;transition:transform .26s cubic-bezier(.5,0,.9,.4)}
-.ab-big img{width:100%;height:100%;object-fit:contain;display:block;animation:abFloat 6s ease-in-out infinite alternate}
-.ab-big.turn{transform:rotateY(90deg) scale(.94)}
-.ab-big:not(.turn){transition:transform .5s var(--ease)}
-.ab-lv-dots{display:flex;gap:14px}
-.ab-lv-dots span{width:52px;height:52px;opacity:.3;transition:opacity .4s,transform .4s var(--ease)}
-.ab-lv-dots span.on{opacity:1;transform:translateY(-4px)}
-.ab-lv-dots img{width:100%;height:100%;object-fit:contain}
-@media (max-width:760px){.ab-levels{grid-template-columns:minmax(0,1fr)}.ab-lv-stage{order:-1}}
+/* ---------- три уровня: три медали рядом, при смене отделки поворачиваются ребром ---------- */
+.ab-trio{--h:clamp(170px,19vw,260px);perspective:1100px}
+.ab-trio .ab-piece{opacity:1;transform:none}
+.ab-trio .ab-coin{transition:transform .26s cubic-bezier(.5,0,.9,.4)}
+.ab-trio .ab-coin.turn img{transform:rotateY(90deg) scale(.94)}
+.ab-trio .ab-coin img{transition:transform .26s cubic-bezier(.5,0,.9,.4)}
+.ab-trio figcaption{opacity:1;gap:4px;margin-top:8px}
+.ab-trio figcaption b{font-weight:500;font-size:clamp(18px,1.5vw,22px)}
+@media (max-width:560px){.ab-trio .ab-piece{flex-basis:calc(33% - 8px)}.ab-trio{flex-wrap:nowrap;--h:clamp(100px,28vw,150px)}}
 
-/* ---------- чертеж: слева — линии, справа — рендер, граница ходит ---------- */
-.ab-plan{padding:clamp(20px,3vw,44px);
-  background-image:linear-gradient(rgba(29,34,42,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(29,34,42,.06) 1px,transparent 1px),
-    radial-gradient(120% 90% at 50% 18%,#FBFBFA 0,var(--ab-paper) 62%,#E2E2DE 100%);
-  background-size:28px 28px,28px 28px,auto;background-position:center}
-.ab-board{position:relative;margin-top:clamp(20px,3vw,40px);min-height:clamp(380px,44vw,620px);touch-action:pan-y;cursor:ew-resize;user-select:none;-webkit-user-select:none}
-.ab-board .ab-scene{align-items:center;justify-content:center;padding:0 clamp(40px,6vw,96px) 8px 0}
-.ab-obj{position:relative;height:var(--h,60%);max-height:clamp(240px,30vw,440px);max-width:100%;margin-bottom:56px}
+/* ---------- чертеж: три вещи в масштабе на сетке; слева от границы — линии, справа — рендер ---------- */
+.ab-plan{--k:clamp(17px,2.5vw,36px);   /* сколько пикселей в сантиметре: вещи стоят в реальных пропорциях */
+  background-image:linear-gradient(color-mix(in srgb,currentColor 7%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,currentColor 7%,transparent) 1px,transparent 1px);
+  background-size:var(--k) var(--k);background-position:center;padding:clamp(28px,4vw,56px) 0 clamp(20px,3vw,40px)}
+.ab-board{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;column-gap:clamp(56px,7vw,120px);row-gap:40px;
+  touch-action:pan-y;cursor:ew-resize;user-select:none;-webkit-user-select:none}
+.ab-part{margin:0;display:flex;flex-direction:column;align-items:center;gap:16px}
+.ab-part figcaption{font-size:16px;opacity:.7;margin-top:52px}
+.ab-obj{position:relative;width:calc(var(--cm) * var(--k))}
 .ab-render,.ab-lines{position:absolute;inset:0;width:100%;height:100%}
 .ab-render{object-fit:contain;clip-path:inset(0 0 0 var(--lx,50%))}
-.ab-lines{display:block;background:var(--ab-ink);clip-path:inset(0 calc(100% - var(--lx,50%)) 0 0);
+.ab-lines{display:block;background:currentColor;clip-path:inset(0 calc(100% - var(--lx,50%)) 0 0);
   -webkit-mask:var(--mask) center / contain no-repeat;mask:var(--mask) center / contain no-repeat}
 /* граница рендера и чертежа */
-.ab-cut{position:absolute;top:2%;bottom:24%;left:var(--x,50%);width:1.5px;background:var(--ab-ink);opacity:.35;pointer-events:none}
-.ab-cut::after{content:"";position:absolute;top:50%;left:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ab-ink)}
+.ab-cut{position:absolute;top:-12px;bottom:-12px;left:var(--x,50%);width:1.5px;background:currentColor;opacity:.3;pointer-events:none}
+.ab-cut::after{content:"";position:absolute;top:50%;left:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:currentColor}
 /* размерные линии: прорисовываются, подпись проявляется следом */
-.ab-dim{position:absolute;display:flex;align-items:center;justify-content:center;color:var(--ab-ink);pointer-events:none}
+.ab-dim{position:absolute;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .ab-dim::before{content:"";position:absolute;background:currentColor;transition:transform 1s var(--ease) .2s}
-.ab-dim b{position:relative;font-weight:500;font-size:16px;line-height:1;padding:4px 8px 6px;background:#F4F4F2;border-radius:4px;opacity:0;transition:opacity .5s .9s;white-space:nowrap}
-.ab-dx{left:0;right:0;top:calc(100% + 26px);height:12px;border-inline:1.5px solid}
+.ab-dim b{position:relative;font-weight:500;font-size:16px;line-height:1;padding:4px 8px 6px;background:var(--bg);border-radius:4px;opacity:0;transition:opacity .5s .9s;white-space:nowrap}
+.ab-dx{left:0;right:0;top:calc(100% + 22px);height:12px;border-inline:1.5px solid}
 .ab-dx::before{left:0;right:0;top:50%;height:1.5px;transform:scaleX(0)}
-.ab-dy{top:0;bottom:0;left:calc(100% + 26px);width:12px;border-block:1.5px solid}
+.ab-dy{top:0;bottom:0;left:calc(100% + 18px);width:12px;border-block:1.5px solid}
 .ab-dy::before{top:0;bottom:0;left:50%;width:1.5px;transform:scaleY(0)}
 .ab-dy b{writing-mode:vertical-rl;transform:rotate(180deg);padding:8px 4px 8px 6px}
-.ab-scene.drawn .ab-dim::before{transform:none}
-.ab-scene.drawn .ab-dim b{opacity:1}
-.ab-board .ab-about{text-align:center;max-width:50ch}
-@media (max-width:560px){.ab-board{min-height:420px}.ab-board .ab-scene{padding-right:44px}.ab-dy{left:calc(100% + 14px)}}
+.drawn .ab-dim::before{transform:none}
+.drawn .ab-dim b{opacity:1}
+.ab-plan > .ab-about{margin:clamp(28px,3vw,44px) auto 0;text-align:center;max-width:56ch}
 
 /* ---------- подставка: финальная крутится на витрине, три металла рядом ---------- */
 .ab-stand{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:clamp(12px,1.6vw,24px)}
@@ -151,6 +139,7 @@
 .ab-turn:not(.edge) img{transition:transform .5s var(--ease),opacity .1s}
 .ab-metals{display:flex;align-items:center;padding:clamp(20px,3vw,44px) clamp(12px,2vw,28px)}
 .ab-metals .ab-shelf{width:100%;--h:clamp(200px,24vw,380px)}
+.ab-metals .ab-coin::after{display:none}   /* у подставок без теней */
 @media (max-width:760px){.ab-stand{grid-template-columns:minmax(0,1fr)}.ab-metals .ab-shelf{--h:clamp(160px,44vw,260px)}}
 
 /* ---------- коробка ---------- */
@@ -168,11 +157,7 @@
   background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.9) 50%,transparent 65%);background-size:250% 100%;background-position:120% 0}
 .ab-sweep.go{animation:abSweep 1.3s var(--ease) .15s both}
 @keyframes abSweep{0%{opacity:1;background-position:120% 0}100%{opacity:1;background-position:-20% 0}}
-.ab-inside{display:flex;flex-direction:column;gap:12px}
-.ab-inside > span{font-size:16px;opacity:.6}
-.ab-chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
-.ab-chips li{opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease) var(--d),transform .6s var(--ease) var(--d)}
-.ab-ch.in .ab-chips li{opacity:1;transform:none}
+.ab-foil .ab-tabs{margin-bottom:0}
 @media (max-width:760px){.ab-box{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- витрина: лампа ходит за курсором, медали поворачиваются к свету ---------- */
@@ -190,6 +175,6 @@
 @media (max-width:760px){.ab-case{grid-template-columns:repeat(2,minmax(0,1fr))}.ab-g4{grid-column:1 / -1;width:60%}}
 
 @media (prefers-reduced-motion: reduce){
-  .ab-viz,.ab-piece,.ab-chips li{opacity:1;transform:none;transition:none}
-  .ab-coin,.ab-coin::after,.ab-big img,.ab-gem img{animation:none}
+  .ab-viz,.ab-piece{opacity:1;transform:none;transition:none}
+  .ab-coin,.ab-coin::after,.ab-gem img{animation:none}
 }
