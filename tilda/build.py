@@ -13,6 +13,7 @@
 и tilda/проверка.html — все блоки подряд, как их соберет Тильда,
 чтобы открыть локально и убедиться, что всё работает.
 """
+import json
 import os, re, shutil
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -139,11 +140,18 @@ def page_block(sid, group, note):
     return sections[sid]
 
 def js_block(names, note):
-    # файлы кода подключаются с GitHub по порядку; ?v= меняется раз в час
+    # файлы кода подключаются с GitHub по порядку; ?v= меняется раз в час.
+    # Если блок случайно вставлен на страницу дважды, каждый файл все равно подключится один раз
     files = ','.join(f"'{n}'" for n in names)
     return (f'<!-- {note} Это код, тексты здесь не правятся: сам код лежит на GitHub. -->\n'
-            f"<script>(function(){{var B='{CDN}',v=Math.floor(Date.now()/36e5);"
-            f"[{files}].forEach(function(f){{document.write('<script src=\"'+B+f+'?v='+v+'\"><\\/script>')}})}})()</script>")
+            f"<script>(function(){{var B='{CDN}',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{{}};"
+            f"[{files}].forEach(function(f){{if(L[f])return;L[f]=1;document.write('<script src=\"'+B+f+'?v='+v+'\"><\\/script>')}})}})()</script>")
+
+def once_block(html, note):
+    # разметка выводится один раз: если такой блок на странице уже есть (окно кейса #case), копия ничего не добавляет
+    js = json.dumps(html, ensure_ascii=False).replace('</', '<\\/')
+    return (f'<!-- {note} -->\n'
+            f"<script>(function(){{if(document.getElementById('case'))return;document.write({js})}})()</script>")
 
 def taplink_block():
     # таплинк — отдельная страница Тильды из одного блока; вся страница (разметка, тексты, стили, код)
@@ -189,7 +197,7 @@ BLOCKS = {
         ('1 таплинк целиком', taplink_block()),
     ],
     '9 подвал': [
-        ('1 служебные кнопки и окно кейса', f'<!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->\n{service_html}'),
+        ('1 служебные кнопки и окно кейса', once_block(service_html, 'Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах.')),
         ('2 код сайта', js_block(['app.js', 'waves.js', 'fun.js', 'shimmer.js'], 'КОД САЙТА: движок, переливы и дружеская версия.')),
     ],
 }

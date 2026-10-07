@@ -178,7 +178,7 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <!-- КОД САЙТА. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
-<script>(function(){var B='../',v=Math.floor(Date.now()/36e5);['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{};['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){if(L[f])return;L[f]=1;document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
 </div>
 <div class="r t-rec" data-record-type="131"><!-- 5 таплинк / 1 таплинк целиком -->
 <!-- ТАПЛИНК. Весь таплинк лежит на GitHub в taplink.html и подключается отсюда. Блок не менять. -->
@@ -196,27 +196,11 @@ root.style.minHeight='';root.style.background=''})})()</script>
 </div>
 <div class="r t-rec" data-record-type="131"><!-- 9 подвал / 1 служебные кнопки и окно кейса -->
 <!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->
-<!-- Кнопка «Связаться», всегда на экране -->
-<!-- Маленькая кнопка «наверх» -->
-<button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
-<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
-
-<!-- Страница кейса: заполняется при клике на проект -->
-<div class="case" id="case" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
-  <div class="case-bar"><div class="wrap">
-    <button class="case-back" id="caseBack">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 10H4M9 5l-5 5 5 5"/></svg>
-      <span data-text="works.back"></span>
-    </button>
-  </div></div>
-  <div id="caseContent"></div>
-</div>
-
-<div class="toasts" id="toasts" aria-live="polite"></div>
+<script>(function(){if(document.getElementById('case'))return;document.write("<!-- Кнопка «Связаться», всегда на экране -->\n<!-- Маленькая кнопка «наверх» -->\n<button class=\"to-top\" id=\"toTop\" aria-label=\"Наверх\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 16V4M5 9l5-5 5 5\"/><\/svg><\/button>\n<a class=\"fab tease\" id=\"fab\" data-href=\"telegram\"><span data-text=\"contactButton\" class=\"spell\"><\/span><\/a>\n\n<!-- Страница кейса: заполняется при клике на проект -->\n<div class=\"case\" id=\"case\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"caseTitle\">\n  <div class=\"case-bar\"><div class=\"wrap\">\n    <button class=\"case-back\" id=\"caseBack\">\n      <svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M16 10H4M9 5l-5 5 5 5\"/><\/svg>\n      <span data-text=\"works.back\"><\/span>\n    <\/button>\n  <\/div><\/div>\n  <div id=\"caseContent\"><\/div>\n<\/div>\n\n<div class=\"toasts\" id=\"toasts\" aria-live=\"polite\"><\/div>")})()</script>
 </div>
 <div class="r t-rec" data-record-type="131"><!-- 9 подвал / 2 код сайта -->
 <!-- КОД САЙТА: движок, переливы и дружеская версия. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
-<script>(function(){var B='../',v=Math.floor(Date.now()/36e5);['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{};['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){if(L[f])return;L[f]=1;document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
 </div>
 </div>
 </body>
