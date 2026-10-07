@@ -47,8 +47,6 @@ const ARR = [32,23,22,26,26,32,33,27,30,28,22,27,47,33,44,43,30,44,44,41,47,31,3
 const MIX = [35,33,30,36,37,38,35,33,34,35,34,39,55,43,54,52,50,55,53,51,57,46,48,69,71,63,60,52,58,52,41,39,40,26,57,64,65,66,74,74,72,66,56,66,69,54,80,86,71,89,77,71,75,74,69,80,67,58,53,52,46,54,47,53,48,48,47,41,43,69,50,64,71,69,61,47,35,35,30,20,60,64,69,61,77,68,73,73,52,59,37,35,94,84,66,85,91,91,84,75,65,87,73,61,36,33,38,38,32,39,42,43,50,48,43,35,31,39,37,35,40,43,27,27,32,32,84,87,82,91,93,91,89,100,81,89,80,60,11,4];
 // средний цвет каждой секунды клипа (166 секунд), насыщенность чуть усилена, чтобы полоска читалась
 const BAR = '3a3a3a 444444 535353 484848 3a3a3a 444444 474747 5b5b5b 363636 684f3d 654c3e 634b3d 525259 525058 6d6666 685d5c 8c836a 8d866d 83806a 8b8b8b 727272 9a9a9a 919191 8b8b8b 977548 737373 747474 626262 5b4722 65533a 6a5f51 444032 87776e 595442 5b5444 5b5341 978e8c 857368 87776c 908a85 686656 6a6653 968773 8c8c8c a3a3a3 5f5f5f 4f4f4f 505050 686868 6e6e6e 765e3c 745e3c 3e3e3e 4a4a4a 5c5c5c 474747 656565 474747 525252 484848 444444 4e4e4e 5b5b5b 4f4f4f 414141 505050 555555 505050 606060 777777 7c5d48 948078 94837e 716c5f ab7550 a9734d 565244 595647 665641 878273 8d897a 979386 7c7969 746962 706965 525252 535353 3b7179 4d7a7e 7b866d 806a50 7d654a 766743 1a1d1d 534941 545454 5a5a5a 585858 4c4c4c 505050 434343 505050 aea9a1 547a74 6f625e 6f615c 88684d a18c7b a18979 936a4d c08457 936242 2e578a 887a76 ac7454 b87c50 ac7b56 504e5c 464f6a 3f5173 365178 2c4e7d 264d80 817c6e 5e5e5e 616161 434550 1e334b 261614 261614 3f2926 402d2d 2e2525 322726 3f2d27 412f2a 52382e 3f434a 654e45 61443d 60433d 72765e 747760 8c8c70 8d8d72 8d8d72 585858 5b5b5b 525252 616161 8e795f 887255 352f2e 36312f 756e69 928878 b8b6ab 484143 6c5e61 3b2c1e 34271d 77596a 555555 3a3a3a 010101 010101'.split(' ');
-// цвета моделей в раскадровке
-const MODEL = ['#2F6BFF', '#2FA36B', '#A46BFF', '#E0559A', '#17A9BD'];
 
 /* ---------- история: спуск по лестнице, кадры сменяются сами ---------- */
 function worldsHTML(c){
@@ -161,95 +159,26 @@ function liveFace(box){
     () => box.classList.add('done')));
 }
 
-/* ---------- раскадровка: все 24 кадра по очереди, как дорожка в монтажке ---------- */
-// у кадра: [название, модель, картинка, длительность в секундах]
-function boardHTML(c){
-  const count = c.models.map((_, m) => c.frames.filter(f => f[1] === m).length);
-  let at = 0;
-  const clips = c.frames.map(([name, m, img, d], i) => {
-    const li = `<li data-m="${m}" style="--c:${MODEL[m]};--s:${at};--d:${d};background-image:url('${img}')"><span>${H.T(name)}</span></li>`;
-    at += d; return li;
+/* ---------- дубли: всё, что сгенерировали, одним коллажем ---------- */
+// картинки маленькие и низкого качества, поэтому собраны в один спрайт и не увеличиваются
+function takesHTML(c){
+  const { cols, rows, count } = c;
+  const rnd = i => Math.abs(Math.sin(i * 91.17) * 43758.5453) % 1;
+  // порядок перемешан, чтобы рядом стояли разные сцены; некоторые клетки крупнее — так это коллаж, а не таблица
+  // 132 кадра и 12 крупных — ровно 168 клеток: сетка закрывается без дыр при 14, 8 и 6 колонках
+  const order = Array.from({ length: count }, (_, i) => i).sort((a, b) => rnd(a) - rnd(b)).slice(0, 132);
+  const tiles = order.map((k, n) => {
+    const x = k % cols, y = Math.floor(k / cols), big = n % 8 === 4 && n < 100;
+    return `<i${big ? ' class="big"' : ''} style="--n:${n};background-position:${(x / (cols - 1) * 100).toFixed(3)}% ${(y / (rows - 1) * 100).toFixed(3)}%"></i>`;
   }).join('');
-  const total = at, ticks = [];
-  for (let t = 0; t < total - 15; t += 30) ticks.push(`<span style="--s:${t}">${time(t)}</span>`);
-  return `<div class="cl-board" data-total="${total}">
-    <div class="cl-models">${c.models.map((name, m) =>
-      `<button class="cl-model" data-m="${m}" style="--c:${MODEL[m]}"><i></i><em>${name}</em><span>${count[m]}</span></button>`).join('')}</div>
-    <div class="cl-mon">
-      <div class="cl-mon-img">${c.frames.map(([, , img], i) => `<img src="${img}" alt=""${i ? ' loading="lazy"' : ' class="on"'} draggable="false">`).join('')}</div>
-      <div class="cl-mon-info"><b class="cl-mon-name"></b><span class="cl-mon-tc"></span><span class="cl-mon-model"><i></i><em></em></span></div>
-    </div>
-    <div class="cl-tl"><div class="cl-track">
-      <div class="cl-ruler">${ticks.join('')}</div>
-      <ol class="cl-clips">${clips}</ol>
-      <i class="cl-ph"></i>
-    </div></div>
+  return `<div class="cl-takes" style="--sprite:url('${c.sprite}');--cols:${cols};--rows:${rows}">${tiles}</div>
     ${c.rules ? `<div class="cl-rules">${c.rules.map(r =>
-      `<div><h3>${H.T(r.name)}</h3><p>${H.T(r.text)}</p></div>`).join('')}</div>` : ''}
-  </div>${cap(c.hint)}`;
+      `<div><h3>${H.T(r.name)}</h3><p>${H.T(r.text)}</p></div>`).join('')}</div>` : ''}${cap(c.hint)}`;
 }
-function liveBoard(box){
-  const board = box.querySelector('.cl-board'), tl = box.querySelector('.cl-tl'), track = box.querySelector('.cl-track');
-  const btns = [...box.querySelectorAll('.cl-model')], clips = [...box.querySelectorAll('.cl-clips li')];
-  const imgs = [...box.querySelectorAll('.cl-mon-img img')];
-  const name = box.querySelector('.cl-mon-name'), tc = box.querySelector('.cl-mon-tc');
-  const mdl = box.querySelector('.cl-mon-model'), mName = mdl.querySelector('em');
-  const total = +board.dataset.total;
-  const starts = clips.map(li => +li.style.getPropertyValue('--s')), durs = clips.map(li => +li.style.getPropertyValue('--d'));
-  let px = 4, t = 0, cur = -1, held = false, raf = 0, seen = false, last = 0;
-  // масштаб: вся раскадровка во всю ширину; на телефоне крупнее — тогда дорожка листается пальцем
-  const fit = () => {
-    const cs = getComputedStyle(tl), w = tl.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    px = Math.max(w / total, matchMedia('(max-width:760px)').matches ? 7 : 0);
-    track.style.setProperty('--px', px + 'px');
-    track.style.width = total * px + 'px';
-  };
-  const show = k => {
-    if (k === cur) return; cur = k;
-    imgs.forEach((im, i) => im.classList.toggle('on', i === k));
-    clips.forEach((li, i) => li.classList.toggle('on', i === k));
-    name.innerHTML = clips[k].querySelector('span').innerHTML;
-    const m = +clips[k].dataset.m;
-    mdl.style.setProperty('--c', MODEL[m]); mName.textContent = btns[m].querySelector('em').textContent;
-  };
-  const place = s => {
-    t = clamp(s, 0, total - .01);
-    let k = starts.findIndex((st, i) => t >= st && t < st + durs[i]); if (k < 0) k = clips.length - 1;
-    show(k);
-    tc.textContent = time(t);
-    track.style.setProperty('--t', t.toFixed(2));
-    // дорожка сама подъезжает, чтобы бегунок был виден
-    if (!held && tl.scrollWidth > tl.clientWidth + 2) {
-      const x = t * px, l = tl.scrollLeft, w = tl.clientWidth - 2 * parseFloat(getComputedStyle(tl).paddingLeft);
-      if (x < l + w * .1 || x > l + w * .9) tl.scrollLeft = x - w * .2;
-    }
-  };
-  const at = e => { const r = track.getBoundingClientRect(); return (e.clientX - r.left) / px; };
-  track.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { held = true; place(at(e)); } });
-  track.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') held = false; });
-  track.addEventListener('click', e => place(at(e)));
-  tl.addEventListener('touchstart', () => { held = true; }, { passive: true });
-  tl.addEventListener('touchend', () => setTimeout(() => { held = false; }, 3000), { passive: true });
-  // модель: наведение или нажатие подсвечивает ее кадры на дорожке
-  const choose = m => { board.dataset.m = m < 0 ? '' : m; btns.forEach((b, i) => b.classList.toggle('on', i === m)); };
-  btns.forEach((b, i) => {
-    b.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') choose(i); });
-    b.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') choose(-1); });
-    b.addEventListener('click', e => { if (e.pointerType !== 'mouse') choose(board.dataset.m === String(i) ? -1 : i); });
-  });
-  // бегунок сам идет по раскадровке, в восемь раз быстрее, чем по таймингу
-  const draw = now => {
-    const dt = Math.min(64, now - (last || now)); last = now;
-    if (!held) place((t + dt * .008) % total);
-    if (seen) raf = requestAnimationFrame(draw);
-  };
-  fit(); place(0);
-  addEventListener('resize', () => { fit(); place(t); });
-  if (still()) return;
-  onScreen(board, v => {
-    if (v && !seen) { seen = true; last = 0; raf = requestAnimationFrame(draw); }
-    else if (!v) { seen = false; cancelAnimationFrame(raf); }
-  });
+// клетки проявляются волной, когда коллаж показался на экране
+function liveTakes(box){
+  const t = box.querySelector('.cl-takes');
+  onceSeen(t, () => t.classList.add('on'));
 }
 
 /* ---------- клип в одну полоску: цвет каждой секунды, наведение показывает кадр ---------- */
@@ -299,21 +228,9 @@ function liveScore(box){
   });
 }
 
-/* ---------- звонок из грядущего дня: ответить и увидеть себя старше ---------- */
-function callHTML(c){
-  return `<div class="cl-call">
-    <div class="cl-call-frame">
-      <img class="cl-c-now on" src="${c.from}" alt="" draggable="false">
-      <img class="cl-c-then" src="${c.to}" alt="" loading="lazy" draggable="false">
-      <p class="cl-call-line">${H.T(c.line)}</p>
-    </div>
-    <button class="btn btn-accent cl-answer"><span class="cl-a-on">${H.T(c.answer)}</span><span class="cl-a-off">${H.T(c.hang)}</span></button>
-  </div>${cap(c.hint)}`;
-}
-function liveCall(box){
-  const call = box.querySelector('.cl-call'), btn = box.querySelector('.cl-answer');
-  btn.addEventListener('click', () => call.classList.toggle('talk'));
-  onScreen(call, v => call.classList.toggle('ring', v && !still()));
+/* ---------- клип целиком: в самом конце кейса ---------- */
+function movieHTML(c){
+  return `<div class="cl-movie"><video src="${c.src}" poster="${c.poster}" controls preload="metadata" playsinline></video></div>${cap(c.hint)}`;
 }
 
 /* ---------- кадры: лента едет сама, наведение ее останавливает, можно листать ---------- */
@@ -355,9 +272,9 @@ const KINDS = {
   worlds: [worldsHTML, liveWorlds],
   voice:  [voiceHTML, liveVoice],
   face:   [faceHTML, liveFace],
-  board:  [boardHTML, liveBoard],
+  takes:  [takesHTML, liveTakes],
   score:  [scoreHTML, liveScore],
-  call:   [callHTML, liveCall],
+  movie:  [movieHTML, () => {}],
   film:   [filmHTML, liveFilm],
 };
 
