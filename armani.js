@@ -249,7 +249,7 @@ function loadCSS(base){
   if (!cssReady) cssReady = new Promise(res => {
     const l = document.createElement('link');
     l.rel = 'stylesheet'; l.href = base + 'armani.css?v=' + VERS;
-    l.onload = l.onerror = res; document.head.appendChild(l);
+    l.onload = l.onerror = res; document.body.appendChild(l);   // в конец body: на Тильде style.css стоит в body, стили кейса должны идти после него
   });
   return cssReady;
 }
