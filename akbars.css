@@ -62,10 +62,13 @@
   background:radial-gradient(50% 50% at 50% 50%,rgba(0,0,0,.22),transparent 100%);animation:abShade 5.4s ease-in-out calc(var(--d) * -1.3s) infinite alternate}
 @keyframes abFloat{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-10px) rotate(1deg)}}
 @keyframes abShade{from{transform:scaleX(1);opacity:1}to{transform:scaleX(.82) translateY(10px);opacity:.6}}
+/* телефон: полка — лента, которая листается пальцем вбок; следующий предмет выглядывает из-за края */
 @media (max-width:560px){
-  .ab-shelf{flex-wrap:wrap;row-gap:28px;--h:clamp(130px,38vw,190px)}
-  .ab-shelf .ab-piece{flex:0 0 calc(50% - 8px)}
-  .ab-solo{--h:clamp(220px,70vw,300px)}.ab-solo .ab-piece{flex-basis:100%}
+  .ab-shelf{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+    margin-inline:calc(var(--pad) * -1);padding:12px var(--pad) 24px;gap:12px;--h:clamp(150px,44vw,200px)}
+  .ab-shelf::-webkit-scrollbar{display:none}
+  .ab-shelf .ab-piece{flex:0 0 40%;scroll-snap-align:center}
+  .ab-solo{justify-content:center;--h:clamp(220px,64vw,280px)}.ab-solo .ab-piece{flex-basis:78%}
 }
 .ab-piece figcaption{font-size:16px;line-height:1.3;text-align:center;opacity:.75;text-wrap:balance;display:flex;flex-direction:column;align-items:center;gap:8px}
 /* двусторонняя медаль: при наведении или сама — оборот */
@@ -95,7 +98,12 @@
 .ab-wear{display:block;width:100%;aspect-ratio:1;padding:0;border-radius:var(--r-img);overflow:hidden;cursor:zoom-in;background:#1F2A44}
 .ab-wear img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
 .ab-wear:hover img{transform:scale(1.06)}
-@media (max-width:760px){.ab-wears-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* телефон: крупные планы — тоже лентой вбок */
+@media (max-width:760px){
+  .ab-wears-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad)}
+  .ab-wears-row::-webkit-scrollbar{display:none}
+  .ab-wears figure{flex:0 0 44%;scroll-snap-align:start}
+}
 
 /* ---------- три уровня: три медали рядом, при смене отделки поворачиваются ребром ---------- */
 .ab-trio{--h:clamp(170px,19vw,260px);perspective:1100px}
@@ -105,7 +113,13 @@
 .ab-trio .ab-coin img{transition:transform .26s cubic-bezier(.5,0,.9,.4)}
 .ab-trio figcaption{opacity:1;gap:4px;margin-top:8px}
 .ab-trio figcaption b{font-weight:500;font-size:clamp(18px,1.5vw,22px)}
-@media (max-width:560px){.ab-trio .ab-piece{flex-basis:calc(33% - 8px)}.ab-trio{flex-wrap:nowrap;--h:clamp(100px,28vw,150px)}}
+/* телефон: три уровня — списком, медаль слева, название и металл справа */
+@media (max-width:560px){
+  .ab-trio{flex-direction:column;align-items:stretch;overflow:visible;margin-inline:0;padding:0;gap:20px;--h:118px}
+  .ab-trio .ab-piece{flex:none;max-width:none;flex-direction:row;align-items:center;gap:18px}
+  .ab-trio .ab-coin{width:118px;flex:none}
+  .ab-trio figcaption{align-items:flex-start;text-align:left;margin:0}
+}
 
 /* ---------- чертеж: три вещи в масштабе на сетке; слева от границы — линии, справа — рендер ---------- */
 .ab-plan{--k:clamp(17px,2.5vw,36px);   /* сколько пикселей в сантиметре: вещи стоят в реальных пропорциях */
@@ -134,6 +148,14 @@
 .ab-dy b{writing-mode:vertical-rl;transform:rotate(180deg);padding:8px 4px 8px 6px}
 .drawn .ab-dim::before{transform:none}
 .drawn .ab-dim b{opacity:1}
+/* телефон: все три вещи в один ряд, масштаб мельче */
+@media (max-width:560px){
+  .ab-plan{--k:11.5px}
+  .ab-board{flex-wrap:nowrap;column-gap:16px}
+  .ab-dy{left:calc(100% + 8px)}
+  .ab-dx{top:calc(100% + 14px)}
+  .ab-part figcaption{margin-top:40px;white-space:nowrap}
+}
 .ab-plan > .ab-about{margin:clamp(28px,3vw,44px) auto 0;text-align:center;max-width:56ch}
 
 /* ---------- подставка: финальная крутится на витрине, три металла рядом ---------- */
@@ -148,6 +170,13 @@
 .ab-metals .ab-shelf{width:100%;--h:clamp(200px,24vw,380px)}
 .ab-metals .ab-coin::after{display:none}   /* у подставок без теней */
 @media (max-width:760px){.ab-stand{grid-template-columns:minmax(0,1fr)}.ab-metals .ab-shelf{--h:clamp(160px,44vw,260px)}}
+/* телефон: три подставки помещаются в один ряд, без ленты */
+@media (max-width:560px){
+  .ab-turn{min-height:0;padding:20px}.ab-turn img{height:clamp(240px,70vw,300px)}
+  .ab-metals{padding:20px 12px}
+  .ab-metals .ab-shelf{overflow:visible;margin-inline:0;padding:0;gap:8px;--h:clamp(130px,38vw,170px)}
+  .ab-metals .ab-piece{flex:1 1 0}
+}
 
 /* ---------- коробка ---------- */
 .ab-box{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(12px,1.6vw,24px)}
@@ -166,6 +195,7 @@
 @keyframes abSweep{0%{opacity:1;background-position:120% 0}100%{opacity:1;background-position:-20% 0}}
 .ab-foil .ab-tabs{margin-bottom:0}
 @media (max-width:760px){.ab-box{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.ab-lids{min-height:0}.ab-lid{width:min(70%,260px)}}
 
 /* ---------- витрина: лампа ходит за курсором, медали поворачиваются к свету ---------- */
 .ab-show{padding:clamp(28px,5vw,80px) clamp(16px,3vw,48px);cursor:crosshair}
