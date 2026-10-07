@@ -1,8 +1,7 @@
 /* ================================================================
    КЕЙС «МУЗЫКАЛЬНЫЙ КЛИП» (поле clip у проекта)
-   Песня и клип, сделанные нейросетями. Главы: история по ступеням
-   лестницы (кадр меняется с прокруткой), голос с диктофона
-   раскладывается на дорожки, 120 фотографий собираются в одно лицо,
+   Песня и клип, сделанные нейросетями. Главы: история — спуск по лестнице
+   (кадры сменяются сами), голос с диктофона и модель, 120 фотографий собираются в одно лицо,
    раскадровка по моделям, клип в одну цветную полоску, звонок
    из грядущего дня. Тексты и картинки — в content.js, оформление —
    clip.css. Волны и цвета посчитаны по настоящим файлам песни и клипа.
@@ -15,20 +14,18 @@ const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const onScreen = (el, cb, margin = '0px') =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: margin }).observe(el);
-// прогресс блока при прокрутке: 0 — только показался снизу, 1 — ушел вверх
-const progress = el => {
-  const r = el.getBoundingClientRect(), vh = innerHeight;
-  return clamp((vh - r.top) / (vh + r.height), 0, 1);
-};
-// подписка на прокрутку кейса (он листается внутри своего окна) и окна
-function onScroll(box, cb){
-  let raf = 0, seen = false;
-  const sc = box.closest('.case') || window;
-  const req = () => { if (seen && !raf) raf = requestAnimationFrame(() => { raf = 0; cb(); }); };
-  sc.addEventListener('scroll', req, { passive: true });
-  addEventListener('resize', req);
-  onScreen(box, v => { seen = v; req(); }, '200px 0px');
+// анимация по времени: f(0…1) за ms миллисекунд
+function tween(ms, f, done){
+  if (still()) { f(1); done && done(); return; }
+  const t0 = performance.now();
+  const step = now => { const k = clamp((now - t0) / ms, 0, 1); f(k); if (k < 1) requestAnimationFrame(step); else done && done(); };
+  requestAnimationFrame(step);
 }
+// один раз, когда блок впервые показался на экране
+const onceSeen = (el, cb) => {
+  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); cb(); } }, { rootMargin: '0px 0px -20% 0px' });
+  io.observe(el);
+};
 const zoom = (list, el) => {
   const imgs = list.map(b => b.querySelector('img'));
   H.openViewer(imgs.map(i => i.currentSrc || i.src), list.indexOf(el), imgs);
@@ -53,49 +50,53 @@ const BAR = '3a3a3a 444444 535353 484848 3a3a3a 444444 474747 5b5b5b 363636 684f
 // цвета моделей в раскадровке
 const MODEL = ['#2F6BFF', '#2FA36B', '#A46BFF', '#E0559A', '#17A9BD'];
 
-/* ---------- история: ступени лестницы, кадр меняется с прокруткой ---------- */
+/* ---------- история: спуск по лестнице, кадры сменяются сами ---------- */
 function worldsHTML(c){
-  return `<div class="cl-worlds" style="--n:${c.items.length}">
-    <div class="cl-w-pin">
-      <div class="cl-w-left">
-        <div class="cl-w-frame">${c.items.map((x, i) =>
-          `<img src="${x.img}" alt="" draggable="false"${i ? ' loading="lazy"' : ' class="on"'}>`).join('')}</div>
-        <div class="cl-w-texts">${c.items.map((x, i) =>
-          `<p class="cl-w-text${i ? '' : ' on'}"><b>${H.T(x.name)}</b> ${H.T(x.text)}</p>`).join('')}</div>
-      </div>
-      <ol class="cl-steps" aria-hidden="true">${c.items.map((x, i) =>
-        `<li style="--i:${i};--sw:#${BAR[Math.min(BAR.length - 1, x.t)]}"${i ? '' : ' class="on"'}><i></i><span>${H.T(x.name)}</span></li>`).join('')}</ol>
+  const n = c.items.length;
+  return `<div class="cl-worlds" style="--n:${n}">
+    <div class="cl-w-frame">${c.items.map((x, i) => x.imgs.map((src, j) =>
+      `<img src="${src}" alt="" draggable="false" data-k="${i}"${i || j ? ' loading="lazy"' : ' class="on"'}>`).join('')).join('')}
+      <p class="cl-w-deep">${H.T(c.deep || '')}</p>
     </div>
-  </div>${cap(c.hint)}`;
+    <ol class="cl-stairs">${c.items.map((x, i) =>
+      `<li style="--i:${i}"${x.deep ? ' data-deep' : ''}${i ? '' : ' class="on"'}><button><span class="cl-st-name">${H.T(x.name)}</span><i class="cl-st-bar"><b></b></i></button></li>`).join('')}</ol>
+    <div class="cl-w-texts">${c.items.map((x, i) =>
+      `<p class="cl-w-text${i ? '' : ' on'}"><b>${H.T(x.name)}</b> ${H.T(x.text)}</p>`).join('')}</div>
+  </div>`;
 }
 function liveWorlds(box){
-  const pin = box.querySelector('.cl-w-pin');
+  const w = box.querySelector('.cl-worlds');
   const imgs = [...box.querySelectorAll('.cl-w-frame img')];
-  const texts = [...box.querySelectorAll('.cl-w-text')];
-  const steps = [...box.querySelectorAll('.cl-steps li')];
-  const n = imgs.length;
-  let cur = 0;
-  const show = k => {
-    if (k === cur) return; cur = k;
-    [imgs, texts, steps].forEach(list => list.forEach((el, i) => el.classList.toggle('on', i === k)));
-    steps.forEach((el, i) => el.classList.toggle('past', i < k));
+  const steps = [...box.querySelectorAll('.cl-stairs li')], texts = [...box.querySelectorAll('.cl-w-text')];
+  const n = steps.length, SHOT = 1500;   // кадр держится полторы секунды — спуск быстрый
+  const shots = steps.map((_, i) => imgs.filter(im => +im.dataset.k === i));
+  let k = 0, j = 0, held = false, seen = false, timer = 0;
+  const show = () => {
+    imgs.forEach(im => im.classList.remove('on'));
+    shots[k][j].classList.add('on');
+    steps.forEach((li, i) => { li.classList.toggle('on', i === k); li.classList.toggle('past', i < k); });
+    texts.forEach((p, i) => p.classList.toggle('on', i === k));
+    w.style.setProperty('--k', k);
+    w.classList.toggle('deep', steps[k].hasAttribute('data-deep'));   // в самой глубине — подпись про темноту
+    // полоска под ступенью заполняется, пока идут ее кадры
+    const bar = steps[k].querySelector('b');
+    bar.style.transition = 'none'; bar.style.width = (j / shots[k].length * 100) + '%';
+    requestAnimationFrame(() => { bar.style.transition = `width ${SHOT}ms linear`; bar.style.width = ((j + 1) / shots[k].length * 100) + '%'; });
   };
-  // ступень — по тому, сколько пролистано, пока кадр приколот
-  const upd = () => {
-    const r = box.getBoundingClientRect(), top = parseFloat(getComputedStyle(pin).top) || 0;
-    const travel = Math.max(1, r.height - pin.offsetHeight);
-    const p = clamp((top - r.top) / travel, 0, .9999);
-    show(Math.floor(p * n));
+  const next = () => {
+    if (++j >= shots[k].length) { j = 0; k = (k + 1) % n; }
+    show();
   };
-  // нажатие на ступень — прокрутка к ней
-  steps.forEach((li, i) => li.addEventListener('click', () => {
-    const sc = box.closest('.case'), r = box.getBoundingClientRect();
-    const travel = r.height - pin.offsetHeight, top = parseFloat(getComputedStyle(pin).top) || 0;
-    const dy = r.top - top + travel * (i + .5) / n;
-    (sc || window).scrollBy({ top: dy, behavior: still() ? 'auto' : 'smooth' });
-  }));
-  upd();
-  onScroll(box, upd);
+  const run = () => { clearInterval(timer); if (seen && !held && !still()) timer = setInterval(next, SHOT); };
+  // наведение на ступень — сразу к ней, спуск ждет
+  steps.forEach((li, i) => {
+    const go = () => { k = i; j = 0; show(); };
+    li.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { held = true; go(); run(); } });
+    li.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { held = false; run(); } });
+    li.addEventListener('click', () => { go(); run(); });
+  });
+  show();
+  onScreen(w, v => { seen = v; run(); });
 }
 
 /* ---------- голос: диктофон раскладывается на дорожки ---------- */
@@ -125,14 +126,10 @@ function voiceHTML(c){
   return `<div class="cl-voice">${c.steps.map(row).join('')}</div>${cap(c.hint)}`;
 }
 function liveVoice(box){
-  const rows = [...box.querySelectorAll('.cl-vrow')], n = rows.length;
-  const upd = () => {
-    const p = still() ? 1 : clamp(progress(box) * 2.4 - .45, 0, 1);
-    // шаги проявляются по очереди, сверху вниз: следующий начинается, когда предыдущий почти готов
-    rows.forEach((r, i) => r.style.setProperty('--q', clamp(p * n - i * .85, 0, 1).toFixed(3)));
-  };
-  upd();
-  onScroll(box, upd);
+  const rows = [...box.querySelectorAll('.cl-vrow')];
+  // шаги проявляются по очереди, когда глава показалась на экране
+  onceSeen(box.querySelector('.cl-voice'), () => rows.forEach((r, i) =>
+    setTimeout(() => tween(1100, q => r.style.setProperty('--q', (1 - Math.pow(1 - q, 2)).toFixed(3))), i * 900)));
 }
 
 /* ---------- лицо: 120 фотографий собираются в одно ---------- */
@@ -159,14 +156,9 @@ function liveFace(box){
   const mos = box.querySelector('.cl-mosaic');
   const shots = [...box.querySelectorAll('.cl-shot')];
   box.addEventListener('click', e => { const b = e.target.closest('.cl-shot'); if (b) zoom(shots, b); });
-  const upd = () => {
-    const p = still() ? 1 : clamp(progress(mos) * 2.6 - .3, 0, 1);
-    const e = 1 - Math.pow(1 - p, 3);
-    mos.style.setProperty('--p', e.toFixed(3));
-    box.classList.toggle('done', p > .97);
-  };
-  upd();
-  onScroll(box, upd);
+  // клетки слетаются в лицо сами, когда мозаика показалась на экране
+  onceSeen(mos, () => tween(2800, p => mos.style.setProperty('--p', (1 - Math.pow(1 - p, 3)).toFixed(3)),
+    () => box.classList.add('done')));
 }
 
 /* ---------- раскадровка: все 24 кадра по очереди, как дорожка в монтажке ---------- */
@@ -324,24 +316,39 @@ function liveCall(box){
   onScreen(call, v => call.classList.toggle('ring', v && !still()));
 }
 
-/* ---------- кадры: лента едет с прокруткой, на телефоне листается пальцем ---------- */
+/* ---------- кадры: лента едет сама, наведение ее останавливает, можно листать ---------- */
 function filmHTML(c){
-  return `<div class="cl-film"><div class="cl-strip">${c.items.map(src =>
-    `<button class="cl-shot" aria-label="Увеличить кадр"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div></div>${cap(c.hint)}`;
+  const shots = c.items.map(src =>
+    `<button class="cl-shot" aria-label="Увеличить кадр"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('');
+  return `<div class="cl-film"><div class="cl-strip">${shots}${shots.replace(/<button class="cl-shot"/g, '<button class="cl-shot" tabindex="-1" aria-hidden="true"')}</div></div>${cap(c.hint)}`;
 }
 function liveFilm(box){
-  const strip = box.querySelector('.cl-strip'), shots = [...box.querySelectorAll('.cl-shot')];
-  box.addEventListener('click', e => { const b = e.target.closest('.cl-shot'); if (b) zoom(shots, b); });
-  const wide = matchMedia('(hover: hover) and (min-width: 761px)');
-  const upd = () => {
-    if (!wide.matches) { strip.style.transform = ''; return; }
-    const p = still() ? 0 : progress(box);
-    const range = Math.max(0, strip.scrollWidth - box.clientWidth);
-    strip.style.transform = `translate3d(${(-range * clamp(p * 1.25 - .1, 0, 1)).toFixed(1)}px,0,0)`;
+  const film = box.querySelector('.cl-film'), strip = box.querySelector('.cl-strip');
+  const shots = [...box.querySelectorAll('.cl-shot')].slice(0, strip.children.length / 2);
+  box.addEventListener('click', e => {
+    const b = e.target.closest('.cl-shot'); if (!b) return;
+    const all = [...strip.children], i = all.indexOf(b) % shots.length;
+    zoom(shots, shots[i]);
+  });
+  if (still()) return;
+  let held = false, raf = 0, seen = false, last = 0, x = 0;
+  film.addEventListener('pointerenter', () => { held = true; });
+  film.addEventListener('pointerleave', () => { held = false; x = film.scrollLeft; });
+  film.addEventListener('touchstart', () => { held = true; }, { passive: true });
+  film.addEventListener('touchend', () => setTimeout(() => { held = false; x = film.scrollLeft; }, 2500), { passive: true });
+  const draw = t => {
+    const dt = Math.min(64, t - (last || t)); last = t;
+    if (!held) {
+      const half = strip.scrollWidth / 2;
+      x += dt * .03; if (x >= half) x -= half;
+      film.scrollLeft = x;
+    }
+    if (seen) raf = requestAnimationFrame(draw);
   };
-  upd();
-  box.querySelectorAll('img').forEach(i => i.addEventListener('load', upd, { once: true }));
-  onScroll(box, upd);
+  onScreen(film, v => {
+    if (v && !seen) { seen = true; last = 0; raf = requestAnimationFrame(draw); }
+    else if (!v) { seen = false; cancelAnimationFrame(raf); }
+  });
 }
 
 const KINDS = {

@@ -90,7 +90,7 @@ function boardHTML(c){
     <p class="ac-line" aria-live="polite"></p>
     <div class="ac-reel">${c.frames.map((f, i) =>
       `<button class="ac-thumb" data-i="${i}" aria-label="${f.text.replace(/"/g, '&quot;')}"><img src="${f.img}" alt="" loading="lazy" draggable="false"><i></i></button>`).join('')}</div>
-    ${cap(c.hint)}
+    ${cap(c.touchHint && matchMedia('(hover: none)').matches ? c.touchHint : c.hint)}
   </div>`;
 }
 function liveBoard(box, c){
@@ -141,7 +141,9 @@ function liveBoard(box, c){
     btn.setAttribute('aria-label', v ? 'Смотреть' : 'Пауза');
     box.classList.toggle('paused', v);
   };
-  btn.addEventListener('click', () => setPaused(!paused));
+  btn.addEventListener('click', e => { e.stopPropagation(); setPaused(!paused); });
+  // на телефоне и планшете наведения нет: пауза — нажатием на кадр
+  scr.addEventListener('click', e => { if (e.pointerType !== 'mouse') setPaused(!paused); });
   scr.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { hover = true; box.classList.add('hold'); } });
   scr.addEventListener('pointerleave', () => { hover = false; box.classList.remove('hold'); });
   reel.addEventListener('click', e => {
@@ -166,7 +168,7 @@ function buildHTML(c, ch){
       <div class="ac-says">${c.steps.map((s, i) => `<p class="ac-say" data-i="${i}">${H.T(s.text)}</p>`).join('')}</div>
     </div>
     ${c.steps.map((s, i) => { const [x, y, w, r] = SPOTS[i % SPOTS.length];
-      return `<button class="ac-fly" data-i="${i}" style="--x:${x}%;--y:${y}%;--w:${w}%;--r:${r}deg;--d:${(i * -1.7).toFixed(1)}s" aria-label="Увеличить"><span><img src="${s.img}" alt="" loading="lazy" draggable="false"></span></button>`; }).join('')}
+      return `<button class="ac-fly" data-i="${i}" style="--x:${x}%;--y:${y}%;--w:${w}%;--r:${r}deg;--d:${(i * -1.7).toFixed(1)}s" aria-label="Увеличить"><span><img src="${s.img}" alt="" loading="lazy" draggable="false"></span><em class="ac-fly-cap">${H.T(s.text)}</em></button>`; }).join('')}
   </div>${cap(c.hint)}`;
 }
 function liveBuild(box){

@@ -52,6 +52,7 @@
 .ac-screen:hover .ac-play,.ac-board.paused .ac-play,.ac-play:focus-visible{opacity:1}
 .ac-play:hover{transform:scale(1.06)}
 @media (hover:none){.ac-play{opacity:1}}
+@media (max-width:760px){.ac-play{width:40px;height:40px}.ac-play svg{width:18px;height:18px}.ac-line{min-height:0}}
 
 .ac-line{min-height:2.8em;margin-top:clamp(16px,2vw,24px);font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:46ch;text-wrap:balance}
 .ac-line.in{animation:acLine .6s var(--ease) both}
@@ -86,12 +87,26 @@
 .ac-fly.on span{animation:none;box-shadow:0 2px 4px rgba(0,0,0,.1),0 28px 56px -18px rgba(0,0,0,.45);transform:rotate(0) scale(1.06)}
 .ac-build.pick .ac-fly:not(.on){opacity:.55}
 .ac-fly{transition:transform .9s var(--ease),opacity .35s var(--ease)}
+.ac-fly-cap{display:none}
+/* планшет и телефон: эскизы сеткой, у каждого своя подпись — список в центре не нужен */
 @media (max-width:900px){
-  .ac-build{min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,3vw,24px)}
-  .ac-mid{grid-column:1 / -1;width:auto;padding-top:0;margin-bottom:12px}
-  .ac-fly{position:static;width:auto;transform:none}
+  .ac-build{min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,40px) clamp(16px,3vw,28px);align-items:start}
+  .ac-mid{grid-column:1 / -1;width:auto;padding-top:0}
+  .ac-says{display:none}
+  .ac-fly{position:static;width:auto;transform:none;text-align:left;cursor:zoom-in}
+  .ac-fly span{transform:rotate(calc(var(--r) * .5))}
+  .ac-fly-cap{display:block;margin-top:14px;font-style:normal;font-size:16px;line-height:1.45;opacity:.7}
   .ac-fly:nth-of-type(5){grid-column:1 / -1;width:70%;justify-self:center}
 }
+@media (max-width:600px){
+  .ac-build{grid-template-columns:1fr}
+  /* эскизы чуть вразнобой, как разложенные листы; высокий план — уже */
+  .ac-fly,.ac-fly:nth-of-type(5){width:88%;justify-self:start}
+  .ac-fly:nth-of-type(even){justify-self:end}
+  .ac-fly:nth-of-type(2){width:62%}
+}
+@keyframes acFloatS{0%,100%{transform:translateY(0) rotate(calc(var(--r) * .5))}50%{transform:translateY(-8px) rotate(calc(var(--r) * -.3))}}
+@media (max-width:900px){.ac-fly span{animation-name:acFloatS}}
 
 /* ---------- свет: сценарии друг за другом ---------- */
 .ac-mode-block+.ac-mode-block{margin-top:clamp(56px,7vw,104px)}
