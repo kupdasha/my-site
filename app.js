@@ -2419,6 +2419,8 @@ function renderCase(k, keepScroll){
   if (p.suit) body += `<div class="su su-mount"></div>`;
   // ventures — The Ventures Japan: живой принт в шапке (плитки с сакурой тают к середине), плитка, съемка, Токио; рисует ventures.js
   if (p.ventures) body += `<div class="vn vn-mount"></div>`;
+  // vector — векторизатор: из Иллюстратора остается одна функция, лупа растр/вектор, пять шагов трассировки, регулятор точек, генерация; рисует vector.js
+  if (p.vector) body += `<div class="vc vc-mount"></div>`;
   // navi — студия дизайна навигации: 3D-ролик кодом в шапке, конструктор таблички, 3D-кампус для студии и заказчика; рисует navi.js
   if (p.navi) body += `<div class="nv nv-mount"></div>`;
   // презентация — в самом конце, перед ссылками
@@ -2521,6 +2523,10 @@ function renderCase(k, keepScroll){
   if (vn) import(SCRIPT_BASE + 'ventures.js?v=' + VER)
     .then(m => m.mountVentures(vn, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс The Ventures Japan не загрузился', err));
+  const vc = caseContent.querySelector('.vc-mount');
+  if (vc) import(SCRIPT_BASE + 'vector.js?v=' + VER)
+    .then(m => m.mountVector(vc, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс векторизатора не загрузился', err));
   const nv = caseContent.querySelector('.nv-mount');
   if (nv) import(SCRIPT_BASE + 'navi.js?v=' + VER)
     .then(m => m.mountNavi(nv, p, { T, pick, openViewer, base: SCRIPT_BASE }))
