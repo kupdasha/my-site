@@ -2506,6 +2506,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         links: [],
       },
       {
+        other: true,   // показывается внизу, в «других работах»
         cat:   'мерч',
         title: 'The Ventures Japan',
         year:  '2026',
@@ -2529,7 +2530,6 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       },
       {
         other: true,   // показывается внизу, в «других работах»
-        promote: ['мерч'],   // но в категории «мерч» — крупной карточкой в сетке
         cat:   'мерч',
         title: 'AR мерч',
         tag:   'AR',
