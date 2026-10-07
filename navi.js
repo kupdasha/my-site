@@ -3,11 +3,13 @@
    В шапке — микроанимация: камера по кругу пролетает над 3D-кампусом
    Бауманки (свой маленький рендерер на холсте), метки носителей
    в цветах статусов.
-   Главы: build — конструктор таблички: текст → макет, цвет плиты
-   и текста из красок RAL, сверка с техзаданием на лету;
+   Главы: build — конструктор таблички на один экран: строки и стрелки
+   (стрелку можно повернуть, сверка скажет, если она спорит с маршрутом),
+   цвет плиты и текста из красок RAL, сверка с техзаданием на лету;
    campus — 3D-кампус: тянуть — поворот, метка — табличка в панели,
-   «подойти к табличке», переключатель «студия / заказчик»
-   (замечание заказчика сразу видно в студии);
+   «подойти к табличке»; «студия» — рабочий проект, таблички правятся,
+   «заказчик» — только точки-замечания на табличке и «согласовать»,
+   замечания сразу видны в студии;
    rec — запись экрана настоящей студии (Kinescope), у заголовка —
    зеленая кнопка демо (поле demo у главы).
    Данные кампуса, графа дорожек и правила типов носителей —
@@ -463,9 +465,10 @@ function liveFly(stage){
 }
 
 /* ================================================================
-   ГЛАВА build: конструктор таблички — текст, цвет, сверка с ТЗ
+   ГЛАВА build: конструктор таблички — текст, стрелки, цвет, сверка с ТЗ
+   Вся глава — на один экран: слева макет и сверка, справа заголовок и поля.
    ================================================================ */
-const START = { D2: 'Библиотека\nСпортзал\nСтоловая\nУЛК', B1: '6 Корпус Т', T1: 'Столовая' };
+const START = { D2: ['Библиотека', 'Спортзал', 'Столовая', 'УЛК'], B1: '6 Корпус Т', T1: 'Столовая' };
 const FROM = 'guk_sq';   // указатель стоит на площади у главного корпуса
 const findObj = s => {
   const q = s.trim().toLowerCase().replace(/ё/g, 'е');
@@ -473,91 +476,143 @@ const findObj = s => {
   const n = x => x.toLowerCase().replace(/ё/g, 'е');
   return OBJECTS.find(o => n(o.ru) === q || n(o.name) === q) || OBJECTS.find(o => q.length > 2 && (n(o.ru).startsWith(q) || n(o.name).startsWith(q)));
 };
-function buildHTML(c){
-  const sw = (list, kind) => list.map((r, i) => `<button class="nv-swatch${i ? '' : ' on'}" data-kind="${kind}" data-ral="${r}" style="--c:${RAL[r][1]}" aria-label="${RAL[r][2]}, ${r.replace('RAL', 'RAL ')}"><i></i><span>${r.replace('RAL', 'RAL ')}</span></button>`).join('');
+const ICON = {
+  del: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  add: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  none: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg>',
+};
+const arrowIcon = a => a ? `<svg viewBox="0 0 100 100" style="transform:rotate(${ARROW_DEG[a]}deg)" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M50 88V16"/><path d="M24 42L50 14L76 42"/></g></svg>` : ICON.none;
+function buildHTML(c, headHTML){
+  const sw = (list, kind) => list.map((r, i) => `<button class="nv-swatch${i ? '' : ' on'}" data-kind="${kind}" data-ral="${r}" style="--c:${RAL[r][1]}" aria-label="${RAL[r][2]}, ${r.replace('RAL', 'RAL ')}" title="${r.replace('RAL', 'RAL ')}, ${RAL[r][2]}"><i></i></button>`).join('');
   return `<div class="nv-build">
-    <div class="nv-build-plate"><div class="nv-plate-box"></div><p class="nv-plate-cap"></p></div>
-    <div class="nv-build-side">
-      <div class="nv-bar-btns">${c.types.map((t, i) => `<button class="btn btn-line nv-type${i ? '' : ' on'}" data-t="${['D2', 'B1', 'T1'][i]}"><span class="spell">${H.T(t)}</span></button>`).join('')}</div>
-      <label class="nv-field"><span class="nv-mini-label">${H.T(c.field)}</span>
-        <textarea class="nv-input" rows="4" spellcheck="false">${START.D2}</textarea>
-        <span class="nv-hint">${H.T(c.hint)}</span></label>
-      <div class="nv-colors">
-        <div class="nv-swatches"><span class="nv-mini-label">${H.T(c.plate)}</span><div>${sw(PLATES, 'plate')}</div></div>
-        <div class="nv-swatches"><span class="nv-mini-label">${H.T(c.ink)}</span><div>${sw(INKS, 'ink')}</div></div>
-        <p class="nv-gost">${H.T(c.gost)}</p>
+    <div class="nv-build-plate">
+      <div class="nv-bar-btns nv-types">${c.types.map((t, i) => `<button class="btn btn-line nv-type${i ? '' : ' on'}" data-t="${['D2', 'B1', 'T1'][i]}"><span class="spell">${H.T(t)}</span></button>`).join('')}</div>
+      <div class="nv-plate-row">
+        <div class="nv-plate-box"></div>
+        <div class="nv-plate-side">
+          <div class="nv-colors">
+            <div class="nv-swatches"><span class="nv-mini-label">${H.T(c.plate)}</span><div>${sw(PLATES, 'plate')}</div></div>
+            <div class="nv-swatches"><span class="nv-mini-label">${H.T(c.ink)}</span><div>${sw(INKS, 'ink')}</div></div>
+            <p class="nv-gost">${H.T(c.gost)}</p>
+          </div>
+          <div><span class="nv-mini-label">${H.T(c.checks)}</span><ul class="nv-list"></ul></div>
+          <p class="nv-plate-cap"></p>
+        </div>
       </div>
-      <div class="nv-checks-box"><span class="nv-mini-label">${H.T(c.checks)}</span><ul class="nv-list"></ul></div>
+    </div>
+    <div class="nv-build-side">
+      ${headHTML}
+      <div class="nv-field"><span class="nv-mini-label nv-field-label"></span><div class="nv-rows"></div></div>
     </div>
   </div>`;
 }
 function liveBuild(box, c){
-  const area = box.querySelector('.nv-input'), plateBox = box.querySelector('.nv-plate-box'), list = box.querySelector('.nv-list');
-  const colors = box.querySelector('.nv-colors'), hint = box.querySelector('.nv-hint'), plateCap = box.querySelector('.nv-plate-cap');
-  const st = { type: 'D2', plate: 'RAL9004', ink: 'RAL9016', text: { ...START } };
+  const plateBox = box.querySelector('.nv-plate-box'), list = box.querySelector('.nv-list'), rowsBox = box.querySelector('.nv-rows');
+  const colors = box.querySelector('.nv-colors'), plateCap = box.querySelector('.nv-plate-cap'), fieldLabel = box.querySelector('.nv-field-label');
+  // строки указателя: текст и стрелка; ar: null — стрелка по маршруту, иначе — поставлена вручную
+  const st = { type: 'D2', plate: 'RAL9004', ink: 'RAL9016', rows: START.D2.map(t => ({ t, ar: null })), one: { B1: START.B1, T1: START.T1 } };
+  const autoOf = t => { const o = findObj(t); return o ? route(FROM, o) : { ar: null, dist: '' }; };
+  function rowsHTML(){
+    if (st.type !== 'D2') return `<div class="nv-row"><input class="nv-line" value="${esc(st.one[st.type])}" aria-label="${esc(H.pick(c.field))}"></div>`;
+    return st.rows.map((r, i) => `<div class="nv-row" data-i="${i}">
+      <button class="nv-arrow" data-i="${i}" aria-label="${esc(H.pick(c.turn))}" title="${esc(H.pick(c.turn))}"></button>
+      <input class="nv-line" data-i="${i}" value="${esc(r.t)}" aria-label="${esc(H.pick(c.field))}">
+      <button class="nv-del" data-i="${i}" aria-label="${esc(H.pick(c.del))}">${ICON.del}</button></div>`).join('')
+      + (st.rows.length < 6 ? `<button class="nv-add">${ICON.add}<span>${H.T(c.add)}</span></button>` : '');
+  }
+  function drawRows(){
+    rowsBox.innerHTML = rowsHTML();
+    fieldLabel.innerHTML = H.T(st.type === 'D2' ? c.field : st.type === 'B1' ? c.fieldB : c.fieldT);
+    render();
+  }
   function render(){
     const t = TYPES[st.type], tac = t.kind === 'tactile';
-    const lines = area.value.split('\n').map(s => s.trim()).filter(Boolean);
-    let items, unknown = [], checks = [];
+    let items, unknown = [], wrong = [];
     if (st.type === 'D2') {
-      items = lines.map(l => { const o = findObj(l); if (!o) unknown.push(l); return o ? { ru: l, en: o.en, ...route(FROM, o) } : { ru: l, en: '', ar: null, dist: '' }; });
+      const rows = st.rows.filter(r => r.t.trim());
+      items = rows.map(r => {
+        const o = findObj(r.t), auto = o ? route(FROM, o) : { ar: null, dist: '' };
+        if (!o) unknown.push(r.t.trim());
+        if (r.ar && o && auto.ar && r.ar !== auto.ar) wrong.push([r.t.trim(), auto.ar]);
+        return { ru: r.t.trim(), en: o ? o.en : '', ar: r.ar || auto.ar, dist: auto.dist };
+      });
+      // стрелки у полей
+      rowsBox.querySelectorAll('.nv-arrow').forEach(b => {
+        const r = st.rows[+b.dataset.i], auto = autoOf(r.t).ar, a = r.ar || auto;
+        b.innerHTML = arrowIcon(a);
+        b.classList.toggle('manual', !!r.ar);
+        b.classList.toggle('bad', !!(r.ar && auto && r.ar !== auto));
+      });
     } else {
-      const m = /^(\d{1,3})\s+(.+)$/.exec(lines[0] || ''), ru = m ? m[2] : lines[0] || '', o = findObj(ru);
+      const line = st.one[st.type].trim(), m = /^(\d{1,3})\s+(.+)$/.exec(line), ru = m ? m[2] : line, o = findObj(ru);
       items = ru ? [{ ru, en: o ? o.en : '', no: st.type === 'B1' ? (m ? m[1] : o ? o.no : '') : '' }] : [];
     }
     const p = prep(st.type, items);
-    // макет в рамке: высота рамки — по колонке, ширина — по пропорциям плиты
-    // на телефоне макет ниже, чтобы рядом было видно поле с текстом
-    const bw = plateBox.clientWidth || 300, bh = innerWidth < 860 ? innerHeight * .42 : Math.min(innerHeight * .7, 620);
-    plateBox.innerHTML = art(p, bw, tac ? bh * .6 : bh, RAL[st.plate][1], RAL[st.ink][1]);
-    plateCap.innerHTML = H.T(t.name) + `, <span class="nv-nw">${t.width}\u00a0×\u00a0${t.height}\u00a0мм</span>`;
+    // макет по высоте панели: указатель — в полную высоту, табличка здания и тактильная — меньше
+    const bh = plateBox.clientHeight || 480, bw = plateBox.clientWidth || 260;
+    plateBox.innerHTML = art(p, bw, bh * (tac ? .5 : st.type === 'B1' ? .62 : 1), RAL[st.plate][1], RAL[st.ink][1]);
+    plateCap.innerHTML = H.T(t.name) + `, <span class="nv-nw">${t.width} × ${t.height} мм</span>`;
     // сверка с техзаданием
-    const contrast = tac ? contrastOf('RAL1023', 'RAL9004') : contrastOf(st.plate, st.ink);
+    const contrast = tac ? contrastOf('RAL1023', 'RAL9004') : contrastOf(st.plate, st.ink), checks = [];
     if (!items.length) checks.push([false, 'Пока пусто — напишите, что должно быть на носителе']);
     checks.push([true, tac ? `Высота букв ${p.xh} мм — по ГОСТу для тактильных табличек` : `Высота строчных ${p.xh} мм — читается с ${t.dist} метров`]);
-    if (st.type === 'D2') checks.push([items.length <= t.maxMsg, items.length <= t.maxMsg
-      ? `Направлений: ${items.length} из ${t.maxMsg}` : `${items.length} направлений при лимите ${t.maxMsg} — разделите развилку на два указателя`]);
-    else if (lines.length > 1) checks.push([false, 'На табличке здания — одно название, остальные строки не попадут на плиту']);
+    if (st.type === 'D2') checks.push([items.length <= t.maxMsg, items.length <= t.maxMsg ? `Направлений: ${items.length} из ${t.maxMsg}` : `${items.length} направлений при лимите ${t.maxMsg} — разделите развилку на два указателя`]);
     const over = p.ms.filter(m => m.fr.over);
     checks.push([!over.length, over.length ? `«${over[0].fr.lines[0]}» не помещается — сократите название или возьмите носитель крупнее` : 'Текст помещается на плите']);
     unknown.forEach(u => checks.push([false, `«${u}» нет на плане — стрелку и расстояние не посчитать`]));
-    if (st.type === 'D2' && items.length && !unknown.length) checks.push([true, 'Стрелки и расстояния посчитаны по дорожкам']);
+    wrong.forEach(([u, a]) => checks.push([false, `Стрелка к «${u}» не совпадает с маршрутом: по дорожкам ${ARROW_CH[a]}`]));
+    if (st.type === 'D2' && items.length && !unknown.length && !wrong.length) checks.push([true, 'Стрелки совпадают с маршрутом по дорожкам']);
     checks.push([contrast >= CFG.contrastMin, `Контраст ${contrast} при норме ${CFG.contrastMin}`]);
     list.innerHTML = checks.map(([ok, txt]) => `<li class="${ok ? 'ok' : 'bad'}"><span class="nv-ic">${okIcon(ok)}</span><span>${H.T(txt)}</span></li>`).join('');
     colors.classList.toggle('tac', tac);
-    hint.innerHTML = H.T(st.type === 'D2' ? c.hint : st.type === 'B1' ? 'Номер корпуса и название через пробел' : 'Название помещения или здания');
   }
-  box.querySelectorAll('.nv-type').forEach(b => b.addEventListener('click', () => {
-    st.text[st.type] = area.value;
-    st.type = b.dataset.t;
-    area.value = st.text[st.type];
-    area.rows = st.type === 'D2' ? 4 : 2;
-    box.querySelectorAll('.nv-type').forEach(x => x.classList.toggle('on', x === b));
+  rowsBox.addEventListener('input', e => {
+    const i = e.target.dataset.i;
+    if (st.type === 'D2') st.rows[+i].t = e.target.value; else st.one[st.type] = e.target.value;
     render();
+  });
+  rowsBox.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.classList.contains('nv-arrow')) {
+      // нажатие поворачивает стрелку на 45° по часовой; полный круг до маршрута — снова «по маршруту»
+      const r = st.rows[+b.dataset.i], auto = autoOf(r.t).ar, cur = r.ar || auto || 'left';
+      const next = ARROWS[(ARROWS.indexOf(cur) + 1) % 8];
+      r.ar = next === auto ? null : next;
+      render();
+    } else if (b.classList.contains('nv-del')) { st.rows.splice(+b.dataset.i, 1); drawRows(); }
+    else if (b.classList.contains('nv-add')) { st.rows.push({ t: '', ar: null }); drawRows(); rowsBox.querySelectorAll('.nv-line')[st.rows.length - 1].focus(); }
+  });
+  box.querySelectorAll('.nv-type').forEach(b => b.addEventListener('click', () => {
+    st.type = b.dataset.t;
+    box.querySelectorAll('.nv-type').forEach(x => x.classList.toggle('on', x === b));
+    drawRows();
   }));
   box.querySelectorAll('.nv-swatch').forEach(b => b.addEventListener('click', () => {
     st[b.dataset.kind] = b.dataset.ral;
     box.querySelectorAll(`.nv-swatch[data-kind="${b.dataset.kind}"]`).forEach(x => x.classList.toggle('on', x === b));
     render();
   }));
-  area.addEventListener('input', render);
   new ResizeObserver(render).observe(plateBox);
-  render();
+  drawRows();
 }
 
 /* ================================================================
-   ГЛАВА campus: 3D-кампус, студия и заказчик на одной карте
+   ГЛАВА campus: одна карта, две роли.
+   Студия — рабочий проект: таблички правятся прямо на карте, видны
+   требования ТЗ и замечания заказчика. Заказчик — только смотрит:
+   ставит точку на табличке и пишет замечание, может согласовать.
    ================================================================ */
 function campusHTML(c){
   return `<div class="nv-campus">
     <div class="nv-scene">
       <canvas class="nv-cv"></canvas>
       <div class="nv-face" aria-hidden="true"></div>
+      <p class="nv-scene-hint"></p>
       <div class="nv-zoom">
-        <button class="nv-round nv-near" aria-label="${esc(H.pick(c.near))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+        <button class="nv-round nv-near" aria-label="${esc(H.pick(c.near))}">${ICON.add}</button>
         <button class="nv-round nv-far" aria-label="${esc(H.pick(c.far))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       </div>
-      <p class="nv-scene-hint">${H.T(c.hint)}</p>
     </div>
     <aside class="nv-side">
       <div class="nv-bar-btns nv-modes">${c.modes.map((m, i) => `<button class="btn btn-line nv-mode${i ? '' : ' on'}" data-m="${i ? 'client' : 'studio'}"><span class="spell">${H.T(m)}</span></button>`).join('')}</div>
@@ -570,12 +625,22 @@ function campusHTML(c){
   </div>`;
 }
 function liveCampus(box, c){
-  const cv = box.querySelector('.nv-cv'), panel = box.querySelector('.nv-panel'), go = box.querySelector('.nv-go');
+  const cv = box.querySelector('.nv-cv'), panel = box.querySelector('.nv-panel'), go = box.querySelector('.nv-go'), hint = box.querySelector('.nv-scene-hint');
   const HOME = { yaw: .46, pitch: .7, dist: 680, tx: 0, ty: -20, tz: 0 };
   const cam = { ...HOME };
-  const st = { mode: 'studio', sel: D2().id, status: {}, notes: {}, close: false, writing: false };
+  // texts — правки студии (строки таблички), notes — замечания заказчика [{x, y, t, done}], status — ok у согласованных
+  const st = { mode: 'studio', sel: D2().id, texts: {}, notes: {}, status: {}, close: false, pin: null };
   let hits = [], anim = 0, raf = 0;
   const board = () => BOARDS.find(b => b.id === st.sel);
+  const open = id => (st.notes[id] || []).filter(n => !n.done);
+  // макет с правками студии
+  function prepEdited(b){
+    const tx = st.texts[b.id];
+    if (!tx) return prepBoard(b);
+    if (b.type === 'D2') return prep('D2', b.msgs.map((id, i) => { const o = objById.get(id); return { ru: tx[i] ?? o.ru, en: o.en, ...route(b.node, o) }; }));
+    const o = objById.get(b.msgs[0]);
+    return prep(b.type, [{ ru: tx[0] ?? o.ru, en: o.en, no: o.no }]);
+  }
   const face = box.querySelector('.nv-face');
   // вплотную — поверх плиты встает настоящий макет, в размер плиты на экране
   function showFace(){
@@ -583,7 +648,7 @@ function liveCampus(box, c){
     if (!st.close || !f) return hideFace();
     const xs = f.map(p => p[0]), ys = f.map(p => p[1]);
     const x0 = Math.min(...xs), y0 = Math.min(...ys), w = Math.max(...xs) - x0, h = Math.max(...ys) - y0;
-    face.innerHTML = art(prepBoard(board()), w, h);
+    face.innerHTML = art(prepEdited(board()), w, h);
     face.style.cssText = `left:${x0 + w / 2}px;top:${y0 + h / 2}px`;
     face.classList.add('on');
   }
@@ -591,14 +656,12 @@ function liveCampus(box, c){
   function draw(){
     raf = 0;
     if (!box.isConnected) return;
-    const [g, W, Hh] = sizeCanvas(cv);
-    const status = {};
-    // в студии метка с замечанием заказчика — фиолетовая, в клиентской — цвет статуса
-    BOARDS.forEach(b => { status[b.id] = st.mode === 'client' ? st.status[b.id] || '' : st.notes[b.id] ? 'fix' : ''; });
+    const [g, W, Hh] = sizeCanvas(cv), status = {};
+    // студия: фиолетовая метка — есть открытые замечания; заказчик: зеленая — согласовал, фиолетовая — просил правки
+    BOARDS.forEach(b => { status[b.id] = open(b.id).length ? 'fix' : st.mode === 'client' && st.status[b.id] === 'ok' ? 'ok' : ''; });
     hits = draw3d(g, W, Hh, cam, { pal: dark() ? PAL.dark : PAL.light, status, sel: st.sel, labels: cam.dist > 120 });
   }
   const redraw = () => { if (!raf) raf = requestAnimationFrame(draw); };
-  // плавный перелет камеры
   function fly(target, ms = 1100){
     cancelAnimationFrame(anim); hideFace();
     const from = { ...cam }, t0 = performance.now();
@@ -614,58 +677,82 @@ function liveCampus(box, c){
     };
     anim = requestAnimationFrame(step);
   }
-  function setClose(v){
-    st.close = v;
-    go.querySelector('.spell').innerHTML = H.T(v ? c.back : c.go);
-  }
+  function setClose(v){ st.close = v; go.querySelector('.spell').innerHTML = H.T(v ? c.back : c.go); }
   function checksOf(b){
-    const p = prepBoard(b), t = TYPES[b.type], out = [];
+    const p = prepEdited(b), t = TYPES[b.type], out = [];
     if (b.type === 'D2' && b.msgs.length > t.maxMsg) out.push(`${b.msgs.length} направлений при лимите ${t.maxMsg}`);
     p.ms.filter(m => m.fr.over).forEach(m => out.push(`«${m.ru}» не помещается`));
+    p.ms.filter(m => !m.ru.trim()).forEach(() => out.push('Пустая строка на плите'));
     if (b.type !== 'T1') p.ms.filter(m => !m.en).forEach(m => out.push(`Нет английского названия у «${m.ru}»`));
     return out;
   }
+  // макет таблички в панели с точками замечаний поверх
+  const plateWithPins = (b, live) => `<div class="nv-pinbox${live ? ' live' : ''}">${art(prepEdited(b), 150, 230)}${
+    (st.notes[b.id] || []).map((n, i) => n.done ? '' : `<span class="nv-dot" style="left:${n.x}%;top:${n.y}%">${i + 1}</span>`).join('')}${
+    st.pin ? `<span class="nv-dot new" style="left:${st.pin.x}%;top:${st.pin.y}%">${(st.notes[b.id] || []).length + 1}</span>` : ''}</div>`;
   function renderPanel(){
-    const b = board(), p = prepBoard(b), t = TYPES[b.type], note = st.notes[b.id], s = st.status[b.id];
-    const plate = `<div class="nv-side-plate">${art(p, 150, 230)}</div>`;
-    const head = `<div class="nv-side-head"><b>${H.T(`${t.name} №${b.n}`)}</b><span>${H.T(b.zone)}</span></div>`;
+    const b = board(), t = TYPES[b.type], notes = st.notes[b.id] || [], live = open(b.id);
+    const head = `<div class="nv-side-head"><span class="nv-role">${H.T(st.mode === 'studio' ? c.studioTag : c.clientTag)}</span><b>${H.T(`${t.name} №${b.n}`)}</b><span>${H.T(b.zone)}</span></div>`;
+    hint.innerHTML = H.T(st.mode === 'studio' ? c.studioHint : c.clientHint);
     if (st.mode === 'studio') {
-      const issues = checksOf(b);
-      panel.innerHTML = `${head}<div class="nv-side-body">${plate}<ul class="nv-list">${
-        (issues.length ? issues.map(x => `<li class="bad"><span class="nv-ic">${okIcon(false)}</span><span>${H.T(x)}</span></li>`)
-          : [`<li class="ok"><span class="nv-ic">${okIcon(true)}</span><span>${H.T(c.clean)}</span></li>`]).join('')}</ul></div>
-        ${note ? `<div class="nv-note"><span class="nv-mini-label">${H.T(c.from)}</span><p>${esc(note)}</p></div>` : ''}`;
+      const p = prepEdited(b), issues = checksOf(b);
+      panel.innerHTML = `${head}
+        <div class="nv-side-body">${plateWithPins(b)}
+          <div class="nv-edit"><span class="nv-mini-label">${H.T(c.edit)}</span>${p.ms.map((m, i) => `<input class="nv-line" data-i="${i}" value="${esc(m.ru)}" aria-label="${esc(H.pick(c.edit))}">`).join('')}</div></div>
+        <ul class="nv-list">${(issues.length ? issues.map(x => `<li class="bad"><span class="nv-ic">${okIcon(false)}</span><span>${H.T(x)}</span></li>`)
+          : [`<li class="ok"><span class="nv-ic">${okIcon(true)}</span><span>${H.T(c.clean)}</span></li>`]).join('')}</ul>
+        ${live.length ? `<div class="nv-notes"><span class="nv-mini-label">${H.T(c.from)}</span>${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p><button class="btn btn-line nv-resolve" data-i="${i}"><span class="spell">${H.T(c.resolve)}</span></button></div>`).join('')}</div>`
+          : `<p class="nv-quiet">${H.T(st.status[b.id] === 'ok' ? c.done : c.noNotes)}</p>`}`;
+      panel.querySelectorAll('.nv-edit .nv-line').forEach(inp => inp.addEventListener('input', () => {
+        const tx = st.texts[b.id] || (st.texts[b.id] = prepBoard(b).ms.map(m => m.ru));
+        tx[+inp.dataset.i] = inp.value;
+        panel.querySelector('.nv-pinbox').outerHTML = plateWithPins(b);
+        panel.querySelector('.nv-list').innerHTML = (checksOf(b).map(x => `<li class="bad"><span class="nv-ic">${okIcon(false)}</span><span>${H.T(x)}</span></li>`).join(''))
+          || `<li class="ok"><span class="nv-ic">${okIcon(true)}</span><span>${H.T(c.clean)}</span></li>`;
+        if (st.close) showFace();
+      }));
+      panel.querySelectorAll('.nv-resolve').forEach(btn => btn.addEventListener('click', () => { notes[+btn.dataset.i].done = true; renderPanel(); redraw(); }));
     } else {
       const done = BOARDS.filter(x => st.status[x.id] === 'ok').length;
-      panel.innerHTML = `${head}<div class="nv-side-body">${plate}<p class="nv-state ${s || 'none'}">${H.T(s === 'ok' ? c.done : s === 'fix' ? c.wait : c.none)}</p></div>
-        ${st.writing ? `<div class="nv-write"><textarea class="nv-input" rows="2" placeholder="${esc(H.pick(c.note))}">${esc(note || '')}</textarea>
-          <button class="btn btn-line nv-send"><span class="spell">${H.T(c.send)}</span></button></div>`
-        : `<div class="nv-bar-btns"><button class="btn btn-line nv-ok${s === 'ok' ? ' on' : ''}"><span class="spell">${H.T(c.ok)}</span></button>
-          <button class="btn btn-line nv-fix${s === 'fix' ? ' on' : ''}"><span class="spell">${H.T(c.fix)}</span></button></div>`}
-        ${note && !st.writing ? `<div class="nv-note"><p>${esc(note)}</p></div>` : ''}
+      panel.innerHTML = `${head}
+        <div class="nv-side-body">${plateWithPins(b, true)}
+          <div class="nv-client">
+            <p class="nv-state ${st.status[b.id] === 'ok' ? 'ok' : live.length ? 'fix' : 'none'}">${H.T(st.status[b.id] === 'ok' ? c.done : live.length ? c.wait : c.none)}</p>
+            <p class="nv-quiet">${H.T(c.pinHint)}</p>
+          </div></div>
+        ${st.pin ? `<div class="nv-write"><textarea class="nv-input" rows="2" placeholder="${esc(H.pick(c.note))}"></textarea>
+          <button class="btn btn-line nv-send"><span class="spell">${H.T(c.send)}</span></button></div>` : ''}
+        ${live.length ? `<div class="nv-notes">${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p></div>`).join('')}</div>` : ''}
+        <div class="nv-bar-btns"><button class="btn btn-line nv-ok${st.status[b.id] === 'ok' ? ' on' : ''}"><span class="spell">${H.T(c.ok)}</span></button></div>
         <p class="nv-count">${H.T(c.count)}: ${done} из ${BOARDS.length}</p>`;
-      panel.querySelector('.nv-ok')?.addEventListener('click', () => { st.status[b.id] = 'ok'; delete st.notes[b.id]; renderPanel(); redraw(); });
-      panel.querySelector('.nv-fix')?.addEventListener('click', () => { st.writing = true; renderPanel(); panel.querySelector('textarea').focus(); });
+      // нажатие на табличку ставит точку замечания
+      panel.querySelector('.nv-pinbox').addEventListener('click', e => {
+        const r = e.currentTarget.getBoundingClientRect();
+        st.pin = { x: clamp((e.clientX - r.left) / r.width * 100, 4, 96), y: clamp((e.clientY - r.top) / r.height * 100, 4, 96) };
+        renderPanel(); panel.querySelector('textarea').focus();
+      });
       panel.querySelector('.nv-send')?.addEventListener('click', () => {
         const v = panel.querySelector('textarea').value.trim();
-        if (v) { st.notes[b.id] = v; st.status[b.id] = 'fix'; }
-        st.writing = false; renderPanel(); redraw();
+        if (v) { (st.notes[b.id] || (st.notes[b.id] = [])).push({ ...st.pin, t: v }); delete st.status[b.id]; }
+        st.pin = null; renderPanel(); redraw();
       });
+      panel.querySelector('.nv-ok').addEventListener('click', () => { st.status[b.id] = 'ok'; st.pin = null; renderPanel(); redraw(); });
     }
   }
   function select(id){
-    st.sel = id; st.writing = false;
+    st.sel = id; st.pin = null;
     renderPanel();
     if (st.close) fly(faceCam(board(), 2.3), 900); else redraw();
   }
   box.querySelectorAll('.nv-mode').forEach(b => b.addEventListener('click', () => {
-    st.mode = b.dataset.m; st.writing = false;
+    st.mode = b.dataset.m; st.pin = null;
     box.querySelectorAll('.nv-mode').forEach(x => x.classList.toggle('on', x === b));
+    box.querySelector('.nv-campus').classList.toggle('client', st.mode === 'client');
     renderPanel(); redraw();
   }));
   go.addEventListener('click', () => {
     if (st.close) { setClose(false); fly(HOME); }
-    else { setClose(true); cv.parentElement.classList.add('used'); fly(faceCam(board(), 2.3)); }
+    else { setClose(true); fly(faceCam(board(), 2.3)); }
   });
   box.querySelector('.nv-all').addEventListener('click', () => { setClose(false); fly(HOME); });
   const zoom = k => { cancelAnimationFrame(anim); hideFace(); cam.dist = clamp(cam.dist * k, 3, 1800); if (cam.dist > 60) setClose(false); redraw(); };
@@ -685,7 +772,6 @@ function liveCampus(box, c){
     if (!drag.moved) return;
     hideFace();
     cam.yaw = drag.yaw - dx * .006; cam.pitch = clamp(drag.pitch + dy * .004, .06, 1.3);
-    cv.parentElement.classList.add('used');   // подсказка больше не нужна
     redraw();
   });
   cv.addEventListener('pointerup', e => {
@@ -750,8 +836,10 @@ export async function mountNavi(mount, p, helpers){
   }
   const ch = N.chapters || [];
   const kinds = ch.map(c => Object.keys(KINDS).find(k => c[k]));
-  mount.innerHTML = ch.map((c, i) =>
-    `<section class="nv-ch wrap nv-${kinds[i]}-ch">${head(c)}<div class="nv-viz">${kinds[i] ? KINDS[kinds[i]][0](c[kinds[i]]) : ''}</div></section>`).join('');
+  // у конструктора заголовок стоит внутри правой колонки — так вся глава помещается в один экран
+  mount.innerHTML = ch.map((c, i) => kinds[i] === 'build'
+    ? `<section class="nv-ch wrap nv-build-ch"><div class="nv-viz">${buildHTML(c.build, head(c))}</div></section>`
+    : `<section class="nv-ch wrap nv-${kinds[i]}-ch">${head(c)}<div class="nv-viz">${kinds[i] ? KINDS[kinds[i]][0](c[kinds[i]]) : ''}</div></section>`).join('');
   mount.querySelectorAll('.nv-ch').forEach(s => reveal.observe(s));
   mount.querySelectorAll('.nv-ch').forEach((s, i) => { const k = kinds[i]; if (k) KINDS[k][1](s.querySelector('.nv-viz'), ch[i][k]); });
 }

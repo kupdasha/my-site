@@ -32,83 +32,117 @@
 /* ---------- заголовок главы с кнопкой демо ---------- */
 .nv-title-row{grid-column:5 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:20px 32px}
 .nv-title-row .nv-title{grid-column:auto}
-/* ярко-зеленая кнопка демо; темный текст — контраст выше 10:1 */
-.nv-demo{background:#14E05A;color:#0E1A12;flex:none}
-.nv-demo:hover{background:var(--ink);color:var(--bg)}
+/* кнопка демо — цветом выделения текста на сайте (--accent) */
+.nv .nv-title-row a.nv-demo{flex:none;background:var(--accent);color:var(--accent-text)}
+.nv .nv-title-row a.nv-demo:hover{background:var(--ink);color:var(--bg)}
 @media (max-width:760px){.nv-title-row{grid-column:1 / -1}}
 
-/* ---------- конструктор таблички ---------- */
-.nv-build{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(28px,4vw,64px);align-items:start}
-.nv-build-plate{position:sticky;top:96px;display:flex;flex-direction:column;align-items:center;background:var(--nv-panel);border-radius:var(--r-img);padding:clamp(24px,4vw,56px) 24px 24px}
-.nv-plate-box{width:100%;display:flex;justify-content:center;min-height:200px}
-.nv-plate-cap{font-size:16px;opacity:.6;margin:18px 0 0;text-align:center;text-wrap:balance}
+/* ---------- конструктор таблички: вся глава в один экран ---------- */
+.nv-build{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(24px,3.5vw,56px);align-items:stretch;
+  height:clamp(560px,calc(100vh - 120px),860px)}
+.nv-build-plate{display:flex;flex-direction:column;gap:clamp(16px,2vw,24px);min-height:0;background:var(--nv-panel);border-radius:var(--r-img);padding:clamp(18px,2.2vw,32px)}
+.nv-types .btn{height:44px;padding:0 18px 3px;font-size:17px}
+.nv-types .btn:not(.on){background:var(--bg)}
+.nv-plate-row{flex:1;min-height:0;display:flex;gap:clamp(20px,2.4vw,36px)}
+.nv-plate-box{flex:0 0 40%;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center}
+.nv-plate-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:clamp(12px,1.8vh,20px);overflow:auto}
+.nv-plate-side .nv-list{gap:8px}
+.nv-plate-side .nv-list li{font-size:16px;line-height:1.3}
+.nv-plate-cap{font-size:16px;opacity:.6;margin:auto 0 0;text-wrap:balance}
 .nv-nw{white-space:nowrap}
-.nv-build-side{display:flex;flex-direction:column;gap:clamp(28px,3vw,40px)}
+.nv-build-side{display:flex;flex-direction:column;gap:clamp(16px,2vh,24px);min-height:0}
+.nv-build-side .nv-head{display:block;margin:0 0 4px}
+.nv-build-side .nv-label{display:block;margin-bottom:12px}
+.nv-build-side .nv-title{font-size:clamp(30px,3.2vw,46px);margin:0 0 12px}
+.nv-build-side .nv-text{font-size:clamp(18px,1.4vw,21px);margin:0}
 .nv-field{display:block}
-.nv-input{display:block;width:100%;resize:vertical;border:0;border-radius:20px;background:var(--soft);color:var(--ink);font:inherit;font-size:20px;line-height:1.45;padding:16px 20px}
-.nv-input:focus{outline:2px solid var(--ink);outline-offset:2px}
-.nv-hint{display:block;font-size:16px;opacity:.6;margin-top:10px}
-.nv-colors{display:grid;justify-content:start;gap:20px}
-.nv-swatches > div{display:flex;flex-wrap:wrap;gap:10px}
-.nv-swatch{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:16px;opacity:.75;transition:opacity .3s}
-.nv-swatch i{display:block;width:44px;height:44px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(127,127,127,.35);transition:box-shadow .3s,transform .3s var(--ease)}
-.nv-swatch span{display:none}
+.nv-rows{display:flex;flex-direction:column;gap:8px}
+.nv-row{display:flex;gap:8px;align-items:center}
+.nv-line{flex:1;min-width:0;height:48px;border:0;border-radius:99px;background:var(--soft);color:var(--ink);font:inherit;font-size:18px;padding:0 20px 2px}
+.nv-line:focus,.nv-input:focus{outline:2px solid var(--ink);outline-offset:2px}
+.nv-arrow,.nv-del{flex:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--ink);color:var(--bg);transition:transform .3s var(--ease),background .3s}
+.nv-arrow svg{width:22px;height:22px;transition:transform .35s var(--ease)}
+.nv-arrow:hover{transform:scale(1.06)}
+.nv-arrow.bad{background:var(--nv-fix);color:#fff}
+.nv-del{width:40px;height:40px;background:var(--soft);color:var(--ink)}
+.nv-del svg,.nv-add svg{width:18px;height:18px}
+.nv-del:hover{background:var(--ink);color:var(--bg)}
+.nv-add{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;height:44px;padding:0 20px 2px 14px;border-radius:99px;background:var(--soft);font-size:17px}
+.nv-add:hover{background:var(--ink);color:var(--bg)}
+.nv-input{display:block;width:100%;resize:vertical;border:0;border-radius:20px;background:var(--soft);color:var(--ink);font:inherit;font-size:18px;line-height:1.45;padding:12px 18px}
+.nv-colors{display:flex;flex-wrap:wrap;gap:12px 24px}
+.nv-swatches > div{display:flex;flex-wrap:wrap;gap:8px}
+.nv-swatches .nv-mini-label{margin-bottom:8px}
+.nv-swatch{display:block}
+.nv-swatch i{display:block;width:32px;height:32px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(127,127,127,.35);transition:box-shadow .3s,transform .3s var(--ease)}
 .nv-swatch:hover i{transform:scale(1.08)}
-.nv-swatch.on{opacity:1}
 .nv-swatch.on i{box-shadow:inset 0 0 0 1px rgba(127,127,127,.35),0 0 0 3px var(--bg),0 0 0 5px var(--ink)}
-.nv-swatch.on span{display:block}
-.nv-gost{display:none;grid-column:1 / -1;font-size:18px;line-height:1.4;margin:0;max-width:40ch}
+.nv-gost{display:none;flex:1 1 100%;font-size:17px;line-height:1.4;margin:0;max-width:40ch}
 .nv-colors.tac .nv-swatches{opacity:.3;pointer-events:none}
 .nv-colors.tac .nv-gost{display:block}
-@media (max-width:860px){
-  .nv-build{grid-template-columns:1fr}
-  .nv-build-plate{position:relative;top:0}
+@media (max-width:900px),(max-height:620px){
+  .nv-build{grid-template-columns:1fr;height:auto}
+  .nv-build-side{order:-1}
+  .nv-plate-row{height:min(70vh,560px);flex:none}
+}
+@media (max-width:560px){
+  .nv-plate-row{flex-direction:column;height:auto}
+  .nv-plate-box{flex:none;height:52vh}
 }
 
-/* ---------- 3D-кампус ---------- */
-.nv-campus{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);gap:clamp(16px,2vw,24px);align-items:start}
+/* ---------- 3D-кампус: студия и заказчик ---------- */
+.nv-campus{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,400px);gap:clamp(16px,2vw,24px);align-items:start}
 .nv-scene{position:relative;aspect-ratio:4/3;border-radius:var(--r-img);overflow:hidden;background:var(--soft);user-select:none;-webkit-user-select:none}
 .nv-scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
 .nv-scene canvas:active{cursor:grabbing}
 .nv-face{position:absolute;left:0;top:0;transform:translate(-50%,-50%);opacity:0;pointer-events:none;transition:opacity .45s}
 .nv-face.on{opacity:1}
 .nv-face .nv-plate{box-shadow:none}
-.nv-scene-hint{position:absolute;left:16px;top:16px;max-width:calc(100% - 32px);margin:0;padding:8px 14px 10px;border-radius:14px;background:var(--bg);font-size:16px;line-height:1.3;pointer-events:none;text-wrap:balance;transition:opacity .5s}
-.nv-scene.used .nv-scene-hint{opacity:0}
+.nv-scene-hint{position:absolute;left:16px;top:16px;max-width:calc(100% - 32px);margin:0;padding:8px 14px 10px;border-radius:14px;background:var(--bg);font-size:16px;line-height:1.3;pointer-events:none;text-wrap:balance}
 .nv-zoom{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px}
 .nv-round{width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;transition:transform .3s var(--ease)}
 .nv-round:hover{transform:scale(1.06)}
 .nv-round svg{width:22px;height:22px}
-.nv-side{display:flex;flex-direction:column;gap:20px;min-width:0}
-.nv-panel{display:flex;flex-direction:column;gap:18px;background:var(--nv-panel);border-radius:var(--r-img);padding:22px}
+.nv-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.nv-panel{display:flex;flex-direction:column;gap:16px;background:var(--nv-panel);border-radius:var(--r-img);padding:22px}
+/* заказчик видит то же, но панель другая: светлая рамка вместо заливки и пометка роли */
+.nv-campus.client .nv-panel{background:transparent;box-shadow:inset 0 0 0 2px var(--line)}
+.nv-role{display:inline-block;margin-bottom:10px;padding:4px 12px 6px;border-radius:99px;background:var(--ink);color:var(--bg);font-size:16px}
+.nv-campus.client .nv-role{background:var(--nv-fix);color:#fff}
 .nv-side-head b{display:block;font-weight:500;font-size:22px;line-height:1.2}
-.nv-side-head span{display:block;font-size:16px;opacity:.6;margin-top:4px}
+.nv-side-head > span:last-child{display:block;font-size:16px;opacity:.6;margin-top:4px}
 .nv-side-body{display:flex;gap:18px;align-items:flex-start}
-.nv-side-plate{flex:none}
-.nv-side-body .nv-list{flex:1;min-width:0}
-.nv-side-body .nv-list li{font-size:16px}
-.nv-state{flex:1;margin:0;font-size:18px;display:flex;align-items:center;gap:10px}
+.nv-pinbox{position:relative;flex:none}
+.nv-pinbox.live{cursor:crosshair}
+.nv-edit{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.nv-edit .nv-mini-label{margin-bottom:2px}
+.nv-edit .nv-line{flex:none;width:100%;height:42px;font-size:17px;padding:0 16px 2px;background:var(--bg)}
+.nv-client{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.nv-quiet{margin:0;font-size:16px;line-height:1.35;opacity:.65}
+.nv-dot{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--nv-fix);color:#fff;font-size:16px;font-weight:600;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff;pointer-events:none}
+.nv-dot.new{animation:nvPop .35s var(--ease) both}
+@keyframes nvPop{from{transform:translate(-50%,-50%) scale(.3)}}
+.nv-notes{display:flex;flex-direction:column;gap:10px}
+.nv-note{display:flex;align-items:center;gap:12px}
+.nv-note .nv-dot{position:static;transform:none;flex:none}
+.nv-note p{flex:1;margin:0;font-size:17px;line-height:1.35}
+.nv-state{margin:0;font-size:18px;display:flex;align-items:center;gap:10px}
 .nv-state::before{content:"";flex:none;width:12px;height:12px;border-radius:50%;background:#9a9ca3}
 .nv-state.ok::before{background:var(--nv-ok)}
 .nv-state.fix::before{background:var(--nv-fix)}
-.nv-panel .btn{height:48px;padding:0 20px 3px;font-size:17px}
+.nv-panel .btn{height:44px;padding:0 18px 3px;font-size:17px}
 .nv-panel .nv-bar-btns{gap:10px}
-.nv-panel .nv-bar-btns .btn:not(.on){background:var(--bg)}
-.nv-panel .nv-bar-btns .btn:not(.on):hover{background:var(--ink)}
+.nv-panel .nv-bar-btns .btn:not(.on){background:var(--ink);color:var(--bg)}
+.nv-panel .nv-bar-btns .btn.on{background:var(--nv-ok);color:#fff}
+.nv-note .btn{background:var(--ink);color:var(--bg);flex:none}
 .nv-write{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
-.nv-write .nv-input{background:var(--bg);font-size:18px;border-radius:16px;padding:12px 16px}
-.nv-note{border-left:3px solid var(--nv-fix);padding-left:14px}
-.nv-note p{margin:0;font-size:18px;line-height:1.4}
-.nv-note .nv-mini-label{margin-bottom:4px}
+.nv-write .nv-input{border-radius:16px;padding:12px 16px}
 .nv-count{margin:0;font-size:16px;opacity:.6}
 .nv-campus-btns{margin-top:20px}
-@media (max-width:960px){
-  .nv-campus{grid-template-columns:1fr}
-  .nv-scene-hint{display:none}
-}
+@media (max-width:960px){.nv-campus{grid-template-columns:1fr}}
 @media (max-width:560px){
   .nv-scene{aspect-ratio:1/1}
-  .nv-panel .btn{padding:0 16px 3px}
+  .nv-scene-hint{left:10px;top:10px;max-width:calc(100% - 20px)}
 }
 
 /* ---------- запись экрана ---------- */
