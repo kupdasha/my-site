@@ -1099,7 +1099,8 @@ function shotHTML(src){
 }
 function heroHTML(p){
   // heroVideo — тихий ролик в шапке вместо основного (основной тогда стоит в галерее, см. Ростех)
-  const m = parseMedia(p.heroVideo || legacyVideo(p));
+  // heroImage без heroVideo — в шапке картинка, даже если у проекта есть ролик (он тогда в галерее и задает пропорции карточки, см. Ростех)
+  const m = p.heroImage && !p.heroVideo ? null : parseMedia(p.heroVideo || legacyVideo(p));
   // heroSound — ролик со звуком и кнопками управления, запускается по нажатию (см. музыкальный клип)
   if (m && m.type === 'file' && p.heroSound) return `<video class="hero-full" src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} controls preload="metadata" playsinline></video>`;
   if (m && m.type === 'file') return `<video src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} muted loop playsinline autoplay></video>`;
