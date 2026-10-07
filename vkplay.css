@@ -1,0 +1,165 @@
+/* ================================================================
+   КЕЙС «VK PLAY, УНИВЕРСАЛЬНЫЙ СТЕНД» (vkplay.js, поле stand у проекта)
+   Цвета — сайта; свои — синий VK Play, голубой LED и темная
+   подложка под рендеры, как в презентации.
+   ================================================================ */
+.vp{overflow-x:clip;--vp-gap:clamp(64px,8vw,128px);--vp-blue:#0A5BFF;--vp-led:#3CCBFF;--vp-dark:#16171B;
+  --vp-stage:linear-gradient(180deg,#141518 0%,#3a3c41 60%,#64666b 100%)}
+.vp-ch{margin-bottom:var(--vp-gap)}
+.vp-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
+.vp-label{grid-column:1 / span 3;grid-row:1}
+.vp-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.vp-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
+@media (max-width:760px){.vp-label,.vp-title,.vp-text{grid-column:1 / -1}.vp-label{grid-row:auto}}
+.vp-cap{font-size:16px;opacity:.6;margin-top:16px;max-width:60ch;text-wrap:balance}
+
+.vp-viz{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease) .15s,transform 1s var(--ease) .15s}
+.vp-ch.in .vp-viz{opacity:1;transform:none}
+
+/* темная подложка под рендеры: стенд вырезан, фон — как в презентации */
+.vp-stage{position:relative;display:block;width:100%;padding:0;border-radius:var(--r-img);overflow:hidden;background:var(--vp-stage);user-select:none;-webkit-user-select:none}
+.vp-stage img{display:block;width:100%;height:auto;pointer-events:none}
+.vp-bar{display:flex;flex-wrap:wrap;gap:12px}
+.vp-bar .btn:not(.on){background:var(--soft);color:var(--ink)}
+.vp-bar .btn:not(.on):hover{background:var(--ink);color:var(--bg)}
+.vp-chips{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:0;padding:0}
+.vp-chips .chip.on{background:var(--ink);color:var(--bg)}
+
+/* ---------- план сверху ---------- */
+.vp-plan{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center}
+.vp-plan-map{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:14px;row-gap:12px}
+.vp-plan-pic{position:relative;grid-column:1;grid-row:2;aspect-ratio:976/809;border-radius:var(--r-img);overflow:hidden;background:#2a2c35}
+.vp-plan-pic img{width:100%;height:100%;display:block;pointer-events:none}
+/* модуль: остальное гаснет за счет огромной тени, сам модуль — в белой рамке */
+.vp-zone{position:absolute;padding:0;border-radius:4px;background:transparent;cursor:pointer;box-shadow:0 0 0 0 rgba(10,12,20,0),inset 0 0 0 0 #fff;transition:box-shadow .6s var(--ease)}
+.vp-zone.on{box-shadow:0 0 0 2000px rgba(10,12,20,.55),inset 0 0 0 3px #fff}
+/* размеры: линия прорисовывается, подпись проявляется */
+.vp-dim{display:flex;align-items:center;justify-content:center;position:relative;font-size:16px;color:var(--ink);opacity:.7}
+.vp-dim i{position:absolute;background:currentColor;transition:transform 1.2s var(--ease) .4s}
+.vp-dim span{position:relative;background:var(--bg);padding:0 10px 3px;opacity:0;transition:opacity .6s 1.2s}
+.vp-ch.in .vp-dim span{opacity:1}
+.vp-dim-w{grid-column:1;grid-row:1;height:24px}
+.vp-dim-w i{left:0;right:0;top:50%;height:1.5px;transform:scaleX(0)}
+.vp-dim-w i::before,.vp-dim-w i::after{content:"";position:absolute;top:-4px;width:1.5px;height:10px;background:currentColor}
+.vp-dim-w i::before{left:0}.vp-dim-w i::after{right:0}
+.vp-dim-h{grid-column:2;grid-row:2;width:24px}
+.vp-dim-h i{top:0;bottom:0;left:50%;width:1.5px;transform:scaleY(0)}
+.vp-dim-h i::before,.vp-dim-h i::after{content:"";position:absolute;left:-4px;height:1.5px;width:10px;background:currentColor}
+.vp-dim-h i::before{top:0}.vp-dim-h i::after{bottom:0}
+.vp-dim-h span{writing-mode:vertical-rl;padding:10px 0;white-space:nowrap}
+.vp-ch.in .vp-dim i{transform:none}
+.vp-zones{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:clamp(20px,2.4vw,32px)}
+.vp-zones li[data-i]{cursor:pointer;opacity:.38;transition:opacity .5s var(--ease)}
+.vp-zones li.on{opacity:1}
+.vp-zones h3{font-size:clamp(22px,2vw,28px);font-weight:500;line-height:1.15;margin:0 0 8px;text-wrap:balance}
+.vp-zones p{font-family:var(--font-read);font-size:clamp(18px,1.4vw,21px);line-height:1.45;max-width:36ch}
+.vp-area{font-size:16px;opacity:.6}
+@media (max-width:860px){.vp-plan{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- из чего собран: точки на общем виде ---------- */
+.vp-parts-pic{aspect-ratio:16/9}
+.vp-spot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;padding:0;border-radius:50%;background:transparent;cursor:pointer;z-index:2}
+.vp-spot i{position:absolute;inset:13px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform .4s var(--ease),background .3s}
+/* круг расходится волной, как пульс */
+.vp-spot::before{content:"";position:absolute;inset:13px;border-radius:50%;border:2px solid #fff;opacity:0;animation:vpPulse 2.4s var(--ease) infinite}
+.vp-spot:nth-of-type(2n)::before{animation-delay:.8s}
+.vp-spot:nth-of-type(3n)::before{animation-delay:1.6s}
+@keyframes vpPulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.vp-spot.on i,.vp-spot:hover i{transform:scale(1.35);background:var(--vp-led)}
+.vp-tip{position:absolute;z-index:3;width:max-content;max-width:min(320px,46%);padding:14px 18px 16px;margin:20px 0 0 20px;border-radius:14px;background:#fff;color:#1D222A;pointer-events:none;
+  opacity:0;transform:translateY(8px);box-shadow:0 14px 34px rgba(0,0,0,.28)}
+.vp-tip.show{animation:vpTip .5s var(--ease) forwards}
+@keyframes vpTip{to{opacity:1;transform:none}}
+.vp-tip.left{translate:calc(-100% - 40px) 0}
+.vp-tip.up{margin-top:0;translate:0 calc(-100% - 20px)}
+.vp-tip.left.up{translate:calc(-100% - 40px) calc(-100% - 20px)}
+.vp-tip b{display:block;font-size:18px;font-weight:600;line-height:1.2}
+.vp-tip span{display:block;font-size:16px;line-height:1.35;margin-top:6px;opacity:.75}
+.vp-tip span:empty{display:none}
+.vp-parts .vp-chips{margin-top:clamp(16px,2vw,24px)}
+@media (max-width:640px){.vp-tip{max-width:60%;padding:10px 14px 12px}.vp-tip span{display:none}.vp-spot{width:36px;height:36px;margin:-18px 0 0 -18px}.vp-spot i,.vp-spot::before{inset:11px}}
+
+/* ---------- один бренд или три: шторка ---------- */
+.vp-wipe{aspect-ratio:16/9;cursor:ew-resize;touch-action:pan-y}
+.vp-wipe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .26s}
+.vp-wipe-b{clip-path:inset(0 0 0 var(--x))}
+.vp-wipe.swap img{opacity:0}
+.vp-wipe-line{position:absolute;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:#fff;pointer-events:none}
+.vp-wipe-knob{position:absolute;top:50%;left:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:#fff;color:#1D222A;display:grid;place-items:center;pointer-events:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);transition:transform .35s var(--ease)}
+.vp-wipe.held .vp-wipe-knob{transform:scale(.9)}
+.vp-wipe-name{position:absolute;top:clamp(14px,2vw,28px);font-size:clamp(16px,1.4vw,20px);font-weight:500;color:#fff;padding:8px 16px 10px;border-radius:99px;background:rgba(20,21,27,.6);transition:opacity .4s}
+.vp-wipe-name-a{left:clamp(14px,2vw,28px)}
+.vp-wipe-name-b{right:clamp(14px,2vw,28px)}
+.vp-wipe.only-b .vp-wipe-name-a,.vp-wipe.only-a .vp-wipe-name-b{opacity:0}
+.vp-brands .vp-bar{margin-top:clamp(16px,2vw,24px)}
+
+/* ---------- куб VK Play ---------- */
+.vp-cube-box{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center}
+.vp-cube-stage{--s:clamp(110px,13vw,190px);position:relative;height:clamp(440px,46vw,640px);border-radius:var(--r-img);overflow:hidden;background:var(--vp-stage)}
+.vp-cube-spot{position:absolute;left:50%;top:12%;width:var(--s);height:var(--s);margin-left:calc(var(--s) / -2);perspective:900px;cursor:grab;touch-action:none;z-index:2;
+  transition:top 1s var(--ease)}
+.vp-cube-spot.held{cursor:grabbing}
+.vp-cube{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+/* грани — надутые, глянцевые, с текстом из светодиодов */
+.vp-face{position:absolute;inset:0;border-radius:24%;display:grid;place-items:center;color:#fff;backface-visibility:hidden;
+  background:radial-gradient(120% 110% at 28% 18%,#5C9BFF 0%,#1F5CFF 34%,#0A35D6 70%,#0623A0 100%);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.18),inset 0 -14px 30px rgba(0,10,60,.45),inset 10px 12px 26px rgba(255,255,255,.22)}
+.vp-face span,.vp-face .vp-xo{-webkit-mask:radial-gradient(circle,#000 58%,transparent 64%) 0 0/5px 5px;mask:radial-gradient(circle,#000 58%,transparent 64%) 0 0/5px 5px}
+.vp-face span{font-weight:800;font-size:calc(var(--s) * .2);letter-spacing:.02em;line-height:1}
+.vp-xo{width:62%;height:auto}
+.vp-front{transform:translateZ(calc(var(--s) / 2))}
+.vp-back{transform:rotateY(180deg) translateZ(calc(var(--s) / 2))}
+.vp-right{transform:rotateY(90deg) translateZ(calc(var(--s) / 2))}
+.vp-left{transform:rotateY(-90deg) translateZ(calc(var(--s) / 2))}
+.vp-top{transform:rotateX(90deg) translateZ(calc(var(--s) / 2))}
+.vp-bottom{transform:rotateX(-90deg) translateZ(calc(var(--s) / 2))}
+/* подвес: трос сверху. Подставка: колонна от стойки, а стойка шире */
+.vp-cable{position:absolute;left:50%;top:0;width:2px;margin-left:-1px;height:calc(12% + var(--s) * .2);background:#0c0d10;transform-origin:top;transition:transform .7s var(--ease)}
+.vp-post{position:absolute;left:50%;bottom:30%;top:calc(16% + var(--s) * .85);width:clamp(16px,2vw,26px);margin-left:calc(clamp(16px,2vw,26px) / -2);border-radius:4px 4px 0 0;
+  background:linear-gradient(90deg,#1b1c21,#3d4048 45%,#1b1c21);transform:scaleY(0);transform-origin:bottom;transition:transform .9s var(--ease)}
+.vp-desk{position:absolute;left:50%;bottom:10%;width:42%;height:20%;transform:translateX(-50%);border-radius:12px 12px 4px 4px;
+  background:repeating-linear-gradient(90deg,transparent 0 22%,rgba(255,255,255,.05) 22% 22.6%),linear-gradient(180deg,#2c2f38,#121318);
+  box-shadow:0 18px 30px rgba(0,0,0,.35);transition:width .9s var(--ease);z-index:1;overflow:hidden}
+.vp-desk-led{position:absolute;left:0;right:0;top:12%;height:30%;background:#08090c;overflow:hidden;display:flex;align-items:center}
+.vp-desk .vp-led-track{font-size:clamp(14px,1.3vw,18px)}
+.vp-floor{position:absolute;left:8%;right:8%;bottom:8%;height:8%;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,rgba(10,91,255,.35),transparent 70%)}
+.vp-cube-stage[data-mode="stand"] .vp-cable{transform:scaleY(0)}
+.vp-cube-stage[data-mode="stand"] .vp-cube-spot{top:16%}
+.vp-cube-stage[data-mode="stand"] .vp-post{transform:none}
+.vp-cube-stage[data-mode="stand"] .vp-desk{width:64%}
+.vp-cube-side{display:flex;flex-direction:column;gap:clamp(20px,2.4vw,28px)}
+.vp-mode-text{display:none;font-family:var(--font-read);font-size:clamp(19px,1.6vw,23px);line-height:1.45;max-width:36ch}
+.vp-mode-text.on{display:block;animation:vpFade .5s var(--ease)}
+@keyframes vpFade{from{opacity:0;transform:translateY(8px)}}
+@media (max-width:860px){.vp-cube-box{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- бегущая строка: светодиоды без свечения ---------- */
+.vp-led{height:clamp(96px,11vw,150px);border-radius:var(--r-img);background:#08090c;overflow:hidden;display:flex;align-items:center;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.vp-led-track{--dur:14s;display:flex;width:max-content;font-weight:700;font-size:clamp(44px,6vw,92px);line-height:1;color:#fff;white-space:nowrap;
+  -webkit-mask:radial-gradient(circle,#000 56%,transparent 62%) 0 0/.11em .11em;mask:radial-gradient(circle,#000 56%,transparent 62%) 0 0/.11em .11em;
+  animation:vpRun var(--dur) linear infinite;transition:opacity .22s}
+.vp-led-track.swap{opacity:0}
+.vp-led-run{display:flex;align-items:center;flex:none}
+.vp-led-run > span{padding:0 .5em .08em}
+.vp-led-dot{display:inline-block;width:.32em;height:.32em;border-radius:3px;background:var(--vp-led)}
+@keyframes vpRun{to{transform:translateX(-50%)}}
+.vp-ticker-ctrl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 28px;margin-top:clamp(16px,2vw,24px)}
+.vp-form{display:flex;gap:10px;flex:1 1 360px;max-width:520px}
+.vp-input{flex:1;min-width:0;height:56px;padding:0 22px 3px;border:0;border-radius:99px;background:var(--soft);color:var(--ink);font:inherit;font-size:18px}
+.vp-input:focus{outline:2px solid var(--ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.vp-led-track{animation:none}.vp-spot::before{animation:none}}
+@media (max-width:560px){.vp-form .btn{padding:0 20px 4px}}
+
+/* ---------- обход стенда: прокрутка вниз двигает ленту вбок ---------- */
+.vp-walk{position:relative;height:calc(100vh + var(--n) * 34vh)}
+.vp-walk-pin{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
+.vp-walk-track{display:flex;gap:clamp(12px,1.6vw,24px);padding:0 var(--pad,clamp(16px,4vw,56px));will-change:transform}
+.vp-walk-item{flex:none;width:min(78vw,calc((100vh - 140px) * 16 / 9));margin:0}
+.vp-walk-shot{aspect-ratio:16/9;cursor:zoom-in}
+.vp-walk-shot img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.vp-walk-shot:hover img{transform:scale(1.03)}
+.vp-walk-item figcaption{font-size:16px;opacity:.6;margin-top:12px}
+@media (max-width:760px){.vp-walk{height:calc(100vh + var(--n) * 24vh)}.vp-walk-item{width:86vw}}
+@media (max-width:560px){.vp-cube-stage{height:400px}.vp-desk{width:64%}.vp-cube-stage[data-mode="stand"] .vp-desk{width:88%}}
