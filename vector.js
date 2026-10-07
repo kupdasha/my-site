@@ -355,7 +355,9 @@ export async function mountVector(mount, p, helpers){
   const ch = p.vector.chapters || [];
   const kinds = ch.map(c => Object.keys(KINDS).find(k => c[k]));
   mount.innerHTML = ch.map((c, i) =>
-    `<section class="vc-ch wrap vc-${kinds[i]}-ch">${head(c)}<div class="vc-viz">${kinds[i] ? KINDS[kinds[i]][0](c[kinds[i]]) : ''}</div></section>`).join('');
+    `<section class="vc-ch wrap vc-${kinds[i]}-ch">${head(c)}<div class="vc-viz">${kinds[i] ? KINDS[kinds[i]][0](c[kinds[i]]) : ''}</div></section>`).join('')
+    // демо — крупная лаймовая кнопка в конце, в обеих версиях
+    + (p.vector.demo ? `<section class="vc-ch wrap vc-try"><a class="btn vc-demo" href="${p.vector.demo.link}" target="_blank" rel="noopener">${H.T(p.vector.demo.text)}<span class="arr" aria-hidden="true">↗</span></a></section>` : '');
   mount.querySelectorAll('.vc-ch').forEach(s => reveal.observe(s));
   mount.querySelectorAll('.vc-ch').forEach((s, i) => { const k = kinds[i]; if (k) KINDS[k][1](s.querySelector('.vc-viz'), ch[i][k]); });
 }

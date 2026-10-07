@@ -159,3 +159,19 @@
   .vc-caret,.vc-step.on i::after,.vc-cat-pts rect{animation:none}
   .vc-viz{transition:opacity .3s;transform:none}
 }
+
+/* ---------- текст в начале: на планшете 2 × 2 (на телефоне app.js ставит одну колонку) ---------- */
+@media (min-width:761px) and (max-width:1100px){
+  .case-body:has(.vc-mount) .scheme-cols>.camp-col{grid-column:span 6 !important}
+}
+
+/* ---------- кнопка демо: крупная, лаймовая в обеих версиях (просьба 07.10) ---------- */
+.vc-try{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px)}
+.vc-demo{grid-column:5 / -1;justify-self:start;height:clamp(68px,6.4vw,96px);padding:0 clamp(36px,4vw,60px) 5px;gap:14px;
+  font-size:clamp(22px,2.2vw,32px);background:var(--accent);color:var(--accent-text)}
+.vc-demo:hover{background:var(--ink);color:var(--bg)}
+.vc-demo .arr{transition:transform .45s var(--ease)}
+.vc-demo:hover .arr{transform:translate(3px,-3px)}
+.vc-demo:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+@media (max-width:1100px){.vc-demo{grid-column:1 / -1}}
+@media (max-width:760px){.vc-demo{width:100%;height:72px;font-size:22px}}
