@@ -32,22 +32,25 @@
   .vn-poster .vn-logo{width:62%}
 }
 
-/* ---------- кольцо из плиток ---------- */
-/* без плашек: мягкое синее пятно прямо на фоне страницы, растворяется во все стороны */
-.vn-tile{position:relative;isolation:isolate}
-.vn-tile::before{content:'';position:absolute;inset:-14% -10%;z-index:-1;pointer-events:none;
-  background:radial-gradient(ellipse 34% 50% at 50% 50%,var(--vn-blue) 0%,rgba(48,68,255,.75) 34%,rgba(48,68,255,.26) 66%,rgba(48,68,255,0) 100%)}
-.vn-ring{position:relative;height:clamp(380px,46vw,640px);touch-action:pan-y}
-.vn-ring>img{position:absolute;left:50%;top:50%;height:auto;will-change:transform}
-.vn-tile-big{position:absolute;left:50%;top:50%;width:clamp(150px,20vw,280px);aspect-ratio:1;margin:calc(clamp(150px,20vw,280px) / -2) 0 0 calc(clamp(150px,20vw,280px) / -2)}
-.vn-tile-big img{position:absolute;width:62%;height:auto}
-.vn-t1{left:2%;top:4%;rotate:-24deg;animation:vnSwayA 6.5s ease-in-out infinite alternate}
-.vn-t2{left:34%;top:32%;rotate:16deg;animation:vnSwayB 8s ease-in-out infinite alternate}
-@keyframes vnSwayA{from{transform:translate(0,0) rotate(-6deg)}to{transform:translate(4%,-5%) rotate(10deg)}}
-@keyframes vnSwayB{from{transform:translate(0,0) rotate(8deg)}to{transform:translate(-5%,4%) rotate(-12deg)}}
+/* ---------- осьминог пополам, текст посередине ---------- */
+/* блок во всю ширину экрана; половины за краями, синие пятна мягко растворяются */
+.vn-tile-ch>.vn-viz{opacity:1;transform:none}
+.vn-tile{position:relative;isolation:isolate;margin-inline:calc(50% - 50vw)}
+.vn-tile::before{content:'';position:absolute;inset:-10% 0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 26% 40% at 0% 50%,var(--vn-blue) 0%,rgba(48,68,255,.6) 40%,rgba(48,68,255,0) 100%),
+             radial-gradient(ellipse 26% 40% at 100% 50%,var(--vn-blue) 0%,rgba(48,68,255,.6) 40%,rgba(48,68,255,0) 100%)}
+.vn-ring{position:relative;height:clamp(440px,44vw,640px);overflow:hidden;display:grid;place-items:center}
+.vn-ring>img{position:absolute;left:0;top:0;height:auto;will-change:transform;pointer-events:none}
+/* текст главы — в середине, поверх ничего не лежит */
+.vn-ring>.vn-head{position:relative;z-index:1;display:block;max-width:min(36ch,42%);margin:0;text-align:center;padding:24px}
+.vn-ring>.vn-head .vn-label{display:block;margin-bottom:16px}
+.vn-ring>.vn-head .vn-title{max-width:none;margin:0 auto 18px}
+.vn-ring>.vn-head .vn-text{max-width:none;font-size:clamp(18px,1.5vw,22px)}
 @media (max-width:760px){
-  .vn-tile::before{inset:-8% -6%;background:radial-gradient(ellipse 50% 46% at 50% 50%,var(--vn-blue) 0%,rgba(48,68,255,.72) 36%,rgba(48,68,255,.22) 68%,rgba(48,68,255,0) 100%)}
-  .vn-ring{height:92vw}
+  .vn-tile::before{inset:0;background:radial-gradient(ellipse 70% 22% at 50% 0%,var(--vn-blue) 0%,rgba(48,68,255,.55) 40%,rgba(48,68,255,0) 100%),
+             radial-gradient(ellipse 70% 22% at 50% 100%,var(--vn-blue) 0%,rgba(48,68,255,.55) 40%,rgba(48,68,255,0) 100%)}
+  .vn-ring{height:auto;min-height:150vw;padding:44vw 0}
+  .vn-ring>.vn-head{max-width:100%;padding:0 20px}
 }
 
 /* ---------- фасоны: две колонки, у выбранного — отметка ---------- */
@@ -96,6 +99,5 @@
 @media (max-width:420px){.case-head:has(+ .vn-hero) .case-title{font-size:34px}}
 
 @media (prefers-reduced-motion:reduce){
-  .vn-tile-big img{animation:none}
   .vn-side{transition:opacity .3s}
 }

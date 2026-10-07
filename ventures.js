@@ -2,8 +2,8 @@
    КЕЙС «THE VENTURES JAPAN» (поле ventures у проекта)
    Шапка кейса — живой принт на сплошном синем: плитки с веткой
    сакуры едут от подола вверх и тают, сверху белый логотип.
-   Главы: tile — калейдоскоп-осьминог: восемь щупалец из плиток «десять шагов уменьшения»
-   извиваются вокруг двух крупных плиток и крутятся от движения курсора (на телефоне — пальца);
+   Главы: tile — осьминог, разрезанный пополам: половины по краям, текст главы посередине;
+   щупальца из плиток «десять шагов уменьшения» тянутся к тексту, при наведении на текст — к курсору;
    fits — фасоны рядом (oversize и облегающий, выбранный отмечен);
    look — съемка, по нажатию крупно; tokyo — фото с мероприятия.
    Векторы сняты из макета в Figma: img/ventures/*.svg.
@@ -129,67 +129,86 @@ async function livePoster(box, c){
   box.addEventListener('pointerleave', () => { mx = my = -1e4; if (still()) { near = 0; draw(); } });
 }
 
-/* ---------- глава: калейдоскоп-осьминог ---------- */
-const ARMS = 8, PER_ARM = 9;   // восемь щупалец, в каждом — шаги уменьшения плитки с принта
+/* ---------- глава: осьминог пополам, текст посередине ---------- */
+const ARMS = 5, PER_ARM = 9;   // у каждой половины пять щупалец, в каждом — шаги уменьшения плитки с принта
 function tileHTML(c){
   const src = `${H.base}img/ventures/tile.svg`;
-  return `<div class="vn-tile">
-    <div class="vn-ring">${Array.from({ length: ARMS * PER_ARM }, () => `<img src="${src}" alt="">`).join('')}
-      <div class="vn-tile-big"><img class="vn-t1" src="${src}" alt=""><img class="vn-t2" src="${src}" alt=""></div>
-    </div>
-  </div>${c.caption ? `<p class="vn-cap">${H.T(c.caption)}</p>` : ''}`;
+  const half = side => `${Array.from({ length: ARMS * PER_ARM }, () => `<img class="vn-arm" data-side="${side}" src="${src}" alt="">`).join('')}
+      <img class="vn-body" data-side="${side}" src="${src}" alt="">`;
+  return `<div class="vn-tile"><div class="vn-ring">${half(0)}${half(1)}</div></div>`;
 }
 function liveTile(box){
-  const ring = box.querySelector('.vn-ring'), tiles = [...ring.querySelectorAll(':scope > img')];
-  const big = ring.querySelector('.vn-tile-big');
-  // плитка n: щупальце arm, шаг i от тела (крупная) к кончику (мелкая) — размеры как на принте
-  const steps = tiles.map((_, n) => ({ arm: Math.floor(n / PER_ARM), i: n % PER_ARM, s: colAt((n % PER_ARM) / (PER_ARM - 1) * 0.92).s / BIG }));
-  // шаг вдоль щупальца — по размеру соседних плиток: у тела плотнее, к кончику реже, без каши
+  const ring = box.querySelector('.vn-ring');
+  // заголовок и текст главы встают в середину, между половинами
+  const headEl = box.parentElement.querySelector('.vn-head');
+  if (headEl) ring.appendChild(headEl);
+  const tiles = [...ring.querySelectorAll('.vn-arm')], bodies = [...ring.querySelectorAll('.vn-body')];
+  const steps = tiles.map((el, n) => {
+    const k = n % (ARMS * PER_ARM);
+    return { side: +el.dataset.side, arm: Math.floor(k / PER_ARM), i: k % PER_ARM, s: colAt((k % PER_ARM) / (PER_ARM - 1) * 0.92).s / BIG };
+  });
+  // шаг вдоль щупальца — по размеру соседних плиток: у тела плотнее, к кончику реже
   const cum = [0]; for (let i = 1; i < PER_ARM; i++) cum[i] = cum[i - 1] + (steps[i - 1].s + steps[i].s) / 2;
   steps.forEach(st => { st.t = (cum[st.i] + 0.5) / (cum[PER_ARM - 1] + 0.5); });
-  let Rr = 0, R0 = 0, T = 0, angle = 0, spin = 0, raf = 0, visible = false, last = 0, time = 0;
-  let px = 0, py = 0, tx = 0, ty = 0, lastX = null, lastY = null, stir = 0;
-  const size = () => { const r = ring.getBoundingClientRect(), m = Math.min(r.width, r.height); Rr = m * 0.5; R0 = m * 0.16; T = m * 0.105; };
+
+  let W = 0, Hh = 0, R0 = 0, L = 0, T = 0, phone = false, raf = 0, visible = false, last = 0, time = 0;
+  let body = [], aim = { x: 0, y: 0 }, goal = { x: 0, y: 0 }, pull = 0, pullGoal = 0;
+  function size(){
+    const r = ring.getBoundingClientRect(); W = r.width; Hh = r.height;
+    phone = matchMedia('(max-width:760px)').matches;
+    const m = phone ? W : Hh;
+    T = m * (phone ? 0.11 : 0.12); R0 = m * 0.1;
+    // тела половин — за краями блока: на компьютере слева и справа, на телефоне сверху и снизу
+    body = phone ? [{ x: W / 2, y: -m * 0.06, dir: Math.PI / 2 }, { x: W / 2, y: Hh + m * 0.06, dir: -Math.PI / 2 }]
+                 : [{ x: -m * 0.08, y: Hh / 2, dir: 0 }, { x: W + m * 0.08, y: Hh / 2, dir: Math.PI }];
+    L = phone ? Hh * 0.3 : W * 0.3;
+    if (!pullGoal){ goal = { x: W / 2, y: Hh / 2 }; aim = { ...goal }; }
+  }
   function place(){
     tiles.forEach((el, n) => {
-      const st = steps[n], t = st.t;
-      // щупальце закручивается к кончику и волнуется; соседние — в противофазе, как в калейдоскопе
-      const wave = Math.sin(time * 1.3 - st.i * 0.55 + st.arm * Math.PI / 2) * (0.35 + stir * 0.6);
-      const curl = (1.15 + stir * 0.8) * Math.pow(t, 1.5) + wave * t;
-      const a = angle + st.arm * Math.PI * 2 / ARMS + curl;
-      const r = R0 + t * (Rr - R0);
+      const st = steps[n], b = body[st.side], t = st.t;
+      // веер щупалец смотрит внутрь, к тексту
+      const spread = (st.arm - (ARMS - 1) / 2) * (phone ? 0.42 : 0.36);
+      const wave = Math.sin(time * 1.3 - st.i * 0.55 + st.arm * 1.7 + st.side * 2) * 0.32 * t;
+      const curl = (st.side ? -1 : 1) * (st.arm % 2 ? -1 : 1) * 0.55 * Math.pow(t, 1.6);   // соседние закручиваются в разные стороны — как в калейдоскопе
+      let a = b.dir + spread + curl + wave, r = R0 + t * L;
+      // тянемся к цели: к середине текста, при наведении — к курсору
+      const dx = aim.x - b.x, dy = aim.y - b.y, ta = Math.atan2(dy, dx);
+      let da = ta - a; da = Math.atan2(Math.sin(da), Math.cos(da));
+      const w = (0.22 + pull * 0.6) * Math.pow(t, 1.3);
+      a += da * w;
+      r += (Math.hypot(dx, dy) * 0.92 - (R0 + L)) * pull * Math.pow(t, 1.5) * 0.7;
       const s = Math.max(st.s, 0.05) * T;
       el.style.width = s + 'px';
-      el.style.transform = `translate(${Math.cos(a) * r - s / 2}px,${Math.sin(a) * r - s / 2}px) rotate(${a * 180 / Math.PI + 90 + curl * 40}deg)`;
+      el.style.transform = `translate(${b.x + Math.cos(a) * r - s / 2}px,${b.y + Math.sin(a) * r - s / 2}px) rotate(${a * 180 / Math.PI + 90 + curl * 50}deg)`;
     });
-    big.style.transform = `translate(${-px * 14}px,${-py * 14}px) rotate(${angle * 40}deg)`;
+    bodies.forEach((el, k) => {
+      const b = body[k], s = T * 2.2;
+      el.style.width = s + 'px';
+      el.style.transform = `translate(${b.x - s / 2}px,${b.y - s / 2}px) rotate(${(k ? 16 : -24) + Math.sin(time * 0.7 + k * 2) * 8}deg)`;
+    });
   }
   function tick(t){
     raf = 0;
     const dt = last ? Math.min(t - last, 50) : 16; last = t;
     time += dt / 1000;
-    spin *= Math.pow(0.94, dt / 16);                      // раскрутка от курсора гаснет
-    stir *= Math.pow(0.97, dt / 16);                      // и щупальца успокаиваются
-    angle += (0.00012 * dt) + spin * dt / 16;             // само чуть-чуть плывет
-    px += (tx - px) * 0.08; py += (ty - py) * 0.08;
+    pull += (pullGoal - pull) * 0.06;
+    aim.x += (goal.x - aim.x) * 0.1; aim.y += (goal.y - aim.y) * 0.1;
     place();
     if (visible && !still()) raf = requestAnimationFrame(tick);
   }
   const run = () => { if (!raf && visible && !still()){ last = 0; raf = requestAnimationFrame(tick); } };
-  // движение курсора закручивает осьминога: по часовой стрелке — туда же, против — обратно; щупальца оживают
-  ring.addEventListener('pointermove', e => {
-    const r = ring.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-    const x = e.clientX - cx, y = e.clientY - cy;
-    tx = x / (r.width / 2); ty = y / (r.height / 2);
-    if (lastX != null){
-      const cross = lastX * y - lastY * x, d = Math.max(Math.hypot(x, y) * Math.hypot(lastX, lastY), 900);
-      spin = clamp(spin + cross / d * 0.35, -0.08, 0.08);
-      stir = clamp(stir + Math.hypot(x - lastX, y - lastY) / 900, 0, 1);
-    }
-    lastX = x; lastY = y;
-    if (still()) { angle += spin; spin = 0; place(); }
+  // наведение на текст — щупальца тянутся к курсору; ушли с текста — возвращаются к середине
+  const target = headEl || ring;
+  target.addEventListener('pointermove', e => {
+    const r = ring.getBoundingClientRect();
+    goal = { x: e.clientX - r.left, y: e.clientY - r.top }; pullGoal = 1;
+    if (still()) { aim = { ...goal }; pull = 1; place(); }
   });
-  ring.addEventListener('pointerleave', () => { lastX = lastY = null; tx = ty = 0; });
+  target.addEventListener('pointerleave', () => {
+    goal = { x: W / 2, y: Hh / 2 }; pullGoal = 0;
+    if (still()) { aim = { ...goal }; pull = 0; place(); }
+  });
   new ResizeObserver(() => { size(); place(); }).observe(ring);
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(ring);
   size(); place();
