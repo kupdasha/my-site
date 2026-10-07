@@ -42,13 +42,41 @@ const head = ch => `<div class="vp-head">
 </div>`;
 const cap = t => t ? `<p class="vp-cap">${H.T(t)}</p>` : '';
 
-/* ---------- план сверху: три модуля подсвечиваются по очереди ---------- */
+/* ---------- план сверху: чертеж стенда, три модуля подсвечиваются по очереди ---------- */
+// чертеж в масштабе: 1 единица — 1 см, площадка 600 на 500. Линии прорисовываются при появлении
+const ln = (d, c = '') => `<path class="vp-ln${c}" d="${d}" pathLength="1"/>`;
+const rr = (x, y, w, h, r) => `M${x + r} ${y}H${x + w - r}A${r} ${r} 0 0 1 ${x + w} ${y + r}V${y + h - r}A${r} ${r} 0 0 1 ${x + w - r} ${y + h}H${x + r}A${r} ${r} 0 0 1 ${x} ${y + h - r}V${y + r}A${r} ${r} 0 0 1 ${x + r} ${y}Z`;
+const circ = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0`;
+function planSVG(){
+  const grid = [];
+  for (let x = 50; x < 600; x += 50) grid.push(`M${x} 0V500`);
+  for (let y = 50; y < 500; y += 50) grid.push(`M0 ${y}H600`);
+  // арка сверху: стойки на концах, между ними — навес с ламелями
+  const arch = (x, w, led) => {
+    const slats = [];
+    for (let y = 40; y <= 460; y += 20) slats.push(`M${x + 8} ${y}H${x + w - 8}`);
+    return ln(rr(x, 0, w, 500, 6), ' vp-ln-bg') + ln(rr(x + 4, 4, w - 8, 24, 4), ' vp-ln-fill') + ln(rr(x + 4, 472, w - 8, 24, 4), ' vp-ln-fill')
+      + `<path class="vp-ln vp-ln-thin" d="${slats.join('')}" pathLength="1"/>` + ln(`M${led} 0V500`, ' vp-ln-led');
+  };
+  const pouf = (x, y, r) => ln(circ(x, y, r)) + ln(circ(x, y, r * .45), ' vp-ln-thin');
+  return `<svg class="vp-draw" viewBox="-4 -4 608 508" aria-hidden="true">
+    <path class="vp-grid" d="${grid.join('')}"/>
+    ${ln('M0 0H600V500H0Z', ' vp-ln-bold')}
+    ${pouf(376, 65, 50)}${pouf(413, 413, 52)}${pouf(111, 414, 36)}${pouf(486, 290, 38)}
+    ${arch(0, 111, 111)}
+    ${arch(486, 114, 486)}
+    ${ln(rr(198, 150, 200, 200, 16), ' vp-ln-bold')}
+    ${ln(rr(228, 178, 142, 144, 6))}
+    ${ln(rr(239, 189, 120, 120, 26), ' vp-ln-dash')}
+    ${ln('M251 201L347 297M347 201L251 297', ' vp-ln-dash vp-ln-thin')}
+  </svg>`;
+}
 function planHTML(c){
   return `<div class="vp-plan">
     <div class="vp-plan-map">
       <div class="vp-dim vp-dim-w"><i></i><span>${H.T(c.width)}</span></div>
       <div class="vp-plan-pic">
-        <img src="${c.img}" alt="" draggable="false">
+        ${planSVG()}
         ${c.zones.map((z, i) => `<button class="vp-zone" data-i="${i}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%" aria-label="${esc(H.pick(z.name))}"></button>`).join('')}
       </div>
       <div class="vp-dim vp-dim-h"><i></i><span>${H.T(c.height)}</span></div>
