@@ -2435,7 +2435,7 @@ function renderCase(k, keepScroll){
       ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
       ${p.note ? `<p class="case-note" data-reveal>${T(p.note)}</p>` : ''}
     </div>
-    ${p.noHero ? '' : `<div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>`}
+    ${p.noHero ? '' : `<div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto${p.heroPhone ? `;--hp:${p.heroPhone}` : ''}"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>`}
     ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
     <div class="case-body${p.noHero ? ' no-hero' : ''}">${body}</div>
     <div class="wrap case-end">

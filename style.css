@@ -1869,3 +1869,5 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 
 /* превью-ролик у строки «других работ» (listPreview) — квадратный */
 .client-preview video{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-img);background:var(--soft)}
+/* heroPhone — на телефоне широкая шапка обрезается до этих пропорций по центру (см. Ростех) */
+@media (max-width:760px){.case-hero[style*="--hp"]{aspect-ratio:var(--hp) !important}}

@@ -2025,7 +2025,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 'Оказывается, самолеты тоже пахнут, и без спирта'],
         image: 'img/rostech.jpg',
         preview: 'img/rostech.mp4',   // тихое зацикленное превью в сетке на главной
-        heroImage: 'img/rostech/hero.jpg', heroRatio: 1920 / 815,   // в шапке кейса — кадр с флаконом целиком, без видео
+        heroImage: 'img/rostech/hero.jpg', heroRatio: 1920 / 815, heroPhone: '4/3',   // в шапке кейса — кадр с флаконом целиком, без видео; на телефоне — 4:3 по центру
         video: 'img/rostech/final.mp4',   // финальный ролик со звуком — в конце кейса, в галерее; карточка на главной остается 16:9
         link:  'https://kupdasha.ru/video',
         links: [],
