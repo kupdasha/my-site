@@ -162,7 +162,7 @@ function liveColors(box){
 /* ---------- поиски разметки: ведете по дороге — макеты меняются, колесо катится ---------- */
 function searchHTML(c){
   const n = c.items.length;
-  // подсказка — не мелкой строкой, а крупно справа от карточки
+  // подсказка — не мелкой строкой, а крупно над карточкой; игрушка по центру страницы
   return `<div class="fl-search-row"><div class="fl-search" style="--n:${n}">
     <div class="fl-stage">${c.items.map((x, i) => `<img class="${i ? '' : 'on'}" src="${x.img}" alt="" loading="lazy" draggable="false">`).join('')}
       ${c.items.map((x, i) => `<span class="fl-tag${i ? '' : ' on'}${i === n - 1 ? ' last' : ''}">${H.T(x.name)}</span>`).join('')}</div>
