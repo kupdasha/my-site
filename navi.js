@@ -3,9 +3,10 @@
    В шапке — микроанимация: камера по кругу пролетает над 3D-кампусом
    Бауманки (свой маленький рендерер на холсте), метки носителей
    в цветах статусов.
-   Главы: build — табличка с выносками-инфографикой (габарит, высота
-   букв и дистанция, стрелки по маршруту, контраст), справа текст;
-   стрелка на плите поворачивается нажатием, кружки меняют цвет плиты;
+   Главы: build — конструктор: слева макет с размерами и выносками-
+   иконками напротив строк, справа строки (стрелка поворачивается,
+   текст любой, убрать, «+»), тип носителя и цвет плиты — иконками;
+   подсказки — микроанимацией, а не текстом;
    campus — 3D-кампус: тянуть — поворот, метка — табличка в панели,
    «подойти к табличке»; «студия» — рабочий проект, таблички правятся,
    «заказчик» — только точки-замечания на табличке и «согласовать»,
@@ -199,7 +200,7 @@ function art(p, maxW, maxH, plateHex, inkHex){
       const meta = [m.en, m.dist].filter(Boolean);
       return `<div style="display:flex;align-items:flex-start;gap:${u(p.gap)}">
         <div style="flex:1 1 auto;min-width:0">
-          <div style="font-weight:600;font-size:${u(p.size)};line-height:${u(p.lh)};letter-spacing:${u(m.fr.tr * p.size)};white-space:nowrap${over(m)}">${m.fr.lines.map(esc).join('<br>')}</div>
+          <div class="nv-nm" data-i="${i}" style="font-weight:600;font-size:${u(p.size)};line-height:${u(p.lh)};letter-spacing:${u(m.fr.tr * p.size)};white-space:nowrap${over(m)}">${m.fr.lines.map(esc).join('<br>')}</div>
           ${meta.length ? `<div style="display:flex;gap:${u(p.size * .34)};margin-top:${u(p.size * .14)};opacity:.72;${small(p.size * .52)}">${meta.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}
         </div>
         <div style="flex:0 0 ${u(p.aw)};padding-top:${u(p.size * .06)}">${m.ar ? arrowSvg(m.ar, u(p.aw), ink, i) : ''}</div></div>`;
@@ -210,7 +211,7 @@ function art(p, maxW, maxH, plateHex, inkHex){
     const dots = [0, 1, 2, 3, 4, 5].map(i => `<circle cx="${3.4 + (i % 3) * 8}" cy="${4 + Math.floor(i / 3) * 7.6}" r="2.1" fill="${ink}"/>`).join('');
     body = `<div style="flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;gap:${u(p.size * (tac ? .42 : .1))}">
       ${m.no ? `<div style="font-weight:700;font-size:${u(p.size * 1.6)};line-height:.88;margin-bottom:${u(p.size * .06)}">${esc(m.no)}</div>` : ''}
-      <div style="font-weight:${tac ? 700 : 600};font-size:${u(p.size)};line-height:${u(p.lh)};white-space:nowrap${over(m)}">${m.fr.lines.map(esc).join('<br>')}</div>
+      <div class="nv-nm" data-i="0" style="font-weight:${tac ? 700 : 600};font-size:${u(p.size)};line-height:${u(p.lh)};white-space:nowrap${over(m)}">${m.fr.lines.map(esc).join('<br>')}</div>
       ${!tac && m.en ? `<div style="opacity:.72;${small(p.size * .52)}">${esc(m.en)}</div>` : ''}
       ${tac ? `<svg width="${u(p.size * 2.1)}" height="${u(p.size * .86)}" viewBox="0 0 27 14" style="display:block" aria-hidden="true">${dots}</svg>` : ''}</div>`;
   }
@@ -465,20 +466,46 @@ function liveFly(stage){
 }
 
 /* ================================================================
-   ГЛАВА build: табличка и инфографика вокруг нее, справа — текст.
-   Выноски: габарит плиты, высота строчных и дистанция чтения,
-   стрелки по маршруту, контраст. Нажатие на стрелку поворачивает ее
-   (выноска становится фиолетовой, если стрелка спорит с маршрутом),
-   кружки внизу меняют цвет плиты — выноска контраста пересчитывается.
+   ГЛАВА build: конструктор таблички. Слева — макет с размерными
+   линиями и выносками-иконками напротив нужных строк (буквы и
+   дистанция, сколько направлений, влезает ли, есть ли на плане,
+   спорит ли стрелка с маршрутом, контраст); справа — заголовок
+   и строки: стрелка (нажатие поворачивает), текст, убрать, «+».
+   Подсказки — микроанимацией: в начале одна строка сама
+   перепечатывается, у первой стрелки пульсирует кольцо, пока
+   ее не нажали; изменившаяся выноска подпрыгивает.
    ================================================================ */
-const START = ['Библиотека', 'Спортзал', 'Столовая', 'УЛК'];
-const FROM = 'guk_sq';   // указатель стоит на площади у главного корпуса
-const ICON = {
-  add: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+const START = { D2: ['Библиотека', 'Спортзал', 'Столовая', 'УЛК'], B1: '6 Корпус Т', T1: 'Столовая' };
+const DEMO = 'Технопарк';   // это слово печатается вместо последней строки, пока посетитель ничего не трогал
+const FROM = 'guk_sq';      // указатель стоит на площади у главного корпуса
+const findObj = s => {
+  const q = s.trim().toLowerCase().replace(/ё/g, 'е');
+  if (!q) return null;
+  const n = x => x.toLowerCase().replace(/ё/g, 'е');
+  return OBJECTS.find(o => n(o.ru) === q || n(o.name) === q) || OBJECTS.find(o => q.length > 2 && (n(o.ru).startsWith(q) || n(o.name).startsWith(q)));
 };
+const ICON = {
+  del: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  add: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  none: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg>',
+  // типы носителей: указатель на стойке, здание, точки Брайля
+  D2: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21V3M5 5h11l3 3-3 3H5zM6 13h11v5H6z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>',
+  B1: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V8l8-4 8 4v13M4 21h16M9 21v-6h6v6M8 10h2M14 10h2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+  T1: '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></g></svg>',
+  // выноски
+  size: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18L9 6l5 12M6 14h6M17 6v12M15 8l2-2 2 2M15 16l2 2 2-2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  route: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-6 4-8 7-8s5-2 5-6M13 5h4v4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="19" r="1.8" fill="currentColor"/></svg>',
+  count: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 10h14M5 14h14M5 18h9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>',
+  fit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5v14M20 5v14M8 12h8M10 9l-3 3 3 3M14 9l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.5 6-11a6 6 0 0 0-12 0c0 5.5 6 11 6 11z" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="10" r="2.2" fill="currentColor"/></svg>',
+  contrast: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>',
+};
+const arrowIcon = a => a ? `<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M50 88V16"/><path d="M24 42L50 14L76 42"/></g></svg>` : ICON.none;
 function buildHTML(c, headHTML){
   return `<div class="nv-build">
     <div class="nv-build-plate">
+      <div class="nv-types" role="group">${['D2', 'B1', 'T1'].map((k, i) =>
+        `<button class="nv-type${i ? '' : ' on'}" data-t="${k}" aria-label="${esc(H.pick(c.types[i]))}">${ICON[k]}<span>${H.T(c.types[i])}</span></button>`).join('')}</div>
       <div class="nv-info">
         <div class="nv-dim nv-dim-h"><span></span></div>
         <div class="nv-plate-box"></div>
@@ -488,55 +515,130 @@ function buildHTML(c, headHTML){
       <div class="nv-paint" role="group" aria-label="${esc(H.pick(c.plate))}">${PLATES.map((r, i) =>
         `<button class="nv-swatch${i ? '' : ' on'}" data-ral="${r}" style="--c:${RAL[r][1]}" aria-label="${r.replace('RAL', 'RAL ')}, ${RAL[r][2]}" title="${r.replace('RAL', 'RAL ')}, ${RAL[r][2]}"><i></i></button>`).join('')}</div>
     </div>
-    <div class="nv-build-side">${headHTML}${c.hint ? `<p class="nv-quiet nv-build-hint">${H.T(c.hint)}</p>` : ''}</div>
+    <div class="nv-build-side">${headHTML}<div class="nv-rows"></div></div>
   </div>`;
 }
 function liveBuild(box, c){
-  const plateBox = box.querySelector('.nv-plate-box'), calls = box.querySelector('.nv-calls');
-  const dimH = box.querySelector('.nv-dim-h span'), dimW = box.querySelector('.nv-dim-w span');
-  const objs = START.map(t => OBJECTS.find(o => o.ru === t)), auto = objs.map(o => route(FROM, o));
-  const st = { plate: 'RAL9004', ar: auto.map(a => a.ar) };
+  const plateBox = box.querySelector('.nv-plate-box'), calls = box.querySelector('.nv-calls'), rowsBox = box.querySelector('.nv-rows');
+  const dimH = box.querySelector('.nv-dim-h span'), dimW = box.querySelector('.nv-dim-w span'), info = box.querySelector('.nv-info');
+  // строки указателя: текст и стрелка; ar: null — стрелка по маршруту, иначе — поставлена вручную
+  const st = { type: 'D2', plate: 'RAL9004', rows: START.D2.map(t => ({ t, ar: null })), one: { B1: START.B1, T1: START.T1 }, touched: false, turned: false };
+  let prevCalls = {}, demo = 0;
   const ink = () => RAL[st.plate][0] > 50 ? 'RAL9004' : 'RAL9016';   // на светлой плите текст темный
+  const autoOf = t => { const o = findObj(t); return o ? route(FROM, o).ar : null; };
+  const L = (k, rep = {}) => Object.entries(rep).reduce((x, [a, b]) => x.replace(`{${a}}`, b), H.pick(c.calls[k]));
+  function rowsHTML(){
+    const ph = esc(H.pick(c.placeholder));
+    if (st.type !== 'D2') return `<div class="nv-row"><span class="nv-arrow ghost">${ICON[st.type]}</span><input class="nv-line" value="${esc(st.one[st.type])}" placeholder="${ph}" aria-label="${ph}"></div>`;
+    return st.rows.map((r, i) => `<div class="nv-row">
+      <button class="nv-arrow${!i && !st.turned ? ' nudge' : ''}" data-i="${i}" aria-label="${esc(H.pick(c.turn))}" title="${esc(H.pick(c.turn))}"></button>
+      <input class="nv-line" data-i="${i}" value="${esc(r.t)}" placeholder="${ph}" aria-label="${ph}">
+      <button class="nv-del" data-i="${i}" aria-label="${esc(H.pick(c.del))}" title="${esc(H.pick(c.del))}">${ICON.del}</button></div>`).join('')
+      + (st.rows.length < 6 ? `<button class="nv-add" aria-label="${esc(H.pick(c.add))}" title="${esc(H.pick(c.add))}">${ICON.add}</button>` : '');
+  }
+  function drawRows(){ rowsBox.innerHTML = rowsHTML(); render(); }
   function render(){
-    const p = prep('D2', objs.map((o, i) => ({ ru: o.ru, en: o.en, ar: st.ar[i], dist: auto[i].dist })));
-    plateBox.innerHTML = art(p, plateBox.clientWidth || 240, plateBox.clientHeight || 520, RAL[st.plate][1], RAL[ink()][1]);
-    const plate = plateBox.querySelector('.nv-plate'), t = p.t;
+    const t = TYPES[st.type], tac = t.kind === 'tactile', out = [];
+    let items;
+    if (st.type === 'D2') {
+      items = st.rows.map((r, i) => ({ r, i })).filter(x => x.r.t.trim()).map(({ r, i }) => {
+        const o = findObj(r.t), auto = o ? route(FROM, o) : { ar: null, dist: '' };
+        return { ru: r.t.trim(), en: o ? o.en : '', ar: r.ar || auto.ar, dist: auto.dist, row: i, known: !!o, wrong: !!(r.ar && o && auto.ar && r.ar !== auto.ar) };
+      });
+      // стрелки у полей поворачиваются плавно: угол растет, не сбрасываясь на 0
+      rowsBox.querySelectorAll('.nv-arrow[data-i]').forEach(b => {
+        const r = st.rows[+b.dataset.i], a = r.ar || autoOf(r.t);
+        if (!b.firstElementChild || !!a !== !b.classList.contains('empty')) b.innerHTML = arrowIcon(a);
+        b.classList.toggle('empty', !a);
+        if (a) { const deg = ARROW_DEG[a], prev = +(b.dataset.deg || deg), next = prev + ((deg - prev % 360 + 540) % 360 - 180); b.dataset.deg = next; b.firstElementChild.style.transform = `rotate(${next}deg)`; }
+        const it = items.find(x => x.row === +b.dataset.i);
+        b.classList.toggle('bad', !!(it && it.wrong));
+      });
+    } else {
+      const line = st.one[st.type].trim(), m = /^(\d{1,3})\s+(.+)$/.exec(line), ru = m ? m[2] : line, o = findObj(ru);
+      items = ru ? [{ ru, en: o ? o.en : '', no: st.type === 'B1' ? (m ? m[1] : o ? o.no : '') : '' }] : [];
+    }
+    const p = prep(st.type, items);
+    plateBox.innerHTML = art(p, plateBox.clientWidth || 220, (plateBox.clientHeight || 480) * (tac ? .5 : st.type === 'B1' ? .62 : 1), tac ? null : RAL[st.plate][1], tac ? null : RAL[ink()][1]);
+    const plate = plateBox.querySelector('.nv-plate');
     dimH.textContent = `${t.height} мм`; dimW.textContent = `${t.width} мм`;
-    box.querySelector('.nv-info').style.setProperty('--pw', plate.offsetWidth + 'px');
-    box.querySelector('.nv-info').style.setProperty('--ph', plate.offsetHeight + 'px');
-    // выноски: высота букв — у названия в первой строке (плита → строки → первая строка → текст → название), стрелки — у второй, контраст — внизу плиты
+    info.style.setProperty('--pw', plate.offsetWidth + 'px'); info.style.setProperty('--ph', plate.offsetHeight + 'px');
+    box.querySelector('.nv-paint').classList.toggle('off', tac);
+    // выноски — напротив строк, к которым относятся
     const pr = plate.getBoundingClientRect(), cr = calls.getBoundingClientRect(), at = k => pr.top - cr.top + pr.height * k;
-    const y = el => { const r = el.getBoundingClientRect(); return r.top - cr.top + r.height / 2; };
-    const row = plate.firstElementChild.firstElementChild.firstElementChild.firstElementChild, arrows = [...plate.querySelectorAll('.nv-ar')];
-    const wrongAt = st.ar.findIndex((a, i) => a !== auto[i].ar), wrong = wrongAt >= 0, contrast = contrastOf(st.plate, ink());
-    const items = [
-      [true, y(row), H.pick(c.calls.size).replace('{mm}', p.xh).replace('{m}', t.dist)],
-      [!wrong, (el => el ? y(el) : at(.4))(arrows[wrongAt >= 0 ? wrongAt : 1]), H.pick(wrong ? c.calls.wrong : c.calls.route)],
-      [contrast >= CFG.contrastMin, at(.97), H.pick(c.calls.contrast).replace('{c}', contrast).replace('{n}', CFG.contrastMin)],
-    ];
-    calls.innerHTML = items.map(([ok, top, txt]) => `<p class="nv-call${ok ? '' : ' bad'}" style="top:${top}px"><span class="nv-ic">${okIcon(ok)}</span><span>${H.T(txt)}</span></p>`).join('');
+    const yOf = el => { if (!el) return at(.5); const r = el.getBoundingClientRect(); return r.top - cr.top + r.height / 2; };
+    const nm = i => plate.querySelector(`.nv-nm[data-i="${i}"]`);
+    out.push(['size', true, yOf(nm(0)), L(tac ? 'sizeT' : 'size', { mm: p.xh, m: t.dist })]);
+    if (st.type === 'D2' && items.length > t.maxMsg) out.push(['count', false, at(.5), L('count', { n: items.length, max: t.maxMsg })]);
+    p.ms.forEach((m, k) => {
+      if (m.fr.over) out.push(['fit', false, yOf(nm(k)), L('fit')]);
+      else if (st.type === 'D2' && !items[k].known) out.push(['map', false, yOf(nm(k)), L('unknown')]);
+      else if (st.type === 'D2' && items[k].wrong) out.push(['route', false, yOf(plate.querySelector(`.nv-ar[data-i="${k}"]`)), L('wrong')]);
+    });
+    if (st.type === 'D2' && items.length && !out.some(x => !x[1] && x[0] !== 'count')) out.push(['route', true, yOf(plate.querySelector('.nv-ar[data-i="1"]') || nm(0)), L('route')]);
+    const contrast = tac ? contrastOf('RAL1023', 'RAL9004') : contrastOf(st.plate, ink());
+    out.push(['contrast', contrast >= CFG.contrastMin, at(.97), tac ? L('gost') : L('contrast', { c: contrast, n: CFG.contrastMin })]);
+    calls.innerHTML = out.map(([icon, ok, top, txt]) => {
+      const key = icon + txt, pop = !prevCalls[key] && Object.keys(prevCalls).length ? ' pop' : '';
+      return `<p class="nv-call${ok ? '' : ' bad'}${pop}" style="top:${top}px"><span class="nv-ic">${ICON[icon]}</span><span>${H.T(txt)}</span></p>`;
+    }).join('');
+    prevCalls = Object.fromEntries(out.map(([icon, , , txt]) => [icon + txt, 1]));
     // выноски не наезжают друг на друга: каждая следующая — не выше низа предыдущей
     let floor = -Infinity;
-    [...calls.children].map((el, i) => [el, items[i][1]]).sort((p, q) => p[1] - q[1]).forEach(([el, top]) => {
-      const h = el.offsetHeight, t = Math.max(top, floor + h / 2 + 12);
-      el.style.top = t + 'px'; floor = t + h / 2;
+    [...calls.children].map((el, i) => [el, out[i][2]]).sort((a, b) => a[1] - b[1]).forEach(([el, top]) => {
+      const h = el.offsetHeight, y = Math.max(top, floor + h / 2 + 10);
+      el.style.top = y + 'px'; floor = y + h / 2;
     });
   }
-  // стрелка поворачивается на 45° по часовой
-  plateBox.addEventListener('click', e => {
-    const a = e.target.closest('.nv-ar');
-    if (!a) return;
-    const i = +a.dataset.i;
-    st.ar[i] = ARROWS[(ARROWS.indexOf(st.ar[i]) + 1) % 8];
+  const touch = () => { st.touched = true; clearTimeout(demo); };
+  rowsBox.addEventListener('input', e => {
+    touch();
+    const i = e.target.dataset.i;
+    if (st.type === 'D2') st.rows[+i].t = e.target.value; else st.one[st.type] = e.target.value;
     render();
   });
+  rowsBox.addEventListener('focusin', touch);
+  rowsBox.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    touch();
+    if (b.classList.contains('nv-arrow')) {
+      // нажатие поворачивает стрелку на 45° по часовой; полный круг до маршрута — снова «по маршруту»
+      const r = st.rows[+b.dataset.i], auto = autoOf(r.t), cur = r.ar || auto || 'left';
+      const next = ARROWS[(ARROWS.indexOf(cur) + 1) % 8];
+      r.ar = next === auto ? null : next;
+      if (!st.turned) { st.turned = true; rowsBox.querySelector('.nudge')?.classList.remove('nudge'); }
+      render();
+    } else if (b.classList.contains('nv-del')) { st.rows.splice(+b.dataset.i, 1); drawRows(); }
+    else if (b.classList.contains('nv-add')) { st.rows.push({ t: '', ar: null }); drawRows(); rowsBox.querySelectorAll('.nv-line')[st.rows.length - 1].focus(); }
+  });
+  box.querySelectorAll('.nv-type').forEach(b => b.addEventListener('click', () => {
+    touch(); st.type = b.dataset.t;
+    box.querySelectorAll('.nv-type').forEach(x => x.classList.toggle('on', x === b));
+    drawRows();
+  }));
   box.querySelectorAll('.nv-swatch').forEach(b => b.addEventListener('click', () => {
-    st.plate = b.dataset.ral;
+    touch(); st.plate = b.dataset.ral;
     box.querySelectorAll('.nv-swatch').forEach(x => x.classList.toggle('on', x === b));
     render();
   }));
+  // показ: последняя строка стирается и печатается заново, пока посетитель ничего не трогал
+  function typeDemo(){
+    const i = st.rows.length - 1, inp = () => rowsBox.querySelectorAll('.nv-line')[i];
+    if (st.touched || st.type !== 'D2' || !inp()) return;
+    const from = st.rows[i].t, steps = [...Array(from.length)].map((_, k) => from.slice(0, from.length - k - 1)).concat([...DEMO].map((_, k) => DEMO.slice(0, k + 1)));
+    rowsBox.classList.add('typing');
+    const step = k => {
+      if (st.touched || !inp()) return rowsBox.classList.remove('typing');
+      st.rows[i].t = steps[k]; inp().value = steps[k]; render();
+      if (k + 1 < steps.length) demo = setTimeout(() => step(k + 1), k < from.length ? 90 : 120);
+      else rowsBox.classList.remove('typing');
+    };
+    step(0);
+  }
+  onScreen(box, v => { if (v && !st.touched && !still() && !demo) demo = setTimeout(typeDemo, 1200); }, '0px 0px -30% 0px');
   new ResizeObserver(render).observe(plateBox);
-  render();
+  drawRows();
 }
 
 /* ================================================================

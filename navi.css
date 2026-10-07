@@ -37,54 +37,86 @@
 .nv .nv-title-row a.nv-demo:hover{background:var(--ink);color:var(--bg)}
 @media (max-width:760px){.nv-title-row{grid-column:1 / -1}}
 
-/* ---------- конструктор: табличка с выносками слева, текст справа, на один экран ---------- */
-.nv-build{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(24px,4vw,72px);align-items:stretch;
+/* ---------- конструктор: макет с выносками-иконками слева, строки справа, на один экран ---------- */
+.nv-build{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:stretch;
   height:clamp(560px,calc(100vh - 140px),820px)}
-.nv-build-plate{display:flex;flex-direction:column;gap:20px;min-height:0;background:var(--nv-panel);border-radius:var(--r-img);padding:clamp(20px,2.6vw,40px)}
-.nv-info{flex:1;min-height:0;display:grid;grid-template-columns:40px auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) 40px;column-gap:clamp(12px,1.6vw,24px)}
-.nv-plate-box{grid-column:2;grid-row:1;width:clamp(150px,15vw,240px);min-height:0;display:flex;align-items:center;justify-content:center}
-.nv-plate-box .nv-ar{cursor:pointer}
+.nv-build-plate{display:flex;flex-direction:column;gap:18px;min-height:0;background:var(--nv-panel);border-radius:var(--r-img);padding:clamp(18px,2.4vw,36px)}
+/* тип носителя — иконка и одно слово */
+.nv-types{display:flex;flex-wrap:wrap;gap:8px}
+.nv-type{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px 2px 12px;border-radius:99px;background:var(--bg);font-size:17px;transition:background .3s,color .3s}
+.nv-type svg{width:22px;height:22px}
+.nv-type.on{background:var(--ink);color:var(--bg)}
+.nv-type:not(.on):hover{background:var(--ink);color:var(--bg)}
+.nv-info{flex:1;min-height:0;display:grid;grid-template-columns:40px auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) 36px;column-gap:clamp(12px,1.6vw,24px)}
+.nv-plate-box{grid-column:2;grid-row:1;width:clamp(140px,14vw,220px);min-height:0;display:flex;align-items:center;justify-content:center}
 /* размерные линии */
-.nv-dim{position:relative;display:flex;align-items:center;justify-content:center;font-size:16px;opacity:.6}
+.nv-dim{position:relative;display:flex;align-items:center;justify-content:center;font-size:16px;opacity:.55}
 .nv-dim-h{grid-column:1;grid-row:1}
-.nv-dim-h::before{content:"";position:absolute;left:50%;top:50%;height:var(--ph,0);transform:translateY(-50%);border-left:1.5px solid currentColor}
+.nv-dim-h::before{content:"";position:absolute;left:50%;top:50%;height:var(--ph,0);transform:translateY(-50%);border-left:1.5px solid currentColor;transition:height .4s var(--ease)}
 .nv-dim-h span{position:relative;transform:rotate(-90deg);white-space:nowrap;background:var(--nv-panel);padding:0 8px}
 .nv-dim-w{grid-column:2;grid-row:2}
-.nv-dim-w::before{content:"";position:absolute;top:50%;left:50%;width:var(--pw,0);transform:translateX(-50%);border-top:1.5px solid currentColor}
+.nv-dim-w::before{content:"";position:absolute;top:50%;left:50%;width:var(--pw,0);transform:translateX(-50%);border-top:1.5px solid currentColor;transition:width .4s var(--ease)}
 .nv-dim-w span{position:relative;background:var(--nv-panel);padding:0 8px;white-space:nowrap}
-.nv-dim::after{content:"";position:absolute;inset:0;pointer-events:none}
-/* выноски */
+/* выноски: линия от плиты, иконка, два-три слова */
 .nv-calls{grid-column:3;grid-row:1;position:relative;min-width:0}
-.nv-call{position:absolute;left:0;right:0;transform:translateY(-50%);margin:0;display:flex;align-items:center;gap:12px;font-size:18px;line-height:1.3;transition:top .4s var(--ease)}
-.nv-call::before{content:"";flex:none;width:clamp(16px,2vw,32px);border-top:1.5px solid currentColor;opacity:.35}
-.nv-call.ok,.nv-call:not(.bad) > .nv-ic{background:color-mix(in srgb,var(--nv-ok) 16%,transparent);color:var(--nv-ok)}
-.nv-call.bad > .nv-ic{background:color-mix(in srgb,var(--nv-fix) 18%,transparent);color:var(--nv-fix)}
+.nv-call{position:absolute;left:0;right:0;transform:translateY(-50%);margin:0;display:flex;align-items:center;gap:10px;font-size:17px;line-height:1.25;transition:top .45s var(--ease)}
+.nv-call::before{content:"";flex:none;width:clamp(14px,1.8vw,28px);border-top:1.5px solid currentColor;opacity:.3}
+.nv-call .nv-ic{flex:0 0 32px;width:32px;height:32px;margin:0;background:color-mix(in srgb,var(--nv-ok) 15%,transparent);color:var(--nv-ok)}
+.nv-call .nv-ic svg{width:19px;height:19px}
 .nv-call.bad{color:var(--nv-fix)}
-.nv-paint{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.nv-swatch i{display:block;width:34px;height:34px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(127,127,127,.35);transition:box-shadow .3s,transform .3s var(--ease)}
-.nv-swatch:hover i{transform:scale(1.08)}
+.nv-call.bad .nv-ic{background:color-mix(in srgb,var(--nv-fix) 16%,transparent);color:var(--nv-fix)}
+.nv-call.pop .nv-ic{animation:nvBounce .5s var(--ease)}
+@keyframes nvBounce{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.nv-paint{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;transition:opacity .3s}
+.nv-paint.off{opacity:.25;pointer-events:none}
+.nv-swatch i{display:block;width:32px;height:32px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(127,127,127,.35);transition:box-shadow .3s,transform .3s var(--ease)}
+.nv-swatch:hover i{transform:scale(1.1)}
 .nv-swatch.on i{box-shadow:inset 0 0 0 1px rgba(127,127,127,.35),0 0 0 3px var(--nv-panel),0 0 0 5px var(--ink)}
-.nv-build-side{display:flex;flex-direction:column;justify-content:center;min-height:0}
+/* правая колонка: заголовок и строки */
+.nv-build-side{display:flex;flex-direction:column;justify-content:center;gap:clamp(24px,3.5vh,40px);min-height:0}
 .nv-build-side .nv-head{display:block;margin:0}
-.nv-build-side .nv-label{display:block;margin-bottom:16px}
-.nv-build-side .nv-title{margin:0 0 20px}
-.nv-build-side .nv-text{margin:0}
-.nv-build-hint{margin-top:24px}
+.nv-build-side .nv-label{display:block;margin-bottom:14px}
+.nv-build-side .nv-title{margin:0 0 16px}
+.nv-build-side .nv-text{margin:0;font-size:clamp(18px,1.4vw,21px)}
+.nv-rows{display:flex;flex-direction:column;gap:8px}
+.nv-row{display:flex;gap:8px;align-items:center;animation:nvIn .35s var(--ease) both}
+@keyframes nvIn{from{opacity:0;transform:translateY(6px)}}
 .nv-line,.nv-input{border:0;background:var(--soft);color:var(--ink);font:inherit}
 .nv-line{flex:1;min-width:0;height:48px;border-radius:99px;font-size:18px;padding:0 20px 2px}
+.nv-line::placeholder{color:currentColor;opacity:.4}
 .nv-input{display:block;width:100%;resize:vertical;border-radius:20px;font-size:18px;line-height:1.45;padding:12px 18px}
 .nv-line:focus,.nv-input:focus{outline:2px solid var(--ink);outline-offset:2px}
+/* пока строка печатается сама — у последнего поля мигает курсор-полоска */
+.nv-rows.typing .nv-row:last-of-type .nv-line{box-shadow:inset 3px 0 0 var(--ink)}
+.nv-arrow,.nv-del,.nv-add{flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .3s var(--ease),background .3s,color .3s}
+.nv-arrow{position:relative;width:48px;height:48px;background:var(--ink);color:var(--bg)}
+.nv-arrow svg{width:22px;height:22px;transition:transform .45s var(--ease)}
+.nv-arrow:hover{transform:scale(1.07)}
+.nv-arrow.bad{background:var(--nv-fix);color:#fff}
+.nv-arrow.empty{background:var(--soft);color:var(--ink)}
+.nv-arrow.ghost{background:var(--soft);color:var(--ink);opacity:.6}
+/* подсказка без слов: кольцо пульсирует вокруг первой стрелки, пока ее не нажали */
+.nv-arrow.nudge::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--ink);animation:nvRing 1.8s var(--ease) infinite;pointer-events:none}
+@keyframes nvRing{0%{transform:scale(1);opacity:.6}80%,100%{transform:scale(1.6);opacity:0}}
+.nv-del{width:40px;height:40px;background:transparent;color:var(--ink);opacity:.45}
+.nv-del:hover{opacity:1;background:var(--soft)}
+.nv-del svg,.nv-add svg{width:18px;height:18px}
+.nv-add{width:48px;height:48px;background:var(--soft);color:var(--ink)}
+.nv-add:hover{background:var(--ink);color:var(--bg);transform:rotate(90deg)}
+@media (prefers-reduced-motion:reduce){.nv-arrow.nudge::after,.nv-call.pop .nv-ic,.nv-row{animation:none}}
 @media (max-width:900px),(max-height:620px){
   .nv-build{grid-template-columns:1fr;height:auto}
   .nv-build-side{order:-1}
-  .nv-build-plate{height:min(76vh,600px)}
+  .nv-build-plate{height:min(80vh,620px)}
 }
 @media (max-width:560px){
-  .nv-info{grid-template-columns:32px auto minmax(0,1fr);column-gap:10px}
-  .nv-plate-box{width:110px}
-  .nv-call{font-size:16px;gap:8px}
-  .nv-call::before{width:10px}
-  .nv-call .nv-ic{flex-basis:22px;width:22px;height:22px}
+  .nv-info{grid-template-columns:28px auto minmax(0,1fr);column-gap:10px}
+  .nv-plate-box{width:100px}
+  .nv-call{font-size:16px;gap:6px}
+  .nv-call::before{width:8px}
+  .nv-call .nv-ic{flex-basis:26px;width:26px;height:26px}
+  .nv-type span{display:none}
+  .nv-type{padding:0 12px}
 }
 
 /* ---------- 3D-кампус: студия и заказчик ---------- */
