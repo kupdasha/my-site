@@ -822,7 +822,8 @@ function mediaHTML(p){
   const img = cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async"${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
   // ролик подгружается, только когда до карточки остается экран; до этого видна обложка
   // hover: true — ролик стоит на обложке и играет, только пока курсор над карточкой
-  if (m && m.type === 'file') return `<video muted loop playsinline preload="none" ${cover ? `poster="${cover}"` : ''} data-src="${m.src}"${p.hover ? ' data-hover' : ''}></video>`;
+  // под роликом — обычная картинка-обложка: видна всегда, даже если ролик еще не загрузился или браузер его не запустил
+  if (m && m.type === 'file') return img + `<video muted loop playsinline preload="none" ${cover ? `poster="${cover}"` : ''} data-src="${m.src}"${p.hover ? ' data-hover' : ''}></video>`;
   // still: true — в сетке только статичная обложка, без ролика
   if (p.still && img) return img;
   if (m && (m.type === 'vimeo' || m.type === 'kinescope')) return img + `<iframe data-src="${embedURL(m, true)}"${p.ratio ? ` style="--vr:${p.ratio}"` : ''} allow="autoplay" tabindex="-1" aria-hidden="true"></iframe>`;
