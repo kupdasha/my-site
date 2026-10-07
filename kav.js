@@ -36,7 +36,7 @@ function zoomable(box){
 const loopVideo = (src, poster) => `<video class="kv-vid" src="${src}" poster="${poster || ''}" muted loop playsinline preload="none"></video>`;
 function liveVideos(box){
   box.querySelectorAll('.kv-vid').forEach(v => onScreen(v, on => {
-    if (on && !still()) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause();
+    if (on && !still()) { v.preload = 'auto'; v.muted = true; v.play().catch(() => v.addEventListener('canplay', () => v.play().catch(() => {}), { once: true })); } else v.pause();
   }));
 }
 
@@ -385,26 +385,55 @@ function plush3D(host, T3, ring){
   const tex = new T3.CanvasTexture(cv);
   tex.colorSpace = T3.SRGBColorSpace; tex.anisotropy = 4;
 
-  // форма: тонкая кавычка, вокруг нее — толстая скругленная фаска, получается подушка
-  // контур дробим часто и ровно: длинные прямые грани иначе не могут прогнуться и ломаются складкой
-  const dense = (pts, step) => pts.flatMap((p, i) => {
-    const q = pts[(i + 1) % pts.length], n = Math.max(1, Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / step));
-    return Array.from({ length: n }, (_, j) => [p[0] + (q[0] - p[0]) * j / n, p[1] + (q[1] - p[1]) * j / n]);
-  });
-  const shape = new T3.Shape(dense(outline(.12, 10), .05).map(p => new T3.Vector2(...p)));
-  let geo = new T3.ExtrudeGeometry(shape, { depth: .02, bevelEnabled: true, bevelThickness: .42, bevelSize: CR - .12, bevelSegments: 18, curveSegments: 4 });
-  geo.translate(0, 0, -.01);
-  // склеиваем одинаковые точки, чтобы ткань гнулась плавно
-  const src = geo.attributes.position, map = new Map(), pos = [], idx = [];
-  for (let i = 0; i < src.count; i++) {
-    const x = src.getX(i), y = src.getY(i), z = src.getZ(i);
-    const key = `${x.toFixed(4)},${y.toFixed(4)},${z.toFixed(4)}`;
-    let j = map.get(key);
-    if (j == null) { j = pos.length / 3; map.set(key, j); pos.push(x, y, z); }
-    idx.push(j);
+  // форма-подушка: точки на расстоянии меньше R от средней линии кавычки; высота — как у надутой ткани.
+  // Внутренний угол скруглен (мягкий минимум расстояний до двух ручек), края сшиты с изнанкой.
+  const seg = (x, y, p, q) => {
+    const vx = q[0] - p[0], vy = q[1] - p[1];
+    const t = clamp(((x - p[0]) * vx + (y - p[1]) * vy) / (vx * vx + vy * vy), 0, 1);
+    return Math.hypot(x - p[0] - vx * t, y - p[1] - vy * t);
+  };
+  const SM = .3;
+  const dist = (x, y) => {
+    const a = seg(x, y, CA, CB), b = seg(x, y, CB, CC);
+    const h = clamp(.5 + .5 * (b - a) / SM, 0, 1);
+    return b * (1 - h) + a * h - SM * h * (1 - h);
+  };
+  const PUFF = .5, STEP = .036;
+  const x0 = Math.min(...xs) - .1, y0 = Math.min(...ys) - .1;
+  const nx = Math.ceil((Math.max(...xs) + .1 - x0) / STEP), ny = Math.ceil((Math.max(...ys) + .1 - y0) / STEP);
+  const pos = [], idOf = new Int32Array((nx + 1) * (ny + 1)).fill(-1), rimOf = new Uint8Array((nx + 1) * (ny + 1));
+  const front = [], back = new Int32Array((nx + 1) * (ny + 1)).fill(-1);
+  for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
+    let x = x0 + i * STEP, y = y0 + j * STEP, d = dist(x, y);
+    if (d > CR + STEP * 1.5) continue;
+    const k = j * (nx + 1) + i;
+    if (d >= CR) {
+      // точку снаружи притягиваем на край: пара шагов по градиенту расстояния
+      for (let it = 0; it < 4; it++) {
+        const e = 1e-3, gx = (dist(x + e, y) - dist(x - e, y)) / (2 * e), gy = (dist(x, y + e) - dist(x, y - e)) / (2 * e), gl = Math.hypot(gx, gy) || 1;
+        x -= (d - CR) * gx / gl; y -= (d - CR) * gy / gl; d = dist(x, y);
+      }
+      rimOf[k] = 1;
+      idOf[k] = pos.length / 3; pos.push(x, y, 0);
+      back[k] = idOf[k];
+    } else {
+      const z = PUFF * Math.sqrt(1 - (d / CR) ** 2);
+      idOf[k] = pos.length / 3; pos.push(x, y, z);
+      back[k] = pos.length / 3; pos.push(x, y, -z);
+    }
   }
-  geo.dispose();
-  geo = new T3.BufferGeometry();
+  const idx = [];
+  const tri = (m, a, b, c, flip) => {
+    if (m[a] < 0 || m[b] < 0 || m[c] < 0) return;
+    if (rimOf[a] && rimOf[b] && rimOf[c]) return;
+    flip ? idx.push(m[a], m[c], m[b]) : idx.push(m[a], m[b], m[c]);
+  };
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    const a = j * (nx + 1) + i, b = a + 1, c = a + nx + 1, d = c + 1;
+    tri(idOf, a, b, d, 0); tri(idOf, a, d, c, 0);
+    tri(back, a, b, d, 1); tri(back, a, d, c, 1);
+  }
+  const geo = new T3.BufferGeometry();
   geo.setAttribute('position', new T3.Float32BufferAttribute(pos, 3));
   geo.setIndex(idx);
   const uv = []; for (let i = 0; i < pos.length; i += 3) uv.push((pos[i] - cx) / S + .5, (pos[i + 1] - cy) / S + .5);
@@ -449,7 +478,7 @@ function plush3D(host, T3, ring){
   cvs.addEventListener('pointerup', up); cvs.addEventListener('pointercancel', up);
   cvs.addEventListener('pointerleave', () => { mx = my = 0; });
 
-  const SIG = .68, DENT = .6;
+  const SIG = .52, DENT = .72;
   const deform = () => {
     const a = P.array, sq = 1 - .22 * press, wide = 1 + .06 * press;
     for (let i = 0; i < a.length; i += 3) {

@@ -127,7 +127,7 @@
 .kv-toy-still[hidden]{display:none}
 .kv-plush-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.6vw,20px);align-items:start}
 .kv-plush-side .kv-shot{aspect-ratio:4/5}
-.kv-plush-side .kv-mini{grid-column:1 / -1;width:min(150px,40%)}
+.kv-plush-side .kv-mini{width:min(150px,100%)}
 .kv-plush-side .kv-vid{aspect-ratio:9/16}
 @media (max-width:760px){.kv-plush{grid-template-columns:minmax(0,1fr)}}
 
@@ -136,7 +136,7 @@
 .kv-cell .kv-shot{aspect-ratio:4/5;height:100%}
 .kv-c0{grid-column:span 2;grid-row:span 2}
 .kv-c0 .kv-shot{aspect-ratio:auto}
-.kv-vids{grid-column:span 3;display:flex;justify-content:center;align-items:center;gap:clamp(10px,1.4vw,20px);padding:clamp(10px,1.4vw,20px)}
+.kv-vids{grid-column:span 2;display:flex;justify-content:center;align-items:center;gap:clamp(10px,1.4vw,20px);padding:clamp(10px,1.4vw,20px)}
 .kv-vids .kv-mini{height:100%;aspect-ratio:9/16;max-width:170px}
 .kv-vids .kv-vid{height:100%;aspect-ratio:9/16}
 @media (max-width:760px){

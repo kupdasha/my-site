@@ -2433,7 +2433,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                    'Плюшевая кавычка на сумку или рюкзак. По краю бежит «медиа о дизайне, и вообще». Нажмите — она мягкая'],
             plush: {
               ring: ['медиа о дизайне, и вообще', 'медиа о дизайне, и вообще'],
-              photos: ['img/kavychka/plush-hand.webp', 'img/kavychka/plush-bag.webp'],
+              photos: ['img/kavychka/plush-hand.webp'],
               video: 'img/kavychka/plush.mp4',
               poster: 'img/kavychka/plush.jpg',
               hint: ['Нажмите на брелок и подержите — он мягкий', 'Потыкайте. Она не обидится'],
@@ -2451,6 +2451,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 { video: 'img/kavychka/black.mp4', poster: 'img/kavychka/black.jpg' },
                 'img/kavychka/white-dark.webp',
                 'img/kavychka/white-back.webp',
+                'img/kavychka/plush-bag.webp',
               ],
               hint: ['Нажмите на кадр, чтобы увеличить', 'Нажмите на кадр — увеличится'],
             } },
