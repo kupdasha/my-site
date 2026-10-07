@@ -114,7 +114,7 @@ button.ac-cell:hover img{transform:scale(1.04)}
 .ac-films{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,1.2vw,16px)}
 @media (max-width:760px){.ac-films{grid-template-columns:1fr}}
 /* итог: какой свет выбрали */
-.ac-outro{margin-top:clamp(56px,7vw,104px);margin-left:calc(4 / 12 * 100%);font-weight:500;font-size:clamp(24px,2.4vw,34px);line-height:1.25;max-width:30ch;text-wrap:balance}
+.ac-outro{margin-top:clamp(56px,7vw,104px);margin-left:calc(4 / 12 * 100%);font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
 @media (max-width:760px){.ac-outro{margin-left:0}}
 
 /* ---------- полный ролик ---------- */
