@@ -26,89 +26,16 @@
 .bad > .nv-ic{background:color-mix(in srgb,var(--nv-fix) 18%,transparent);color:var(--nv-fix)}
 .nv-plate{display:flex;flex-direction:column;font-family:var(--font);box-shadow:0 26px 60px -24px rgba(0,0,0,.45);overflow:hidden;flex:none}
 
-/* ---------- шапка: 3D-ролик ---------- */
-.case-hero.nv-hero{aspect-ratio:auto;max-height:none;overflow:visible;background:none}
-.nv-stage{position:relative;width:100%;max-width:calc(86vh * 16 / 9);margin:0 auto;aspect-ratio:16/9;background:#0a0a0b;overflow:hidden;container-type:inline-size;color:#e7e7ea;font-family:var(--font)}
-.nv-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.nv-scrim{position:absolute;inset:0;background:#0a0a0b;opacity:0;transition:opacity .5s ease;pointer-events:none}
-.nv-ui{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:5% 6%;opacity:0;transition:opacity .45s ease;pointer-events:none}
-.nv-ui.on{opacity:1}
-.nv-film-bar{margin-top:20px}
-.nv-ctl{display:flex;align-items:center;gap:12px}
-.nv-ctl .btn:not(:first-child){background:var(--soft);color:var(--ink)}
-.nv-ctl .btn:not(:first-child):hover{background:var(--ink);color:var(--bg)}
-.nv-track{position:relative;flex:1;height:28px;cursor:pointer;touch-action:none}
-.nv-track::before{content:"";position:absolute;left:0;right:0;top:12px;height:4px;border-radius:4px;background:var(--line)}
-.nv-bar{position:absolute;left:0;top:12px;height:4px;border-radius:4px;background:var(--ink);width:0}
-.nv-ticks i{position:absolute;top:9px;width:2px;height:10px;margin-left:-1px;border-radius:2px;background:var(--line)}
-.nv-track:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:4px}
-.nv-tc{font-size:16px;opacity:.6;font-variant-numeric:tabular-nums;white-space:nowrap}
-.nv-cap{min-height:6.2em;margin-top:20px;transition:opacity .4s}
-.nv-cap.off{opacity:0}
-.nv-cap.in .nv-cap-t,.nv-cap.in .nv-cap-s{animation:nvUp .55s var(--ease) both}
-.nv-cap.in .nv-cap-s{animation-delay:.08s}
-.nv-cap-t{font-weight:500;font-size:clamp(24px,2.4vw,34px);line-height:1.12;letter-spacing:-.01em;margin:0 0 .3em;text-wrap:balance}
-.nv-cap-s{font-size:18px;line-height:1.45;opacity:.7;margin:0;max-width:62ch}
-@keyframes nvUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-@media (max-width:640px){
-  .nv-ctl{flex-wrap:wrap}
-  .nv-track{order:3;flex:1 1 100%}
-  .nv-tc{margin-left:auto}
-}
+/* ---------- шапка: пролеты над 3D-кампусом ---------- */
+.case-hero.nv-hero .nv-fly{position:absolute;inset:0;width:100%;height:100%;display:block}
 
-/* картинки поверх кадра — в долях кадра, как в самом ролике */
-.nv-ov{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:4%}
-.nv-ov-two > *{flex:0 1 auto;display:flex;align-items:center;justify-content:center;max-width:48%}
-.nv-ov-col{flex-direction:column;gap:3cqw}
-.nv-ov-chap{flex-direction:column;gap:0;text-align:center}
-.nv-chip{background:#8B5CF6;color:#fff;font-weight:600;font-size:1.5cqw;padding:.55cqw 1.6cqw .7cqw;border-radius:99px;margin-bottom:2cqw}
-.nv-ov-chap b{font-weight:700;font-size:6.4cqw;line-height:1;letter-spacing:-.035em;color:#fafafa}
-.nv-ov-chap p{margin:1.5cqw 0 0;font-size:1.9cqw;line-height:1.45;color:#8b8b93;max-width:26ch}
-.nv-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:.8cqw;width:100%}
-.nv-mini{background:#1c1e20;border-radius:.3cqw;padding:.5cqw .45cqw;display:flex;flex-direction:column;gap:.3cqw;aspect-ratio:7/10}
-.nv-mini i{display:block;height:.45cqw;background:#4a4d52;border-radius:2px}
-.nv-mini.bad{background:#33257a;animation:nvBlink 1.4s ease-in-out infinite}
-.nv-mini.bad i{background:#9c8bdd}
-@keyframes nvBlink{50%{opacity:.45}}
-.nv-stack{position:relative;width:20%;aspect-ratio:3/4}
-.nv-stack i{position:absolute;inset:0;background:#e8e8ea;border-radius:.4cqw;transform:translate(calc(var(--i) * .35cqw),calc(var(--i) * -.4cqw));padding:12% 10%;display:flex;flex-direction:column;gap:8%;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.nv-stack b{display:block;height:5%;background:#c3c3c8;border-radius:2px}
-.nv-letter{background:#161618;border-radius:1.2cqw;padding:1.6cqw 2cqw;font-size:1.8cqw;line-height:1.45;max-width:38%}
-.nv-code{flex-direction:column;align-items:flex-start!important;gap:.4cqw;background:#161618;border-radius:1.1cqw;padding:1.5cqw 1.8cqw;font-size:1.6cqw;line-height:1.5}
-.nv-code span:first-child{color:#8b8b93;margin-bottom:.4cqw}
-.nv-checks{flex-direction:column;align-items:stretch!important;gap:1cqw;width:40cqw}
-.nv-chk{display:flex;align-items:center;gap:1cqw;background:#161618;border-radius:1.1cqw;padding:1cqw 1.4cqw;font-size:1.6cqw}
-.nv-chk.bad{background:#241a3d}
-.nv-chk .nv-ic{flex:0 0 2cqw;width:2cqw;height:2cqw;margin:0}
-.nv-chk .nv-ic svg{width:1.4cqw;height:1.4cqw}
-.nv-chk.ok .nv-ic{background:rgba(22,163,74,.18);color:#16a34a}
-.nv-chk.bad .nv-ic{background:rgba(139,92,246,.22);color:#a58bff}
-.nv-sw{display:grid!important;grid-template-columns:repeat(2,1fr);gap:1cqw;width:34cqw}
-.nv-sw div{display:flex;align-items:center;gap:1cqw;background:#161618;border-radius:1cqw;padding:1cqw 1.3cqw;font-size:1.7cqw}
-.nv-sw i{width:2.6cqw;height:2.6cqw;border-radius:.8cqw;flex:none}
-.nv-contrast{flex-direction:column;background:#161618;border-radius:2cqw;padding:2.8cqw 3.4cqw;text-align:center}
-.nv-contrast b{font-size:5.8cqw;color:#16a34a;line-height:1}
-.nv-contrast span{margin-top:1cqw;font-size:1.75cqw}
-.nv-contrast em{margin-top:.6cqw;font-style:normal;font-size:1.5cqw;color:#6b6b73}
-.nv-sheet{flex-direction:column;align-items:stretch!important;background:#161618;border-radius:1.7cqw;padding:1.8cqw 2cqw;width:28cqw}
-.nv-sheet > b{font-size:1.9cqw;margin-bottom:1.3cqw;color:#fafafa}
-.nv-pin{display:flex;gap:.9cqw;align-items:flex-start;margin-bottom:1.4cqw}
-.nv-pin span{flex:0 0 1.7cqw;height:1.7cqw;border-radius:50%;background:#8B5CF6}
-.nv-pin p{margin:0;flex:1;background:#111113;border-radius:.9cqw;padding:.8cqw 1cqw;font-size:1.45cqw}
-.nv-sheet-btns{display:flex;gap:.7cqw}
-.nv-sheet-btns span{flex:1;text-align:center;padding:.8cqw 0 .95cqw;border-radius:99px;font-weight:600;font-size:1.4cqw}
-.nv-sheet-btns .ok{background:#D6F0B8;color:#1E4711}
-.nv-sheet-btns .fix{background:#E4DAFB;color:#3B2870}
-.nv-stages{display:flex;align-items:center;gap:.8cqw;flex-wrap:wrap;justify-content:center}
-.nv-stages span{background:#161618;color:#8b8b93;padding:.7cqw 1.3cqw .85cqw;border-radius:99px;font-size:1.5cqw}
-.nv-stages span.on{background:#16a34a;color:#fff;font-weight:600}
-.nv-stages em{color:#6b6b73;font-style:normal;font-size:1.5cqw}
-.nv-vector{display:flex;flex-direction:column;align-items:center;background:#161618;border-radius:1.7cqw;padding:2.4cqw 3cqw;text-align:center}
-.nv-vector b{font-size:1.9cqw;color:#fafafa}
-.nv-vector span{font-size:1.5cqw;color:#8b8b93;margin-top:.4cqw}
-.nv-ov-logo{gap:1cqw}
-.nv-ov-logo b{font-weight:700;font-size:4.6cqw;letter-spacing:-.03em;color:#fafafa;text-align:center}
-.nv-ov-logo span{font-size:1.6cqw;color:#8b8b93}
+/* ---------- заголовок главы с кнопкой демо ---------- */
+.nv-title-row{grid-column:5 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:20px 32px}
+.nv-title-row .nv-title{grid-column:auto}
+/* ярко-зеленая кнопка демо; темный текст — контраст выше 10:1 */
+.nv-demo{background:#14E05A;color:#0E1A12;flex:none}
+.nv-demo:hover{background:var(--ink);color:var(--bg)}
+@media (max-width:760px){.nv-title-row{grid-column:1 / -1}}
 
 /* ---------- конструктор таблички ---------- */
 .nv-build{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(28px,4vw,64px);align-items:start}
@@ -188,4 +115,3 @@
 .nv-rec{position:relative;aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:var(--soft)}
 .nv-rec iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
-@media (prefers-reduced-motion:reduce){.nv-mini.bad{animation:none}.nv-cap.in .nv-cap-t,.nv-cap.in .nv-cap-s{animation:none}}

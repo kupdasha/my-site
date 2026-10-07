@@ -1,13 +1,15 @@
 /* ================================================================
    КЕЙС «СТУДИЯ ДИЗАЙНА НАВИГАЦИИ» (поле navi у проекта)
-   В шапке — 3D-ролик, написанный кодом: кампус Бауманки на холсте,
-   камера и титры по сценам, плеер с паузой и перемоткой.
+   В шапке — микроанимация: камера по кругу пролетает над 3D-кампусом
+   Бауманки (свой маленький рендерер на холсте), метки носителей
+   в цветах статусов.
    Главы: build — конструктор таблички: текст → макет, цвет плиты
    и текста из красок RAL, сверка с техзаданием на лету;
    campus — 3D-кампус: тянуть — поворот, метка — табличка в панели,
    «подойти к табличке», переключатель «студия / заказчик»
    (замечание заказчика сразу видно в студии);
-   rec — запись экрана настоящей студии (Kinescope).
+   rec — запись экрана настоящей студии (Kinescope), у заголовка —
+   зеленая кнопка демо (поле demo у главы).
    Данные кампуса, графа дорожек и правила типов носителей —
    из демо студии. Тексты — в content.js, оформление — navi.css.
    ================================================================ */
@@ -416,156 +418,48 @@ const okIcon = ok => ok
   : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v8.5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><circle cx="12" cy="18.6" r="1.7" fill="currentColor"/></svg>`;
 
 /* ================================================================
-   3D-РОЛИК В ШАПКЕ: сцены по времени, камера между точками a и b
+   ШАПКА: камера по кругу пролетает над 3D-кампусом
    ================================================================ */
-// сцена: d — длительность, cam a → b, ov — картинка поверх кадра, dim — затемнение кадра под ней
-// титры и тексты картинок — в content.js (film.scenes), по порядку
-const SCENES = [
-  { d: 6, cam: [[.10, .72, 1100], [.46, .66, 900]], reveal: [0, 1] },
-  { d: 5, ov: 'chap', dim: .9, cam: [[.46, .66, 900], [.52, .66, 910]] },
-  { d: 9, ov: 'grid', dim: .86, cam: [[.52, .66, 910], [.62, .66, 930]] },
-  { d: 9, ov: 'gridBad', dim: .86, cam: [[.62, .66, 930], [.72, .66, 950]] },
-  { d: 9, ov: 'pdf', dim: .88, cam: [[.72, .66, 950], [.82, .68, 965]] },
-  { d: 6, ov: 'chap', dim: .9, cam: [[.82, .68, 965], [.88, .70, 955]] },
-  { d: 12, ov: 'text', dim: .9, cam: [[.88, .70, 955], [.98, .72, 940]] },
-  { d: 14, ov: 'checks', dim: .9, cam: [[.98, .72, 940], [1.08, .74, 930]] },
-  { d: 11, ov: 'palette', dim: .9, cam: [[1.08, .74, 930], [1.16, .74, 920]] },
-  { d: 13, approach: true },
-  { d: 9, cam: [[.2, .5, 120, 3], [.38, .66, 430, 2]], place: true },
-  { d: 12, ov: 'client', dim: .9, cam: [[.38, .66, 430, 2], [.50, .72, 700]], status: 'mix' },
-  { d: 8, ov: 'stages', dim: .9, cam: [[.50, .72, 700], [.60, .74, 820]], status: 'ok' },
-  { d: 8, ov: 'logo', dim: .55, cam: [[.60, .74, 820], [.96, .80, 1250]], status: 'ok' },
+// точки пролета: yaw, pitch, dist, tx, ty, tz; между ними — плавный переход, по кругу
+const FLY = [
+  [.30, .82, 980, 0, 0, 0],      // весь кампус сверху
+  [.62, .52, 420, -40, 10, 4],   // ниже, над главным корпусом
+  [1.05, .34, 210, 20, 40, 8],   // низко вдоль двора
+  [1.50, .44, 300, 90, 140, 6],  // к библиотеке и набережной
+  [2.10, .62, 560, 40, 60, 0],   // разворот
+  [2.60, .40, 260, -110, -30, 6],// над западными корпусами
+  [3.10, .70, 760, 0, -20, 0],   // набор высоты
 ];
-const TOTAL = SCENES.reduce((s, x) => s + x.d, 0);
-const statusMap = kind => {
-  const m = {};
-  BOARDS.forEach((b, i) => { m[b.id] = kind === 'mix' ? (i % 5 === 0 ? 'fix' : i % 3 === 0 ? 'ok' : '') : (i % 7 === 0 ? 'fix' : 'ok'); });
-  return m;
-};
-const fmtTime = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-
-// картинки поверх кадра; sh — высота кадра в px (макеты плит считаются в пикселях)
-const OV = {
-  chap: c => `<div class="nv-ov nv-ov-chap"><span class="nv-chip">${H.T(c.chap[0])}</span><b>${H.T(c.chap[1])}</b><p>${H.T(c.chap[2])}</p></div>`,
-  grid: () => gridOv(false),
-  gridBad: () => gridOv(true),
-  pdf: c => `<div class="nv-ov nv-ov-two"><div class="nv-stack">${Array.from({ length: 7 }, (_, i) => `<i style="--i:${i}"><b></b><b></b><b></b><b></b><b></b></i>`).join('')}</div>
-    <div class="nv-letter">«${H.T(c.quote || '')}»</div></div>`,
-  text: (c, sh) => {
-    const b = D2(), p = prepBoard(b);
-    return `<div class="nv-ov nv-ov-two"><div class="nv-code"><span>указатель, ${esc(b.zone.toLowerCase())}</span>${p.ms.map(m => `<span>${esc(m.ru)} ${m.ar ? ARROW_CH[m.ar] : ''}</span>`).join('')}</div>
-      <div>${art(p, sh * .24, sh * .62)}</div></div>`;
-  },
-  checks: (c, sh) => `<div class="nv-ov nv-ov-two"><div>${art(prepBoard(D2()), sh * .22, sh * .58)}</div>
-    <div class="nv-checks">${(c.checks || []).map(([k, t]) => `<div class="nv-chk ${k}"><span class="nv-ic">${okIcon(k === 'ok')}</span>${H.T(t)}</div>`).join('')}</div></div>`,
-  palette: c => `<div class="nv-ov nv-ov-two"><div class="nv-sw">${['RAL9004', 'RAL9016', 'RAL6005', 'RAL1015'].map(r => `<div><i style="background:${RAL[r][1]}"></i>${r.replace('RAL', 'RAL ')}</div>`).join('')}</div>
-    <div class="nv-contrast"><b>${contrastOf('RAL9016', 'RAL9004')}</b><span>${H.T(c.contrast[0])}</span><em>${H.T(c.contrast[1])}</em></div></div>`,
-  client: (c, sh) => {
-    const b = BOARDS.find(x => x.type === 'B1' && objById.get(x.msgs[0]).no) || BOARDS.find(x => x.type === 'B1');
-    return `<div class="nv-ov nv-ov-two"><div>${art(prepBoard(b), sh * .24, sh * .42)}</div>
-      <div class="nv-sheet"><b>${H.T(c.sheet.title)} №${b.n}</b><div class="nv-pin"><span></span><p>${H.T(c.sheet.note)}</p></div>
-      <div class="nv-sheet-btns"><span class="ok">${H.T(c.sheet.ok)}</span><span class="fix">${H.T(c.sheet.fix)}</span></div></div></div>`;
-  },
-  stages: c => `<div class="nv-ov nv-ov-col"><div class="nv-stages">${c.stages.map((s, i) => `<span${i === c.stages.length - 1 ? ' class="on"' : ''}>${H.T(s)}</span>`).join('<em>→</em>')}</div>
-    <div class="nv-vector"><b>${H.T(c.vector[0])}</b><span>${H.T(c.vector[1])}</span></div></div>`,
-  logo: c => `<div class="nv-ov nv-ov-col nv-ov-logo"><b>${H.T(c.logo[0])}</b><span>${H.T(c.logo[1])}</span></div>`,
-};
-function gridOv(bad){
-  const red = [4, 9, 15, 21, 26, 31, 38, 44];
-  return `<div class="nv-ov"><div class="nv-grid">${Array.from({ length: 48 }, (_, i) =>
-    `<div class="nv-mini${bad && red.includes(i) ? ' bad' : ''}"><i style="width:62%"></i><i style="width:44%"></i><i style="width:70%"></i><i style="width:38%"></i></div>`).join('')}</div></div>`;
-}
-
-function filmHTML(F){
-  return `<div class="nv-film">
-    <div class="nv-stage"><canvas class="nv-cv" aria-label="3D-ролик о студии дизайна навигации"></canvas><div class="nv-scrim"></div><div class="nv-ui"></div></div>
-    <div class="wrap nv-film-bar">
-      <div class="nv-ctl">
-        <button class="btn btn-line nv-pp"><span class="spell">${H.T(F.play)}</span></button>
-        <button class="btn btn-line nv-rs"><span class="spell">${H.T(F.again)}</span></button>
-        <div class="nv-track" role="slider" tabindex="0" aria-label="Перемотка" aria-valuemin="0" aria-valuemax="${TOTAL}"><div class="nv-ticks">${SCENES.map((s, i) =>
-          i ? `<i style="left:${SCENES.slice(0, i).reduce((a, x) => a + x.d, 0) / TOTAL * 100}%"></i>` : '').join('')}</div><div class="nv-bar"></div></div>
-        <span class="nv-tc">0:00 / ${fmtTime(TOTAL)}</span>
-      </div>
-      <div class="nv-cap"><h3 class="nv-cap-t"></h3><p class="nv-cap-s"></p></div>
-    </div>
-  </div>`;
-}
-function liveFilm(box, F){
-  const cv = box.querySelector('.nv-cv'), stage = box.querySelector('.nv-stage'), ui = box.querySelector('.nv-ui'), scrim = box.querySelector('.nv-scrim');
-  const capT = box.querySelector('.nv-cap-t'), capS = box.querySelector('.nv-cap-s'), cap = box.querySelector('.nv-cap');
-  const bar = box.querySelector('.nv-bar'), tc = box.querySelector('.nv-tc'), pp = box.querySelector('.nv-pp'), track = box.querySelector('.nv-track');
-  const cam = { yaw: .32, pitch: .7, dist: 900, tx: 0, ty: 0, tz: 0 };
-  let elapsed = 0, playing = false, wanted = !still(), visible = false, cur = -1, t0 = 0, timer = 0, from = null, to = null;
-  const label = () => { pp.querySelector('.spell').innerHTML = H.T(playing ? F.play : elapsed >= TOTAL ? F.again : F.resume); };
-  const sceneAt = t => {
-    let acc = 0;
-    for (let i = 0; i < SCENES.length; i++) { if (t < acc + SCENES[i].d || i === SCENES.length - 1) return [i, t - acc]; acc += SCENES[i].d; }
-  };
-  function enter(i){
-    cur = i;
-    const sc = SCENES[i], c = F.scenes[i] || {};
-    cap.classList.toggle('off', !!c.chap);
-    capT.innerHTML = c.t ? H.T(c.t) : ''; capS.innerHTML = c.s ? H.T(c.s) : '';
-    cap.classList.remove('in'); void cap.offsetWidth; cap.classList.add('in');
-    ui.innerHTML = sc.ov ? OV[sc.ov](c, stage.clientHeight) : '';
-    ui.classList.toggle('on', !!sc.ov);
-    scrim.style.opacity = sc.dim || 0;
-    if (sc.approach) { from = { ...cam }; to = faceCam(D2()); }
-  }
+const LEG = 7;   // секунд на перелет между точками
+// статусы меток: часть согласована, часть ждет правок — как в рабочей карте
+const FLY_STATUS = Object.fromEntries(BOARDS.map((b, i) => [b.id, i % 5 === 0 ? 'fix' : i % 3 === 0 ? '' : 'ok']));
+function liveFly(stage){
+  const cv = stage.querySelector('.nv-cv'), cam = { yaw: 0, pitch: 0, dist: 0, tx: 0, ty: 0, tz: 0 };
+  let t = 0, last = 0, timer = 0;
+  const keys = ['yaw', 'pitch', 'dist', 'tx', 'ty', 'tz'];
   function frame(){
-    const [i, local] = sceneAt(elapsed), sc = SCENES[i], k = clamp(local / sc.d, 0, 1), e = ease(k);
-    if (i !== cur) enter(i);
-    if (sc.approach && to) {
-      let dy = to.yaw - from.yaw;
-      while (dy > Math.PI) dy -= 2 * Math.PI;
-      while (dy < -Math.PI) dy += 2 * Math.PI;
-      cam.tx = lerp(from.tx, to.tx, e); cam.ty = lerp(from.ty, to.ty, e); cam.tz = lerp(from.tz, to.tz, e);
-      cam.dist = lerp(from.dist, to.dist, Math.pow(e, .7)); cam.pitch = lerp(from.pitch, to.pitch, e); cam.yaw = from.yaw + dy * e;
-    } else if (sc.cam) {
-      const [a, b] = sc.cam;
-      cam.yaw = lerp(a[0], b[0], e); cam.pitch = lerp(a[1], b[1], e); cam.dist = lerp(a[2], b[2], e);
-      cam.tz = lerp(a[3] || 0, b[3] || 0, e); cam.tx = 0; cam.ty = 0;
-    }
+    const n = FLY.length, k = t / LEG, i = Math.floor(k) % n, a = FLY[i], b = FLY[(i + 1) % n];
+    // последняя точка ведет в первую: yaw продолжает расти, чтобы камера не крутилась назад
+    const e = ease(k - Math.floor(k)), turn = i === n - 1 ? 2 * Math.PI * Math.ceil((a[0] - b[0]) / (2 * Math.PI)) : 0;
+    keys.forEach((key, j) => { cam[key] = j === 2 ? Math.exp(lerp(Math.log(a[j]), Math.log(b[j]), e)) : lerp(a[j], b[j] + (j ? 0 : turn), e); });
     const [g, W, Hh] = sizeCanvas(cv);
-    draw3d(g, W, Hh, cam, {
-      pal: PAL.dark, reveal: sc.reveal ? lerp(sc.reveal[0], sc.reveal[1], e) : 1,
-      status: sc.status ? statusMap(sc.status) : null,
-      pulse: sc.approach ? D2().id : sc.place && k > .45 ? BOARDS[3].id : null,
-      labels: cam.dist > 120,
-    });
-    bar.style.width = elapsed / TOTAL * 100 + '%';
-    tc.textContent = `${fmtTime(elapsed)} / ${fmtTime(TOTAL)}`;
-    track.setAttribute('aria-valuenow', Math.round(elapsed));
+    draw3d(g, W, Hh, cam, { pal: dark() ? PAL.dark : PAL.light, status: FLY_STATUS, labels: cam.dist > 120 && cam.dist < 700 });
   }
   function tick(){
-    if (!box.isConnected) return stop();
+    if (!stage.isConnected) return clearInterval(timer);
     const now = performance.now();
-    elapsed = Math.min(TOTAL, elapsed + (now - t0) / 1000); t0 = now;
+    t += Math.min(.1, (now - last) / 1000); last = now;
     frame();
-    if (elapsed >= TOTAL) { stop(); wanted = false; label(); }
   }
-  // цикл на таймере, а не на requestAnimationFrame: так ролик не глохнет во встроенных окнах предпросмотра
-  function start(){ if (playing) return; playing = true; t0 = performance.now(); timer = setInterval(tick, 1000 / 30); label(); }
-  function stop(){ playing = false; clearInterval(timer); label(); }
-  const sync = () => (wanted && visible ? start() : stop());
-  pp.addEventListener('click', () => {
-    if (elapsed >= TOTAL) { elapsed = 0; cur = -1; }
-    wanted = !playing; sync();
-    if (!playing) frame();
+  // цикл на таймере, а не на requestAnimationFrame: так анимация не глохнет во встроенных окнах предпросмотра;
+  // идет, только пока шапка на экране
+  onScreen(stage, v => {
+    clearInterval(timer);
+    if (v && !still()) { last = performance.now(); timer = setInterval(tick, 1000 / 30); }
   });
-  box.querySelector('.nv-rs').addEventListener('click', () => { elapsed = 0; cur = -1; wanted = true; sync(); frame(); });
-  // перемотка: нажать или тянуть по полоске
-  const seek = e => { const r = track.getBoundingClientRect(); elapsed = clamp((e.clientX - r.left) / r.width, 0, 1) * TOTAL * .9999; cur = -1; frame(); label(); };
-  track.addEventListener('pointerdown', e => { track.setPointerCapture(e.pointerId); seek(e); track.onpointermove = seek; });
-  track.addEventListener('pointerup', () => { track.onpointermove = null; });
-  track.addEventListener('keydown', e => {
-    const d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0;
-    if (d) { e.preventDefault(); elapsed = clamp(elapsed + d, 0, TOTAL - .01); cur = -1; frame(); }
-  });
-  onScreen(stage, v => { visible = v; sync(); });
-  addEventListener('resize', () => { if (box.isConnected && !playing) { cur = -1; frame(); } });
-  frame(); label();
+  new MutationObserver(frame).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  addEventListener('resize', () => { if (stage.isConnected) frame(); });
+  frame();
 }
 
 /* ================================================================
@@ -821,9 +715,10 @@ const KINDS = {
   campus: [campusHTML, liveCampus],
   rec: [recHTML, () => {}],
 };
+// demo — ярко-зеленая кнопка рядом с заголовком главы
 const head = ch => `<div class="nv-head">
   <span class="case-label nv-label">${H.T(ch.label)}</span>
-  <h2 class="nv-title">${H.T(ch.title)}</h2>
+  <div class="nv-title-row"><h2 class="nv-title">${H.T(ch.title)}</h2>${ch.demo ? `<a class="btn nv-demo" href="${esc(ch.demo.link)}" target="_blank" rel="noopener"><span class="spell">${H.T(ch.demo.text)}</span></a>` : ''}</div>
   ${ch.text ? `<p class="nv-text">${H.T(ch.text)}</p>` : ''}
 </div>`;
 let cssReady;
@@ -846,12 +741,12 @@ export async function mountNavi(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   measureX();
   const N = p.navi;
-  // шапка кейса: вместо обложки — 3D-ролик кодом
+  // шапка кейса: вместо обложки — пролеты над 3D-кампусом (обложка видна, пока грузится код)
   const hero = (mount.closest('.case-body') || mount).parentElement?.querySelector('.case-hero');
-  if (hero && N.film) {
+  if (hero && N.fly) {
     hero.classList.add('nv-hero');
-    hero.innerHTML = filmHTML(N.film);
-    liveFilm(hero.querySelector('.nv-film'), N.film);
+    hero.insertAdjacentHTML('beforeend', '<canvas class="nv-cv nv-fly" aria-hidden="true"></canvas>');
+    liveFly(hero);
   }
   const ch = N.chapters || [];
   const kinds = ch.map(c => Object.keys(KINDS).find(k => c[k]));
