@@ -56,6 +56,12 @@
 
 /* ---------- цепочка этапов: ровно как .yst, но без верхней линии и отступа снизу ---------- */
 .su-steps{border-top:0;padding-top:0;margin-bottom:0}
+/* на планшете шесть шагов в столбик слишком длинны — две колонки, линия над каждым шагом вместо стрелок */
+@media (min-width:641px) and (max-width:900px){
+  .su-steps{display:grid;grid-template-columns:1fr 1fr;gap:28px 32px}
+  .su-steps .yst-arrow{display:none}
+  .su-steps .yst-step{border-top:2px solid var(--line);padding-top:16px}
+}
 
 /* ---------- точки на рендере ---------- */
 .su-stage{position:relative;display:block;width:100%;padding:0;border-radius:var(--r-img);overflow:hidden;background:var(--soft);user-select:none;-webkit-user-select:none}

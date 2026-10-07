@@ -65,11 +65,6 @@ function diverSVG(colored){
   const grips = s => grip(mid(s.sh, s.el, .24), mid(s.sh, s.el, .86), 11) + grip(mid(s.hip, s.kn, .22), mid(s.hip, s.kn, .84), 12);
   // ножные обхваты подвески
   const legStrap = s => seg(mid(s.hip, s.kn, .04), mid(s.hip, s.kn, .14), 23, strap);
-  // кольцо-логотип на шлеме: четыре дуги фирменных цветов
-  const ring = (cx, cy, r) => ['#E53E3E', '#F2C94C', '#2EA44A', '#2F6FE0'].map((c, i) => {
-    const a0 = i * Math.PI / 2 - Math.PI / 2, a1 = a0 + Math.PI / 2 - .25;
-    return `<path d="M${(cx + r * Math.cos(a0)).toFixed(1)} ${(cy + r * Math.sin(a0)).toFixed(1)}A${r} ${r} 0 0 1 ${(cx + r * Math.cos(a1)).toFixed(1)} ${(cy + r * Math.sin(a1)).toFixed(1)}" fill="none" stroke="${c}" stroke-width="2.4"/>`;
-  }).join('');
   return `<svg viewBox="0 0 200 222" aria-hidden="true">
     <defs>
       <linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="40" y1="30" x2="170" y2="210"><stop offset="0" stop-color="#2C2F37"/><stop offset=".55" stop-color="#1A1C21"/><stop offset="1" stop-color="#101114"/></linearGradient>
@@ -88,7 +83,6 @@ function diverSVG(colored){
     <circle cx="100" cy="40" r="20" fill="url(#${id}h)"/>
     <path d="M83 33q17 -10 34 0" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".18"/>
     <path d="M82 46q18 8 36 0" fill="none" stroke="#0B0C0F" stroke-width="3" stroke-linecap="round"/>
-    ${ring(100, 42, 6)}
     ${grips(L)}${grips(R)}
   </svg>`;
 }
