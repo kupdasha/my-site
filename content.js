@@ -2791,7 +2791,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               } },
             { label: ['результат', 'что получилось'],
               title: ['футболка доехала до Токио', 'слетала в Токио'],
-              tokyo: { items: [
+              tokyo: {
+                flight: { from: ['Москва', 'Москва'], to: ['Токио', 'Токио'] },   // самолет летит по прокрутке и садится перед главой
+                items: [
                 { src: 'img/ventures/tokyo-sushitech.jpg', ratio: 16 / 9, caption: ['SusHi Tech Tokyo 2026', 'SusHi Tech Tokyo 2026'] },
                 { src: 'img/ventures/tokyo-tib.jpg', ratio: 719 / 1600, caption: ['Tokyo Innovation Base', 'Tokyo Innovation Base'] },
               ] } },
