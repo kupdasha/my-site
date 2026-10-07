@@ -1827,3 +1827,7 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .pp-ico{display:inline-block;width:1.05em;height:1.05em;margin-right:.4em;vertical-align:-.15em;background:currentColor;
   -webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
 .frames{margin-bottom:clamp(56px,7vw,104px)}   /* отступ до следующего блока кейса */
+
+/* Страница NDA: карточки одного размера, по две в ряд (на телефоне — по одной) */
+.nda-page .works .work{grid-column:span 6}
+@media (max-width:760px){.nda-page .works .work{grid-column:1 / -1}}

@@ -562,13 +562,13 @@ function renderNdaPage(){
   const N = SITE.ndaPage;
   if (!N || !isNdaPage) return;
   $('#ndaProjects').innerHTML = (N.items || []).map((p, k) => {
-    const [size, side] = p.size ? [p.size, p.side] : PATTERN[k % PATTERN.length];
-    const ratio = p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');
+    // все карточки одного размера и пропорций — сетка по две в ряд (стили .nda-page .works)
+    const ratio = p.ratio || '16/9';
     const inner = `
       <span class="media" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
       <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}`;
-    const cls = `work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}`;
+    const cls = 'work';
     // page: '' — отдельной страницы еще нет: карточка видна, но никуда не ведет
     if (p.page === '') return `<div class="${cls} soon" style="cursor:default" data-reveal>${inner}</div>`;
     return p.page
