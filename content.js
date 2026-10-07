@@ -2691,10 +2691,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                    'Листайте вниз, а стенд поедет вбок. Как на экскурсии, только ногами шевелить не надо'],
             walk: {
               items: [
+                { img: 'img/vkplay/sut-zal.webp',        cap: ['стенд в зале', 'стенд в зале'] },
                 { img: 'img/vkplay/front-led.webp',      cap: ['изогнутый LED-экран', 'экран-арка'] },
                 { img: 'img/vkplay/front-strim.webp',    cap: ['лайн, слоган или логотип партнера', 'место для партнера'] },
                 { img: 'img/vkplay/tri-chetverti.webp',  cap: ['вид три четверти', 'вид три четверти'] },
-                { img: 'img/vkplay/snizu.webp',          cap: ['вид снизу', 'вид снизу'] },
+                { img: 'img/vkplay/snizu-zal.webp',      cap: ['вид снизу', 'вид снизу'] },
                 { img: 'img/vkplay/front-kub.webp',      cap: ['куб VK Play', 'куб VK Play'] },
                 { img: 'img/vkplay/stol.webp',           cap: ['стол для дискуссий', 'стол для разговоров'] },
                 { img: 'img/vkplay/tri-brenda.webp',     cap: ['три бренда: VK Play, игры вконтакте и OK', 'три бренда вместе'] },
