@@ -162,7 +162,8 @@ function liveColors(box){
 /* ---------- поиски разметки: ведете по дороге — макеты меняются, колесо катится ---------- */
 function searchHTML(c){
   const n = c.items.length;
-  return `<div class="fl-search" style="--n:${n}">
+  // подсказка — не мелкой строкой, а крупно справа от карточки
+  return `<div class="fl-search-row"><div class="fl-search" style="--n:${n}">
     <div class="fl-stage">${c.items.map((x, i) => `<img class="${i ? '' : 'on'}" src="${x.img}" alt="" loading="lazy" draggable="false">`).join('')}
       ${c.items.map((x, i) => `<span class="fl-tag${i ? '' : ' on'}${i === n - 1 ? ' last' : ''}">${H.T(x.name)}</span>`).join('')}</div>
     <div class="fl-track">
@@ -170,7 +171,7 @@ function searchHTML(c){
       <span class="fl-wh-box"><span class="fl-car-wh">${WHEEL}</span></span>
       <input class="fl-range" type="range" min="0" max="${n - 1}" step="any" value="0" aria-label="Варианты разметки, от первых проб к финалу">
     </div>
-  </div>${cap(c.hint)}`;
+  </div>${c.hint ? `<p class="fl-side">${H.T(c.hint)}</p>` : ''}</div>`;
 }
 function liveSearch(box){
   const imgs = [...box.querySelectorAll('.fl-stage img')], tags = [...box.querySelectorAll('.fl-tag')];
