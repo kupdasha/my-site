@@ -194,11 +194,12 @@ function liveBuild(box){
 function lightHTML(c){
   return `<div class="ac-light">${c.modes.map(m => `<div class="ac-mode-block">
       <div class="ac-mode-head"><h3 class="ac-mode-name">${H.T(m.name)}</h3><p class="ac-about">${H.T(m.text)}</p></div>
-      <div class="ac-film">${vid(m.video, m.poster)}</div>
+      ${m.videos ? `<div class="ac-films">${m.videos.map(v => `<div class="ac-film">${vid(v.src, v.poster)}</div>`).join('')}</div>`
+        : `<div class="ac-film">${vid(m.video, m.poster)}</div>`}
       ${m.items ? `<div class="ac-row">${m.items.map(src => isVideo(src)
         ? `<div class="ac-cell">${vid(src)}</div>`
         : `<button class="ac-cell" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>` : ''}
-    </div>`).join('')}</div>${cap(c.hint)}`;
+    </div>`).join('')}${c.outro ? `<p class="ac-outro">${H.T(c.outro)}</p>` : ''}</div>${cap(c.hint)}`;
 }
 function liveLight(box){
   box.querySelectorAll('video').forEach(v => player.observe(v));
