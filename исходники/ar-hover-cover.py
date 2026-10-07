@@ -14,7 +14,7 @@ img = Image.new('RGBA', (W, H), BG + (255,))
 def layer(): return Image.new('RGBA', (W, H), (0, 0, 0, 0))
 
 # простая перспектива: камера в начале координат смотрит вдоль z
-F, CX, CY = 1600, 1180, 560
+F, CX, CY = 1600, 1380, 560
 def P(x, y, z): return (CX + F * x / z, CY - F * y / z)
 
 def line3(dr, a, b, color, width):
@@ -161,7 +161,7 @@ ph.paste(scr, (22, 22), m)
 d.rounded_rectangle([PW // 2 - 70, 46, PW // 2 + 70, 82], radius=18, fill=(236, 236, 238, 255))   # вырез камеры
 ang = 11
 ph = ph.rotate(ang, resample=Image.BICUBIC, expand=True)
-ox, oy = 70, 470
+ox, oy = 270, 470
 a = math.radians(ang); rx, ry = 0, 64 - PH / 2           # точка камеры после поворота
 cam = (ox + ph.width / 2 + rx * math.cos(a) + ry * math.sin(a), oy + ph.height / 2 - rx * math.sin(a) + ry * math.cos(a))
 r = layer(); dr = ImageDraw.Draw(r)
