@@ -1651,7 +1651,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         short: ['Вы ведете активно соц сети и пришли на евент.',
                 'Теперь можно не бояться чихнуть на фото'],
         image: 'img/ispravlyator.jpg',
-        thumb: 'img/thumbs/w14.webp',   // легкая копия обложки для сетки (339 КБ → 78 КБ)
+        thumb: 'img/thumbs/ispravlyator.webp',   // обложка в сетке на главной: до и после во весь кадр (прислана 07.10); в кейсе — image
         still: true,   // в сетке — статичная обложка
         video: 'kinescope:nKUu3sbT1d246RoCWUBFxT',
         headed: true,   // абзацы идут парами: подзаголовок, затем текст
