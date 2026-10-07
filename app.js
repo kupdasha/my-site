@@ -1837,6 +1837,27 @@ const clipPlayer = new IntersectionObserver(es => es.forEach(e => {
   const v = e.target;
   if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
 }), { threshold: 0.2 });
+/* РОЛИКИ В ТЕЛЕФОНЕ (поле { phones: [{ src, poster }], title, text } в галерее кейса, см. AR мерч):
+   запись экрана стоит в рамке телефона, рядом заголовок и текст. Ролик стоит на заставке и играет,
+   пока на него навели курсор; на тач-экранах — пока телефон на экране */
+function phonesHTML(x){
+  return `<div class="wrap ph-row${x.phones.length > 1 ? ' ph-many' : ''}" data-reveal><div class="ph-set">${
+    x.phones.map(f => `<div class="phone"><video src="${f.src}"${f.poster ? ` poster="${f.poster}"` : ''} muted loop playsinline preload="none" disablepictureinpicture></video></div>`).join('')
+  }</div><div class="ph-text">${x.title ? `<h3>${T(x.title)}</h3>` : ''}${x.text ? `<p>${T(x.text)}</p>` : ''}</div></div>`;
+}
+const phoneTouch = matchMedia('(hover: none)').matches;
+const phonePlayer = new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
+}), { threshold: 0.6 });
+function phonesInit(root){
+  root.querySelectorAll('.phone video').forEach(v => {
+    if (phoneTouch) return phonePlayer.observe(v);
+    const box = v.parentNode;
+    box.addEventListener('mouseenter', () => v.play().catch(() => {}));
+    box.addEventListener('mouseleave', () => v.pause());
+  });
+}
 /* ГАЙДЛАЙН ЗНАКА (см. MANGO OFFICE)
    { formula: { parts: [картинки], logo, tags: [слова] } } — части знака встают через «+», под ними собирается
    логотип, следом по одному появляются теги-ценности;
@@ -2092,6 +2113,7 @@ function galleryItem(x){
   if (x && x.sizes) return sizesHTML(x.sizes);
   if (x && x.safe) return safeHTML(x.safe);
   if (x && x.clips) return clipsHTML(x);
+  if (x && x.phones) return phonesHTML(x);
   if (x && x.morph) return morphHTML(x);
   if (x && x.fold) return foldHTML(x.fold);
   if (x && x.pipe) return pipeHTML(x.pipe);
@@ -2435,6 +2457,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.ui-papers, .ui-login, .ui-mail, .ui-laptop').forEach(el => gdReveal.observe(el));
   caseContent.querySelectorAll('.ys, .zm, .yst, .yru').forEach(el => ysReveal.observe(el));
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
+  phonesInit(caseContent);   // ролики в телефонах — по наведению
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   caseContent.querySelectorAll('.m3d').forEach(watchMark);
   caseContent.querySelectorAll('.st, .st-grads, .st-pages').forEach(watchStars);
