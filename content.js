@@ -1962,7 +1962,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'AI',
         short: ['Аниматик — черновая покадровая анимация будущего ролика. Это еще не сам ролик, а его чертеж.',
                 'Ролик до ролика: черновик, на котором все договариваются, пока это еще дешево'],
-        image: 'https://edge-ams-1.kinescopecdn.net/4c376ec4-5d77-4b85-ade2-c2f213a08085/posters/fb1623ae-9d5c-4c78-8554-4894a4177a18/poster_lg/019caa3b-7372-7633-9578-c6df1ab647a2.jpg',
+        image: 'img/anima/cover.jpg',   // обложка в сетке и шапке кейса: кадр из ролика «VK Видео, зима»
         links: [],
         labels: ['что это', 'зачем', 'как работали'],
         story: [
@@ -1976,12 +1976,12 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         gallery: [
           [], [],   // ролики — после третьего абзаца
           [
+            { film: 'kinescope:rjTxCG8b7Tb24mosSuHn6F', caption: 'VK Видео, зима' },
             { film: 'img/anima/anima-1.mp4', poster: 'img/anima/anima-1.jpg', caption: 'VK Видео' },
             { film: 'img/anima/anima-2.mp4', poster: 'img/anima/anima-2.jpg', caption: 'VK Видео, осень' },
             { film: 'img/anima/anima-3.mp4', poster: 'img/anima/anima-3.jpg', caption: 'История одной музыки' },
             { film: 'img/anima/anima-4.mp4', poster: 'img/anima/anima-4.jpg', caption: 'Машина времени' },
             { film: 'img/anima/anima-5.mp4', poster: 'img/anima/anima-5.jpg', caption: 'Наши дома' },
-            { film: 'kinescope:rjTxCG8b7Tb24mosSuHn6F', caption: 'VK Видео, зима' },
           ],
         ],
       },
