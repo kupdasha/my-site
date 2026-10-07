@@ -2429,7 +2429,7 @@ function renderCase(k, keepScroll){
     </div>
     ${p.noHero ? '' : `<div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>`}
     ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
-    <div class="case-body">${body}</div>
+    <div class="case-body${p.noHero ? ' no-hero' : ''}">${body}</div>
     <div class="wrap case-end">
       <button class="btn btn-line case-to-list"><span class="arr">←</span><span class="spell">${T(isNdaPage ? SITE.ndaPage.back : W.back)}</span></button>
     </div>
