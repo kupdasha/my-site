@@ -25,7 +25,7 @@ def read(name):
         return f.read()
 
 # адреса страниц на Тильде
-LINKS = [("'index.html#", "'/#"), ("'index.html'", "'/'"), ("'about.html'", "'/i'"), ("'speaker.html'", "'/speaker'"), ("'nda.html'", "'/n_d_a'")]
+LINKS = [("'index.html#", "'/full#"), ("'index.html'", "'/full'"), ("'about.html'", "'/i'"), ("'speaker.html'", "'/speaker'"), ("'nda.html'", "'/n_d_a'")]
 
 # Код, стили, картинки и видео лежат на GitHub (kupdasha/my-site) и раздаются через jsDelivr.
 # Блоки в Тильде на них только ссылаются: обновил файлы на GitHub — сайт подхватил сам.
