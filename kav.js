@@ -73,7 +73,7 @@ const HAND = `<svg viewBox="0 0 64 72"><g fill="#fff" stroke="#141414" stroke-wi
   <rect x="6" y="34" width="9" height="22" rx="4.5" transform="rotate(-40 10 45)"/>
   <path d="M14 30h40v16c0 12-8 22-20 22s-20-8-20-20z"/></g></svg>`;
 function pinsHTML(c, ch){
-  return `<div class="kv-panel kv-pins">
+  return `<div class="kv-pins">
     ${FRAY}
     <div class="kv-board" style="aspect-ratio:896/${Math.round(1152 * (1 - (c.crop || 0) / 100))}">
       <img src="${c.bg}" alt="" draggable="false">
