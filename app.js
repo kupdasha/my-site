@@ -815,10 +815,12 @@ const legacyVideo = p => p.video || (p.vimeo ? 'vimeo:' + p.vimeo : '');
 function mediaHTML(p){
   // preview — отдельный легкий ролик для сетки (mp4), если основное видео на площадке, которая не умеет тихий повтор
   const m = parseMedia(p.preview || legacyVideo(p));
-  const img = p.image ? `<img src="${p.image}" alt="" loading="lazy"${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
+  // thumb — легкая копия обложки для карточек (сетка, «следующий проект»); в шапке кейса остается полная image
+  const cover = p.thumb || p.image;
+  const img = cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async"${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
   // ролик подгружается, только когда до карточки остается экран; до этого видна обложка
   // hover: true — ролик стоит на обложке и играет, только пока курсор над карточкой
-  if (m && m.type === 'file') return `<video muted loop playsinline preload="none" ${p.image ? `poster="${p.image}"` : ''} data-src="${m.src}"${p.hover ? ' data-hover' : ''}></video>`;
+  if (m && m.type === 'file') return `<video muted loop playsinline preload="none" ${cover ? `poster="${cover}"` : ''} data-src="${m.src}"${p.hover ? ' data-hover' : ''}></video>`;
   // still: true — в сетке только статичная обложка, без ролика
   if (p.still && img) return img;
   if (m && (m.type === 'vimeo' || m.type === 'kinescope')) return img + `<iframe data-src="${embedURL(m, true)}"${p.ratio ? ` style="--vr:${p.ratio}"` : ''} allow="autoplay" tabindex="-1" aria-hidden="true"></iframe>`;
