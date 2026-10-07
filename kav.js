@@ -48,8 +48,6 @@ const FRAY = `<svg class="kv-defs" aria-hidden="true" width="0" height="0"><defs
 </defs></svg>`;
 // английская булавка: петля и головка
 const PIN = (x, y, a) => `<g transform="translate(${x} ${y}) rotate(${a})" class="kv-safety"><path d="M0 0h30a3.2 3.2 0 0 1 0 6.4H3" fill="none" stroke="#141414" stroke-width="1.8" stroke-linecap="round"/><path d="M-6 -1.8h7v8.2h-7a1.4 1.4 0 0 1-1.4-1.4V-.4A1.4 1.4 0 0 1-6-1.8z" fill="#141414"/></g>`;
-const PSD = `<g fill="none" stroke="#141414" stroke-width="2.6" stroke-linejoin="round"><path d="M38 20h30l14 14v36H38z"/><path d="M68 20v14h14"/><rect x="30" y="44" width="38" height="18" rx="4" fill="${NEON}"/></g>
-  <text x="49" y="58" text-anchor="middle" font-size="13" font-weight="700" fill="#141414">PSD</text>`;
 // неровный контур лоскута: у каждого свой, углы и середины сторон чуть гуляют
 function blob(i, inset){
   let k = i * 9301 + 49297;
@@ -59,23 +57,27 @@ function blob(i, inset){
   return 'M' + pts.map(p => p.map(v => v.toFixed(1)).join(' ')).join('L') + 'Z';
 }
 function patchSVG(it, i){
-  const lines = it.text ? it.text.split('\n') : [];
-  const fs = 15, lh = 17, y0 = 62 - (lines.length - 1) * lh / 2;
-  const body = it.psd
-    ? `${PSD}<text x="60" y="94" text-anchor="middle" font-size="15" font-weight="700" fill="#141414">${esc(it.psd)}</text>`
-    : lines.map((l, i) => `<text x="60" y="${y0 + i * lh}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#141414">${esc(l)}</text>`).join('');
+  // надпись — векторный макет квадрата из печати (PDF → прозрачный PNG), лоскут под ней — свой, лохматый
+  const body = it.art ? `<image href="${it.art}" x="12" y="12" width="96" height="96"/>` : '';
   return `<svg viewBox="0 0 120 120" aria-hidden="true">
     <path d="${blob(i, 11)}" fill="none" stroke="#EEFF6A" stroke-width="9" stroke-dasharray=".7 1.8" filter="url(#kvFluff)"/>
     <path d="${blob(i, 13)}" fill="${NEON}" filter="url(#kvEdge)"/>
-    <g dominant-baseline="middle" font-family="Golos Text, system-ui, sans-serif">${body}</g>
+    ${body}
     ${PIN(14, 18, -28)}${PIN(82, 104, 18)}
   </svg>`;
 }
+// полупрозрачная рука-подсказка: сама берет стикер и переносит, пока посетитель не тронул ничего сам
+const HAND = `<svg viewBox="0 0 64 72"><g fill="#fff" stroke="#141414" stroke-width="2.4" stroke-linejoin="round">
+  <rect class="f" x="16" y="6" width="9" height="34" rx="4.5"/><rect class="f" x="25" y="2" width="9" height="38" rx="4.5"/>
+  <rect class="f" x="34" y="4" width="9" height="36" rx="4.5"/><rect class="f" x="43" y="10" width="9" height="30" rx="4.5"/>
+  <rect x="6" y="34" width="9" height="22" rx="4.5" transform="rotate(-40 10 45)"/>
+  <path d="M14 30h40v16c0 12-8 22-20 22s-20-8-20-20z"/></g></svg>`;
 function pinsHTML(c, ch){
   return `<div class="kv-panel kv-pins">
     ${FRAY}
-    <div class="kv-board">
+    <div class="kv-board" style="aspect-ratio:896/${Math.round(1152 * (1 - (c.crop || 0) / 100))}">
       <img src="${c.bg}" alt="" draggable="false">
+      <i class="kv-hand" aria-hidden="true">${HAND}</i>
       ${c.items.map((it, i) => `<div class="kv-pin" data-i="${i}" style="left:${it.x}%;top:${it.y}%;--r:${it.r || 0}deg" aria-hidden="true">${patchSVG(it, i)}</div>`).join('')}
     </div>
     <div class="kv-pins-side">
@@ -126,9 +128,39 @@ function livePins(box, c){
     p.addEventListener('pointercancel', drop);
   });
   const shuffle = () => pins.forEach(p => {
-    place(p, 14 + Math.random() * 72, 30 + Math.random() * 62, Math.round(Math.random() * 50 - 25));
+    place(p, 12 + Math.random() * 76, 12 + Math.random() * 78, Math.round(Math.random() * 50 - 25));
     p.style.zIndex = ++z;
   });
+  // подсказка: рука берет пустой стикер, переносит и отпускает; следующий раз — обратно
+  const hand = board.querySelector('.kv-hand');
+  let demo = !still(), seen = false, busy = false, there = false;
+  const timers = [];
+  const later = (ms, f) => timers.push(setTimeout(f, ms));
+  const stopDemo = () => {
+    if (!demo) return;
+    demo = false; timers.forEach(clearTimeout);
+    hand.classList.remove('on', 'grab');
+    pins.forEach(p => p.classList.remove('demo', 'held'));
+  };
+  const at = (x, y) => { hand.style.left = x + '%'; hand.style.top = y + '%'; };
+  const run = () => {
+    if (!demo || !seen || busy) return;
+    busy = true;
+    const p = pins[0], it = c.items[0], to = [39, 18];
+    const [fx, fy] = there ? to : [it.x, it.y], [tx, ty] = there ? [it.x, it.y] : to;
+    hand.style.transition = 'none'; at(fx + 9, fy + 16); hand.getBoundingClientRect(); hand.style.transition = '';
+    hand.classList.add('on'); at(fx, fy);
+    later(800, () => { hand.classList.add('grab'); p.style.zIndex = ++z; p.classList.add('held', 'demo'); });
+    later(1150, () => { place(p, tx, ty); at(tx, ty); });
+    later(2350, () => { hand.classList.remove('grab'); p.classList.remove('held'); p.classList.remove('pinned'); void p.offsetWidth; p.classList.add('pinned'); });
+    later(2700, () => { hand.classList.remove('on'); at(tx + 6, ty + 12); });
+    later(3300, () => { p.classList.remove('demo'); there = !there; busy = false; });
+    later(5200, run);
+  };
+  board.addEventListener('pointerdown', stopDemo, true);
+  onScreen(board, v => { seen = v; if (v) later(600, run); }, '-15% 0px');
+  box.querySelector('.kv-shuffle').addEventListener('click', () => { stopDemo(); });
+  box.querySelector('.kv-reset').addEventListener('click', () => { stopDemo(); });
   box.querySelector('.kv-shuffle').addEventListener('click', shuffle);
   box.querySelector('.kv-reset').addEventListener('click', () => pins.forEach((p, i) => place(p, c.items[i].x, c.items[i].y, c.items[i].r || 0)));
   zoomable(box);
@@ -295,6 +327,8 @@ const RING = 213.6, EDGE = 285;   // надпись идет на расстоя
 const CR = 0.8, SC = CR / EDGE;   // в 3D край — 0.8 от средней линии
 const w3 = p => [(p[0] - PAGE[0] / 2) * SC, (PAGE[1] / 2 - p[1]) * SC];
 const CA = w3(PA), CB = w3(PB), CC = w3(PC);
+// силуэт игрушки в точках макета: надпись, склеенная в ленту, плюс поле до шва, сглажено
+const OUTLINE = [827,1404.5,795,1403.5,764,1396.5,724,1382.5,669,1360.5,600,1328.5,560,1317.5,545,1309.5,520,1288.5,482,1264.5,443,1244.5,373,1201.5,355,1192.5,346,1189.5,330,1181.5,323,1176.5,291,1144.5,266.5,1123,243,1095.5,216,1073.5,198.5,1056,165.5,1016,138.5,979,120.5,952,103.5,923,69.5,859,51.5,816,38.5,777,25.5,749,22.5,737,22.5,718,24.5,708,28.5,695,28.5,691,34.5,666,42.5,645,50.5,631,60.5,608,68.5,593,89.5,560,124.5,511,143.5,475,158,459.5,171,449.5,183.5,437,191.5,427,227.5,392,245.5,366,257.5,351,326.5,276,422,181.5,459,150.5,486,130.5,506,110.5,517,102.5,525,98.5,563,87.5,579,80.5,613,68.5,635,58.5,676,45.5,715,36.5,720,36.5,745,31.5,751,31.5,758,29.5,771,28.5,772,27.5,780,27.5,781,26.5,792,26.5,793,27.5,804,28.5,835,39.5,857,44.5,877,51.5,901,65.5,944,86.5,955,93.5,966,102.5,975.5,112,988.5,128,997.5,142,1007.5,161,1014.5,178,1021.5,203,1023.5,220,1024.5,221,1024.5,228,1025.5,229,1025.5,241,1026.5,242,1026.5,261,1025.5,262,1024.5,279,1023.5,280,1020.5,302,1013.5,326,1009.5,334,1004.5,349,995.5,367,984.5,384,973.5,398,928.5,443,915.5,461,903,473.5,864,496.5,832,521.5,806,546.5,754,590.5,733.5,611,719.5,629,711,637.5,700,645.5,683,654.5,668,665.5,659.5,674,655.5,680,652.5,689,653.5,699,657.5,707,665.5,718,720.5,780,825.5,905,842,921.5,858,933.5,870.5,947,887.5,980,899.5,998,914.5,1019,945.5,1057,967.5,1089,980.5,1111,993.5,1138,1003.5,1155,1013.5,1179,1014.5,1184,1014.5,1205,1010.5,1224,1008.5,1245,1002.5,1269,996.5,1283,989.5,1294,977.5,1308,949.5,1346,940,1356.5,925,1368.5,899,1383.5,872,1394.5,866,1395.5,859,1398.5,827,1404.5];
 function plushHTML(c){
   return `<div class="kv-plush">
     <div class="kv-panel kv-toy-box">
@@ -332,42 +366,65 @@ function plush3D(host, T3, art){
   const tex = new T3.CanvasTexture(cv);
   tex.colorSpace = T3.SRGBColorSpace; tex.anisotropy = 8;
 
-  // форма-подушка: точки на расстоянии меньше R от средней линии кавычки; высота — как у надутой ткани.
-  // Внутренний угол скруглен (мягкий минимум расстояний до двух ручек), края сшиты с изнанкой.
-  const seg = (x, y, p, q) => {
-    const vx = q[0] - p[0], vy = q[1] - p[1];
-    const t = clamp(((x - p[0]) * vx + (y - p[1]) * vy) / (vx * vx + vy * vy), 0, 1);
-    return Math.hypot(x - p[0] - vx * t, y - p[1] - vy * t);
-  };
-  const SM = .3;
-  const dist = (x, y) => {
-    const a = seg(x, y, CA, CB), b = seg(x, y, CB, CC);
-    const h = clamp(.5 + .5 * (b - a) / SM, 0, 1);
-    return b * (1 - h) + a * h - SM * h * (1 - h);
-  };
-  const PUFF = .5, STEP = .036;
-  const x0 = Math.min(...xs) - CR - .1, y0 = Math.min(...ys) - CR - .1;
-  const nx = Math.ceil((Math.max(...xs) + CR + .1 - x0) / STEP), ny = Math.ceil((Math.max(...ys) + CR + .1 - y0) / STEP);
-  const pos = [], idOf = new Int32Array((nx + 1) * (ny + 1)).fill(-1), rimOf = new Uint8Array((nx + 1) * (ny + 1));
-  const front = [], back = new Int32Array((nx + 1) * (ny + 1)).fill(-1);
-  for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
-    let x = x0 + i * STEP, y = y0 + j * STEP, d = dist(x, y);
-    if (d > CR + STEP * 1.5) continue;
-    const k = j * (nx + 1) + i;
-    if (d >= CR) {
-      // точку снаружи притягиваем на край: пара шагов по градиенту расстояния
-      for (let it = 0; it < 4; it++) {
-        const e = 1e-3, gx = (dist(x + e, y) - dist(x - e, y)) / (2 * e), gy = (dist(x, y + e) - dist(x, y - e)) / (2 * e), gl = Math.hypot(gx, gy) || 1;
-        x -= (d - CR) * gx / gl; y -= (d - CR) * gy / gl; d = dist(x, y);
-      }
-      rimOf[k] = 1;
-      idOf[k] = pos.length / 3; pos.push(x, y, 0);
-      back[k] = idOf[k];
-    } else {
-      const z = PUFF * Math.sqrt(1 - (d / CR) ** 2);
-      idOf[k] = pos.length / 3; pos.push(x, y, z);
-      back[k] = pos.length / 3; pos.push(x, y, -z);
+  // форма-подушка: контур снят с печатного макета (надпись по краю плюс поле до шва), высота — как у надутой ткани:
+  // у края ткань уходит вниз круто, к середине ручки — плавно. Края сшиты с изнанкой.
+  const poly = [];
+  for (let i = 0; i < OUTLINE.length; i += 2) poly.push(w3([OUTLINE[i], OUTLINE[i + 1]]));
+  const near = (x, y) => {   // ближайшая точка контура и расстояние до нее
+    let best = Infinity, bx = 0, by = 0;
+    for (let i = 0; i < poly.length; i++) {
+      const p = poly[i], q = poly[(i + 1) % poly.length], vx = q[0] - p[0], vy = q[1] - p[1];
+      const t = clamp(((x - p[0]) * vx + (y - p[1]) * vy) / (vx * vx + vy * vy), 0, 1);
+      const cx2 = p[0] + vx * t, cy2 = p[1] + vy * t, d = (x - cx2) ** 2 + (y - cy2) ** 2;
+      if (d < best) { best = d; bx = cx2; by = cy2; }
     }
+    return [Math.sqrt(best), bx, by];
+  };
+  const inside = (x, y) => {
+    let c = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+    }
+    return c;
+  };
+  const PUFF = .5, STEP = .026;
+  const pxs = poly.map(p => p[0]), pys = poly.map(p => p[1]);
+  const x0 = Math.min(...pxs) - .1, y0 = Math.min(...pys) - .1;
+  const nx = Math.ceil((Math.max(...pxs) + .1 - x0) / STEP), ny = Math.ceil((Math.max(...pys) + .1 - y0) / STEP);
+  const NN = (nx + 1) * (ny + 1);
+  // клетки: 0 — вне игрушки, 1 — шов (точка лежит на контуре), 2 — внутри
+  const kind = new Uint8Array(NN), gx = new Float32Array(NN), gy = new Float32Array(NN);
+  for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
+    const k = j * (nx + 1) + i, x = x0 + i * STEP, y = y0 + j * STEP, [d, bx, by] = near(x, y), inn = inside(x, y);
+    if (!inn && d > STEP * 1.5) continue;
+    if (!inn || d < STEP * .3) { kind[k] = 1; gx[k] = bx; gy[k] = by; }
+    else { kind[k] = 2; gx[k] = x; gy[k] = y; }
+  }
+  // надуваем, как настоящую подушку: давление изнутри, шов держит края (уравнение Пуассона, релаксация)
+  const h = new Float32Array(NN);
+  const W1 = nx + 1, src = STEP * STEP;
+  for (let it = 0; it < 260; it++) for (let k = W1; k < NN - W1; k++) {
+    if (kind[k] !== 2) continue;
+    const v = (h[k - 1] + h[k + 1] + h[k - W1] + h[k + W1] + src) / 4;
+    h[k] += 1.9 * (v - h[k]);
+  }
+  let hmax = 0; for (let k = 0; k < NN; k++) if (h[k] > hmax) hmax = h[k];
+  // корень дает крутой, круглый бок у шва и плоскую середину; пара сглаживаний убирает рябь у шва
+  let zf = new Float32Array(NN);
+  for (let k = 0; k < NN; k++) if (kind[k] === 2) zf[k] = Math.sqrt(Math.max(0, h[k] / hmax));
+  for (let pass = 0; pass < 4; pass++) {
+    const nz = zf.slice();
+    for (let k = W1; k < NN - W1; k++) if (kind[k] === 2) nz[k] = (zf[k] * 4 + zf[k - 1] + zf[k + 1] + zf[k - W1] + zf[k + W1]) / 8;
+    zf = nz;
+  }
+  const pos = [], idOf = new Int32Array(NN).fill(-1), rimOf = kind.map(v => v === 1 ? 1 : 0), back = new Int32Array(NN).fill(-1);
+  for (let k = 0; k < NN; k++) {
+    if (!kind[k]) continue;
+    if (kind[k] === 1) { idOf[k] = back[k] = pos.length / 3; pos.push(gx[k], gy[k], 0); continue; }
+    const z = PUFF * zf[k];
+    idOf[k] = pos.length / 3; pos.push(gx[k], gy[k], z);
+    back[k] = pos.length / 3; pos.push(gx[k], gy[k], -z);
   }
   const idx = [];
   const tri = (m, a, b, c, flip) => {
@@ -395,7 +452,19 @@ function plush3D(host, T3, art){
   // кольцо — на конце нижней ручки
   const dl = Math.hypot(CC[0] - CB[0], CC[1] - CB[1]), dir = [(CC[0] - CB[0]) / dl, (CC[1] - CB[1]) / dl];
   ringMesh.position.set(CC[0] + dir[0] * .92, CC[1] + dir[1] * .92, 0); ringMesh.rotation.set(0, .9, Math.atan2(dir[1], dir[0]));
-  const grp = new T3.Group(); grp.add(toy, ringMesh); grp.position.x = .07;
+  // шов-оверлок по краю: тонкий валик в черную строчку, как на настоящей игрушке
+  const st = document.createElement('canvas'); st.width = 64; st.height = 32;
+  const sg = st.getContext('2d');
+  sg.fillStyle = NEON; sg.fillRect(0, 0, 64, 32);
+  sg.strokeStyle = '#1b1b1b'; sg.lineWidth = 7;
+  sg.beginPath(); sg.moveTo(8, -4); sg.lineTo(40, 36); sg.stroke();
+  const stTex = new T3.CanvasTexture(st);
+  stTex.colorSpace = T3.SRGBColorSpace; stTex.wrapS = stTex.wrapT = T3.RepeatWrapping;
+  const curve = new T3.CatmullRomCurve3(poly.map(p => new T3.Vector3(p[0], p[1], 0)), true, 'centripetal');
+  stTex.repeat.set(Math.round(curve.getLength() / .045), 1);
+  const seam = new T3.Mesh(new T3.TubeGeometry(curve, 900, .038, 10, true),
+    new T3.MeshStandardMaterial({ map: stTex, emissive: 0xffffff, emissiveMap: stTex, emissiveIntensity: .25, roughness: .9 }));
+  const grp = new T3.Group(); grp.add(toy, seam, ringMesh); grp.position.x = .07;
 
   const renderer = new T3.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio));
@@ -433,10 +502,12 @@ function plush3D(host, T3, art){
     for (let i = 0; i < a.length; i += 3) {
       const bx = base[i], by = base[i + 1], bz = base[i + 2];
       const dx = bx - hit.x, dy = by - hit.y, dz = bz - hit.z;
-      const f = Math.exp(-(dx * dx + dy * dy + dz * dz) / (2 * SIG * SIG)) * press * DENT;
+      // шов держит форму: у самого края вмятины нет
+      const f = bz === 0 ? 0 : Math.exp(-(dx * dx + dy * dy + dz * dz) / (2 * SIG * SIG)) * press * DENT;
       a[i] = (bx - nrm[i] * f) * wide; a[i + 1] = (by - nrm[i + 1] * f) * wide; a[i + 2] = (bz - nrm[i + 2] * f) * sq;
     }
     P.needsUpdate = true; geo.computeVertexNormals();
+    seam.scale.set(wide, wide, 1);
   };
   let raf = 0, seen = false, last = 0, frame = 0, settled = false;
   const tick = t => {

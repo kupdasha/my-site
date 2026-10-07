@@ -30,16 +30,16 @@
 
 /* ---------- стикеры ---------- */
 .kv-defs{position:absolute;width:0;height:0;overflow:hidden}
-.kv-pins{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;padding:clamp(16px,3vw,48px)}
-.kv-board{position:relative;aspect-ratio:896/1152;width:100%;max-height:86vh;margin:0 auto;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
-/* серый студийный фон над воротом растворяется в сером фоне панели */
-.kv-board > img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:var(--r-img);
-  -webkit-mask-image:linear-gradient(transparent 0,#000 22%);mask-image:linear-gradient(transparent 0,#000 22%)}
+.kv-pins{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center;padding:clamp(12px,1.6vw,24px)}
+/* только спина футболки: серый фон съемки срезан сверху (crop в content.js) */
+.kv-board{position:relative;width:100%;max-height:72vh;margin:0 auto;border-radius:var(--r-img);overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.kv-board > img{width:100%;height:100%;object-fit:cover;object-position:50% 100%;display:block;pointer-events:none}
+.kv-pins-side{padding:clamp(0px,1vw,16px) clamp(0px,1.4vw,24px) clamp(0px,1vw,16px) 0}
 .kv-pins-side{display:flex;flex-direction:column;align-items:flex-start;gap:20px}
 .kv-pins-side .kv-title,.kv-pins-side .kv-text{margin:0}
 .kv-pins-side .kv-cap{margin:0;opacity:.7}
 @media (max-width:760px){.kv-pins{grid-template-columns:minmax(0,1fr)}}
-.kv-pin{position:absolute;width:21%;aspect-ratio:1;translate:-50% -50%;rotate:calc(var(--r) + var(--tilt,0deg));cursor:grab;touch-action:none;
+.kv-pin{position:absolute;width:19%;aspect-ratio:1;translate:-50% -50%;rotate:calc(var(--r) + var(--tilt,0deg));cursor:grab;touch-action:none;
   transition:left .7s var(--ease),top .7s var(--ease),rotate .5s var(--ease),scale .25s var(--ease),filter .25s;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}
 .kv-pin svg{display:block;width:100%;height:100%;overflow:visible}
 .kv-pin.held{cursor:grabbing;scale:1.08;transition:rotate .2s,scale .25s var(--ease),filter .25s;filter:drop-shadow(0 14px 14px rgba(0,0,0,.35))}
@@ -47,7 +47,15 @@
 .kv-pin.pinned{animation:kvPin .45s var(--ease)}
 @keyframes kvPin{40%{scale:.94}}
 .kv-pins-bar{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
-@media (max-width:560px){.kv-pin{width:23%}}
+@media (max-width:560px){.kv-pin{width:22%}}
+/* рука-подсказка: полупрозрачная, ладонь — в точке захвата */
+.kv-hand{position:absolute;z-index:500;width:13%;aspect-ratio:64/72;translate:-42% -38%;pointer-events:none;opacity:0;
+  transition:left 1.1s var(--ease-io),top 1.1s var(--ease-io),opacity .45s var(--ease)}
+.kv-hand.on{opacity:.78}
+.kv-hand svg{display:block;width:100%;height:100%;overflow:visible}
+.kv-hand .f{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s var(--ease)}
+.kv-hand.grab .f{transform:scaleY(.55)}
+.kv-pin.held.demo{transition:left 1.1s var(--ease-io),top 1.1s var(--ease-io),rotate .5s var(--ease),scale .25s var(--ease),filter .25s}
 
 /* ---------- кармашек ---------- */
 .kv-pocket{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(12px,1.6vw,24px);align-items:start}
