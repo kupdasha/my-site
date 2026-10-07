@@ -43,10 +43,10 @@
 .cl-w-text{grid-area:1 / 1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:46ch;opacity:0;transform:translateY(8px);transition:opacity .4s var(--ease),transform .5s var(--ease)}
 .cl-w-text b{font-family:var(--font);font-weight:500}
 .cl-w-text.on{opacity:1;transform:none}
-/* на телефоне лестница — под кадром, без подписей: название этапа — в тексте */
-@media (max-width:760px){
+/* на планшете и телефоне лестница — под кадром, без подписей: название этапа — в тексте */
+@media (max-width:760px){.cl-w-frame{aspect-ratio:4/3}}
+@media (max-width:1024px){
   .cl-worlds{grid-template-columns:1fr}
-  .cl-w-frame{aspect-ratio:4/3}
   .cl-stairs{grid-column:1;grid-row:2;--sw:calc((100% - 6px) / var(--n));--sh:12px;display:flex}
   .cl-stairs li{padding:0;margin-top:calc(var(--i) * var(--sh));flex:1}
   .cl-stairs button{width:100%}
