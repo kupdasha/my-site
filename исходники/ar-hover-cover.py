@@ -1,184 +1,174 @@
 # Обложка AR мерч для превью при наведении в «других работах»: рисуется кодом, без нейросетей.
-# Телефон смотрит на черную сумку, из экрана вылетают AR-объекты: кубы, диско-шар, шары, ленты.
+# Черно-белая: сетка пространства в перспективе, в нем каркасная футболка в рамке-объеме,
+# телефон сканирует ее — лучи от камеры к рамке, на экране та же футболка и линия сканирования.
 # Запуск: python3 исходники/ar-hover-cover.py → img/armerch/hover-cover.jpg (1280 × 800, как рамка превью 16:10)
 import math, random
-import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 
-S = 1600                      # рисуем вдвое крупнее и уменьшаем — края гладкие
-random.seed(7)
+W, H = 2560, 1600             # рисуем вдвое крупнее и уменьшаем — линии гладкие
+random.seed(3)
+BG = (10, 10, 12)
 
-def rgb(h): h = h.lstrip('#'); return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+img = Image.new('RGBA', (W, H), BG + (255,))
 
-def vgrad(w, h, top, bottom):
-    t = np.linspace(0, 1, h)[:, None, None]
-    a, b = np.array(rgb(top)), np.array(rgb(bottom))
-    arr = (a * (1 - t) + b * t).repeat(w, axis=1)
-    return Image.fromarray(arr.astype('uint8'), 'RGB')
+def layer(): return Image.new('RGBA', (W, H), (0, 0, 0, 0))
 
-def soft(img, box, color, alpha, blur):
-    """мягкое пятно: цвет сплошной, размывается только прозрачность — без серых ореолов"""
-    m = Image.new('L', img.size, 0)
-    ImageDraw.Draw(m).ellipse(box, fill=alpha)
-    lay = Image.new('RGBA', img.size, color + (0,))
-    lay.putalpha(m.filter(ImageFilter.GaussianBlur(blur)))
-    img.alpha_composite(lay)
+# простая перспектива: камера в начале координат смотрит вдоль z
+F, CX, CY = 1150, 1280, 560
+def P(x, y, z): return (CX + F * x / z, CY - F * y / z)
 
-def blob(img, xy, r, color, alpha, blur):
-    soft(img, [xy[0]-r, xy[1]-r, xy[0]+r, xy[1]+r], rgb(color), alpha, blur)
+def line3(dr, a, b, color, width):
+    dr.line([P(*a), P(*b)], fill=color, width=width)
 
-def shadow(img, box, alpha, blur):
-    soft(img, box, (30, 28, 50), alpha, blur)
+def dashed(dr, p, q, color, width, dash=18, gap=14):
+    L = math.dist(p, q); n = int(L // (dash + gap)) + 1
+    for i in range(n):
+        t0, t1 = i * (dash + gap) / L, min(1, (i * (dash + gap) + dash) / L)
+        if t0 >= 1: break
+        dr.line([(p[0] + (q[0]-p[0])*t0, p[1] + (q[1]-p[1])*t0), (p[0] + (q[0]-p[0])*t1, p[1] + (q[1]-p[1])*t1)], fill=color, width=width)
 
-def sphere(img, c, r, base, light='#FFFFFF', dark=None):
-    """шар с мягким светом сверху слева"""
-    x0, y0 = c[0]-r, c[1]-r
-    yy, xx = np.mgrid[0:2*r, 0:2*r].astype(float)
-    dx, dy = (xx - r) / r, (yy - r) / r
-    d = np.sqrt(dx**2 + dy**2)
-    mask = np.clip((1 - d) * r / 1.5, 0, 1)                        # сглаженный край
-    hl = np.clip(1 - np.sqrt((dx + .38)**2 + (dy + .42)**2) / .9, 0, 1) ** 1.6   # блик
-    sh = np.clip((dx * .5 + dy * .7 + .2), 0, 1) ** 1.2              # тень снизу справа
-    b, l = np.array(rgb(base), float), np.array(rgb(light), float)
-    k = np.array(rgb(dark), float) if dark else b * .55
-    col = b * (1 - sh[..., None] * .8) + k * sh[..., None] * .8
-    col = col * (1 - hl[..., None] * .75) + l * hl[..., None] * .75
-    arr = np.dstack([np.clip(col, 0, 255), mask * 255]).astype('uint8')
-    img.alpha_composite(Image.fromarray(arr, 'RGBA'), (x0, y0))
+FLOOR, WALL = -1.7, 17.0
 
-def disco(img, c, r):
-    """диско-шар: серебряный шар в зеркальной плитке"""
-    sphere(img, c, r, '#B9BCC8', '#FFFFFF', '#5E6272')
-    lay = Image.new('RGBA', img.size, (0, 0, 0, 0))
-    dr = ImageDraw.Draw(lay)
-    n = 16
-    for i in range(n):                         # широта
-        la0, la1 = -math.pi/2 + math.pi*i/n, -math.pi/2 + math.pi*(i+1)/n
-        m = max(4, int(2 * n * math.cos((la0 + la1) / 2)))
-        for j in range(m):                     # долгота, видна передняя половина
-            lo0, lo1 = -math.pi/2 + math.pi*j/m, -math.pi/2 + math.pi*(j+1)/m
-            pts = []
-            for la, lo in ((la0, lo0), (la0, lo1), (la1, lo1), (la1, lo0)):
-                pts.append((c[0] + r*.97*math.cos(la)*math.sin(lo), c[1] + r*.97*math.sin(la)))
-            v = random.random()
-            if v > .86: fill = (255, 255, 255, 210)
-            elif v > .7: fill = (200, 210, 255, 120)
-            elif v < .15: fill = (60, 64, 80, 90)
-            else: fill = (255, 255, 255, 0)
-            dr.polygon(pts, fill=fill, outline=(120, 124, 140, 45))
-    img.alpha_composite(lay)
+# сетка: пол и задняя стена, вдали бледнее
+g = layer(); dg = ImageDraw.Draw(g)
+z = 2.2
+while z <= WALL:
+    a = int(150 * max(.12, 1 - (z - 2.2) / (WALL - 2.2)))
+    line3(dg, (-30, FLOOR, z), (30, FLOOR, z), (255, 255, 255, a), 2)
+    z += .6
+for i in range(-50, 51):
+    x = i * .6
+    dg.line([P(x, FLOOR, 2.2), P(x, FLOOR, WALL)], fill=(255, 255, 255, 70), width=2)
+    dg.line([P(x, FLOOR, WALL), P(x, 7, WALL)], fill=(255, 255, 255, 34), width=2)
+y = FLOOR
+while y <= 7:
+    line3(dg, (-30, y, WALL), (30, y, WALL), (255, 255, 255, 34), 2)
+    y += .6
+img.alpha_composite(g)
 
-def cube(img, c, a, ang, top, left, right):
-    """куб в изометрии, повернут на ang"""
-    def p(x, y):
-        ca, sa = math.cos(ang), math.sin(ang)
-        return (c[0] + x*ca - y*sa, c[1] + x*sa + y*ca)
-    h = a * .5
-    T = [p(0, -a), p(a*.87, -h), p(0, 0), p(-a*.87, -h)]
-    L = [p(-a*.87, -h), p(0, 0), p(0, a), p(-a*.87, h)]
-    R = [p(0, 0), p(a*.87, -h), p(a*.87, h), p(0, a)]
-    lay = Image.new('RGBA', img.size, (0, 0, 0, 0))
-    dr = ImageDraw.Draw(lay)
-    dr.polygon(L, fill=rgb(left)); dr.polygon(R, fill=rgb(right)); dr.polygon(T, fill=rgb(top))
-    dr.line(T + [T[0]], fill=(255, 255, 255, 90), width=3)
-    img.alpha_composite(lay)
+# футболка: силуэт спереди, объем — изгиб по глубине; рисуется сеткой из линий
+SX, SY, SZ, SC, YAW = 1.3, -.05, 7.6, 1.15, math.radians(34)
+HALF = [(0, .95), (.12, .97), (.22, 1.03), (.30, 1.12), (.62, 1.14), (.84, 1.06), (1.04, .93),
+        (1.46, .56), (1.24, .30), (.90, .50), (.86, .20), (.85, -.3), (.88, -1.0), (.90, -1.22), (0, -1.25)]
+# правая половина от ворота по часовой: ворот дугой, плечо, рукав с четким краем, бок, подол
+OUT = HALF + [(-x, y) for x, y in reversed(HALF[1:-1])]
 
-def ribbon(img, pts, w, c1, c2):
-    """лента: кривая Безье, цвет плавно меняется по длине, светлая кромка"""
-    def bez(t):
-        n = len(pts) - 1
-        x = sum(math.comb(n, i) * (1-t)**(n-i) * t**i * pts[i][0] for i in range(n+1))
-        y = sum(math.comb(n, i) * (1-t)**(n-i) * t**i * pts[i][1] for i in range(n+1))
-        return x, y
-    lay = Image.new('RGBA', img.size, (0, 0, 0, 0))
-    dr = ImageDraw.Draw(lay)
-    a, b = np.array(rgb(c1)), np.array(rgb(c2))
-    N = 220
-    for i in range(N):
-        t = i / N
-        x, y = bez(t)
-        twist = .55 + .45 * math.cos(t * math.pi * 3)     # лента поворачивается — то шире, то уже
-        col = tuple(int(v) for v in a * (1-t) + b * t)
-        rr = w * twist / 2
-        dr.ellipse([x-rr, y-rr, x+rr, y+rr], fill=col + (255,))
-    img.alpha_composite(lay)
-    hl = Image.new('RGBA', img.size, (0, 0, 0, 0))
-    dh = ImageDraw.Draw(hl)
-    for i in range(N):
-        t = i / N
-        x, y = bez(t)
-        twist = .55 + .45 * math.cos(t * math.pi * 3)
-        rr = w * twist / 7
-        dh.ellipse([x-rr-w*.12, y-rr-w*.12, x+rr-w*.12, y+rr-w*.12], fill=(255, 255, 255, 70))
-    a = hl.getchannel('A').filter(ImageFilter.GaussianBlur(4))
-    hl = Image.new('RGBA', img.size, (255, 255, 255, 0)); hl.putalpha(a)
-    img.alpha_composite(hl)
+def inside(x, y, poly=OUT):
+    c = False
+    for i in range(len(poly)):
+        (x1, y1), (x2, y2) = poly[i], poly[i - 1]
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1: c = not c
+    return c
 
-# фон: светлый, с мягкими пятнами цветов сайта
-W = 2560
-bg = vgrad(W, S, '#F3F0FB', '#FBFAF7').convert('RGBA')
-blob(bg, (560, 420), 520, '#D9CCFA', 170, 200)
-blob(bg, (2000, 560), 480, '#CDEBDD', 170, 200)
-blob(bg, (1500, 1420), 560, '#D3DDFE', 140, 220)
-img = Image.new('RGBA', (S, S), (0, 0, 0, 0))   # сцена: телефон и AR, потом встает по центру широкого фона
+def depth(x, y):   # передняя сторона выпуклая, к краям и рукавам уходит назад
+    return -.38 * math.sqrt(max(0, 1 - (x / 1.5) ** 2)) * (1 - .25 * max(0, y - .4))
 
-# телефон: рисуем отдельно и наклоняем
-PW, PH = 500, 980
+def R(x, y, z):                                   # точка футболки в мире: масштаб и поворот вокруг вертикали
+    x, y, z = x * SC, y * SC, z * SC
+    return (SX + x * math.cos(YAW) + z * math.sin(YAW), SY + y, SZ - x * math.sin(YAW) + z * math.cos(YAW))
+
+def S(x, y): return P(*R(x, y, depth(x, y)))
+
+def mesh(dr, alpha_h, alpha_v):
+    yy = -1.2                                    # горизонтальные линии каркаса
+    while yy < 1.18:
+        seg = []; xx = -1.5
+        while xx <= 1.5:
+            if inside(xx, yy): seg.append(S(xx, yy))
+            else:
+                if len(seg) > 1: dr.line(seg, fill=(255, 255, 255, alpha_h), width=2)
+                seg = []
+            xx += .02
+        if len(seg) > 1: dr.line(seg, fill=(255, 255, 255, alpha_h), width=2)
+        yy += .12
+    xx = -1.4                                    # вертикальные
+    while xx <= 1.4:
+        seg = []; yy = -1.3
+        while yy <= 1.2:
+            if inside(xx, yy): seg.append(S(xx, yy))
+            else:
+                if len(seg) > 1: dr.line(seg, fill=(255, 255, 255, alpha_v), width=2)
+                seg = []
+            yy += .02
+        if len(seg) > 1: dr.line(seg, fill=(255, 255, 255, alpha_v), width=2)
+        xx += .14
+
+t = layer(); dt = ImageDraw.Draw(t)
+mesh(dt, 150, 110)
+dt.line([S(x, y) for x, y in OUT + [OUT[0]]], fill=(255, 255, 255, 255), width=4, joint='curve')   # контур
+for _ in range(900):                             # облако точек по поверхности
+    x, y = random.uniform(-1.5, 1.5), random.uniform(-1.3, 1.2)
+    if inside(x, y):
+        px, py = S(x, y); r = random.choice((1.6, 2.2, 3))
+        dt.ellipse([px - r, py - r, px + r, py + r], fill=(255, 255, 255, random.randint(120, 255)))
+img.alpha_composite(t)
+
+# линия сканирования: светлая полоса и четкая линия поперек футболки
+scan_y = .25
+sc = layer(); ds = ImageDraw.Draw(sc)
+a1, a2 = P(*R(-1.6, scan_y, -.5)), P(*R(1.6, scan_y, -.5))      # полоса идет по передней стороне рамки
+b1, b2 = P(*R(-1.6, scan_y - .3, -.5)), P(*R(1.6, scan_y - .3, -.5))
+ds.polygon([a1, a2, b2, b1], fill=(255, 255, 255, 26))
+ds.line([a1, a2], fill=(255, 255, 255, 255), width=4)
+img.alpha_composite(sc)
+
+# рамка-объем вокруг футболки: пунктир, уголки сплошные
+C = [R(x, y, z) for z in (-.5, .5) for y in (-1.38, 1.3) for x in (-1.6, 1.6)]
+E = [(0, 1), (2, 3), (0, 2), (1, 3), (4, 5), (6, 7), (4, 6), (5, 7), (0, 4), (1, 5), (2, 6), (3, 7)]
+b = layer(); db = ImageDraw.Draw(b)
+for i, j in E: dashed(db, P(*C[i]), P(*C[j]), (255, 255, 255, 120), 2, 10, 10)
+for i, j in E:
+    for a_, c_ in ((i, j), (j, i)):
+        p, q = P(*C[a_]), P(*C[c_]); L = math.dist(p, q); k = min(.22, 46 / L)
+        db.line([p, (p[0] + (q[0]-p[0])*k, p[1] + (q[1]-p[1])*k)], fill=(255, 255, 255, 255), width=5)
+for _ in range(260):                             # точки на полу под футболкой
+    x, z = random.gauss(SX, .8), random.gauss(SZ, .55)
+    px, py = P(x, FLOOR, z); r = 1.8
+    db.ellipse([px - r, py - r, px + r, py + r], fill=(255, 255, 255, random.randint(60, 160)))
+img.alpha_composite(b)
+
+# телефон: впереди слева, наклонен; камера — точка у верхнего края
+PW, PH = 400, 820
 ph = Image.new('RGBA', (PW, PH), (0, 0, 0, 0))
 d = ImageDraw.Draw(ph)
-d.rounded_rectangle([0, 0, PW-1, PH-1], radius=84, fill=rgb('#16181C'))
-SX, SY, SW, SH = 22, 22, PW-44, PH-44
-screen = vgrad(SW, SH, '#E9E7EE', '#D8D5DF').convert('RGBA')
-sd = ImageDraw.Draw(screen)
-# стол и сумка на экране телефона — как снято камерой
-sd.rectangle([0, int(SH*.62), SW, SH], fill=rgb('#CFCBD6'))
-bx0, by0, bx1, by1 = int(SW*.17), int(SH*.40), int(SW*.83), int(SH*.86)
-sd.arc([int(SW*.30), int(SH*.26), int(SW*.70), int(SH*.52)], 180, 360, fill=rgb('#0F1013'), width=22)
-sd.polygon([(bx0, by0), (bx1, by0), (bx1+14, by1), (bx0-14, by1)], fill=rgb('#1B1D22'))
-sd.polygon([(bx0, by0), (bx1, by0), (bx1, by0+18), (bx0, by0+18)], fill=rgb('#26292F'))
-# рамка распознавания метки (без текста)
-fx0, fy0, fx1, fy1 = int(SW*.34), int(SH*.52), int(SW*.66), int(SH*.70)
+d.rounded_rectangle([0, 0, PW - 1, PH - 1], radius=66, fill=(236, 236, 238, 255))
+d.rounded_rectangle([16, 16, PW - 17, PH - 17], radius=52, fill=(16, 16, 19, 255))
+sw, sh = PW - 32, PH - 32                        # на экране: та же сетка и футболка в рамке
+scr = Image.new('RGBA', (sw, sh), (0, 0, 0, 0)); ds2 = ImageDraw.Draw(scr)
+hy = sh * .5
+for k in range(1, 14):
+    yk = hy + (sh - hy) * (k / 13) ** 1.6
+    ds2.line([(0, yk), (sw, yk)], fill=(255, 255, 255, 60), width=2)
+for k in range(-8, 9):
+    ds2.line([(sw / 2 + k * 14, hy), (sw / 2 + k * 90, sh)], fill=(255, 255, 255, 50), width=2)
+cxs, cys, ss = sw / 2, sh * .46, 100
+pts = [(cxs + x * ss, cys - y * ss) for x, y in OUT]
+ds2.polygon(pts, fill=(16, 16, 19, 255))
+for yv in [i * .2 - 1.2 for i in range(12)]:
+    xs = [x for x in [i * .02 - 1.5 for i in range(151)] if inside(x, yv)]
+    if xs: ds2.line([(cxs + xs[0] * ss, cys - yv * ss), (cxs + xs[-1] * ss, cys - yv * ss)], fill=(255, 255, 255, 90), width=2)
+ds2.line(pts + [pts[0]], fill=(255, 255, 255, 255), width=3, joint='curve')
+fx0, fy0, fx1, fy1 = cxs - 1.68 * ss, cys - 1.45 * ss, cxs + 1.68 * ss, cys + 1.5 * ss
 for (x, y, dx, dy) in ((fx0, fy0, 1, 1), (fx1, fy0, -1, 1), (fx0, fy1, 1, -1), (fx1, fy1, -1, -1)):
-    sd.line([(x, y), (x + dx*44, y)], fill=(255, 255, 255, 230), width=8)
-    sd.line([(x, y), (x, y + dy*44)], fill=(255, 255, 255, 230), width=8)
-sd.rounded_rectangle([fx0+30, fy0+28, fx1-30, fy1-28], radius=18, fill=rgb('#5B6CF6'))
-sd.ellipse([fx0+66, fy0+52, fx1-66, fy1-52], fill=rgb('#C9B6F5'))
-# кнопка камеры
-cx, cy = SW//2, int(SH*.93)
-sd.ellipse([cx-54, cy-54, cx+54, cy+54], fill=(255, 255, 255, 235))
-sd.ellipse([cx-40, cy-40, cx+40, cy+40], fill=rgb('#3D5BF5'))
-mask = Image.new('L', (SW, SH), 0)
-ImageDraw.Draw(mask).rounded_rectangle([0, 0, SW-1, SH-1], radius=64, fill=255)
-ph.paste(screen, (SX, SY), mask)
-d.rounded_rectangle([PW//2-64, 40, PW//2+64, 72], radius=16, fill=rgb('#16181C'))   # вырез камеры
-ph = ph.rotate(-7, resample=Image.BICUBIC, expand=True)
+    ds2.line([(x, y), (x + dx * 34, y)], fill=(255, 255, 255, 255), width=5)
+    ds2.line([(x, y), (x, y + dy * 34)], fill=(255, 255, 255, 255), width=5)
+ys = cys - .25 * ss
+ds2.rectangle([fx0, ys, fx1, ys + 34], fill=(255, 255, 255, 28))
+ds2.line([(fx0, ys), (fx1, ys)], fill=(255, 255, 255, 255), width=3)
+ds2.ellipse([sw / 2 - 34, sh - 100, sw / 2 + 34, sh - 32], outline=(255, 255, 255, 255), width=4)
+m = Image.new('L', (sw, sh), 0); ImageDraw.Draw(m).rounded_rectangle([0, 0, sw - 1, sh - 1], radius=52, fill=255)
+ph.paste(scr, (16, 16), m)
+d.rounded_rectangle([PW // 2 - 50, 34, PW // 2 + 50, 60], radius=13, fill=(236, 236, 238, 255))   # вырез камеры
+ang = 11
+ph = ph.rotate(ang, resample=Image.BICUBIC, expand=True)
+ox, oy = 250, 640
+a = math.radians(ang); rx, ry = 0, 47 - PH / 2           # точка камеры после поворота
+cam = (ox + ph.width / 2 + rx * math.cos(a) + ry * math.sin(a), oy + ph.height / 2 - rx * math.sin(a) + ry * math.cos(a))
+r = layer(); dr = ImageDraw.Draw(r)
+for i in (0, 2, 4, 6, 1):
+    dashed(dr, cam, P(*C[i]), (255, 255, 255, 110), 2)
+img.alpha_composite(r)
+img.alpha_composite(ph, (ox, oy))
 
-shadow(img, (560, 1500, 1120, 1580), 45, 40)
-img.alpha_composite(ph, (800 - ph.width//2 + 30, 1560 - ph.height))
-
-# AR вылетает из экрана: ленты из верха экрана вверх, над ними диско-шар, вокруг кубы и шары
-ribbon(img, [(740, 820), (520, 640), (900, 470), (600, 180)], 70, '#C9B6F5', '#9C86EE')
-ribbon(img, [(880, 820), (1180, 640), (860, 420), (1150, 160)], 64, '#BFE6CF', '#7CCB9F')
-disco(img, (830, 420), 140)
-sphere(img, (500, 560), 44, '#8FD3A8')
-sphere(img, (1230, 560), 34, '#C9B6F5')
-sphere(img, (1060, 230), 26, '#B9BCC8', '#FFFFFF', '#5E6272')
-sphere(img, (420, 330), 24, '#C9B6F5')
-sphere(img, (1300, 860), 22, '#8FD3A8')
-cube(img, (1140, 690), 100, .18, '#7B90FF', '#3D5BF5', '#2B44C9')
-cube(img, (560, 230), 80, -.25, '#7B90FF', '#3D5BF5', '#2B44C9')
-cube(img, (640, 760), 56, .4, '#A9B6FF', '#5B6CF6', '#3D50D8')
-cube(img, (1300, 300), 50, -.1, '#C9B6F5', '#9C86EE', '#7E68D8')
-
-# по бокам широкого кадра — еще немного AR, чтобы сцена не висела островом
-side = Image.new('RGBA', (W, S), (0, 0, 0, 0))
-sphere(side, (300, 1100), 40, '#8FD3A8')
-cube(side, (420, 640), 70, .3, '#C9B6F5', '#9C86EE', '#7E68D8')
-sphere(side, (230, 360), 22, '#B9BCC8', '#FFFFFF', '#5E6272')
-cube(side, (2200, 1050), 76, -.2, '#7B90FF', '#3D5BF5', '#2B44C9')
-sphere(side, (2330, 520), 36, '#C9B6F5')
-sphere(side, (2120, 1380), 20, '#8FD3A8')
-bg.alpha_composite(side)
-bg.alpha_composite(img, ((W - S) // 2, 0))
-bg.convert('RGB').resize((1280, 800), Image.LANCZOS).save('img/armerch/hover-cover.jpg', quality=88)
+img.convert('RGB').resize((1280, 800), Image.LANCZOS).save('img/armerch/hover-cover.jpg', quality=90)
 print('ok')
