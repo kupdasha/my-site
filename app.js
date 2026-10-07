@@ -2186,6 +2186,8 @@ function renderCase(k, keepScroll){
   if (p.adhd) body += `<div class="adhd adhd-mount"></div>`;
   // fleet — кейс Nέofleet как дорога: слоганы на полосах, цвета рядами, живая разметка, фары; рисует fleet.js
   if (p.fleet) body += `<div class="fleet fleet-mount"></div>`;
+  // clip — музыкальный клип: история по ступеням, голос на дорожки, 120 фото в лицо, полоска клипа, звонок; рисует clip.js
+  if (p.clip) body += `<div class="cl cl-mount"></div>`;
   // casa — кейс Armani/Casa: огурцы режиссера, раскадровка-плеер, квартира с нуля, выбор света, правки; рисует armani.js
   if (p.casa) body += `<div class="casa casa-mount"></div>`;
   // презентация — в самом конце, перед ссылками
@@ -2256,6 +2258,10 @@ function renderCase(k, keepScroll){
   if (fl) import(SCRIPT_BASE + 'fleet.js?v=' + VER)
     .then(m => m.mountFleet(fl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс Nέofleet не загрузился', err));
+  const cl = caseContent.querySelector('.cl-mount');
+  if (cl) import(SCRIPT_BASE + 'clip.js?v=' + VER)
+    .then(m => m.mountClip(cl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс клипа не загрузился', err));
   const ca = caseContent.querySelector('.casa-mount');
   if (ca) import(SCRIPT_BASE + 'armani.js?v=' + VER)
     .then(m => m.mountCasa(ca, p, { T, pick, openViewer, base: SCRIPT_BASE }))
