@@ -105,20 +105,24 @@ function livePlan(box, c){
 function partsHTML(c){
   return `<div class="vp-parts">
     <div class="vp-stage vp-parts-pic">
-      <img src="${c.img}" alt="" draggable="false">
-      ${c.spots.map((s, i) => `<button class="vp-spot" data-i="${i}" style="left:${s.x}%;top:${s.y}%" aria-label="${esc(H.pick(s.name))}"><i></i></button>`).join('')}
+      <div class="vp-parts-in"><img src="${c.img}" alt="" draggable="false">
+      ${c.spots.map((s, i) => `<button class="vp-spot" data-i="${i}" style="left:${s.x}%;top:${s.y}%" aria-label="${esc(H.pick(s.name))}"><i></i></button>`).join('')}</div>
       <div class="vp-tip" aria-live="polite"><b></b><span></span></div>
     </div>
+    <p class="vp-parts-cap"><b></b><span></span></p>
   </div>`;
 }
 function liveParts(box, c){
-  const pic = box.querySelector('.vp-parts-pic'), tip = box.querySelector('.vp-tip');
+  const pic = box.querySelector('.vp-parts-pic'), tip = box.querySelector('.vp-tip'), mob = box.querySelector('.vp-parts-cap');
   const spots = [...box.querySelectorAll('.vp-spot')];
   const show = i => {
     const s = c.spots[i];
     spots.forEach((el, k) => el.classList.toggle('on', k === i));
-    tip.querySelector('b').innerHTML = H.T(s.name);
-    tip.querySelector('span').innerHTML = s.text ? H.T(s.text) : '';
+    // на телефоне подсказка закрыла бы стенд — там подпись стоит под картинкой
+    [tip, mob].forEach(el => {
+      el.querySelector(':scope > b').innerHTML = H.T(s.name);
+      el.querySelector(':scope > span').innerHTML = s.text ? H.T(s.text) : '';
+    });
     // подсказка — с той стороны точки, где больше места
     tip.style.left = s.x + '%'; tip.style.top = s.y + '%';
     tip.classList.toggle('left', s.x > 58);

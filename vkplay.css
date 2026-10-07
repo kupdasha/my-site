@@ -73,10 +73,22 @@
 .vp-zones h3{font-size:clamp(22px,2vw,28px);font-weight:500;line-height:1.15;margin:0 0 8px;text-wrap:balance}
 .vp-zones p{font-family:var(--font-read);font-size:clamp(18px,1.4vw,21px);line-height:1.45;max-width:36ch}
 .vp-area{font-size:16px;opacity:.6}
-@media (max-width:860px){.vp-plan{grid-template-columns:minmax(0,1fr)}}
+/* планшет: чертеж во всю ширину, модули под ним в три колонки */
+@media (max-width:860px){.vp-plan{grid-template-columns:minmax(0,1fr)}
+  .vp-zones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px clamp(16px,3vw,28px)}
+  .vp-area{grid-column:1 / -1}}
+/* телефон: модули столбиком, описание раскрывается только у подсвеченного */
+@media (max-width:560px){.vp-zones{grid-template-columns:minmax(0,1fr);gap:16px}
+  .vp-zones li[data-i] p{max-height:0;overflow:hidden;transition:max-height .5s var(--ease)}
+  .vp-zones li.on p{max-height:8em}
+  .vp-zones h3{margin-bottom:6px}
+  .vp-dim{font-size:16px}}
 
 /* ---------- из чего собран: точки на общем виде ---------- */
 .vp-parts-pic{aspect-ratio:16/9}
+/* картинка и точки двигаются вместе: на телефоне стенд крупнее, пустые края фона уходят за рамку */
+.vp-parts-in{position:relative}
+@media (max-width:640px){.vp-parts-pic{aspect-ratio:auto}.vp-parts-in{width:132%;margin-left:-16%}}
 .vp-spot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;padding:0;border-radius:50%;background:transparent;cursor:pointer;z-index:2}
 .vp-spot i{position:absolute;inset:13px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform .4s var(--ease),background .3s}
 /* круг расходится волной, как пульс */
@@ -93,10 +105,14 @@
 .vp-tip.up{margin-top:0;translate:0 calc(-100% - 20px)}
 .vp-tip.left.up{translate:calc(-100% - 40px) calc(-100% - 20px)}
 .vp-tip b{display:block;font-size:18px;font-weight:600;line-height:1.2}
-.vp-tip span{display:block;font-size:16px;line-height:1.35;margin-top:6px;opacity:.75}
-.vp-tip span:empty{display:none}
+.vp-tip > span{display:block;font-size:16px;line-height:1.35;margin-top:6px;opacity:.75}
+.vp-tip > span:empty{display:none}
 .vp-parts .vp-chips{margin-top:clamp(16px,2vw,24px)}
-@media (max-width:640px){.vp-tip{max-width:60%;padding:10px 14px 12px}.vp-tip span{display:none}.vp-spot{width:36px;height:36px;margin:-18px 0 0 -18px}.vp-spot i,.vp-spot::before{inset:11px}}
+/* подпись под картинкой — только на телефоне, вместо всплывающей подсказки */
+.vp-parts-cap{display:none;margin-top:16px;min-height:3.2em}
+.vp-parts-cap b{display:block;font-size:20px;font-weight:500;line-height:1.2}
+.vp-parts-cap > span{display:block;font-family:var(--font-read);font-size:18px;line-height:1.4;margin-top:4px}
+@media (max-width:640px){.vp-tip{display:none}.vp-parts-cap{display:block}.vp-spot{width:36px;height:36px;margin:-18px 0 0 -18px}.vp-spot i,.vp-spot::before{inset:11px}}
 
 /* ---------- один бренд или три: шторка ---------- */
 .vp-wipe{aspect-ratio:16/9;cursor:ew-resize;touch-action:pan-y}
@@ -177,7 +193,7 @@
 .vp-mode-text.on{display:block;animation:vpFade .5s var(--ease)}
 @keyframes vpFade{from{opacity:0;transform:translateY(8px)}}
 @media (max-width:860px){.vp-cube-box{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:560px){.vp-cube-stage{--s:76px}}
+@media (max-width:860px){.vp-cube-stage{--s:clamp(80px,15vw,128px)}}
 
 /* ---------- сделано в Blender ---------- */
 .vp-credit{display:flex;align-items:center;gap:clamp(16px,2vw,28px);padding:clamp(20px,2.4vw,32px) 0;border-top:2px solid var(--line);border-bottom:2px solid var(--line)}
@@ -196,11 +212,11 @@
 .vp-led-dot{display:inline-block;width:.32em;height:.32em;border-radius:3px;background:var(--vp-led)}
 @keyframes vpRun{to{transform:translateX(-50%)}}
 .vp-ticker-ctrl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 28px;margin-top:clamp(16px,2vw,24px)}
-.vp-form{display:flex;gap:10px;flex:1 1 360px;max-width:520px}
+.vp-form{display:flex;gap:10px;flex:1 1 300px;min-width:0;max-width:520px}
 .vp-input{flex:1;min-width:0;height:56px;padding:0 22px 3px;border:0;border-radius:99px;background:var(--soft);color:var(--ink);font:inherit;font-size:18px}
 .vp-input:focus{outline:2px solid var(--ink);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.vp-led-track{animation:none}.vp-spot::before{animation:none}}
-@media (max-width:560px){.vp-form .btn{padding:0 20px 4px}}
+@media (max-width:560px){.vp-form{flex-basis:100%}.vp-form .btn{padding:0 20px 4px}.vp-input{padding:0 18px 3px}}
 
 /* ---------- обход стенда: прокрутка вниз двигает ленту вбок ---------- */
 .vp-walk{position:relative;height:calc(100vh + var(--n) * 34vh)}
@@ -211,4 +227,8 @@
 .vp-walk-shot img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
 .vp-walk-shot:hover img{transform:scale(1.03)}
 .vp-walk-item figcaption{font-size:16px;opacity:.6;margin-top:12px}
-@media (max-width:760px){.vp-walk{height:calc(100vh + var(--n) * 24vh)}.vp-walk-item{width:86vw}}
+/* телефон: без закрепления — кадры столбиком во всю ширину */
+@media (max-width:760px){.vp-walk{height:auto}.vp-walk-pin{position:static;height:auto;display:block;overflow:visible}
+  .vp-walk-track{flex-direction:column;gap:24px;transform:none !important}
+  .vp-walk-item{width:100%}}
+@media (max-width:560px){.vp-cube-stage[data-mode="stand"] .vp-desk{--w:calc(var(--s) * 2.4)}}
