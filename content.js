@@ -2103,9 +2103,12 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           { caption: ['розово-голубой', 'неон'],
             row: ['img/rostech/neon-1.jpg', 'img/rostech/neon-2.jpg', 'img/rostech/neon-4.jpg'] },
           { row: ['img/rostech/neon-3.jpg', 'img/rostech/neon-5.jpg', 'img/rostech/neon-6.jpg', 'img/rostech/neon-7.jpg'] },
-          { head: { title: ['финальный ролик', 'что вышло'], cols: true,
-                    text: ['Финальный ролик, который показали на презентации в Дубае.', 'Вот что показали в Дубае. Со звуком лучше'] } },
-          { film: 'img/rostech/final.mp4', poster: 'img/rostech/final.jpg' },   // свой файл со звуком, не Rutube
+          { head: { title: ['финальные ролики', 'что вышло'],
+                    text: ['Собрали две финальные версии: с золотыми частицами и с линиями. С заказчиком согласовали вторую — ее и показали на презентации в Дубае.',
+                           'Довели до конца две версии: в золотых искрах и с линиями. Заказчик выбрал линии — их и показали в Дубае. Со звуком лучше'] } },
+          // свои файлы со звуком, не Rutube: сначала версия с частицами, потом согласованная — с линиями
+          { film: 'img/rostech/particles.mp4', poster: 'img/rostech/particles.jpg', caption: ['версия с частицами', 'в золотых искрах'] },
+          { film: 'img/rostech/final.mp4', poster: 'img/rostech/final.jpg', caption: ['версия с линиями — согласована с заказчиком', 'с линиями — ее и выбрали'] },
           { caption: ['публикации в СМИ', 'про духи написали все'], row: ['img/rostech/press.jpg'] },
         ],
       },
