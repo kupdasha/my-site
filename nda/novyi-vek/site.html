@@ -7,7 +7,7 @@
 <title>Новый век — прототип сайта</title>
 <script src="../nda.js"></script>
 <script>/* прототип тоже под паролем: без пароля — на страницу проекта, там замок */
-(function(){var ok=false;try{ok=sessionStorage.getItem('nda-pass')===NDA.PASS||localStorage.getItem('nda-pass')===NDA.PASS}catch(e){} if(!ok) location.replace('./');})();
+(function(){var ok=!!window.NDA_EMBED;try{ok=ok||sessionStorage.getItem('nda-pass')===NDA.PASS||localStorage.getItem('nda-pass')===NDA.PASS}catch(e){} if(!ok) location.replace('./');})();
 if('scrollRestoration' in history) history.scrollRestoration='manual';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -646,7 +646,8 @@ var ease=function(t){return 1-Math.pow(1-t,3)};
 var rem=function(){return parseFloat(getComputedStyle(document.documentElement).fontSize)};
 var fmt=function(n){return Math.round(n).toLocaleString('ru-RU').replace(/,/g,' ')};
 /* ?demo=services или ?demo=credit — живой макет для страницы проекта: один экран, курсор показывает сам */
-var DEMO=(location.search.match(/demo=(\w+)/)||[])[1]||'';
+/* внутри окна кейса на сайте адрес окна пустой — тогда параметры приходят в window.NV_SEARCH */
+var DEMO=((window.NV_SEARCH||location.search).match(/demo=(\w+)/)||[])[1]||'';
 if(DEMO){ document.documentElement.classList.add('demo','demo-'+DEMO); if(location.hash!==(DEMO==='credit'?'#credit':'#main')) history.replaceState(null,'',DEMO==='credit'?'#credit':'#main'); }
 
 /* логотип: вставляем svg, чтобы цветок крутился отдельно от надписи */

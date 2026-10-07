@@ -2267,9 +2267,67 @@ function watchMark(el){
   new IntersectionObserver(([e]) => { seen = e.isIntersecting; run(); }).observe(el);
 }
 
+/* ================================================================
+   КЕЙС-СТРАНИЦА ЦЕЛИКОМ В ОКНЕ (поле embed у проекта, см. «Новый век»)
+   Отдельная страница из репозитория (embed: 'nda/novyi-vek/index.html')
+   открывается в окне кейса. С GitHub файлы .html приходят простым текстом,
+   поэтому страница скачивается и вставляется в окно как есть, с адресом
+   своей папки (<base>), — так находятся ее стили, картинки и скрипты.
+   ================================================================ */
+function embedHTML(html, url){
+  const dir = url.replace(/[^/]*([?#].*)?$/, '');
+  const search = (url.match(/\?[^#]*/) || [''])[0];
+  const head = `<base href="${dir}"><style>.page>.back{display:none!important}</style>` +
+    `<script>window.NDA_EMBED=true;window.NV_SEARCH=${JSON.stringify(search)};(${embedBridge})()<\/script>`;
+  return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + head) : head + html;
+}
+window.kdEmbedHTML = embedHTML;
+// работает внутри окна: ссылки «назад» закрывают кейс, вложенные окна с прототипом (*.html) вставляются так же
+function embedBridge(){
+  // адрес '#main' считается от <base> и уходит на GitHub — в окне такое запрещено; меняется только хвост с #
+  ['replaceState', 'pushState'].forEach(k => {
+    const orig = history[k].bind(history);
+    history[k] = (s, t, u) => {
+      if (typeof u === 'string' && u[0] === '#') u = location.href.split('#')[0] + u;
+      try { orig(s, t, u); } catch (e) {}
+    };
+  });
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    const h = a.getAttribute('href');
+    if (h === '../' || h === './') { e.preventDefault(); top.postMessage({ kdEmbed: 'close' }, '*'); }
+    else if (/\.html/.test(h)) {   // «открыть на весь экран» — окно прототипа на весь экран
+      e.preventDefault();
+      const f = document.querySelector('.frame iframe') || document.querySelector('iframe');
+      if (f && f.requestFullscreen) f.requestFullscreen();
+    }
+  }, true);
+  const fix = f => {
+    const s = f.getAttribute('src');
+    if (!s || !/\.html/.test(s)) return;
+    const u = new URL(s, document.baseURI).href;
+    f.removeAttribute('src');
+    fetch(u).then(r => r.text()).then(t => { f.srcdoc = top.kdEmbedHTML(t, u); });
+  };
+  new MutationObserver(ms => ms.forEach(m => {
+    if (m.type === 'attributes') { if (m.target.tagName === 'IFRAME') fix(m.target); return; }
+    m.addedNodes.forEach(n => { if (n.tagName === 'IFRAME') fix(n); else if (n.querySelectorAll) n.querySelectorAll('iframe[src]').forEach(fix); });
+  })).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
+}
+function renderEmbed(p){
+  const url = SCRIPT_BASE + p.embed;
+  caseContent.innerHTML = `<iframe class="case-embed" title="${pick(p.title)}" allow="fullscreen" allowfullscreen></iframe>`;
+  const f = caseContent.querySelector('iframe');
+  fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + VER).then(r => r.text()).then(t => { if (f.isConnected) f.srcdoc = embedHTML(t, url); });
+}
+addEventListener('message', e => { if (e.data && e.data.kdEmbed === 'close' && caseIndex != null) $('#caseBack').click(); });
+
 function renderCase(k, keepScroll){
   // следующий проект — без отдельных страниц (page) и без самого себя
   const W = SITE.works, items = caseItems(), p = items[k];
+  if (p.embed) { caseEl.classList.add('embed'); renderEmbed(p); caseEl.scrollTop = 0; return; }
+  caseEl.classList.remove('embed');
   let nk = (k + 1) % items.length;
   while (nk !== k && items[nk].page != null) nk = (nk + 1) % items.length;
   const next = nk !== k ? items[nk] : null;

@@ -166,6 +166,8 @@ var NDA = window.NDA = {
 function ndaHash(s){var a=0xdeadbeef,b=0x41c6ce57;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return (4294967296*(2097151&b)+(a>>>0)).toString(36)}
 
 function ndaGate(onOpen){
+  /* внутри страницы NDA на сайте (окно кейса) страницу уже защищает пароль Тильды */
+  if(window.NDA_EMBED){ document.documentElement.classList.add('nda-open'); onOpen(); return; }
   var KEY='nda-pass', ok=false;
   try{ ok = sessionStorage.getItem(KEY)===NDA.PASS || localStorage.getItem(KEY)===NDA.PASS; }catch(e){}
   if(ok){ document.documentElement.classList.add('nda-open'); onOpen(); return; }
