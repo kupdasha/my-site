@@ -241,6 +241,8 @@ function liveMark(box){
     fetch(ov.dataset.svg + (ov.dataset.svg.includes('?') ? '&' : '?') + 'v=' + VERS).then(r => r.ok ? r.text() : '').then(svg => {
       if (!svg) return;
       ov.innerHTML = svg;
+      // слой обрезается так же, как фото под ним (object-fit: cover), — пустые поля сверху и снизу уходят
+      ov.querySelector('svg')?.setAttribute('preserveAspectRatio', 'xMidYMid slice');
       // полосы — линиями: тогда их можно разрезать на бегущий пунктир
       ov.querySelectorAll('.fl-stripe').forEach(r => {
         const x = +r.getAttribute('x') + 17, y = +r.getAttribute('y'), h = +r.getAttribute('height');

@@ -86,7 +86,7 @@
 .fl-mark{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.6vw,24px)}
 .fl-hood{display:flex;flex-direction:column;gap:14px}
 .fl-hood figcaption{font-size:17px;opacity:.6}
-.fl-hood-in{position:relative;display:block;aspect-ratio:3/4;border-radius:var(--r-img);overflow:hidden;background:#F7F7F7;cursor:zoom-in;padding:0}
+.fl-hood-in{position:relative;display:block;aspect-ratio:900/950;border-radius:var(--r-img);overflow:hidden;background:#F7F7F7;cursor:zoom-in;padding:0}
 .fl-hood-in > img{width:100%;height:100%;object-fit:cover;display:block}
 .fl-ov{position:absolute;inset:0;pointer-events:none}
 .fl-ov svg{width:100%;height:100%;display:block}
