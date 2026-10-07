@@ -1838,12 +1838,12 @@ const clipPlayer = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
 }), { threshold: 0.2 });
 /* РОЛИКИ В ТЕЛЕФОНЕ (поле { phones: [{ src, poster }], title, text } в галерее кейса, см. AR мерч):
-   запись экрана стоит в рамке телефона, рядом заголовок и текст. Ролик стоит на заставке и играет,
+   запись экрана стоит в рамке телефона, рядом заголовок и текст; phones: [] — только текст, тем же шрифтом. Ролик стоит на заставке и играет,
    пока на него навели курсор; на тач-экранах — пока телефон на экране */
 function phonesHTML(x){
-  return `<div class="wrap ph-row${x.phones.length > 1 ? ' ph-many' : ''}" data-reveal><div class="ph-set">${
+  return `<div class="wrap ph-row${x.phones.length > 1 ? ' ph-many' : ''}${x.phones.length ? '' : ' ph-solo'}" data-reveal>${x.phones.length ? `<div class="ph-set">${
     x.phones.map(f => `<div class="phone"><video src="${f.src}"${f.poster ? ` poster="${f.poster}"` : ''} muted loop playsinline preload="none" disablepictureinpicture></video></div>`).join('')
-  }</div><div class="ph-text">${x.title ? `<h3>${T(x.title)}</h3>` : ''}${x.text ? `<p>${T(x.text)}</p>` : ''}</div></div>`;
+  }</div>` : ''}<div class="ph-text">${x.title ? `<h3>${T(x.title)}</h3>` : ''}${x.text ? `<p>${T(x.text)}</p>` : ''}</div></div>`;
 }
 const phoneTouch = matchMedia('(hover: none)').matches;
 const phonePlayer = new IntersectionObserver(es => es.forEach(e => {
@@ -2427,7 +2427,7 @@ function renderCase(k, keepScroll){
       ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
       ${p.note ? `<p class="case-note" data-reveal>${T(p.note)}</p>` : ''}
     </div>
-    <div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>
+    ${p.noHero ? '' : `<div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>`}
     ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
     <div class="case-body">${body}</div>
     <div class="wrap case-end">
