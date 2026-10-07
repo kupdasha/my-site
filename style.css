@@ -988,14 +988,14 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .ty{text-align:left;padding-top:clamp(32px,4vw,56px);display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:clamp(32px,5vw,80px);align-items:center}
 .ty>:not(.ty-switch){grid-column:1}
 .ty>.ty-switch{grid-column:2;grid-row:1 / span 3;align-self:center}
-@media (max-width:900px){.ty{grid-template-columns:1fr}.ty>.ty-switch{grid-column:1;grid-row:auto;justify-self:start}}
-.ty .h2{margin:0;max-width:16ch;font-size:clamp(36px,4.8vw,80px)}
+@media (max-width:1000px){.ty{grid-template-columns:1fr}.ty>.ty-switch{grid-column:1;grid-row:auto;justify-self:start}}
+.ty .h2{margin:0;max-width:16ch;font-size:clamp(36px,4.8vw,68px)}   /* не больше 68px: иначе на широких экранах «подружимся?» упирается в тумблер */
 .ty .lead{margin:20px 0 0}
 .ty-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px 40px;margin-top:clamp(28px,4vw,48px)}
 .ty .contact-links{margin:0;justify-content:flex-start}
 /* радужный перелив только под тумблером */
 .ty-switch{position:relative;display:inline-flex;overflow:hidden;border-radius:99px;padding:22px 22px 22px 48px;background:#E2FB5A}
-@media (max-width:900px){.ty-switch{margin-top:clamp(28px,4vw,44px)}}
+@media (max-width:1000px){.ty-switch{margin-top:clamp(28px,4vw,44px)}}
 .ty-switch .waves-canvas{position:absolute;inset:0;width:100%;height:100%}
 .ty-switch .switch{position:relative}
 :root[data-theme="dark"] .ty-switch{display:none}
