@@ -2417,6 +2417,8 @@ function renderCase(k, keepScroll){
   if (p.stand) body += `<div class="vp vp-mount"></div>`;
   // suit — парашютный костюм Skolkovo: партнеры в небе с ползунком, три идеи, цепочка этапов, точки на рендере; рисует suit.js
   if (p.suit) body += `<div class="su su-mount"></div>`;
+  // ventures — The Ventures Japan: живой принт в шапке (плитки с сакурой тают к середине), плитка, съемка, Токио; рисует ventures.js
+  if (p.ventures) body += `<div class="vn vn-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2513,6 +2515,10 @@ function renderCase(k, keepScroll){
   if (su) import(SCRIPT_BASE + 'suit.js?v=' + VER)
     .then(m => m.mountSuit(su, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс парашютного костюма не загрузился', err));
+  const vn = caseContent.querySelector('.vn-mount');
+  if (vn) import(SCRIPT_BASE + 'ventures.js?v=' + VER)
+    .then(m => m.mountVentures(vn, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс The Ventures Japan не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
   if (vp) import(SCRIPT_BASE + 'vkplay.js?v=' + VER)
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))

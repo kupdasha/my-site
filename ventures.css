@@ -1,0 +1,90 @@
+/* ================================================================
+   КЕЙС «THE VENTURES JAPAN» (ventures.js, поле ventures у проекта)
+   Цвета — сайта; свое — только принт: фирменный синий #3044FF
+   и белый, в обеих версиях одинаковые (это ткань, а не интерфейс).
+   ================================================================ */
+.vn{overflow-x:clip;--vn-gap:clamp(64px,8vw,128px);--vn-blue:#3044FF}
+.vn-ch{margin-bottom:var(--vn-gap)}
+.vn-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
+.vn-label{grid-column:1 / span 3;grid-row:1}
+.vn-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.vn-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
+@media (max-width:760px){.vn-label,.vn-title,.vn-text{grid-column:1 / -1}.vn-label{grid-row:auto}}
+.vn-cap{font-size:16px;opacity:.6;margin-top:16px;max-width:60ch;text-wrap:balance}
+
+.vn-viz{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease) .15s,transform 1s var(--ease) .15s}
+.vn-ch.in .vn-viz{opacity:1;transform:none}
+
+/* ---------- шапка: живой принт поверх обложки ---------- */
+.case-hero.vn-hero{position:relative;aspect-ratio:16/9}
+.vn-poster{position:absolute;inset:0;cursor:pointer;user-select:none;-webkit-user-select:none;color:#1D222A;outline:none;
+  opacity:0;animation:vnIn .9s var(--ease) .1s forwards}
+@keyframes vnIn{to{opacity:1}}
+/* картинки шапки сайт растягивает на весь блок — здесь надписи живут своим размером */
+.case-hero .vn-poster img{position:static;inset:auto;height:auto;object-fit:initial;mix-blend-mode:normal}
+.vn-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* перед и спина сменяют друг друга: надписи уезжают вверх, новые приходят снизу */
+.vn-side{position:absolute;left:0;right:0;top:37%;translate:0 -50%;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.4vw,22px);pointer-events:none;
+  transition:opacity .6s var(--ease),transform .9s var(--ease)}
+.vn-poster .vn-logo{width:clamp(180px,26%,420px)}
+.vn-poster .vn-award{width:clamp(150px,17%,280px)}
+.vn-poster .vn-slogan{width:clamp(190px,30%,480px)}
+.vn-back{opacity:0;transform:translateY(24px)}
+.vn-poster.back .vn-front{opacity:0;transform:translateY(-24px)}
+.vn-poster.back .vn-back{opacity:1;transform:none}
+/* подпись-переключатель сверху, на синем: «перед — спина», активное слово ярче */
+.vn-flip{position:absolute;left:50%;top:clamp(14px,2.2vw,28px);translate:-50% 0;display:flex;align-items:center;gap:10px;
+  padding:6px 16px 8px;border:1.5px solid #fff;border-radius:99px;color:#fff;font-size:16px;line-height:1.2;white-space:nowrap;pointer-events:none}
+.vn-flip i{width:18px;height:1.5px;background:currentColor;opacity:.6}
+.vn-flip b{font-weight:400;opacity:.55;transition:opacity .5s}
+.vn-poster:not(.back) .vn-flip .vn-f,.vn-poster.back .vn-flip .vn-b{opacity:1}
+.vn-poster:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+@media (max-width:760px){
+  .case-hero.vn-hero{aspect-ratio:4/5}
+  .vn-side{top:40%}
+  .vn-poster .vn-logo{width:62%}.vn-poster .vn-award{width:46%}.vn-poster .vn-slogan{width:74%}
+}
+
+/* ---------- плитка и десять шагов ---------- */
+.vn-tile{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(16px,2vw,28px);align-items:stretch}
+.vn-tile-big{aspect-ratio:1;border-radius:var(--r-img);background:var(--vn-blue);display:grid;place-items:center}
+.vn-tile-big img{width:62%;height:auto;animation:vnSway 7s ease-in-out infinite alternate}
+@keyframes vnSway{from{rotate:-6deg}to{rotate:4deg}}
+/* шаги — на растяжке синий → белый, как на футболке снизу вверх */
+.vn-steps{border-radius:var(--r-img);background:linear-gradient(90deg,var(--vn-blue) 0%,#7D8AFF 45%,#fff 100%);
+  display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,3vw,48px);min-height:220px;
+  box-shadow:inset 0 0 0 1px var(--line)}
+.vn-steps span{flex:0 0 auto;width:calc(clamp(40px,7vw,104px) * var(--s));aspect-ratio:1;rotate:var(--r);
+  transform-origin:50% 50%;animation:vnBreath 3.2s ease-in-out infinite;animation-delay:calc(var(--i) * -.32s)}
+.vn-steps img{width:100%;height:auto;display:block}
+@keyframes vnBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+@media (max-width:760px){
+  .vn-tile{grid-template-columns:minmax(0,1fr)}
+  .vn-tile-big{aspect-ratio:16/10;min-width:0}.vn-tile-big img{width:38%}
+  .vn-steps{min-height:120px;padding:0 12px}
+  .vn-steps span{width:calc(9vw * var(--s))}
+}
+
+/* ---------- съемка ---------- */
+.vn-look{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1vw,16px)}
+.vn-shot{display:block;width:100%;padding:0;border:0;background:#F1F1F3;border-radius:var(--r-img);overflow:hidden;cursor:zoom-in}
+.vn-look .vn-shot{aspect-ratio:3/4}
+.vn-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s var(--ease)}
+/* первые два кадра — крупные, на две колонки и два ряда */
+.vn-look .vn-shot:nth-child(1),.vn-look .vn-shot:nth-child(6){grid-column:span 2;grid-row:span 2}
+@media (max-width:760px){.vn-look{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- Токио ---------- */
+.vn-tokyo{display:flex;gap:clamp(8px,1vw,16px);align-items:flex-start}
+.vn-tokyo figure{margin:0;flex:var(--ar) 1 0;min-width:0}
+.vn-tokyo .vn-shot{aspect-ratio:var(--ar)}
+.vn-tokyo figcaption{font-size:16px;opacity:.6;margin-top:12px}
+@media (max-width:760px){.vn-tokyo{flex-direction:column}.vn-tokyo figure{width:100%}}
+
+/* «The Ventures Japan» типограф не рвет (имя бренда) — на узком телефоне заголовок кейса чуть мельче, чтобы влез */
+@media (max-width:420px){.case-head:has(+ .vn-hero) .case-title{font-size:34px}}
+
+@media (prefers-reduced-motion:reduce){
+  .vn-tile-big img,.vn-steps span{animation:none}
+  .vn-side{transition:opacity .3s}
+}
