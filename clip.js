@@ -43,21 +43,13 @@ const head = ch => `<div class="cl-head">
 const cap = t => t ? `<p class="cl-cap">${H.T(t)}</p>` : '';
 
 /* ---------- данные песни и клипа ---------- */
-// громкость дорожек песни «Звонок из грядущего дня»: 140 точек на 2:46, каждая дорожка от 0 до 100
-// (посчитано по wav-файлам: голос, бэк-вокал, барабаны, бас, клавиши, перкуссия, синтезатор)
-const WAVES = [
-  [43,51,44,48,57,48,39,39,31,45,58,64,80,60,80,72,95,78,78,70,71,100,88,78,90,72,59,70,74,55,82,80,84,53,75,60,73,65,73,66,62,73,66,67,66,80,54,51,52,42,49,50,52,48,42,50,79,77,66,56,85,80,72,72,64,68,50,62,93,72,75,77,86,81,57,81,74,54,78,35,67,61,70,62,72,72,57,69,74,71,68,69,32,42,44,32,47,54,43,44,50,41,66,78,75,70,77,83,72,70,79,94,84,96,67,31,36,62,5,12,63,41,48,53,52,63,38,38,49,50,42,37,13,41,60,27,51,57,2,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,5,8,2,5,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,10,0,98,49,0,0,0,0,0,0,33,63,1,0,0,0,0,0,0,0,0,8,19,26,28,10,6,12,11,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,21,1,0],
-  [0,0,0,0,0,3,0,7,4,1,4,6,56,53,57,40,43,57,50,58,55,35,45,50,74,47,41,21,40,41,17,10,14,11,53,51,54,68,57,63,59,48,52,59,67,38,60,100,66,80,58,61,61,55,44,73,66,38,36,40,40,17,31,41,27,38,41,28,56,27,52,66,64,49,59,31,22,20,9,16,67,58,60,81,64,66,57,54,54,59,34,50,69,71,52,71,66,83,70,45,41,59,56,49,0,0,0,0,0,0,0,0,0,0,26,32,28,33,42,31,28,44,16,1,0,0,71,70,68,93,73,84,77,73,59,93,65,53,49,5],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,65,73,28,51,36,0,0,0,0,56,56,53,68,60,52,56,60,10,49,52,32,60,72,83,82,53,61,71,64,68,66,42,32,22,18,15,20,12,29,19,10,18,9,0,38,15,38,24,16,14,2,0,0,0,0,31,43,40,33,55,47,56,62,11,21,0,1,78,70,62,78,65,73,64,65,61,81,57,35,0,0,0,0,0,27,30,31,37,35,22,0,0,0,0,0,0,0,0,0,0,0,69,84,83,66,100,82,97,99,92,85,83,38,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,47,79,54,90,79,26,76,70,31,100,62,38,57,60,50,67,54,52,66,55,81,94,18,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,17,9,16,14,18,0,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,55,0,0,0,0,0,0,0,0,0,0,0,72,0,100,63,15,49,42,41,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [84,61,62,79,75,80,81,71,85,80,60,66,46,2,56,62,0,30,33,0,51,40,67,100,56,79,71,30,48,35,40,50,30,34,32,31,52,35,34,40,45,33,40,32,30,40,36,48,35,40,37,30,31,40,38,33,30,58,56,48,66,62,60,77,79,42,57,51,28,70,21,47,64,53,54,60,38,37,17,4,63,41,57,42,43,33,41,48,23,30,28,26,69,59,50,55,42,48,51,47,31,31,33,17,7,7,7,7,8,31,26,21,22,14,10,31,16,22,33,39,35,19,21,14,17,21,31,44,32,27,34,35,37,35,33,31,21,0,0,1]
-];
+// громкость песни «Звонок из грядущего дня»: 140 точек на 2:46, от 0 до 100 (посчитано по wav-файлам):
+// VOICE — голос, спетый моделью; ARR — аранжировка; MIX — песня целиком
+const VOICE = [43,51,44,48,57,48,39,39,31,45,58,64,80,60,80,72,95,78,78,70,71,100,88,78,90,72,59,70,74,55,82,80,84,53,75,60,73,65,73,66,62,73,66,67,66,80,54,51,52,42,49,50,52,48,42,50,79,77,66,56,85,80,72,72,64,68,50,62,93,72,75,77,86,81,57,81,74,54,78,35,67,61,70,62,72,72,57,69,74,71,68,69,32,42,44,32,47,54,43,44,50,41,66,78,75,70,77,83,72,70,79,94,84,96,67,31,36,62,5,12,63,41,48,53,52,63,38,38,49,50,42,37,13,41,60,27,51,57,2,0];
+const ARR = [32,23,22,26,26,32,33,27,30,28,22,27,47,33,44,43,30,44,44,41,47,31,30,65,68,56,64,51,55,49,34,25,18,13,51,65,62,69,76,74,74,64,55,64,68,45,83,79,83,98,83,68,78,84,74,87,68,49,47,48,33,41,35,39,46,41,40,33,22,68,2,68,67,66,45,47,30,20,12,5,58,61,70,56,79,71,71,76,55,55,28,20,96,78,78,92,100,94,86,84,66,89,74,56,16,15,15,17,8,26,27,22,38,32,25,35,28,28,30,41,34,36,16,13,18,11,77,86,90,86,96,96,93,93,87,100,87,51,46,6];
+const MIX = [35,33,30,36,37,38,35,33,34,35,34,39,55,43,54,52,50,55,53,51,57,46,48,69,71,63,60,52,58,52,41,39,40,26,57,64,65,66,74,74,72,66,56,66,69,54,80,86,71,89,77,71,75,74,69,80,67,58,53,52,46,54,47,53,48,48,47,41,43,69,50,64,71,69,61,47,35,35,30,20,60,64,69,61,77,68,73,73,52,59,37,35,94,84,66,85,91,91,84,75,65,87,73,61,36,33,38,38,32,39,42,43,50,48,43,35,31,39,37,35,40,43,27,27,32,32,84,87,82,91,93,91,89,100,81,89,80,60,11,4];
 // средний цвет каждой секунды клипа (166 секунд), насыщенность чуть усилена, чтобы полоска читалась
 const BAR = '3a3a3a 444444 535353 484848 3a3a3a 444444 474747 5b5b5b 363636 684f3d 654c3e 634b3d 525259 525058 6d6666 685d5c 8c836a 8d866d 83806a 8b8b8b 727272 9a9a9a 919191 8b8b8b 977548 737373 747474 626262 5b4722 65533a 6a5f51 444032 87776e 595442 5b5444 5b5341 978e8c 857368 87776c 908a85 686656 6a6653 968773 8c8c8c a3a3a3 5f5f5f 4f4f4f 505050 686868 6e6e6e 765e3c 745e3c 3e3e3e 4a4a4a 5c5c5c 474747 656565 474747 525252 484848 444444 4e4e4e 5b5b5b 4f4f4f 414141 505050 555555 505050 606060 777777 7c5d48 948078 94837e 716c5f ab7550 a9734d 565244 595647 665641 878273 8d897a 979386 7c7969 746962 706965 525252 535353 3b7179 4d7a7e 7b866d 806a50 7d654a 766743 1a1d1d 534941 545454 5a5a5a 585858 4c4c4c 505050 434343 505050 aea9a1 547a74 6f625e 6f615c 88684d a18c7b a18979 936a4d c08457 936242 2e578a 887a76 ac7454 b87c50 ac7b56 504e5c 464f6a 3f5173 365178 2c4e7d 264d80 817c6e 5e5e5e 616161 434550 1e334b 261614 261614 3f2926 402d2d 2e2525 322726 3f2d27 412f2a 52382e 3f434a 654e45 61443d 60433d 72765e 747760 8c8c70 8d8d72 8d8d72 585858 5b5b5b 525252 616161 8e795f 887255 352f2e 36312f 756e69 928878 b8b6ab 484143 6c5e61 3b2c1e 34271d 77596a 555555 3a3a3a 010101 010101'.split(' ');
-// цвета дорожек: голос — цветом текста, остальные — свои, без оранжевого
-const STEM = ['var(--ink)', '#7B8CFF', '#2FA36B', '#2F6BFF', '#A46BFF', '#E0559A', '#17A9BD'];
 // цвета моделей в раскадровке
 const MODEL = ['#2F6BFF', '#2FA36B', '#A46BFF', '#E0559A', '#17A9BD'];
 
@@ -118,35 +110,26 @@ function wavePath(v, h = 40){
   });
   return top + bot + 'Z';
 }
-// голос на диктофоне: та же песня, но с шумом комнаты и неровной громкостью
-const MEMO = WAVES[0].map((a, i) => clamp(a * .7 + 14 + 10 * Math.abs(Math.sin(i * 12.9898) * 43758.5453 % 1), 0, 100));
+// голос на диктофоне: та же партия, но с шумом комнаты и неровной громкостью
+const MEMO = VOICE.map((a, i) => clamp(a * .7 + 14 + 10 * Math.abs(Math.sin(i * 12.9898) * 43758.5453 % 1), 0, 100));
+const WAVE = { arr: ARR, memo: MEMO, voice: VOICE };
 
+// шаги по порядку: аранжировка, голос на диктофон, модель, голос модели, всё вместе
 function voiceHTML(c){
-  return `<div class="cl-voice">
-    <div class="cl-memo">
-      <span class="cl-v-name">${H.T(c.memo)}</span>
-      <svg viewBox="0 0 140 40" preserveAspectRatio="none" aria-hidden="true"><path d="${wavePath(MEMO)}"/></svg>
-    </div>
-    <div class="cl-ai"><i></i><span>${H.T(c.ai)}</span><i></i></div>
-    <div class="cl-stems">${c.stems.map((name, i) => `<div class="cl-stem" style="--c:${STEM[i]};--d:${i}">
-      <span class="cl-v-name">${H.T(name)}</span>
-      <div class="cl-s-w"><svg viewBox="0 0 140 40" preserveAspectRatio="none" aria-hidden="true"><path d="${wavePath(WAVES[i])}"/></svg></div>
-    </div>`).join('')}<i class="cl-play"></i></div>
-  </div>${cap(c.hint)}`;
+  const svg = inner => `<div class="cl-s-w"><svg viewBox="0 0 140 40" preserveAspectRatio="none" aria-hidden="true">${inner}</svg></div>`;
+  const row = (x, i) => x.model
+    ? `<div class="cl-ai cl-vrow" style="--d:${i}"><i></i><span>${H.T(x.model)}</span><i></i></div>`
+    : `<div class="cl-vrow cl-v-${x.wave}" style="--d:${i}"><span class="cl-v-name">${H.T(x.name)}</span>${svg(
+        x.wave === 'mix' ? `<path class="cl-w-arr" d="${wavePath(ARR)}"/><path class="cl-w-voice" d="${wavePath(VOICE.map(v => v * .55))}"/>`
+                         : `<path d="${wavePath(WAVE[x.wave])}"/>`)}</div>`;
+  return `<div class="cl-voice">${c.steps.map(row).join('')}</div>${cap(c.hint)}`;
 }
 function liveVoice(box){
-  const stems = box.querySelector('.cl-stems'), rows = [...box.querySelectorAll('.cl-stem')];
-  // наведение на дорожку — остальные притихают
-  rows.forEach(r => {
-    r.addEventListener('pointerenter', () => { stems.classList.add('hold'); r.classList.add('on'); });
-    r.addEventListener('pointerleave', () => { stems.classList.remove('hold'); r.classList.remove('on'); });
-  });
+  const rows = [...box.querySelectorAll('.cl-vrow')], n = rows.length;
   const upd = () => {
-    const p = still() ? 1 : clamp(progress(box) * 2.4 - .5, 0, 1);
-    box.style.setProperty('--p', p.toFixed(3));
-    box.style.setProperty('--h', Math.min(1, p * 1.5).toFixed(3));   // бегунок идет впереди первой дорожки
-    // дорожки проявляются по очереди, сверху вниз
-    rows.forEach((r, i) => r.style.setProperty('--q', clamp(p * 1.5 - i * .07, 0, 1).toFixed(3)));
+    const p = still() ? 1 : clamp(progress(box) * 2.4 - .45, 0, 1);
+    // шаги проявляются по очереди, сверху вниз: следующий начинается, когда предыдущий почти готов
+    rows.forEach((r, i) => r.style.setProperty('--q', clamp(p * n - i * .85, 0, 1).toFixed(3)));
   };
   upd();
   onScroll(box, upd);
@@ -186,34 +169,95 @@ function liveFace(box){
   onScroll(box, upd);
 }
 
-/* ---------- раскадровка: 24 кадра и модели, которые их сделали ---------- */
+/* ---------- раскадровка: все 24 кадра по очереди, как дорожка в монтажке ---------- */
+// у кадра: [название, модель, картинка, длительность в секундах]
 function boardHTML(c){
   const count = c.models.map((_, m) => c.frames.filter(f => f[1] === m).length);
-  return `<div class="cl-board">
+  let at = 0;
+  const clips = c.frames.map(([name, m, img, d], i) => {
+    const li = `<li data-m="${m}" style="--c:${MODEL[m]};--s:${at};--d:${d};background-image:url('${img}')"><span>${H.T(name)}</span></li>`;
+    at += d; return li;
+  }).join('');
+  const total = at, ticks = [];
+  for (let t = 0; t < total - 15; t += 30) ticks.push(`<span style="--s:${t}">${time(t)}</span>`);
+  return `<div class="cl-board" data-total="${total}">
     <div class="cl-models">${c.models.map((name, m) =>
-      `<button class="cl-model" data-m="${m}" style="--c:${MODEL[m]}"><i></i>${name}<span>${count[m]}</span></button>`).join('')}</div>
-    <ol class="cl-cells">${c.frames.map(([name, m]) =>
-      `<li data-m="${m}" style="--c:${MODEL[m]}">${H.T(name)}</li>`).join('')}</ol>
+      `<button class="cl-model" data-m="${m}" style="--c:${MODEL[m]}"><i></i><em>${name}</em><span>${count[m]}</span></button>`).join('')}</div>
+    <div class="cl-mon">
+      <div class="cl-mon-img">${c.frames.map(([, , img], i) => `<img src="${img}" alt=""${i ? ' loading="lazy"' : ' class="on"'} draggable="false">`).join('')}</div>
+      <div class="cl-mon-info"><b class="cl-mon-name"></b><span class="cl-mon-tc"></span><span class="cl-mon-model"><i></i><em></em></span></div>
+    </div>
+    <div class="cl-tl"><div class="cl-track">
+      <div class="cl-ruler">${ticks.join('')}</div>
+      <ol class="cl-clips">${clips}</ol>
+      <i class="cl-ph"></i>
+    </div></div>
     ${c.rules ? `<div class="cl-rules">${c.rules.map(r =>
       `<div><h3>${H.T(r.name)}</h3><p>${H.T(r.text)}</p></div>`).join('')}</div>` : ''}
   </div>${cap(c.hint)}`;
 }
 function liveBoard(box){
-  const board = box.querySelector('.cl-board'), btns = [...box.querySelectorAll('.cl-model')];
-  let k = -1, held = false, t = 0, seen = false;
-  const show = m => {
-    board.dataset.m = m < 0 ? '' : m;
-    btns.forEach((b, i) => b.classList.toggle('on', i === m));
+  const board = box.querySelector('.cl-board'), tl = box.querySelector('.cl-tl'), track = box.querySelector('.cl-track');
+  const btns = [...box.querySelectorAll('.cl-model')], clips = [...box.querySelectorAll('.cl-clips li')];
+  const imgs = [...box.querySelectorAll('.cl-mon-img img')];
+  const name = box.querySelector('.cl-mon-name'), tc = box.querySelector('.cl-mon-tc');
+  const mdl = box.querySelector('.cl-mon-model'), mName = mdl.querySelector('em');
+  const total = +board.dataset.total;
+  const starts = clips.map(li => +li.style.getPropertyValue('--s')), durs = clips.map(li => +li.style.getPropertyValue('--d'));
+  let px = 4, t = 0, cur = -1, held = false, raf = 0, seen = false, last = 0;
+  // масштаб: вся раскадровка во всю ширину; на телефоне крупнее — тогда дорожка листается пальцем
+  const fit = () => {
+    const cs = getComputedStyle(tl), w = tl.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    px = Math.max(w / total, matchMedia('(max-width:760px)').matches ? 7 : 0);
+    track.style.setProperty('--px', px + 'px');
+    track.style.width = total * px + 'px';
   };
-  // пока на экране, модели подсвечиваются по очереди; наведение останавливает перебор
-  const step = () => { if (!held) { k = (k + 1) % btns.length; show(k); } };
-  const run = () => { clearInterval(t); if (seen && !still()) t = setInterval(step, 1800); };
+  const show = k => {
+    if (k === cur) return; cur = k;
+    imgs.forEach((im, i) => im.classList.toggle('on', i === k));
+    clips.forEach((li, i) => li.classList.toggle('on', i === k));
+    name.innerHTML = clips[k].querySelector('span').innerHTML;
+    const m = +clips[k].dataset.m;
+    mdl.style.setProperty('--c', MODEL[m]); mName.textContent = btns[m].querySelector('em').textContent;
+  };
+  const place = s => {
+    t = clamp(s, 0, total - .01);
+    let k = starts.findIndex((st, i) => t >= st && t < st + durs[i]); if (k < 0) k = clips.length - 1;
+    show(k);
+    tc.textContent = time(t);
+    track.style.setProperty('--t', t.toFixed(2));
+    // дорожка сама подъезжает, чтобы бегунок был виден
+    if (!held && tl.scrollWidth > tl.clientWidth + 2) {
+      const x = t * px, l = tl.scrollLeft, w = tl.clientWidth - 2 * parseFloat(getComputedStyle(tl).paddingLeft);
+      if (x < l + w * .1 || x > l + w * .9) tl.scrollLeft = x - w * .2;
+    }
+  };
+  const at = e => { const r = track.getBoundingClientRect(); return (e.clientX - r.left) / px; };
+  track.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { held = true; place(at(e)); } });
+  track.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') held = false; });
+  track.addEventListener('click', e => place(at(e)));
+  tl.addEventListener('touchstart', () => { held = true; }, { passive: true });
+  tl.addEventListener('touchend', () => setTimeout(() => { held = false; }, 3000), { passive: true });
+  // модель: наведение или нажатие подсвечивает ее кадры на дорожке
+  const choose = m => { board.dataset.m = m < 0 ? '' : m; btns.forEach((b, i) => b.classList.toggle('on', i === m)); };
   btns.forEach((b, i) => {
-    b.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { held = true; k = i; show(i); } });
-    b.addEventListener('pointerleave', () => { held = false; run(); });
-    b.addEventListener('click', () => { k = i; show(i); run(); });
+    b.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') choose(i); });
+    b.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') choose(-1); });
+    b.addEventListener('click', e => { if (e.pointerType !== 'mouse') choose(board.dataset.m === String(i) ? -1 : i); });
   });
-  onScreen(board, v => { seen = v; if (v && k < 0) step(); run(); });
+  // бегунок сам идет по раскадровке, в восемь раз быстрее, чем по таймингу
+  const draw = now => {
+    const dt = Math.min(64, now - (last || now)); last = now;
+    if (!held) place((t + dt * .008) % total);
+    if (seen) raf = requestAnimationFrame(draw);
+  };
+  fit(); place(0);
+  addEventListener('resize', () => { fit(); place(t); });
+  if (still()) return;
+  onScreen(board, v => {
+    if (v && !seen) { seen = true; last = 0; raf = requestAnimationFrame(draw); }
+    else if (!v) { seen = false; cancelAnimationFrame(raf); }
+  });
 }
 
 /* ---------- клип в одну полоску: цвет каждой секунды, наведение показывает кадр ---------- */

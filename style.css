@@ -1336,6 +1336,8 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
    остальные цвета почти не меняются. Только в светлой версии — на темной умножение затемнило бы картинки */
 :root:not([data-theme="dark"]) :is(.case-shot,.case-hero,.work .media,.case-next .media){background:var(--bg)}
 :root:not([data-theme="dark"]) :is(.case-shot,.case-hero,.work .media,.case-next .media) :is(img,video){mix-blend-mode:multiply}
+/* ролик со звуком в шапке кейса — как есть, без смешивания с фоном */
+.case-hero .hero-full{mix-blend-mode:normal!important;object-fit:contain;background:#000}
 
 /* «другие работы»: в серьезной версии строки разделены линиями, в веселой — струнами */
 #otherList .string{display:none}

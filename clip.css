@@ -48,29 +48,24 @@
   .cl-steps li i{display:block;width:16px;height:16px}
 }
 
-/* ---------- голос: диктофон и дорожки ---------- */
-.cl-voice{display:grid;gap:clamp(14px,1.6vw,20px)}
-.cl-memo,.cl-stem{display:grid;grid-template-columns:minmax(120px,2fr) minmax(0,10fr);gap:clamp(12px,2vw,28px);align-items:center}
-.cl-v-name{font-size:17px;line-height:1.2}
-.cl-memo svg{width:100%;height:clamp(56px,7vw,96px);display:block;fill:color-mix(in srgb,var(--ink) 38%,transparent);transition:opacity .4s}
-.cl-memo{opacity:calc(1 - var(--p,0) * .45)}
-.cl-ai{display:flex;align-items:center;gap:14px;font-size:17px;padding-left:calc(min(16.6%,220px) + clamp(12px,2vw,28px))}
+/* ---------- голос: аранжировка, диктофон, модель, всё вместе ---------- */
+.cl-voice{display:grid;gap:clamp(12px,1.4vw,18px)}
+.cl-vrow{--q:0;display:grid;grid-template-columns:minmax(140px,3fr) minmax(0,9fr);gap:clamp(12px,2vw,28px);align-items:center;
+  opacity:calc(.25 + var(--q) * .75)}
+.cl-v-name{font-size:17px;line-height:1.25;text-wrap:balance}
+.cl-s-w{height:clamp(52px,6vw,84px);clip-path:inset(0 calc((1 - var(--q)) * 100%) 0 0)}
+.cl-s-w svg{width:100%;height:100%;display:block;overflow:visible}
+.cl-v-arr path{fill:#2F6BFF}
+.cl-v-memo path{fill:color-mix(in srgb,var(--ink) 38%,transparent)}
+.cl-v-voice path{fill:var(--ink)}
+.cl-v-mix .cl-w-arr{fill:#2F6BFF}
+.cl-v-mix .cl-w-voice{fill:var(--ink)}
+/* модель — плашка посередине между грязной и чистой записью */
+.cl-ai{display:flex;align-items:center;gap:14px;font-size:17px}
 .cl-ai i{flex:1;height:1px;background:var(--cl-line)}
-.cl-ai span{padding:8px 16px 10px;border-radius:999px;background:var(--ink);color:var(--bg);white-space:nowrap}
-.cl-stems{position:relative;display:grid;gap:6px}
-.cl-stem{--q:0;transition:opacity .35s var(--ease)}
-.cl-s-w{height:clamp(30px,3.4vw,46px);clip-path:inset(0 calc((1 - var(--q)) * 100%) 0 0)}
-.cl-s-w svg{width:100%;height:100%;display:block;fill:var(--c)}
-.cl-stem .cl-v-name{opacity:calc(.3 + var(--q) * .7)}
-.cl-stems.hold .cl-stem:not(.on){opacity:.2}
-/* бегунок — где сейчас «играет» раскладка */
-.cl-play{position:absolute;top:-6px;bottom:-6px;width:2px;border-radius:2px;background:var(--ink);
-  left:calc(min(16.6%,220px) + clamp(12px,2vw,28px) + (100% - min(16.6%,220px) - clamp(12px,2vw,28px)) * var(--h,0));opacity:calc((1 - var(--h,0)) * 4)}
-@media (max-width:640px){
-  .cl-memo,.cl-stem{grid-template-columns:1fr;gap:4px}
-  .cl-ai{padding-left:0}
-  .cl-play{left:calc(100% * var(--h,0))}
-}
+.cl-ai span{padding:9px 18px 11px;border-radius:999px;background:var(--ink);color:var(--bg);text-align:center;text-wrap:balance;
+  transform:scale(calc(.85 + var(--q) * .15))}
+@media (max-width:640px){.cl-vrow:not(.cl-ai){grid-template-columns:1fr;gap:6px}}
 
 /* ---------- лицо: мозаика из 120 клеток ---------- */
 .cl-face{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);gap:clamp(20px,3vw,48px);align-items:center}
@@ -97,25 +92,45 @@
   .cl-same{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* ---------- раскадровка по моделям ---------- */
+/* ---------- раскадровка: монитор и дорожка, как в монтажке ---------- */
 .cl-models{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:clamp(18px,2vw,28px)}
 .cl-model{display:inline-flex;align-items:center;gap:10px;font-size:17px;line-height:1;padding:10px 16px 12px 12px;border-radius:999px;background:var(--soft);color:var(--ink);transition:background .35s var(--ease),color .35s var(--ease)}
 .cl-model i{width:18px;height:18px;border-radius:50%;background:var(--c)}
+.cl-model em{font-style:normal}
 .cl-model span{opacity:.6;font-variant-numeric:tabular-nums}
 .cl-model.on{background:var(--ink);color:var(--bg)}
-.cl-cells{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(6px,.8vw,10px)}
-.cl-cells li{position:relative;min-height:clamp(84px,8vw,112px);padding:12px 14px 14px;border-radius:var(--r-img);font-size:17px;line-height:1.2;
-  background:color-mix(in srgb,var(--c) 16%,var(--bg));box-shadow:inset 4px 0 0 var(--c);text-wrap:balance;
-  transition:opacity .4s var(--ease),transform .5s var(--ease),background .4s var(--ease),color .4s var(--ease)}
+.cl-mon{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(16px,3vw,48px);align-items:end;margin-bottom:clamp(16px,2vw,24px)}
+.cl-mon-img{position:relative;aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:#0E0F12}
+.cl-mon-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s var(--ease)}
+.cl-mon-img img.on{opacity:1}
+.cl-mon-info{display:grid;gap:10px;align-content:end}
+.cl-mon-name{font-weight:500;font-size:clamp(26px,2.6vw,40px);line-height:1.05;text-wrap:balance}
+.cl-mon-tc{font-size:18px;font-variant-numeric:tabular-nums;opacity:.6}
+.cl-mon-model{display:inline-flex;align-items:center;gap:10px;font-size:17px}
+.cl-mon-model i{width:16px;height:16px;border-radius:50%;background:var(--c)}
+.cl-mon-model em{font-style:normal}
+@media (max-width:760px){.cl-mon{grid-template-columns:1fr}}
+/* дорожка: ширина кадра — его длительность */
+.cl-tl{overflow-x:auto;scrollbar-width:none;margin:0 calc(var(--pad) * -1);padding:0 var(--pad);touch-action:pan-x pan-y}
+.cl-tl::-webkit-scrollbar{display:none}
+.cl-track{--px:4px;--t:0;position:relative;width:calc(285 * var(--px));cursor:ew-resize;user-select:none}
+.cl-ruler{position:relative;height:28px;border-bottom:1px solid var(--cl-line)}
+.cl-ruler span{position:absolute;left:calc(var(--s) * var(--px));bottom:6px;padding-left:6px;border-left:1px solid var(--cl-line);font-size:16px;line-height:1;opacity:.6;font-variant-numeric:tabular-nums}
+.cl-clips{list-style:none;margin:0;padding:0;position:relative;height:clamp(70px,7vw,96px);margin-top:8px}
+.cl-clips li{position:absolute;top:0;bottom:0;left:calc(var(--s) * var(--px));width:calc(var(--d) * var(--px) - 2px);overflow:hidden;
+  border-radius:4px;background-color:#0E0F12;background-size:auto 100%;background-repeat:repeat-x;box-shadow:inset 0 4px 0 var(--c);
+  transition:opacity .35s var(--ease),filter .35s var(--ease)}
+/* название кадра — в мониторе над дорожкой, на самой дорожке не помещается */
+.cl-clips li span{display:none}
+.cl-clips li.on{box-shadow:inset 0 4px 0 var(--c),inset 0 0 0 2px var(--ink)}
 .cl-board[data-m="0"] li:not([data-m="0"]),.cl-board[data-m="1"] li:not([data-m="1"]),.cl-board[data-m="2"] li:not([data-m="2"]),
-.cl-board[data-m="3"] li:not([data-m="3"]),.cl-board[data-m="4"] li:not([data-m="4"]){opacity:.28}
-.cl-board[data-m="0"] li[data-m="0"],.cl-board[data-m="1"] li[data-m="1"],.cl-board[data-m="2"] li[data-m="2"],
-.cl-board[data-m="3"] li[data-m="3"],.cl-board[data-m="4"] li[data-m="4"]{background:var(--c);color:#FFFFFF;transform:translateY(-4px)}
+.cl-board[data-m="3"] li:not([data-m="3"]),.cl-board[data-m="4"] li:not([data-m="4"]){opacity:.18;filter:grayscale(1)}
+.cl-ph{position:absolute;top:0;bottom:-6px;left:calc(var(--t) * var(--px));width:2px;margin-left:-1px;border-radius:2px;background:var(--ink);pointer-events:none}
+.cl-ph::before{content:"";position:absolute;top:0;left:-5px;width:12px;height:12px;border-radius:50%;background:var(--ink)}
 .cl-rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,28px);margin-top:clamp(36px,4vw,56px)}
 .cl-rules h3{font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.1;margin-bottom:10px;text-wrap:balance}
 .cl-rules p{font-family:var(--font-read);font-size:clamp(18px,1.4vw,20px);line-height:1.4}
-@media (max-width:900px){.cl-cells{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:640px){.cl-cells{grid-template-columns:repeat(2,minmax(0,1fr))}.cl-rules{grid-template-columns:1fr}}
+@media (max-width:640px){.cl-rules{grid-template-columns:1fr}}
 
 /* ---------- клип в одну полоску ---------- */
 .cl-score{--x:0;position:relative;padding-top:clamp(120px,14vw,190px);touch-action:pan-y;user-select:none;cursor:ew-resize}

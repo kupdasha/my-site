@@ -135,6 +135,8 @@ const PR_WIDTH = { '?': '-.5em', '!': '-.3em', '.': '-.26em', ',': '-.26em' };
    висячая пунктуация в начале (§ 120) и в конце центрированной строки (§ 143) */
 function toHTML(text, { first = true, center = false } = {}){
   let h = esc(text).replace(/\n/g, '<br>');   // перенос строки: в тексте content.js пишется \n
+  // ссылка внутри текста: [слово](https://адрес) — открывается в новой вкладке
+  h = h.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a class="link" href="$2" target="_blank" rel="noopener">$1</a>');
   h = h.replace(/([A-Za-zА-Яа-яЁё0-9]+(?:-[A-Za-zА-Яа-яЁё0-9]+)+)/g, '<span class="nobr">$1</span>');
   h = h.replace(/(^|[^A-Za-zА-Яа-яЁё])([A-ZА-ЯЁ]{2,})(?=$|[^A-Za-zА-Яа-яЁё])/g, '$1<span class="caps">$2</span>');
   if (first) h = h.replace(/^([«„])/, '<span class="hang-q">$1</span>').replace(/^\(/, '<span class="hang-b">(</span>');
@@ -1083,6 +1085,8 @@ function shotHTML(src){
 }
 function heroHTML(p){
   const m = parseMedia(legacyVideo(p));
+  // heroSound — ролик со звуком и кнопками управления, запускается по нажатию (см. музыкальный клип)
+  if (m && m.type === 'file' && p.heroSound) return `<video class="hero-full" src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} controls preload="metadata" playsinline></video>`;
   if (m && m.type === 'file') return `<video src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} muted loop playsinline autoplay></video>`;
   // heroImage — своя картинка в шапке кейса, если она отличается от обложки в сетке;
   // heroRatio — шапка в пропорциях картинки: целиком и без увеличения, карточка в сетке не меняется (см. СДВГ)
