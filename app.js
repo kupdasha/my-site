@@ -2423,6 +2423,8 @@ function renderCase(k, keepScroll){
   if (p.vector) body += `<div class="vc vc-mount"></div>`;
   // navi — студия дизайна навигации: 3D-ролик кодом в шапке, конструктор таблички, 3D-кампус для студии и заказчика; рисует navi.js
   if (p.navi) body += `<div class="nv nv-mount"></div>`;
+  // anon — анонимайзер: слово меняется на выдуманное той же длины, документ до и после, что чистится внутри файла, возврат; рисует anon.js
+  if (p.anon) body += `<div class="an an-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2531,6 +2533,10 @@ function renderCase(k, keepScroll){
   if (nv) import(SCRIPT_BASE + 'navi.js?v=' + VER)
     .then(m => m.mountNavi(nv, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс студии навигации не загрузился', err));
+  const an = caseContent.querySelector('.an-mount');
+  if (an) import(SCRIPT_BASE + 'anon.js?v=' + VER)
+    .then(m => m.mountAnon(an, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс анонимайзера не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
   if (vp) import(SCRIPT_BASE + 'vkplay.js?v=' + VER)
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))
