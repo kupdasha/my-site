@@ -91,7 +91,7 @@ function pinsHTML(c, ch){
       ${cap(c.hint)}
     </div>
   </div>
-  ${c.photos ? `<div class="kv-row">${c.photos.map(s => shot(s)).join('')}</div>` : ''}`;
+  ${c.photos ? `<div class="kv-collage">${c.photos.map(s => shot(s)).join('')}</div>` : ''}`;
 }
 function livePins(box, c){
   const board = box.querySelector('.kv-board');
@@ -329,6 +329,11 @@ const w3 = p => [(p[0] - PAGE[0] / 2) * SC, (PAGE[1] / 2 - p[1]) * SC];
 const CA = w3(PA), CB = w3(PB), CC = w3(PC);
 // силуэт игрушки в точках макета: надпись, склеенная в ленту, плюс поле до шва, сглажено
 const OUTLINE = [827,1404.5,795,1403.5,764,1396.5,724,1382.5,669,1360.5,600,1328.5,560,1317.5,545,1309.5,520,1288.5,482,1264.5,443,1244.5,373,1201.5,355,1192.5,346,1189.5,330,1181.5,323,1176.5,291,1144.5,266.5,1123,243,1095.5,216,1073.5,198.5,1056,165.5,1016,138.5,979,120.5,952,103.5,923,69.5,859,51.5,816,38.5,777,25.5,749,22.5,737,22.5,718,24.5,708,28.5,695,28.5,691,34.5,666,42.5,645,50.5,631,60.5,608,68.5,593,89.5,560,124.5,511,143.5,475,158,459.5,171,449.5,183.5,437,191.5,427,227.5,392,245.5,366,257.5,351,326.5,276,422,181.5,459,150.5,486,130.5,506,110.5,517,102.5,525,98.5,563,87.5,579,80.5,613,68.5,635,58.5,676,45.5,715,36.5,720,36.5,745,31.5,751,31.5,758,29.5,771,28.5,772,27.5,780,27.5,781,26.5,792,26.5,793,27.5,804,28.5,835,39.5,857,44.5,877,51.5,901,65.5,944,86.5,955,93.5,966,102.5,975.5,112,988.5,128,997.5,142,1007.5,161,1014.5,178,1021.5,203,1023.5,220,1024.5,221,1024.5,228,1025.5,229,1025.5,241,1026.5,242,1026.5,261,1025.5,262,1024.5,279,1023.5,280,1020.5,302,1013.5,326,1009.5,334,1004.5,349,995.5,367,984.5,384,973.5,398,928.5,443,915.5,461,903,473.5,864,496.5,832,521.5,806,546.5,754,590.5,733.5,611,719.5,629,711,637.5,700,645.5,683,654.5,668,665.5,659.5,674,655.5,680,652.5,689,653.5,699,657.5,707,665.5,718,720.5,780,825.5,905,842,921.5,858,933.5,870.5,947,887.5,980,899.5,998,914.5,1019,945.5,1057,967.5,1089,980.5,1111,993.5,1138,1003.5,1155,1013.5,1179,1014.5,1184,1014.5,1205,1010.5,1224,1008.5,1245,1002.5,1269,996.5,1283,989.5,1294,977.5,1308,949.5,1346,940,1356.5,925,1368.5,899,1383.5,872,1394.5,866,1395.5,859,1398.5,827,1404.5];
+// рука с вытянутым пальцем: кончик пальца — точка нажатия
+const TAP = `<svg viewBox="0 0 64 72"><g fill="#fff" stroke="#141414" stroke-width="2.4" stroke-linejoin="round">
+  <rect x="26" y="2" width="11" height="40" rx="5.5"/><rect x="36" y="24" width="10" height="20" rx="5"/><rect x="45" y="28" width="9" height="18" rx="4.5"/>
+  <rect x="11" y="36" width="10" height="22" rx="5" transform="rotate(-38 16 47)"/>
+  <path d="M20 34h34v14c0 12-8 22-19 22s-17-8-17-18z"/></g></svg>`;
 function plushHTML(c){
   return `<div class="kv-plush">
     <div class="kv-panel kv-toy-box">
@@ -464,7 +469,7 @@ function plush3D(host, T3, art){
   stTex.repeat.set(Math.round(curve.getLength() / .045), 1);
   const seam = new T3.Mesh(new T3.TubeGeometry(curve, 900, .038, 10, true),
     new T3.MeshStandardMaterial({ map: stTex, emissive: 0xffffff, emissiveMap: stTex, emissiveIntensity: .25, roughness: .9 }));
-  const grp = new T3.Group(); grp.add(toy, seam, ringMesh); grp.position.x = .07;
+  const grp = new T3.Group(); grp.add(toy, seam, ringMesh); grp.position.set(.07, .06, 0);
 
   const renderer = new T3.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio));
@@ -472,7 +477,7 @@ function plush3D(host, T3, art){
   scene.add(new T3.HemisphereLight(0xffffff, 0x8a8a80, 1.15));
   const key = new T3.DirectionalLight(0xffffff, 2.8); key.position.set(-5, 4, 4); scene.add(key);
   const rim = new T3.DirectionalLight(0xffffff, 1.2); rim.position.set(4, -2, -3); scene.add(rim);
-  const cam = new T3.PerspectiveCamera(30, 1, .1, 50); cam.position.set(0, 0, 9.2);
+  const cam = new T3.PerspectiveCamera(30, 1, .1, 50); cam.position.set(0, 0, 8.6);
   host.appendChild(renderer.domElement);
   const cvs = renderer.domElement; cvs.className = 'kv-toy';
   const size = () => { const w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); };
@@ -490,7 +495,42 @@ function plush3D(host, T3, art){
     if (h) hit.copy(toy.worldToLocal(h.point.clone()));
     return !!h;
   };
-  cvs.addEventListener('pointerdown', e => { if (pick(e)) { target = 1; cvs.setPointerCapture(e.pointerId); cvs.classList.add('held'); } });
+  // подсказка: полупрозрачная рука нажимает на правую часть кавычки, та сминается; пропадает, когда нажмут сами
+  const tapHand = document.createElement('i'), ring = document.createElement('i');
+  tapHand.className = 'kv-tap'; tapHand.setAttribute('aria-hidden', 'true'); tapHand.innerHTML = TAP;
+  ring.className = 'kv-tap-ring'; ring.setAttribute('aria-hidden', 'true');
+  host.append(ring, tapHand);
+  const spots = [[.78, .62], [.72, .66]].map(([t, lane], i) => {
+    // точки на ручках ближе к правому краю: верхняя и нижняя
+    const E = i ? CC : CA;
+    return new T3.Vector3(CB[0] + (E[0] - CB[0]) * t, CB[1] + (E[1] - CB[1]) * t, .45);
+  });
+  let demo = !still(), spot = 0;
+  const demoT = [];
+  const stopDemo = () => { demo = false; demoT.forEach(clearTimeout); tapHand.classList.remove('on', 'down'); ring.classList.remove('go'); };
+  const toScreen = v => {
+    const w = toy.localToWorld(v.clone()).project(cam);
+    return [(w.x + 1) / 2 * 100, (1 - w.y) / 2 * 100];
+  };
+  const tapLoop = () => {
+    if (!demo) return;
+    const v = spots[spot++ % spots.length], [x, y] = toScreen(v);
+    tapHand.style.transition = 'none';
+    tapHand.style.left = x + 8 + '%'; tapHand.style.top = y + 10 + '%';
+    tapHand.getBoundingClientRect(); tapHand.style.transition = '';
+    tapHand.classList.add('on'); tapHand.style.left = x + '%'; tapHand.style.top = y + '%';
+    demoT.push(setTimeout(() => {
+      if (!demo) return;
+      tapHand.classList.add('down');
+      ring.style.left = x + '%'; ring.style.top = y + '%';
+      ring.classList.remove('go'); void ring.offsetWidth; ring.classList.add('go');
+      hit.copy(v); target = 1;
+    }, 750));
+    demoT.push(setTimeout(() => { if (demo) { target = 0; tapHand.classList.remove('down'); } }, 1250));
+    demoT.push(setTimeout(() => { if (demo) tapHand.classList.remove('on'); }, 1700));
+    demoT.push(setTimeout(tapLoop, 3600));
+  };
+  cvs.addEventListener('pointerdown', e => { stopDemo(); if (pick(e)) { target = 1; cvs.setPointerCapture(e.pointerId); cvs.classList.add('held'); } });
   cvs.addEventListener('pointermove', e => { if (target) pick(e); else if (e.pointerType === 'mouse') { const r = cvs.getBoundingClientRect(); mx = (e.clientX - r.left) / r.width * 2 - 1; my = -(e.clientY - r.top) / r.height * 2 + 1; } });
   const up = () => { target = 0; cvs.classList.remove('held'); };
   cvs.addEventListener('pointerup', up); cvs.addEventListener('pointercancel', up);
@@ -524,7 +564,9 @@ function plush3D(host, T3, art){
     if (seen) raf = requestAnimationFrame(tick);
   };
   if (still()) { renderer.render(scene, cam); return; }
+  let demoOn = false;
   onScreen(host, v => {
+    if (v && !demoOn && demo) { demoOn = true; setTimeout(tapLoop, 900); }
     if (v && !seen) { seen = true; last = 0; raf = requestAnimationFrame(tick); }
     else if (!v) { seen = false; cancelAnimationFrame(raf); }
   });
