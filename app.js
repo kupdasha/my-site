@@ -2321,6 +2321,8 @@ function renderCase(k, keepScroll){
   if (p.casa) body += `<div class="casa casa-mount"></div>`;
   // kav — кейс «Одна кавычка»: стикеры перевешиваются, лупа над кавычкой, лейбл печатает текст, мягкий брелок; рисует kav.js
   if (p.kav) body += `<div class="kv kv-mount"></div>`;
+  // akbars — знаки отличия Ак Барс Банка: идеи на полке, правки, три металла, рендер ⇄ чертеж, подставка, коробка, витрина; рисует akbars.js
+  if (p.akbars) body += `<div class="ab ab-mount"></div>`;
   // stand — универсальный стенд VK Play: план сверху, точки на общем виде, шторка «один бренд или три», куб, бегущая строка; рисует vkplay.js
   if (p.stand) body += `<div class="vp vp-mount"></div>`;
   // презентация — в самом конце, перед ссылками
@@ -2405,6 +2407,10 @@ function renderCase(k, keepScroll){
   if (kv) import(SCRIPT_BASE + 'kav.js?v=' + VER)
     .then(m => m.mountKav(kv, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс «Одна кавычка» не загрузился', err));
+  const ab = caseContent.querySelector('.ab-mount');
+  if (ab) import(SCRIPT_BASE + 'akbars.js?v=' + VER)
+    .then(m => m.mountAkbars(ab, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс знаков отличия Ак Барс Банка не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
   if (vp) import(SCRIPT_BASE + 'vkplay.js?v=' + VER)
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))
