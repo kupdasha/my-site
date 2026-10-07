@@ -27,28 +27,35 @@
 .cl-w-deep{position:absolute;left:clamp(16px,3vw,40px);bottom:clamp(14px,2.4vw,32px);z-index:1;max-width:30ch;color:#FFFFFF;font-weight:500;font-size:clamp(20px,2vw,30px);line-height:1.15;text-wrap:balance;
   opacity:0;transform:translateY(10px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 .cl-worlds.deep .cl-w-deep{opacity:1;transform:none}
-/* ступени сверху вниз: каждая следующая сдвинута вправо и темнее — героиня спускается */
-.cl-stairs{grid-column:2;grid-row:1;list-style:none;margin:0;padding:0;display:grid;gap:4px}
-.cl-stairs li{padding-left:calc(var(--i) / (var(--n) - 1) * 40%)}
-.cl-stairs button{display:grid;gap:6px;width:100%;text-align:left;padding:2px 0 4px;color:inherit;cursor:pointer}
-.cl-st-name{font-size:17px;line-height:1.15;opacity:.5;transition:opacity .35s var(--ease)}
-.cl-st-bar{position:relative;display:block;height:8px;border-radius:2px;overflow:hidden;
-  background:color-mix(in srgb,var(--ink) calc(12% + var(--i) * 10%),transparent)}
-.cl-st-bar b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--ink)}
-.cl-stairs li.past .cl-st-bar b{width:100%!important;transition:none!important}
+/* лестница: короткие ступеньки зигзагом сверху вниз, подпись справа от ступени; чем ниже, тем темнее */
+.cl-stairs{grid-column:2;grid-row:1;list-style:none;margin:0;padding:0;display:grid;--sw:clamp(30px,3.2vw,46px);--sh:clamp(34px,4.4vh,48px)}
+.cl-stairs li{padding-left:calc(var(--i) * var(--sw))}
+.cl-stairs button{display:flex;align-items:flex-start;gap:12px;color:inherit;cursor:pointer;text-align:left;padding:0}
+/* проступь сверху, подступенок справа — вместе ступенька; следующая начинается там, где кончился подступенок */
+.cl-st-step{position:relative;flex:none;width:var(--sw);height:var(--sh);
+  border-top:3px solid color-mix(in srgb,var(--ink) calc(25% + var(--i) * 9%),transparent);
+  border-right:3px solid color-mix(in srgb,var(--ink) calc(25% + var(--i) * 9%),transparent);transition:border-color .35s var(--ease)}
+.cl-stairs li.past .cl-st-step,.cl-stairs li.on .cl-st-step{border-color:var(--ink)}
+/* героиня — точка на текущей ступени */
+.cl-st-step::after{content:"";position:absolute;left:50%;top:-14px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--ink);
+  opacity:0;transform:translateY(-6px);transition:opacity .3s var(--ease),transform .4s var(--ease)}
+.cl-stairs li.on .cl-st-step::after{opacity:1;transform:none}
+.cl-st-name{font-size:17px;line-height:1.1;margin-top:-10px;white-space:nowrap;opacity:.5;transition:opacity .35s var(--ease)}
 .cl-stairs li.on .cl-st-name,.cl-stairs li:hover .cl-st-name{opacity:1}
 .cl-stairs li.on .cl-st-name{font-weight:500}
+.cl-door{font:inherit;color:inherit;padding:0;cursor:pointer}
 .cl-w-texts{grid-column:1;grid-row:2;display:grid}
 .cl-w-text{grid-area:1 / 1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:46ch;opacity:0;transform:translateY(8px);transition:opacity .4s var(--ease),transform .5s var(--ease)}
 .cl-w-text b{font-family:var(--font);font-weight:500}
 .cl-w-text.on{opacity:1;transform:none}
-/* на телефоне ступени — ряд под кадром, без подписей: название этапа — в тексте */
+/* на телефоне лестница — под кадром, без подписей: название этапа — в тексте */
 @media (max-width:760px){
   .cl-worlds{grid-template-columns:1fr}
   .cl-w-frame{aspect-ratio:4/3}
-  .cl-stairs{grid-column:1;grid-row:2;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:0;align-items:start}
-  .cl-stairs li{padding:0;margin-top:calc(var(--i) * 6px)}
-  .cl-stairs button{padding:0 3px 0 0}
+  .cl-stairs{grid-column:1;grid-row:2;--sw:calc((100% - 6px) / var(--n));--sh:12px;display:flex}
+  .cl-stairs li{padding:0;margin-top:calc(var(--i) * var(--sh));flex:1}
+  .cl-stairs button{width:100%}
+  .cl-st-step{width:100%}
   .cl-st-name{display:none}
   .cl-w-texts{grid-row:3}
 }
@@ -98,7 +105,7 @@
 }
 
 /* ---------- дубли: коллаж из одного спрайта, без увеличения ---------- */
-.cl-takes{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));grid-auto-flow:dense;gap:4px}
+.cl-takes{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-flow:dense;gap:4px}
 .cl-takes i{display:block;aspect-ratio:16/9;border-radius:3px;background-color:#0E0F12;background-image:var(--sprite);
   background-size:calc(var(--cols) * 100%) calc(var(--rows) * 100%);opacity:0;transform:scale(.92);
   transition:opacity .5s var(--ease) calc(var(--n) * 12ms),transform .7s var(--ease) calc(var(--n) * 12ms)}

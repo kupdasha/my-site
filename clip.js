@@ -57,9 +57,9 @@ function worldsHTML(c){
       <p class="cl-w-deep">${H.T(c.deep || '')}</p>
     </div>
     <ol class="cl-stairs">${c.items.map((x, i) =>
-      `<li style="--i:${i}"${x.deep ? ' data-deep' : ''}${i ? '' : ' class="on"'}><button><span class="cl-st-name">${H.T(x.name)}</span><i class="cl-st-bar"><b></b></i></button></li>`).join('')}</ol>
+      `<li style="--i:${i}"${x.deep ? ' data-deep' : ''}${i ? '' : ' class="on"'}><button><i class="cl-st-step"></i><span class="cl-st-name">${H.T(x.name)}</span></button></li>`).join('')}</ol>
     <div class="cl-w-texts">${c.items.map((x, i) =>
-      `<p class="cl-w-text${i ? '' : ' on'}"><b>${H.T(x.name)}</b> ${H.T(x.text)}</p>`).join('')}</div>
+      `<p class="cl-w-text${i ? '' : ' on'}"><b>${H.T(x.name)}</b> ${H.T(x.text)}${x.door ? ` <button class="link cl-door" data-to="${x.door[0]}">${H.T(x.door[1])}</button>` : ''}</p>`).join('')}</div>
   </div>`;
 }
 function liveWorlds(box){
@@ -76,10 +76,6 @@ function liveWorlds(box){
     texts.forEach((p, i) => p.classList.toggle('on', i === k));
     w.style.setProperty('--k', k);
     w.classList.toggle('deep', steps[k].hasAttribute('data-deep'));   // в самой глубине — подпись про темноту
-    // полоска под ступенью заполняется, пока идут ее кадры
-    const bar = steps[k].querySelector('b');
-    bar.style.transition = 'none'; bar.style.width = (j / shots[k].length * 100) + '%';
-    requestAnimationFrame(() => { bar.style.transition = `width ${SHOT}ms linear`; bar.style.width = ((j + 1) / shots[k].length * 100) + '%'; });
   };
   const next = () => {
     if (++j >= shots[k].length) { j = 0; k = (k + 1) % n; }
@@ -92,6 +88,14 @@ function liveWorlds(box){
     li.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { held = true; go(); run(); } });
     li.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { held = false; run(); } });
     li.addEventListener('click', () => { go(); run(); });
+  });
+  // дверь в тексте этапа — прокрутка к главе, куда она ведет (ссылки с # на Тильде перехватываются, поэтому кодом)
+  box.addEventListener('click', e => {
+    const d = e.target.closest('.cl-door'); if (!d) return;
+    const to = box.closest('.cl').querySelector(`.cl-${d.dataset.to}-ch`); if (!to) return;
+    const sc = box.closest('.case');
+    if (sc) sc.scrollBy({ top: to.getBoundingClientRect().top - 40, behavior: still() ? 'auto' : 'smooth' });
+    else to.scrollIntoView({ behavior: still() ? 'auto' : 'smooth' });
   });
   show();
   onScreen(w, v => { seen = v; run(); });
@@ -165,10 +169,10 @@ function takesHTML(c){
   const { cols, rows, count } = c;
   const rnd = i => Math.abs(Math.sin(i * 91.17) * 43758.5453) % 1;
   // порядок перемешан, чтобы рядом стояли разные сцены; некоторые клетки крупнее — так это коллаж, а не таблица
-  // 132 кадра и 12 крупных — ровно 168 клеток: сетка закрывается без дыр при 14, 8 и 6 колонках
-  const order = Array.from({ length: count }, (_, i) => i).sort((a, b) => rnd(a) - rnd(b)).slice(0, 132);
+  // 84 кадра и 12 крупных — ровно 120 клеток: сетка закрывается без дыр при 12, 8 и 6 колонках
+  const order = Array.from({ length: count }, (_, i) => i).sort((a, b) => rnd(a) - rnd(b));
   const tiles = order.map((k, n) => {
-    const x = k % cols, y = Math.floor(k / cols), big = n % 8 === 4 && n < 100;
+    const x = k % cols, y = Math.floor(k / cols), big = n % 4 === 2 && n < 48;   // крупные — только в первой половине, мелкие после них закрывают дыры
     return `<i${big ? ' class="big"' : ''} style="--n:${n};background-position:${(x / (cols - 1) * 100).toFixed(3)}% ${(y / (rows - 1) * 100).toFixed(3)}%"></i>`;
   }).join('');
   return `<div class="cl-takes" style="--sprite:url('${c.sprite}');--cols:${cols};--rows:${rows}">${tiles}</div>
