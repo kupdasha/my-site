@@ -4,9 +4,10 @@
    днем в светлой версии, в сумерках — в темной.
    ================================================================ */
 .su{overflow-x:clip;--su-gap:clamp(64px,8vw,128px);
-  --su-sky:linear-gradient(180deg,#B9DCFF 0%,#6FB3F2 55%,#3F8BD9 100%);
-  --su-cloud:rgba(255,255,255,.55)}
-:root[data-theme="dark"] .su{--su-sky:linear-gradient(180deg,#56729F 0%,#2C3F66 55%,#17233D 100%);--su-cloud:rgba(255,255,255,.14)}
+  --su-sky:linear-gradient(180deg,#3F86D8 0%,#6FAEEF 45%,#A9D2F7 100%);
+  --su-far:.55;--su-near:.92;--su-sunA:.75;--su-hazeC:rgba(225,238,250,.55)}
+:root[data-theme="dark"] .su{--su-sky:linear-gradient(180deg,#14213C 0%,#2B4470 50%,#5C6F94 100%);
+  --su-far:.14;--su-near:.28;--su-sunA:.22;--su-hazeC:rgba(120,140,180,.35)}
 .su-ch{margin-bottom:var(--su-gap)}
 .su-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
 .su-label{grid-column:1 / span 3;grid-row:1}
@@ -19,15 +20,20 @@
 .su-ch.in .su-viz{opacity:1;transform:none}
 
 /* ---------- небо ---------- */
-.su-sky{position:relative;aspect-ratio:16/8;border-radius:var(--r-img);overflow:hidden;background:var(--su-sky);user-select:none;-webkit-user-select:none;--k:1}
-.su-cloud{position:absolute;width:38%;aspect-ratio:3/1;border-radius:50%;background:radial-gradient(closest-side,var(--su-cloud),transparent 70%);filter:blur(6px);animation:suCloud 40s linear infinite}
-.su-cloud.a{left:-10%;top:8%}
-.su-cloud.b{left:40%;top:60%;width:50%;animation-duration:55s;animation-delay:-20s}
-.su-cloud.c{left:70%;top:20%;width:30%;animation-duration:48s;animation-delay:-35s}
-@keyframes suCloud{from{transform:translateX(-12%)}to{transform:translateX(26%)}}
-.su-fly{position:absolute;left:var(--x);top:50%;width:min(36%,300px);aspect-ratio:200/210;transform:translate(-50%,-50%) scale(var(--k));transform-origin:center;will-change:transform}
-.su-fly svg{display:block;width:100%;height:100%;animation:suSpin 26s linear infinite}
-.su-fly.rev svg{animation-direction:reverse;animation-duration:31s}
+.su-sky{position:relative;aspect-ratio:16/8;border-radius:var(--r-img);overflow:hidden;background:var(--su-sky);user-select:none;-webkit-user-select:none;--k:1;isolation:isolate}
+/* облака из шума: каждый слой — своя картинка, едет туда-сюда целиком, шум не пересчитывается */
+.su-cl{position:absolute;top:0;left:0;width:200%;height:100%;display:block;will-change:transform;animation:suCloud 160s ease-in-out infinite alternate}
+.su-cl-far{opacity:var(--su-far);transform:scale(1.15);transform-origin:0 50%;animation-duration:220s;animation-delay:-90s}
+.su-cl-near{opacity:var(--su-near);animation-delay:-40s}
+@keyframes suCloud{from{translate:0 0}to{translate:-50% 0}}
+.su-sun{position:absolute;inset:0;background:radial-gradient(circle at 84% 10%,rgba(255,255,255,var(--su-sunA)) 0,rgba(255,255,255,calc(var(--su-sunA) * .25)) 18%,transparent 48%);pointer-events:none}
+.su-haze{position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,var(--su-hazeC) 100%);pointer-events:none}
+.su-fly{position:absolute;left:var(--x);top:50%;width:min(36%,300px);aspect-ratio:200/222;transform:translate(-50%,-50%) scale(var(--k));transform-origin:center;will-change:transform;filter:drop-shadow(0 18px 22px rgba(0,20,60,.25))}
+.su-bob{width:100%;height:100%;animation:suBob 7s ease-in-out infinite alternate}
+.su-fly.rev .su-bob{animation-duration:8.5s;animation-delay:-3s}
+@keyframes suBob{from{translate:0 -3%}to{translate:0 3%}}
+.su-fly svg{display:block;width:100%;height:100%;animation:suSpin 34s linear infinite}
+.su-fly.rev svg{animation-direction:reverse;animation-duration:41s}
 @keyframes suSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .su-names{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;font-size:17px;line-height:1.3;text-align:center}
 .su-names span{opacity:.75;text-wrap:balance}
@@ -82,5 +88,5 @@
 }
 @media (prefers-reduced-motion:reduce){
   .su-viz{opacity:1;transform:none;transition:none}
-  .su-cloud,.su-fly svg,.su-spot::before{animation:none}
+  .su-cl,.su-bob,.su-fly svg,.su-spot::before{animation:none}
 }

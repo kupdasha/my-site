@@ -1,7 +1,8 @@
 /* ================================================================
    КЕЙС «ПАРАШЮТНЫЙ КОСТЮМ SKOLKOVO» (поле suit у проекта)
-   Главы: sky — два парашютиста в небе, ползунок отодвигает их,
-   и видно, что черные грипсы пропадают, а полосатые читаются;
+   Главы: sky — два парашютиста в небе (облака из шума, солнце,
+   дымка; фигуры со шлемом, ранцем и стропами), ползунок отодвигает
+   их, и видно, что черные грипсы пропадают, а полосатые читаются;
    shot — картинка с подписью, по нажатию крупно; steps — цепочка
    этапов (разметка .yst из style.css); spots — точки на рендере,
    подсказка у точки, на телефоне подпись под картинкой.
@@ -36,45 +37,81 @@ const cap = t => t ? `<p class="su-cap">${H.T(t)}</p>` : '';
 /* ---------- небо: два парашютиста, ползунок отодвигает их ---------- */
 // фирменные полосы — цвета сняты с рендера костюма
 const STRIPES = ['#2EA44A', '#F2C94C', '#E53E3E', '#FFFFFF', '#8E44AD', '#2F6FE0', '#F2C94C', '#2EA44A', '#FFFFFF', '#E53E3E'];
-// парашютист сверху, лежит на потоке: руки и ноги согнуты, как в групповой акробатике
+let diverN = 0;
+// парашютист сверху, лежит на потоке: видно спину с ранцем, шлем, перчатки, ботинки; руки и ноги согнуты
 function diverSVG(colored){
-  const suit = '#17181C', seam = '#2B2D33';
-  const limb = (a, b, w) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${suit}" stroke-width="${w}" stroke-linecap="round"/>`;
-  // грипс — полосы вдоль отрезка; на черном костюме без узора полосы того же цвета, что костюм
+  const id = 'sd' + (++diverN);
+  const suit = `url(#${id}s)`, dark = '#0E0F12', seam = '#2E3139', strap = '#3A3D46', metal = '#B5BAC4';
+  const seg = (a, b, w, color = suit) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${color}" stroke-width="${w}" stroke-linecap="round"/>`;
+  const mid = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  // грипс — полосы вдоль отрезка, с темной окантовкой; на костюме без узора полосы того же цвета, что костюм
   const grip = (a, b, w) => {
-    const n = STRIPES.length, out = [];
+    const n = STRIPES.length, out = [seg(mid(a, b, -.04), mid(a, b, 1.04), w + 4, dark)];
     for (let i = 0; i < n; i++) {
-      const t0 = i / n, t1 = (i + 1) / n;
-      const x0 = a[0] + (b[0] - a[0]) * t0, y0 = a[1] + (b[1] - a[1]) * t0;
-      const x1 = a[0] + (b[0] - a[0]) * t1, y1 = a[1] + (b[1] - a[1]) * t1;
-      out.push(`<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${colored ? STRIPES[i] : seam}" stroke-width="${w}" stroke-linecap="butt"/>`);
+      const p0 = mid(a, b, i / n), p1 = mid(a, b, (i + 1) / n);
+      out.push(`<line x1="${p0[0].toFixed(1)}" y1="${p0[1].toFixed(1)}" x2="${p1[0].toFixed(1)}" y2="${p1[1].toFixed(1)}" stroke="${colored ? STRIPES[i] : '#24262C'}" stroke-width="${w}"/>`);
     }
     return `<g>${out.join('')}</g>`;
   };
   // точки фигуры: плечо → локоть → кисть, бедро → колено → стопа (стопы подняты к небу, поэтому голени коротки)
-  const L = { sh: [82, 70], el: [40, 64], hd: [30, 28], hip: [88, 132], kn: [60, 172], ft: [56, 200] };
-  const R = { sh: [118, 70], el: [160, 64], hd: [170, 28], hip: [112, 132], kn: [140, 172], ft: [144, 200] };
-  const side = s => limb(s.sh, s.el, 18) + limb(s.el, s.hd, 16) + limb(s.hip, s.kn, 20) + limb(s.kn, s.ft, 18);
-  const grips = s => {
-    const mid = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-    return grip(mid(s.sh, s.el, .22), mid(s.sh, s.el, .88), 11) + grip(mid(s.hip, s.kn, .2), mid(s.hip, s.kn, .85), 12);
-  };
-  return `<svg viewBox="0 0 200 210" aria-hidden="true">
-    ${side(L)}${side(R)}
-    <rect x="76" y="56" width="48" height="82" rx="22" fill="${suit}"/>
-    <circle cx="100" cy="40" r="19" fill="${suit}"/>
-    <path d="M85 38a15 15 0 0 1 30 0" fill="none" stroke="${seam}" stroke-width="4" stroke-linecap="round"/>
+  const L = { sh: [80, 72], el: [40, 66], hd: [28, 28], hip: [86, 134], kn: [58, 174], ft: [54, 202] };
+  const R = { sh: [120, 72], el: [160, 66], hd: [172, 28], hip: [114, 134], kn: [142, 174], ft: [146, 202] };
+  const limbs = s => seg(s.sh, s.el, 19) + seg(s.el, s.hd, 17) + seg(s.hip, s.kn, 21) + seg(s.kn, s.ft, 19)
+    // складки у локтя и колена
+    + `<circle cx="${s.el[0]}" cy="${s.el[1]}" r="7" fill="#fff" opacity=".06"/><circle cx="${s.kn[0]}" cy="${s.kn[1]}" r="8" fill="#fff" opacity=".06"/>`
+    // перчатка с пальцами и ботинок
+    + `<circle cx="${s.hd[0]}" cy="${s.hd[1]}" r="10.5" fill="${dark}"/><path d="M${s.hd[0] - 5} ${s.hd[1] - 7}l1 -5M${s.hd[0]} ${s.hd[1] - 8}l0 -6M${s.hd[0] + 5} ${s.hd[1] - 7}l-1 -5" stroke="${dark}" stroke-width="4" stroke-linecap="round"/>`
+    + `<ellipse cx="${s.ft[0]}" cy="${s.ft[1] + 3}" rx="10" ry="12" fill="${dark}"/><ellipse cx="${s.ft[0]}" cy="${s.ft[1] + 1}" rx="7" ry="8" fill="#fff" opacity=".07"/>`;
+  const grips = s => grip(mid(s.sh, s.el, .24), mid(s.sh, s.el, .86), 11) + grip(mid(s.hip, s.kn, .22), mid(s.hip, s.kn, .84), 12);
+  // ножные обхваты подвески
+  const legStrap = s => seg(mid(s.hip, s.kn, .04), mid(s.hip, s.kn, .14), 23, strap);
+  // кольцо-логотип на шлеме: четыре дуги фирменных цветов
+  const ring = (cx, cy, r) => ['#E53E3E', '#F2C94C', '#2EA44A', '#2F6FE0'].map((c, i) => {
+    const a0 = i * Math.PI / 2 - Math.PI / 2, a1 = a0 + Math.PI / 2 - .25;
+    return `<path d="M${(cx + r * Math.cos(a0)).toFixed(1)} ${(cy + r * Math.sin(a0)).toFixed(1)}A${r} ${r} 0 0 1 ${(cx + r * Math.cos(a1)).toFixed(1)} ${(cy + r * Math.sin(a1)).toFixed(1)}" fill="none" stroke="${c}" stroke-width="2.4"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 200 222" aria-hidden="true">
+    <defs>
+      <linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="40" y1="30" x2="170" y2="210"><stop offset="0" stop-color="#2C2F37"/><stop offset=".55" stop-color="#1A1C21"/><stop offset="1" stop-color="#101114"/></linearGradient>
+      <radialGradient id="${id}h" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#4A4E58"/><stop offset=".6" stop-color="#1C1E24"/><stop offset="1" stop-color="#0B0C0F"/></radialGradient>
+      <linearGradient id="${id}r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262930"/><stop offset="1" stop-color="#15171B"/></linearGradient>
+    </defs>
+    ${limbs(L)}${limbs(R)}
+    <path d="M72 64Q100 52 128 64L124 142Q100 152 76 142Z" fill="${suit}"/>
+    <path d="M100 66v76" stroke="${seam}" stroke-width="2" stroke-linecap="round"/>
+    ${legStrap(L)}${legStrap(R)}
+    <path d="M84 78L78 66M116 78L122 66" stroke="${strap}" stroke-width="7" stroke-linecap="round"/>
+    <rect x="83" y="76" width="34" height="60" rx="11" fill="url(#${id}r)" stroke="${strap}" stroke-width="2"/>
+    <path d="M100 80v52M86 104h28" stroke="#0B0C0F" stroke-width="1.6" opacity=".8"/>
+    <rect x="88" y="123" width="24" height="10" rx="4" fill="#15171B" stroke="${strap}" stroke-width="1.5"/>
+    <circle cx="80" cy="79" r="3.2" fill="${metal}"/><circle cx="120" cy="79" r="3.2" fill="${metal}"/>
+    <circle cx="100" cy="40" r="20" fill="url(#${id}h)"/>
+    <path d="M83 33q17 -10 34 0" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".18"/>
+    <path d="M82 46q18 8 36 0" fill="none" stroke="#0B0C0F" stroke-width="3" stroke-linecap="round"/>
+    ${ring(100, 42, 6)}
     ${grips(L)}${grips(R)}
-    <path d="M100 66v60" stroke="${seam}" stroke-width="3" stroke-linecap="round"/>
+  </svg>`;
+}
+// облака — из шума: слой дальних и слой ближних, каждый своей картинкой, чтобы двигаться без пересчета
+function cloudsSVG(id, freq, seed, cut){
+  return `<svg class="su-cl ${id}" viewBox="0 0 3200 800" preserveAspectRatio="none" aria-hidden="true">
+    <filter id="${id}f" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="5" seed="${seed}"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 ${cut[0]} ${cut[1]}"/>
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <rect width="3200" height="800" filter="url(#${id}f)"/>
   </svg>`;
 }
 function skyHTML(c){
   const names = c.names || [];
   return `<div class="su-sky-box">
     <div class="su-sky">
-      <div class="su-cloud a"></div><div class="su-cloud b"></div><div class="su-cloud c"></div>
-      <div class="su-fly" style="--x:30%">${diverSVG(false)}</div>
-      <div class="su-fly rev" style="--x:70%">${diverSVG(true)}</div>
+      ${cloudsSVG('su-cl-far', '0.0016 0.0045', 11, [12, -6.6])}
+      ${cloudsSVG('su-cl-near', '0.0024 0.0062', 4, [16, -8.9])}
+      <div class="su-sun"></div><div class="su-haze"></div>
+      <div class="su-fly" style="--x:30%"><div class="su-bob">${diverSVG(false)}</div></div>
+      <div class="su-fly rev" style="--x:70%"><div class="su-bob">${diverSVG(true)}</div></div>
     </div>
     <div class="su-names">${names.map(n => `<span>${H.T(n)}</span>`).join('')}</div>
     <label class="su-ctl"><span>${H.T(c.near || 'ближе')}</span><input type="range" min="0" max="1000" value="0" aria-label="${esc(H.pick(c.far || 'дальше'))}"><span>${H.T(c.far || 'дальше')}</span></label>
