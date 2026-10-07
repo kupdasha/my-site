@@ -169,6 +169,8 @@ function liveFace(box){
 
 /* ---------- дубли: кадры, которые не вошли в клип, одним коллажем; по нажатию — крупно ---------- */
 function takesHTML(c){
+  // если jsDelivr еще отдает старый content.js (со спрайтом), берем папку кадров рядом с clip.js
+  if (!c.dir) c = { ...c, dir: H.base + 'img/clip/takes/', count: 132 };
   const rnd = i => Math.abs(Math.sin(i * 91.17) * 43758.5453) % 1;
   // порядок перемешан, чтобы рядом стояли разные сцены; 12 клеток крупнее — так это коллаж, а не таблица.
   // 132 кадра и 12 крупных — ровно 168 клеток: сетка закрывается без дыр при 12, 8 и 6 колонках
@@ -272,7 +274,8 @@ export async function mountClip(mount, p, helpers){
   H = helpers;
   await loadCSS(H.base);
   if (!mount.isConnected) return;   // кейс успели закрыть
-  const chs = p.clip.map(ch => [ch, Object.keys(KINDS).find(k => ch[k])]);
+  // главы, которых нет в этой версии clip.js (например, из устаревшего content.js), пропускаются
+  const chs = p.clip.map(ch => [ch, Object.keys(KINDS).find(k => ch[k])]).filter(([, kind]) => kind);
   mount.innerHTML = chs.map(([ch, kind]) =>
     `<section class="cl-ch wrap cl-${kind}-ch">${head(ch)}<div class="cl-viz">${kind ? KINDS[kind][0](ch[kind]) : ''}</div></section>`).join('');
   [...mount.querySelectorAll('.cl-ch')].forEach((s, i) => {
