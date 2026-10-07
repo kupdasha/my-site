@@ -2,7 +2,8 @@
    КЕЙС «THE VENTURES JAPAN» (поле ventures у проекта)
    Шапка кейса — живой принт на сплошном синем: плитки с веткой
    сакуры едут от подола вверх и тают, сверху белый логотип.
-   Главы: tile — одна плитка и десять шагов уменьшения;
+   Главы: tile — кольцо из двух рядов «десять шагов уменьшения»,
+   крутится от движения курсора (на телефоне — пальца), в центре две крупные плитки;
    fits — фасоны рядом (oversize и облегающий, выбранный отмечен);
    look — съемка, по нажатию крупно; tokyo — фото с мероприятия.
    Векторы сняты из макета в Figma: img/ventures/*.svg.
@@ -64,7 +65,8 @@ async function livePoster(box, c){
     dpr = Math.min(devicePixelRatio || 1, 2);
     W = r.width; Hh = r.height;
     cv.width = Math.round(W * dpr); cv.height = Math.round(Hh * dpr);
-    k = Hh / FRAME_H;
+    // масштаб — как у полной шапки 16:9 (на телефоне 4:5); сама шапка ниже, поэтому верх срезан, плитки те же
+    k = (matchMedia('(max-width:760px)').matches ? W * 5 / 4 : W * 9 / 16) / FRAME_H;
     // плитка один раз рисуется в спрайт крупно — потом только масштабируется
     if (tile){
       const px = Math.ceil(BIG * k * dpr * 1.5);
@@ -128,15 +130,58 @@ async function livePoster(box, c){
 
 /* ---------- глава: плитка и десять шагов ---------- */
 function tileHTML(c){
-  const steps = COL_X.map((_, i) => colAt(i / 9).s);
   const src = `${H.base}img/ventures/tile.svg`;
-  // слева — две крупные плитки внахлест, повернуты в разные стороны и покачиваются вразнобой;
-  // справа — десять шагов: плитка мельчает и поворачивается на 5° сильнее с каждым шагом
+  // кольцо: две копии ряда «десять шагов» по 180°, в центре — две крупные плитки внахлест
   return `<div class="vn-tile">
-    <div class="vn-tile-big"><img class="vn-t1" src="${src}" alt=""><img class="vn-t2" src="${src}" alt=""></div>
-    <div class="vn-steps">${steps.map((s, i) =>
-      `<span style="--s:${(s / BIG).toFixed(3)};--r:${(-5 * i - 8)}deg;--i:${i}"><img src="${src}" alt=""></span>`).join('')}</div>
+    <div class="vn-ring">${Array.from({ length: 20 }, () => `<img src="${src}" alt="">`).join('')}
+      <div class="vn-tile-big"><img class="vn-t1" src="${src}" alt=""><img class="vn-t2" src="${src}" alt=""></div>
+    </div>
   </div>${c.caption ? `<p class="vn-cap">${H.T(c.caption)}</p>` : ''}`;
+}
+function liveTile(box){
+  const ring = box.querySelector('.vn-ring'), tiles = [...ring.querySelectorAll(':scope > img')];
+  const big = ring.querySelector('.vn-tile-big');
+  // у каждой плитки — номер шага в своей половине: размер и поворот как на принте
+  const steps = tiles.map((_, n) => ({ half: n >= 10 ? 1 : 0, i: n % 10, s: colAt((n % 10) / 9).s / BIG }));
+  let R = 0, T = 0, angle = 0, spin = 0, raf = 0, visible = false, last = 0;
+  let px = 0, py = 0, tx = 0, ty = 0, lastX = null, lastY = null;
+  const size = () => { const r = ring.getBoundingClientRect(); R = Math.min(r.width, r.height) * 0.4; T = R * 0.42; };
+  function place(){
+    tiles.forEach((el, n) => {
+      const st = steps[n];
+      const a = angle + (st.half * 180 + st.i * 17) * Math.PI / 180;   // половина круга на ряд, крупные — впереди
+      const s = Math.max(st.s, 0.04) * T;
+      el.style.width = s + 'px';
+      el.style.transform = `translate(${Math.cos(a) * R - s / 2}px,${Math.sin(a) * R - s / 2}px) rotate(${a * 180 / Math.PI + 90 - st.i * 8}deg)`;
+    });
+    big.style.transform = `translate(${-px * 14}px,${-py * 14}px) rotate(${angle * 40}deg)`;
+  }
+  function tick(t){
+    raf = 0;
+    const dt = last ? Math.min(t - last, 50) : 16; last = t;
+    spin *= Math.pow(0.94, dt / 16);                      // раскрутка от курсора гаснет
+    angle += (0.00012 * dt) + spin * dt / 16;             // и само чуть-чуть плывет
+    px += (tx - px) * 0.08; py += (ty - py) * 0.08;
+    place();
+    if (visible && !still()) raf = requestAnimationFrame(tick);
+  }
+  const run = () => { if (!raf && visible && !still()){ last = 0; raf = requestAnimationFrame(tick); } };
+  // движение курсора закручивает кольцо: по часовой стрелке — туда же, против — обратно
+  ring.addEventListener('pointermove', e => {
+    const r = ring.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const x = e.clientX - cx, y = e.clientY - cy;
+    tx = x / (r.width / 2); ty = y / (r.height / 2);
+    if (lastX != null){
+      const cross = lastX * y - lastY * x, d = Math.max(Math.hypot(x, y) * Math.hypot(lastX, lastY), 900);
+      spin = clamp(spin + cross / d * 0.35, -0.08, 0.08);
+    }
+    lastX = x; lastY = y;
+    if (still()) { angle += spin; spin = 0; place(); }
+  });
+  ring.addEventListener('pointerleave', () => { lastX = lastY = null; tx = ty = 0; });
+  new ResizeObserver(() => { size(); place(); }).observe(ring);
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(ring);
+  size(); place();
 }
 
 /* ---------- глава: фасоны рядом, выбранный отмечен ---------- */
@@ -178,7 +223,7 @@ function liveTokyo(box, c){
 }
 
 const KINDS = {
-  tile:  [tileHTML, () => {}],
+  tile:  [tileHTML, liveTile],
   fits:  [fitsHTML, liveFits],
   look:  [lookHTML, liveLook],
   tokyo: [tokyoHTML, liveTokyo],

@@ -16,47 +16,38 @@
 .vn-ch.in .vn-viz{opacity:1;transform:none}
 
 /* ---------- шапка: живой принт поверх обложки ---------- */
-.case-hero.vn-hero{position:relative;aspect-ratio:16/9}
+.case-hero.vn-hero{position:relative;aspect-ratio:16/8}   /* верх срезан: принт тот же, логотип выше */
 .vn-poster{position:absolute;inset:0;user-select:none;-webkit-user-select:none;
   opacity:0;animation:vnIn .9s var(--ease) .1s forwards}
 @keyframes vnIn{to{opacity:1}}
 /* картинки шапки сайт растягивает на весь блок — здесь надписи живут своим размером */
 .case-hero .vn-poster img{position:static;inset:auto;height:auto;object-fit:initial;mix-blend-mode:normal}
 .vn-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.vn-side{position:absolute;left:0;right:0;top:37%;translate:0 -50%;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.4vw,22px);pointer-events:none;
+.vn-side{position:absolute;left:0;right:0;top:30%;translate:0 -50%;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.4vw,22px);pointer-events:none;
   transition:opacity .6s var(--ease),transform .9s var(--ease)}
 .vn-poster .vn-logo{width:clamp(180px,26%,420px)}
 @media (max-width:760px){
-  .case-hero.vn-hero{aspect-ratio:4/5}
-  .vn-side{top:40%}
+  .case-hero.vn-hero{aspect-ratio:4/4.5}
+  .vn-side{top:33%}
   .vn-poster .vn-logo{width:62%}
 }
 
-/* ---------- плитка и десять шагов ---------- */
-/* без плашек: мягкий градиент прямо на фоне страницы — синий слева растворяется вправо */
-.vn-tile{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);align-items:center;
-  min-height:clamp(280px,30vw,440px)}
-/* синее пятно растворяется во все стороны — ни одного края */
-.vn-tile::before{content:'';position:absolute;inset:-18% -14%;z-index:-1;pointer-events:none;
-  background:radial-gradient(ellipse 38% 50% at 24% 50%,var(--vn-blue) 0%,rgba(48,68,255,.78) 32%,rgba(48,68,255,.3) 64%,rgba(48,68,255,0) 100%)}
-.vn-tile-big{position:relative;aspect-ratio:1;max-height:clamp(240px,28vw,400px)}
-.vn-tile-big img{position:absolute;width:56%;height:auto}
-.vn-t1{left:8%;top:10%;rotate:-24deg;animation:vnSwayA 6.5s ease-in-out infinite alternate}
-.vn-t2{left:38%;top:34%;rotate:16deg;animation:vnSwayB 8s ease-in-out infinite alternate}
+/* ---------- кольцо из плиток ---------- */
+/* без плашек: мягкое синее пятно прямо на фоне страницы, растворяется во все стороны */
+.vn-tile{position:relative;isolation:isolate}
+.vn-tile::before{content:'';position:absolute;inset:-14% -10%;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 34% 50% at 50% 50%,var(--vn-blue) 0%,rgba(48,68,255,.75) 34%,rgba(48,68,255,.26) 66%,rgba(48,68,255,0) 100%)}
+.vn-ring{position:relative;height:clamp(380px,46vw,640px);touch-action:pan-y}
+.vn-ring>img{position:absolute;left:50%;top:50%;height:auto;will-change:transform}
+.vn-tile-big{position:absolute;left:50%;top:50%;width:clamp(150px,20vw,280px);aspect-ratio:1;margin:calc(clamp(150px,20vw,280px) / -2) 0 0 calc(clamp(150px,20vw,280px) / -2)}
+.vn-tile-big img{position:absolute;width:62%;height:auto}
+.vn-t1{left:2%;top:4%;rotate:-24deg;animation:vnSwayA 6.5s ease-in-out infinite alternate}
+.vn-t2{left:34%;top:32%;rotate:16deg;animation:vnSwayB 8s ease-in-out infinite alternate}
 @keyframes vnSwayA{from{transform:translate(0,0) rotate(-6deg)}to{transform:translate(4%,-5%) rotate(10deg)}}
 @keyframes vnSwayB{from{transform:translate(0,0) rotate(8deg)}to{transform:translate(-5%,4%) rotate(-12deg)}}
-.vn-steps{display:flex;align-items:center;justify-content:space-between;padding:0 0 0 clamp(16px,3vw,48px)}
-.vn-steps span{flex:0 0 auto;width:calc(clamp(40px,7vw,104px) * var(--s));aspect-ratio:1;rotate:var(--r);
-  transform-origin:50% 50%;animation:vnBreath 3.2s ease-in-out infinite;animation-delay:calc(var(--i) * -.32s)}
-.vn-steps img{width:100%;height:auto;display:block}
-/* шаги дышат и покачиваются волной — от крупной к мелкой */
-@keyframes vnBreath{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.16) rotate(-12deg)}}
 @media (max-width:760px){
-  .vn-tile{grid-template-columns:minmax(0,1fr);padding:24px 0 32px}
-  .vn-tile::before{inset:-12% -8%;background:radial-gradient(ellipse 60% 42% at 50% 30%,var(--vn-blue) 0%,rgba(48,68,255,.7) 35%,rgba(48,68,255,.22) 68%,rgba(48,68,255,0) 100%)}
-  .vn-tile-big{width:72%;margin:0 auto;max-height:none}
-  .vn-steps{padding:16px 0 0}
-  .vn-steps span{width:calc(9vw * var(--s))}
+  .vn-tile::before{inset:-8% -6%;background:radial-gradient(ellipse 50% 46% at 50% 50%,var(--vn-blue) 0%,rgba(48,68,255,.72) 36%,rgba(48,68,255,.22) 68%,rgba(48,68,255,0) 100%)}
+  .vn-ring{height:92vw}
 }
 
 /* ---------- фасоны: две колонки, у выбранного — отметка ---------- */
@@ -88,6 +79,6 @@
 @media (max-width:420px){.case-head:has(+ .vn-hero) .case-title{font-size:34px}}
 
 @media (prefers-reduced-motion:reduce){
-  .vn-tile-big img,.vn-steps span{animation:none}
+  .vn-tile-big img{animation:none}
   .vn-side{transition:opacity .3s}
 }

@@ -2714,7 +2714,6 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
               title: ['футболка в кадре', 'носим'],
               look: {
                 items: ['img/ventures/hold-front.jpg', 'img/ventures/close-2.jpg', 'img/ventures/flat-front.jpg', 'img/ventures/close-3.jpg', 'img/ventures/flat-back.jpg'],
-                hint: ['Нажмите на кадр, чтобы увеличить', 'Нажмите на кадр — увеличится'],
               } },
             { label: ['результат', 'что получилось'],
               title: ['футболка доехала до Токио', 'слетала в Токио'],
