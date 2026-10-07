@@ -161,7 +161,7 @@ function liveTile(box){
     // тела половин — за краями блока: на компьютере слева и справа, на телефоне сверху и снизу
     body = phone ? [{ x: W / 2, y: -m * 0.06, dir: Math.PI / 2 }, { x: W / 2, y: Hh + m * 0.06, dir: -Math.PI / 2 }]
                  : [{ x: -m * 0.08, y: Hh / 2, dir: 0 }, { x: W + m * 0.08, y: Hh / 2, dir: Math.PI }];
-    L = phone ? Hh * 0.3 : W * 0.3;
+    L = phone ? Hh * 0.3 : W * (W < 1100 ? 0.25 : 0.3);   // на планшете щупальца короче — тексту просторнее
     if (!pullGoal){ goal = { x: W / 2, y: Hh / 2 }; aim = { ...goal }; }
   }
   function place(){
@@ -290,7 +290,7 @@ function liveFlight(box){
 function tokyoHTML(c){
   return `${c.flight ? flightHTML(c.flight) : ''}<div class="vn-tokyo">${c.items.map((it, i) =>
     `<figure style="--ar:${it.ratio}"><button class="vn-shot" data-i="${i}" aria-label="Увеличить"><img src="${it.src}" alt="" loading="lazy"></button>
-      <figcaption>${H.T(it.caption)}</figcaption></figure>`).join('')}</div>`;
+      <figcaption>${H.T(it.caption).replace(/\u00a0/g, ' ')}</figcaption></figure>`).join('')}</div>`;   // под узким фото название переносится
 }
 function liveTokyo(box, c){
   const fl = box.querySelector('.vn-flight');
