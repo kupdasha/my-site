@@ -1972,6 +1972,8 @@ function galleryItem(x){
   if (x && x.morph) return morphHTML(x);
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   if (x && x.collage) return campCollage(x);
+  // { film: 'img/….mp4', poster, caption } — ролик для просмотра: со звуком и плеером, сам не запускается, грузится по нажатию
+  if (x && x.film) return `<div class="wrap"><div class="case-shot" data-reveal><video src="${x.film}" style="aspect-ratio:16/9"${x.poster ? ` poster="${x.poster}"` : ''} controls playsinline preload="none"></video></div>${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   // { src: 'kinescope:ID', caption: 'подпись' } — ролик или картинка с подписью под ней
   if (x && x.src) return `<div class="wrap">${shotHTML(x.src)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   return `<div class="wrap">${shotHTML(x)}</div>`;
