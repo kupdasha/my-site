@@ -1,0 +1,130 @@
+/* ================================================================
+   КЕЙС «ОДНА КАВЫЧКА» (kav.js, поле kav у проекта)
+   Цвета — сайта; свои — неон ткани, черная футболка и серый пластик лейбла.
+   ================================================================ */
+.kv{overflow-x:clip;--kv-gap:clamp(64px,8vw,128px);--kv-neon:#E4FF1A;--kv-black:#141414;--kv-paper:#F6F6F4}
+.kv-ch{margin-bottom:var(--kv-gap)}
+.kv-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
+.kv-label{grid-column:1 / span 3;grid-row:1}
+.kv-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.kv-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
+@media (max-width:760px){.kv-label,.kv-title,.kv-text{grid-column:1 / -1}.kv-label{grid-row:auto}}
+.kv-cap{font-size:16px;opacity:.6;margin-top:16px;max-width:60ch;text-wrap:balance}
+
+.kv-viz{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease) .15s,transform 1s var(--ease) .15s}
+.kv-ch.in .kv-viz{opacity:1;transform:none}
+
+/* кадр: по нажатию — крупно */
+.kv-shot{display:block;width:100%;padding:0;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in}
+.kv-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--ease)}
+.kv-shot:hover img{transform:scale(1.04)}
+.kv-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.6vw,24px);margin-top:clamp(12px,1.6vw,24px)}
+.kv-row .kv-shot{aspect-ratio:4/5}
+/* небольшой ролик: тихий, по кругу */
+.kv-mini{margin:0;display:flex;flex-direction:column;gap:12px}
+.kv-mini figcaption{font-size:16px;opacity:.6}
+.kv-vid{display:block;width:100%;border-radius:var(--r-img);background:var(--soft);object-fit:cover}
+
+/* ---------- стикеры ---------- */
+.kv-defs{position:absolute;width:0;height:0;overflow:hidden}
+.kv-board{position:relative;aspect-ratio:896/1152;max-height:92vh;margin:0 auto;border-radius:var(--r-img);overflow:hidden;background:#1a1a1a;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.kv-board > img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.kv-pin{position:absolute;width:21%;aspect-ratio:1;translate:-50% -50%;rotate:calc(var(--r) + var(--tilt,0deg));cursor:grab;touch-action:none;
+  transition:left .7s var(--ease),top .7s var(--ease),rotate .5s var(--ease),scale .25s var(--ease),filter .25s;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}
+.kv-pin svg{display:block;width:100%;height:100%;overflow:visible}
+.kv-pin.held{cursor:grabbing;scale:1.08;transition:rotate .2s,scale .25s var(--ease),filter .25s;filter:drop-shadow(0 14px 14px rgba(0,0,0,.35))}
+/* приколотый лоскут чуть подпрыгивает */
+.kv-pin.pinned{animation:kvPin .45s var(--ease)}
+@keyframes kvPin{40%{scale:.94}}
+.kv-pins-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:clamp(16px,2vw,24px)}
+.kv-pins .kv-cap{text-align:center;margin-left:auto;margin-right:auto}
+.kv-pins-ch .kv-board{width:min(100%,640px)}
+@media (max-width:560px){.kv-pin{width:23%}}
+
+/* ---------- кармашек ---------- */
+.kv-pocket{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(12px,1.6vw,24px);align-items:start}
+.kv-pocket .kv-big{aspect-ratio:4/5}
+.kv-pocket-side{display:flex;flex-direction:column;gap:clamp(16px,2vw,28px)}
+.kv-pocket-side .kv-shot{aspect-ratio:4/5}
+.kv-chips{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:0;padding:0}
+/* теги — единственные контурные элементы */
+.kv-chips li{font-size:18px;line-height:1;padding:10px 18px 13px;border:1.5px solid var(--ink);border-radius:999px;opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease) var(--d),transform .6s var(--ease) var(--d)}
+.kv-ch.in .kv-chips li{opacity:1;transform:none}
+@media (max-width:760px){.kv-pocket{grid-template-columns:minmax(0,1fr)}.kv-chips{order:-1}}
+
+/* ---------- лупа ---------- */
+.kv-tee{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(12px,1.6vw,24px);align-items:stretch}
+.kv-loupe-box{position:relative;aspect-ratio:1611/2000;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:none;touch-action:none}
+.kv-loupe-box > img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.kv-lens{position:absolute;left:0;top:0;width:clamp(140px,16vw,220px);aspect-ratio:1;margin:calc(clamp(140px,16vw,220px) / -2) 0 0 calc(clamp(140px,16vw,220px) / -2);
+  border-radius:50%;background:var(--src) no-repeat;box-shadow:0 0 0 4px #fff,0 18px 40px rgba(0,0,0,.3);pointer-events:none;opacity:0;scale:.6;transition:opacity .3s,scale .4s var(--ease)}
+.kv-loupe-box.on .kv-lens{opacity:1;scale:1}
+.kv-tee-side{display:flex;flex-direction:column;gap:clamp(12px,1.6vw,24px)}
+.kv-tee-side figure{margin:0;display:flex;flex-direction:column;gap:12px;flex:1 1 0;min-height:0}
+.kv-tee-side .kv-shot{flex:1;min-height:0}
+.kv-tee-side figcaption{font-size:16px;opacity:.6}
+@media (max-width:760px){.kv-tee{grid-template-columns:minmax(0,1fr)}.kv-loupe-box{touch-action:pan-y}.kv-tee-side figure{flex:none}.kv-tee-side .kv-shot{aspect-ratio:4/5}}
+
+/* ---------- лейбл ---------- */
+.kv-print{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center}
+/* черная ткань, на ней — пластиковый карман лейбла */
+.kv-desk{position:relative;aspect-ratio:1;border-radius:var(--r-img);overflow:hidden;display:grid;place-items:center;
+  background:radial-gradient(120% 90% at 30% 20%,#2a2a2a 0,#121212 60%,#0b0b0b 100%)}
+.kv-holder{position:relative;width:min(58%,300px);aspect-ratio:3/4;rotate:-7deg;border-radius:10px;padding:17% 5% 5%;
+  background:linear-gradient(160deg,rgba(255,255,255,.55),rgba(220,224,228,.35));box-shadow:0 0 0 1.5px rgba(255,255,255,.55) inset,0 24px 48px rgba(0,0,0,.5)}
+.kv-holder::before{content:"";position:absolute;left:0;right:0;top:0;height:13%;border-radius:10px 10px 0 0;background:#8D9297}
+.kv-hang{position:absolute;left:50%;top:5%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#0b0b0b;z-index:1}
+.kv-hang::after{content:"";position:absolute;left:50%;bottom:6px;width:2px;height:60px;background:#0b0b0b;translate:-50% 0}
+.kv-win{position:relative;width:100%;height:100%;overflow:hidden;border-radius:3px;background:#fff;container-type:inline-size}
+.kv-paper{position:absolute;inset:0;display:grid;place-items:center;padding:10%;background:var(--kv-paper);color:#111;
+  transition:transform .55s var(--ease-io)}
+.kv-paper.out{transform:translateY(-105%)}
+/* новая полоска выезжает сверху и проявляется построчно, как на термопринтере */
+.kv-paper.in{animation:kvFeed .5s var(--ease) .35s both}
+.kv-paper.in > *{animation:kvLines .6s steps(10) .75s both}
+@keyframes kvFeed{from{transform:translateY(-105%)}}
+@keyframes kvLines{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
+.kv-words{font-weight:700;line-height:1.05;text-align:center;letter-spacing:-.01em;overflow-wrap:break-word}
+.kv-logo{width:100%;display:flex;flex-direction:column;gap:9cqw}
+.kv-mark{display:flex;align-items:center;gap:3cqw}
+.kv-mark b{font-weight:800;font-size:12cqw;line-height:.95}
+.kv-chev{width:22cqw;flex:none}
+.kv-pill{display:block;border:1.5px solid #111;border-radius:99px;text-align:center;font-size:7cqw;line-height:1;padding:2.5cqw 0 3.2cqw}
+.kv-bars{display:flex;height:12cqw}
+.kv-bars i{background:#111}.kv-bars u{flex:1}
+.kv-date{display:flex;gap:9cqw;font-style:normal;font-size:6.5cqw;line-height:1;margin-top:-6cqw}.kv-date i{font-style:normal}.kv-date i:last-child{margin-left:auto}
+.kv-ctrl{display:flex;flex-direction:column;gap:clamp(16px,2vw,24px)}
+.kv-presets{display:flex;flex-wrap:wrap;gap:10px}
+.kv-pre{font-size:17px;line-height:1.1;padding:11px 18px 13px;border-radius:999px;background:var(--soft);color:var(--ink);text-align:left;transition:background .3s,color .3s}
+.kv-pre:hover{background:var(--line)}
+.kv-pre.on{background:var(--ink);color:var(--bg)}
+.kv-form{display:flex;gap:10px}
+.kv-input{flex:1;min-width:0;height:56px;padding:0 22px 3px;border-radius:99px;border:0;background:var(--soft);color:var(--ink);font:inherit;font-size:18px}
+.kv-input::placeholder{color:currentColor;opacity:.5}
+.kv-input:focus{outline:2px solid var(--ink);outline-offset:2px}
+.kv-print .kv-mini{width:min(260px,70%)}
+.kv-print .kv-vid{aspect-ratio:4/5}
+@media (max-width:760px){.kv-print{grid-template-columns:minmax(0,1fr)}.kv-form .btn{padding:0 22px 4px}}
+
+/* ---------- брелок ---------- */
+.kv-plush{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center}
+.kv-toy-box{display:grid;place-items:center}
+.kv-toy{width:min(100%,560px);height:auto;overflow:visible;cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.kv-ring{font-family:"Golos Text",system-ui,sans-serif;letter-spacing:.02em}
+.kv-plush-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.6vw,20px);align-items:start}
+.kv-plush-side .kv-shot{aspect-ratio:4/5}
+.kv-plush-side .kv-mini{grid-column:1 / -1;width:min(220px,60%)}
+.kv-plush-side .kv-vid{aspect-ratio:9/16}
+@media (max-width:760px){.kv-plush{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- лукбук: колонки вперемешку с короткими роликами ---------- */
+.kv-look{columns:3;column-gap:clamp(12px,1.6vw,24px)}
+.kv-look > *{break-inside:avoid;margin-bottom:clamp(12px,1.6vw,24px)}
+.kv-look .kv-shot img{height:auto}
+.kv-look-vid .kv-vid{aspect-ratio:9/16}
+@media (max-width:760px){.kv-look{columns:2}}
+
+@media (prefers-reduced-motion: reduce){
+  .kv-viz,.kv-chips li{opacity:1;transform:none;transition:none}
+  .kv-pin{transition:none}
+}

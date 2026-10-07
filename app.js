@@ -2319,6 +2319,8 @@ function renderCase(k, keepScroll){
   if (p.clip) body += `<div class="cl cl-mount"></div>`;
   // casa — кейс Armani/Casa: огурцы режиссера, раскадровка-плеер, квартира с нуля, выбор света, правки; рисует armani.js
   if (p.casa) body += `<div class="casa casa-mount"></div>`;
+  // kav — кейс «Одна кавычка»: стикеры перевешиваются, лупа над кавычкой, лейбл печатает текст, мягкий брелок; рисует kav.js
+  if (p.kav) body += `<div class="kv kv-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2397,6 +2399,10 @@ function renderCase(k, keepScroll){
   if (ca) import(SCRIPT_BASE + 'armani.js?v=' + VER)
     .then(m => m.mountCasa(ca, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс Armani/Casa не загрузился', err));
+  const kv = caseContent.querySelector('.kv-mount');
+  if (kv) import(SCRIPT_BASE + 'kav.js?v=' + VER)
+    .then(m => m.mountKav(kv, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс «Одна кавычка» не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
