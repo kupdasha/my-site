@@ -116,17 +116,21 @@ function scenes(box, c, ms){
 }
 function liveIdeas(box, c){ scenes(box, c, 5600); }
 
-/* ---------- круги правок: этапы строкой сверху, на полке — что показывали заказчику ---------- */
+/* ---------- поиски: этапы строкой сверху, на полке — варианты; ниже всегда видна строка крупных планов на костюме ---------- */
 function roundsHTML(c){
   return `<div class="ab-rounds">
     ${tabs(c.steps.map(s => s.name))}
     <div class="ab-stage">${c.steps.map((s, i) => `<div class="ab-scene${i ? '' : ' on'}">
         ${shelf(s.items, s.items.length > 4 ? ' ab-many' : '')}
-        <div class="ab-note">
-          <p class="ab-about">${H.T(s.text)}</p>
-          ${s.wear ? `<button class="ab-wear" data-zoom="${s.wear}" aria-label="Увеличить">${img(s.wear)}</button>` : ''}
-        </div>
+        <p class="ab-about">${H.T(s.text)}</p>
       </div>`).join('')}</div>
+    ${c.wear ? `<div class="ab-wears">
+      <span class="ab-wears-label">${H.T(c.wear.label)}</span>
+      <div class="ab-wears-row">${c.wear.items.map(w => `<figure>
+          <button class="ab-wear" data-zoom="${w.img}" aria-label="Увеличить">${img(w.img)}</button>
+          <figcaption>${H.T(w.cap)}</figcaption>
+        </figure>`).join('')}</div>
+    </div>` : ''}
   </div>${cap(c.hint)}`;
 }
 function liveRounds(box, c){ scenes(box, c, 6000); }
