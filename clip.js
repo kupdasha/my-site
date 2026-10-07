@@ -66,29 +66,33 @@ function liveWorlds(box){
   const w = box.querySelector('.cl-worlds');
   const imgs = [...box.querySelectorAll('.cl-w-frame img')];
   const steps = [...box.querySelectorAll('.cl-stairs li')], texts = [...box.querySelectorAll('.cl-w-text')];
-  const n = steps.length, SHOT = 1500;   // кадр держится полторы секунды — спуск быстрый
+  const n = steps.length, STEP = 1100;   // ступенька сменяется сама чуть чаще раза в секунду — видно, как идет спуск
   const shots = steps.map((_, i) => imgs.filter(im => +im.dataset.k === i));
-  let k = 0, j = 0, held = false, seen = false, timer = 0;
+  let k = 0, lap = 0, held = false, timer = 0;   // lap — круг спуска: на каждом круге у этапа свой кадр
   const show = () => {
     imgs.forEach(im => im.classList.remove('on'));
-    shots[k][j].classList.add('on');
-    steps.forEach((li, i) => { li.classList.toggle('on', i === k); li.classList.toggle('past', i < k); });
+    shots[k][lap % shots[k].length].classList.add('on');
+    steps.forEach((li, i) => li.classList.toggle('on', i === k));
     texts.forEach((p, i) => p.classList.toggle('on', i === k));
     w.style.setProperty('--k', k);
     w.classList.toggle('deep', steps[k].hasAttribute('data-deep'));   // в самой глубине — подпись про темноту
   };
   const next = () => {
-    if (++j >= shots[k].length) { j = 0; k = (k + 1) % n; }
+    if (++k >= n) { k = 0; lap++; }
     show();
   };
-  const run = () => { clearInterval(timer); if (seen && !held && !still()) timer = setInterval(next, SHOT); };
+  // таймер идет всегда, а шаг делает, только если лестница на экране и курсор не держит ступень
+  const visible = () => { const r = w.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
+  const run = () => { clearInterval(timer); if (!still()) timer = setInterval(() => { if (!held && visible()) next(); }, STEP); };
   // наведение на ступень — сразу к ней, спуск ждет
   steps.forEach((li, i) => {
-    const go = () => { k = i; j = 0; show(); };
+    const go = () => { k = i; show(); };
     li.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { held = true; go(); run(); } });
     li.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { held = false; run(); } });
     li.addEventListener('click', () => { go(); run(); });
   });
+  // курсор ушел с лестницы — спуск продолжается, даже если ступень не заметила ухода
+  box.querySelector('.cl-stairs').addEventListener('pointerleave', () => { held = false; run(); });
   // дверь в тексте этапа — прокрутка к главе, куда она ведет (ссылки с # на Тильде перехватываются, поэтому кодом)
   box.addEventListener('click', e => {
     const d = e.target.closest('.cl-door'); if (!d) return;
@@ -98,7 +102,7 @@ function liveWorlds(box){
     else to.scrollIntoView({ behavior: still() ? 'auto' : 'smooth' });
   });
   show();
-  onScreen(w, v => { seen = v; run(); });
+  run();
 }
 
 /* ---------- голос: диктофон раскладывается на дорожки ---------- */
@@ -163,26 +167,29 @@ function liveFace(box){
     () => box.classList.add('done')));
 }
 
-/* ---------- дубли: всё, что сгенерировали, одним коллажем ---------- */
-// картинки маленькие и низкого качества, поэтому собраны в один спрайт и не увеличиваются
+/* ---------- дубли: кадры, которые не вошли в клип, одним коллажем; по нажатию — крупно ---------- */
 function takesHTML(c){
-  const { cols, rows, count } = c;
   const rnd = i => Math.abs(Math.sin(i * 91.17) * 43758.5453) % 1;
-  // порядок перемешан, чтобы рядом стояли разные сцены; некоторые клетки крупнее — так это коллаж, а не таблица
-  // 84 кадра и 12 крупных — ровно 120 клеток: сетка закрывается без дыр при 12, 8 и 6 колонках
-  const order = Array.from({ length: count }, (_, i) => i).sort((a, b) => rnd(a) - rnd(b));
+  // порядок перемешан, чтобы рядом стояли разные сцены; 12 клеток крупнее — так это коллаж, а не таблица.
+  // 132 кадра и 12 крупных — ровно 168 клеток: сетка закрывается без дыр при 12, 8 и 6 колонках
+  const order = Array.from({ length: c.count }, (_, i) => i + 1).sort((a, b) => rnd(a) - rnd(b));
   const tiles = order.map((k, n) => {
-    const x = k % cols, y = Math.floor(k / cols), big = n % 4 === 2 && n < 48;   // крупные — только в первой половине, мелкие после них закрывают дыры
-    return `<i${big ? ' class="big"' : ''} style="--n:${n};background-position:${(x / (cols - 1) * 100).toFixed(3)}% ${(y / (rows - 1) * 100).toFixed(3)}%"></i>`;
+    const big = n % 5 === 2 && n < 60;   // крупные — только в первой половине, мелкие после них закрывают дыры
+    const id = String(k).padStart(3, '0');
+    return `<button class="cl-take${big ? ' big' : ''}" style="--n:${n}" data-full="${c.dir}${id}.jpg" aria-label="Увеличить кадр"><img src="${c.dir}${id}-s.jpg" alt="" loading="lazy" draggable="false"></button>`;
   }).join('');
-  return `<div class="cl-takes" style="--sprite:url('${c.sprite}');--cols:${cols};--rows:${rows}">${tiles}</div>
+  return `<div class="cl-takes">${tiles}</div>
     ${c.rules ? `<div class="cl-rules">${c.rules.map(r =>
       `<div><h3>${H.T(r.name)}</h3><p>${H.T(r.text)}</p></div>`).join('')}</div>` : ''}${cap(c.hint)}`;
 }
-// клетки проявляются волной, когда коллаж показался на экране
 function liveTakes(box){
-  const t = box.querySelector('.cl-takes');
+  const t = box.querySelector('.cl-takes'), btns = [...t.querySelectorAll('.cl-take')];
+  // клетки проявляются волной, когда коллаж показался на экране
   onceSeen(t, () => t.classList.add('on'));
+  t.addEventListener('click', e => {
+    const b = e.target.closest('.cl-take'); if (!b) return;
+    H.openViewer(btns.map(x => x.dataset.full), btns.indexOf(b), btns.map(x => x.querySelector('img')));
+  });
 }
 
 /* ---------- клип в одну полоску: цвет каждой секунды, наведение показывает кадр ---------- */
@@ -237,41 +244,6 @@ function movieHTML(c){
   return `<div class="cl-movie"><video src="${c.src}" poster="${c.poster}" controls preload="metadata" playsinline></video></div>${cap(c.hint)}`;
 }
 
-/* ---------- кадры: лента едет сама, наведение ее останавливает, можно листать ---------- */
-function filmHTML(c){
-  const shots = c.items.map(src =>
-    `<button class="cl-shot" aria-label="Увеличить кадр"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('');
-  return `<div class="cl-film"><div class="cl-strip">${shots}${shots.replace(/<button class="cl-shot"/g, '<button class="cl-shot" tabindex="-1" aria-hidden="true"')}</div></div>${cap(c.hint)}`;
-}
-function liveFilm(box){
-  const film = box.querySelector('.cl-film'), strip = box.querySelector('.cl-strip');
-  const shots = [...box.querySelectorAll('.cl-shot')].slice(0, strip.children.length / 2);
-  box.addEventListener('click', e => {
-    const b = e.target.closest('.cl-shot'); if (!b) return;
-    const all = [...strip.children], i = all.indexOf(b) % shots.length;
-    zoom(shots, shots[i]);
-  });
-  if (still()) return;
-  let held = false, raf = 0, seen = false, last = 0, x = 0;
-  film.addEventListener('pointerenter', () => { held = true; });
-  film.addEventListener('pointerleave', () => { held = false; x = film.scrollLeft; });
-  film.addEventListener('touchstart', () => { held = true; }, { passive: true });
-  film.addEventListener('touchend', () => setTimeout(() => { held = false; x = film.scrollLeft; }, 2500), { passive: true });
-  const draw = t => {
-    const dt = Math.min(64, t - (last || t)); last = t;
-    if (!held) {
-      const half = strip.scrollWidth / 2;
-      x += dt * .03; if (x >= half) x -= half;
-      film.scrollLeft = x;
-    }
-    if (seen) raf = requestAnimationFrame(draw);
-  };
-  onScreen(film, v => {
-    if (v && !seen) { seen = true; last = 0; raf = requestAnimationFrame(draw); }
-    else if (!v) { seen = false; cancelAnimationFrame(raf); }
-  });
-}
-
 const KINDS = {
   worlds: [worldsHTML, liveWorlds],
   voice:  [voiceHTML, liveVoice],
@@ -279,7 +251,6 @@ const KINDS = {
   takes:  [takesHTML, liveTakes],
   score:  [scoreHTML, liveScore],
   movie:  [movieHTML, () => {}],
-  film:   [filmHTML, liveFilm],
 };
 
 /* ---------- запуск ---------- */

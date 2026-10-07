@@ -27,20 +27,15 @@
 .cl-w-deep{position:absolute;left:clamp(16px,3vw,40px);bottom:clamp(14px,2.4vw,32px);z-index:1;max-width:30ch;color:#FFFFFF;font-weight:500;font-size:clamp(20px,2vw,30px);line-height:1.15;text-wrap:balance;
   opacity:0;transform:translateY(10px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 .cl-worlds.deep .cl-w-deep{opacity:1;transform:none}
-/* лестница: короткие ступеньки зигзагом сверху вниз, подпись справа от ступени; чем ниже, тем темнее */
-.cl-stairs{grid-column:2;grid-row:1;list-style:none;margin:0;padding:0;display:grid;--sw:clamp(30px,3.2vw,46px);--sh:clamp(34px,4.4vh,48px)}
+/* лестница: серые ступеньки-блоки сверху вниз, каждая следующая правее и ниже; текущая — черная, подпись справа */
+.cl-stairs{grid-column:2;grid-row:1;list-style:none;margin:0;padding:0;display:grid;--sw:clamp(34px,3.4vw,50px);--sh:clamp(26px,3.4vh,34px)}
 .cl-stairs li{padding-left:calc(var(--i) * var(--sw))}
-.cl-stairs button{display:flex;align-items:flex-start;gap:12px;color:inherit;cursor:pointer;text-align:left;padding:0}
-/* проступь сверху, подступенок справа — вместе ступенька; следующая начинается там, где кончился подступенок */
-.cl-st-step{position:relative;flex:none;width:var(--sw);height:var(--sh);
-  border-top:3px solid color-mix(in srgb,var(--ink) calc(25% + var(--i) * 9%),transparent);
-  border-right:3px solid color-mix(in srgb,var(--ink) calc(25% + var(--i) * 9%),transparent);transition:border-color .35s var(--ease)}
-.cl-stairs li.past .cl-st-step,.cl-stairs li.on .cl-st-step{border-color:var(--ink)}
-/* героиня — точка на текущей ступени */
-.cl-st-step::after{content:"";position:absolute;left:50%;top:-14px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--ink);
-  opacity:0;transform:translateY(-6px);transition:opacity .3s var(--ease),transform .4s var(--ease)}
-.cl-stairs li.on .cl-st-step::after{opacity:1;transform:none}
-.cl-st-name{font-size:17px;line-height:1.1;margin-top:-10px;white-space:nowrap;opacity:.5;transition:opacity .35s var(--ease)}
+.cl-stairs button{display:flex;align-items:center;gap:14px;color:inherit;cursor:pointer;text-align:left;padding:0}
+.cl-st-step{flex:none;width:var(--sw);height:var(--sh);background:color-mix(in srgb,var(--ink) 16%,transparent);transition:background .25s var(--ease)}
+.cl-stairs li.on .cl-st-step{background:var(--ink)}
+.cl-stairs li:hover .cl-st-step{background:color-mix(in srgb,var(--ink) 45%,transparent)}
+.cl-stairs li.on:hover .cl-st-step{background:var(--ink)}
+.cl-st-name{font-size:17px;line-height:1.1;white-space:nowrap;opacity:.5;transition:opacity .25s var(--ease)}
 .cl-stairs li.on .cl-st-name,.cl-stairs li:hover .cl-st-name{opacity:1}
 .cl-stairs li.on .cl-st-name{font-weight:500}
 .cl-door{font:inherit;color:inherit;padding:0;cursor:pointer}
@@ -104,16 +99,17 @@
   .cl-same{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* ---------- дубли: коллаж из одного спрайта, без увеличения ---------- */
+/* ---------- дубли: коллаж из миниатюр, по нажатию — крупно ---------- */
 .cl-takes{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-flow:dense;gap:4px}
-.cl-takes i{display:block;aspect-ratio:16/9;border-radius:3px;background-color:#0E0F12;background-image:var(--sprite);
-  background-size:calc(var(--cols) * 100%) calc(var(--rows) * 100%);opacity:0;transform:scale(.92);
-  transition:opacity .5s var(--ease) calc(var(--n) * 12ms),transform .7s var(--ease) calc(var(--n) * 12ms)}
-.cl-takes i.big{grid-column:span 2;grid-row:span 2}
-.cl-takes.on i{opacity:1;transform:none}
+.cl-take{display:block;padding:0;aspect-ratio:16/9;border-radius:3px;overflow:hidden;background:#0E0F12;cursor:zoom-in;
+  opacity:0;transform:scale(.92);transition:opacity .5s var(--ease) calc(var(--n) * 10ms),transform .7s var(--ease) calc(var(--n) * 10ms)}
+.cl-take img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease)}
+.cl-take:hover img{transform:scale(1.06)}
+.cl-take.big{grid-column:span 2;grid-row:span 2}
+.cl-takes.on .cl-take{opacity:1;transform:none}
 @media (max-width:900px){.cl-takes{grid-template-columns:repeat(8,minmax(0,1fr))}}
 @media (max-width:520px){.cl-takes{grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}}
-@media (prefers-reduced-motion:reduce){.cl-takes i{opacity:1;transform:none;transition:none}}
+@media (prefers-reduced-motion:reduce){.cl-take{opacity:1;transform:none;transition:none}}
 
 .cl-rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,28px);margin-top:clamp(36px,4vw,56px)}
 .cl-rules h3{font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.1;margin-bottom:10px;text-wrap:balance}
@@ -137,9 +133,3 @@
 .cl-movie{aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:#000}
 .cl-movie video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
 
-/* ---------- кадры лентой ---------- */
-.cl-film{margin:0 calc(var(--pad) * -1);padding:0 var(--pad);overflow-x:auto;scrollbar-width:none}
-.cl-film::-webkit-scrollbar{display:none}
-.cl-strip{display:flex;gap:clamp(10px,1.2vw,16px);width:max-content}
-.cl-strip .cl-shot{flex:none;height:clamp(200px,24vw,340px);width:auto}
-@media (max-width:760px){.cl-strip .cl-shot{height:200px}}
