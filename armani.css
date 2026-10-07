@@ -91,7 +91,7 @@
 /* планшет и телефон: эскизы сеткой, у каждого своя подпись — список в центре не нужен */
 @media (max-width:900px){
   .ac-build{min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,40px) clamp(16px,3vw,28px);align-items:start}
-  .ac-mid{grid-column:1 / -1;width:auto;padding-top:0}
+  .ac-mid{grid-column:1 / -1;width:auto;margin:0;padding-top:0}
   .ac-says{display:none}
   .ac-fly{position:static;width:auto;transform:none;text-align:left;cursor:zoom-in}
   .ac-fly span{transform:rotate(calc(var(--r) * .5))}
@@ -147,4 +147,10 @@ button.ac-note:hover img{transform:scale(1.03)}
 
 @media (prefers-reduced-motion:reduce){
   .ac-layer.on img,.ac-screen.lit .ac-beam,.ac-fly span{animation:none}
+}
+
+/* текст в начале кейса длинный: на планшете колонки встают друг под другом (только в этом кейсе) */
+@media (max-width:900px){
+  .case-body:has(.casa-mount) .scheme-cols>.camp-col{grid-column:1 / -1 !important}
+  .case-body:has(.casa-mount) .scheme-cols>.camp-col p{max-width:60ch}
 }
