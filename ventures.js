@@ -1,9 +1,9 @@
 /* ================================================================
    КЕЙС «THE VENTURES JAPAN» (поле ventures у проекта)
-   Шапка кейса — живой принт: плитки с веткой сакуры едут от подола
-   вверх и тают, как на футболке; нажатие переворачивает
-   футболку (перед — логотип, спина — слоган и award).
+   Шапка кейса — живой принт на сплошном синем: плитки с веткой
+   сакуры едут от подола вверх и тают, сверху белый логотип.
    Главы: tile — одна плитка и десять шагов уменьшения;
+   fits — фасоны рядом (oversize и облегающий, выбранный отмечен);
    look — съемка, по нажатию крупно; tokyo — фото с мероприятия.
    Векторы сняты из макета в Figma: img/ventures/*.svg.
    Тексты — в content.js, оформление — ventures.css.
@@ -22,8 +22,6 @@ const STEP_X = 93.7;           // шаг колонок по горизонта�
 const BIG = 67, SMALL = 0.7;   // размер плитки у края и в середине
 const FRAME_H = 618;           // высота принта; полоса плиток — нижние 344, как у подола футболки
 const BLUE = '#3044FF';        // фирменный синий из макета
-// фон принта: синий → белый → белый → синий (стопы из макета)
-const STOPS = [[0, BLUE], [0.27, '#FFFFFF'], [0.47, '#FFFFFF'], [0.92, BLUE]];
 
 // точка на колонке: u = 0 — край принта, u = 1 — середина; за краем продолжаем первый отрезок
 function colAt(u){
@@ -48,14 +46,9 @@ function loadTile(){
 
 /* ---------- шапка: живой принт ---------- */
 function posterHTML(c){
-  return `<div class="vn-poster" role="button" tabindex="0" aria-label="${H.T(c.hint)}">
+  return `<div class="vn-poster">
     <canvas class="vn-canvas" aria-hidden="true"></canvas>
-    <div class="vn-side vn-front"><img class="vn-logo" src="${H.base}img/ventures/logo.svg" alt="The Ventures Japan 2026"></div>
-    <div class="vn-side vn-back">
-      <img class="vn-award" src="${H.base}img/ventures/award.svg" alt="Global Startup Award">
-      <img class="vn-slogan" src="${H.base}img/ventures/slogan.svg" alt="Pitch in Tokyo. Win Globally.">
-    </div>
-    <span class="vn-flip"><b class="vn-f">${H.T(c.front)}</b><i></i><b class="vn-b">${H.T(c.back)}</b></span>
+    <div class="vn-side"><img class="vn-logo" src="${H.base}img/ventures/logo-white.svg" alt="The Ventures Japan 2026"></div>
   </div>`;
 }
 
@@ -108,9 +101,7 @@ async function livePoster(box, c){
 
   function draw(){
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const g = ctx.createLinearGradient(0, 0, 0, Hh);
-    STOPS.forEach(([o, col]) => g.addColorStop(o, col));
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, Hh);
+    ctx.fillStyle = BLUE; ctx.fillRect(0, 0, W, Hh);
     if (!sprite) return;
     band(true);   // плитки только снизу: у подола крупные, к груди тают
   }
@@ -133,26 +124,33 @@ async function livePoster(box, c){
     if (still()) { near = 1; draw(); }
   });
   box.addEventListener('pointerleave', () => { mx = my = -1e4; if (still()) { near = 0; draw(); } });
-
-  // перед ⇄ спина: по нажатию и сами, пока блок не трогали
-  let auto = 0, touched = false;
-  const flip = () => box.classList.toggle('back');
-  box.addEventListener('click', () => { touched = true; clearInterval(auto); flip(); });
-  box.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); box.click(); } });
-  new IntersectionObserver(([e]) => {
-    clearInterval(auto);
-    if (e.isIntersecting && !touched && !still()) auto = setInterval(flip, 4200);
-  }).observe(box);
 }
 
 /* ---------- глава: плитка и десять шагов ---------- */
 function tileHTML(c){
   const steps = COL_X.map((_, i) => colAt(i / 9).s);
+  const src = `${H.base}img/ventures/tile.svg`;
+  // слева — две крупные плитки внахлест, повернуты в разные стороны и покачиваются вразнобой;
+  // справа — десять шагов: плитка мельчает и поворачивается на 5° сильнее с каждым шагом
   return `<div class="vn-tile">
-    <div class="vn-tile-big"><img src="${H.base}img/ventures/tile.svg" alt=""></div>
+    <div class="vn-tile-big"><img class="vn-t1" src="${src}" alt=""><img class="vn-t2" src="${src}" alt=""></div>
     <div class="vn-steps">${steps.map((s, i) =>
-      `<span style="--s:${(s / BIG).toFixed(3)};--r:${(-2 * i)}deg;--i:${i}"><img src="${H.base}img/ventures/tile.svg" alt=""></span>`).join('')}</div>
+      `<span style="--s:${(s / BIG).toFixed(3)};--r:${(-5 * i - 8)}deg;--i:${i}"><img src="${src}" alt=""></span>`).join('')}</div>
   </div>${c.caption ? `<p class="vn-cap">${H.T(c.caption)}</p>` : ''}`;
+}
+
+/* ---------- глава: фасоны рядом, выбранный отмечен ---------- */
+function fitsHTML(c){
+  return `<div class="vn-fits">${c.items.map(f =>
+    `<div class="vn-fit${f.chosen ? ' chosen' : ''}">
+      <p class="vn-fit-name"><span class="vn-tag">${H.T(f.name)}</span>${f.chosen ? `<span class="vn-fit-note">${H.T(c.chosen)}</span>` : ''}</p>
+      <div class="vn-fit-shots">${f.photos.map(src =>
+        `<button class="vn-shot" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div>
+    </div>`).join('')}</div>`;
+}
+function liveFits(box, c){
+  const list = c.items.flatMap(f => f.photos), imgs = [...box.querySelectorAll('.vn-shot img')];
+  box.querySelectorAll('.vn-shot').forEach((b, i) => b.addEventListener('click', () => H.openViewer(list, i, imgs)));
 }
 
 /* ---------- глава: съемка, по нажатию крупно ---------- */
@@ -181,6 +179,7 @@ function liveTokyo(box, c){
 
 const KINDS = {
   tile:  [tileHTML, () => {}],
+  fits:  [fitsHTML, liveFits],
   look:  [lookHTML, liveLook],
   tokyo: [tokyoHTML, liveTokyo],
 };

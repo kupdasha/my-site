@@ -17,53 +17,56 @@
 
 /* ---------- шапка: живой принт поверх обложки ---------- */
 .case-hero.vn-hero{position:relative;aspect-ratio:16/9}
-.vn-poster{position:absolute;inset:0;cursor:pointer;user-select:none;-webkit-user-select:none;color:#1D222A;outline:none;
+.vn-poster{position:absolute;inset:0;user-select:none;-webkit-user-select:none;
   opacity:0;animation:vnIn .9s var(--ease) .1s forwards}
 @keyframes vnIn{to{opacity:1}}
 /* картинки шапки сайт растягивает на весь блок — здесь надписи живут своим размером */
 .case-hero .vn-poster img{position:static;inset:auto;height:auto;object-fit:initial;mix-blend-mode:normal}
 .vn-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-/* перед и спина сменяют друг друга: надписи уезжают вверх, новые приходят снизу */
 .vn-side{position:absolute;left:0;right:0;top:37%;translate:0 -50%;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.4vw,22px);pointer-events:none;
   transition:opacity .6s var(--ease),transform .9s var(--ease)}
 .vn-poster .vn-logo{width:clamp(180px,26%,420px)}
-.vn-poster .vn-award{width:clamp(150px,17%,280px)}
-.vn-poster .vn-slogan{width:clamp(190px,30%,480px)}
-.vn-back{opacity:0;transform:translateY(24px)}
-.vn-poster.back .vn-front{opacity:0;transform:translateY(-24px)}
-.vn-poster.back .vn-back{opacity:1;transform:none}
-/* подпись-переключатель сверху, на синем: «перед — спина», активное слово ярче */
-.vn-flip{position:absolute;left:50%;top:clamp(14px,2.2vw,28px);translate:-50% 0;display:flex;align-items:center;gap:10px;
-  padding:6px 16px 8px;border:1.5px solid #fff;border-radius:99px;color:#fff;font-size:16px;line-height:1.2;white-space:nowrap;pointer-events:none}
-.vn-flip i{width:18px;height:1.5px;background:currentColor;opacity:.6}
-.vn-flip b{font-weight:400;opacity:.55;transition:opacity .5s}
-.vn-poster:not(.back) .vn-flip .vn-f,.vn-poster.back .vn-flip .vn-b{opacity:1}
-.vn-poster:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
 @media (max-width:760px){
   .case-hero.vn-hero{aspect-ratio:4/5}
   .vn-side{top:40%}
-  .vn-poster .vn-logo{width:62%}.vn-poster .vn-award{width:46%}.vn-poster .vn-slogan{width:74%}
+  .vn-poster .vn-logo{width:62%}
 }
 
 /* ---------- плитка и десять шагов ---------- */
-.vn-tile{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(16px,2vw,28px);align-items:stretch}
-.vn-tile-big{aspect-ratio:1;border-radius:var(--r-img);background:var(--vn-blue);display:grid;place-items:center}
-.vn-tile-big img{width:62%;height:auto;animation:vnSway 7s ease-in-out infinite alternate}
-@keyframes vnSway{from{rotate:-6deg}to{rotate:4deg}}
-/* шаги — на растяжке синий → белый, как на футболке снизу вверх */
-.vn-steps{border-radius:var(--r-img);background:linear-gradient(90deg,var(--vn-blue) 0%,#7D8AFF 45%,#fff 100%);
-  display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,3vw,48px);min-height:220px;
-  box-shadow:inset 0 0 0 1px var(--line)}
+/* без плашек: мягкий градиент прямо на фоне страницы — синий слева растворяется вправо */
+.vn-tile{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);align-items:center;
+  min-height:clamp(280px,30vw,440px)}
+/* синее пятно растворяется во все стороны — ни одного края */
+.vn-tile::before{content:'';position:absolute;inset:-18% -14%;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 38% 50% at 24% 50%,var(--vn-blue) 0%,rgba(48,68,255,.78) 32%,rgba(48,68,255,.3) 64%,rgba(48,68,255,0) 100%)}
+.vn-tile-big{position:relative;aspect-ratio:1;max-height:clamp(240px,28vw,400px)}
+.vn-tile-big img{position:absolute;width:56%;height:auto}
+.vn-t1{left:8%;top:10%;rotate:-24deg;animation:vnSwayA 6.5s ease-in-out infinite alternate}
+.vn-t2{left:38%;top:34%;rotate:16deg;animation:vnSwayB 8s ease-in-out infinite alternate}
+@keyframes vnSwayA{from{transform:translate(0,0) rotate(-6deg)}to{transform:translate(4%,-5%) rotate(10deg)}}
+@keyframes vnSwayB{from{transform:translate(0,0) rotate(8deg)}to{transform:translate(-5%,4%) rotate(-12deg)}}
+.vn-steps{display:flex;align-items:center;justify-content:space-between;padding:0 0 0 clamp(16px,3vw,48px)}
 .vn-steps span{flex:0 0 auto;width:calc(clamp(40px,7vw,104px) * var(--s));aspect-ratio:1;rotate:var(--r);
   transform-origin:50% 50%;animation:vnBreath 3.2s ease-in-out infinite;animation-delay:calc(var(--i) * -.32s)}
 .vn-steps img{width:100%;height:auto;display:block}
-@keyframes vnBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+/* шаги дышат и покачиваются волной — от крупной к мелкой */
+@keyframes vnBreath{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.16) rotate(-12deg)}}
 @media (max-width:760px){
-  .vn-tile{grid-template-columns:minmax(0,1fr)}
-  .vn-tile-big{aspect-ratio:16/10;min-width:0}.vn-tile-big img{width:38%}
-  .vn-steps{min-height:120px;padding:0 12px}
+  .vn-tile{grid-template-columns:minmax(0,1fr);padding:24px 0 32px}
+  .vn-tile::before{inset:-12% -8%;background:radial-gradient(ellipse 60% 42% at 50% 30%,var(--vn-blue) 0%,rgba(48,68,255,.7) 35%,rgba(48,68,255,.22) 68%,rgba(48,68,255,0) 100%)}
+  .vn-tile-big{width:72%;margin:0 auto;max-height:none}
+  .vn-steps{padding:16px 0 0}
   .vn-steps span{width:calc(9vw * var(--s))}
 }
+
+/* ---------- фасоны: две колонки, у выбранного — отметка ---------- */
+.vn-fits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2vw,28px)}
+.vn-fit-name{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:16px}
+.vn-tag{display:inline-block;padding:4px 14px 6px;border:1.5px solid currentColor;border-radius:99px}
+.vn-fit-note{opacity:.6}
+.vn-fit-shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1vw,16px)}
+.vn-fit-shots .vn-shot{aspect-ratio:3/4}
+@media (max-width:760px){.vn-fits{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- съемка ---------- */
 .vn-look{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1vw,16px)}
