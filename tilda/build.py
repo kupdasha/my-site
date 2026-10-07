@@ -121,36 +121,68 @@ about_service_html = between('<!-- Кнопка «Связаться»', '<scrip
 
 
 # ---------- блоки ----------
+# ЗАГРУЗЧИК. Блоки берут файлы с jsDelivr не по ветке main (ее копию jsDelivr держит до 12 часов),
+# а по номеру последней версии: его отдает GitHub, и jsDelivr по номеру сразу отдает свежие файлы.
+# Так любая публикация (и через publish.sh, и обычный git push из другого чата) видна на сайте за минуту.
+# GitHub отвечает около секунды, поэтому номер запоминается в браузере: если он узнан меньше 10 минут назад,
+# страница грузится по нему сразу, а свежий номер спрашивается в фоне — для следующего открытия
+# (после публикации — обновить страницу два раза); тогда же браузер заранее подтягивает новые файлы.
+# По новому номеру jsDelivr первый раз собирает файлы секунд десять — поэтому publish.sh и tilda/warm.sh
+# сразу после отправки сами запрашивают их, и посетители получают уже готовое. Номера нет или он старый — страница ждет ответ GitHub
+# до 2,5 с, не дождалась — берет прошлый номер или main. Скрипты (тексты, код) подключаются строго по порядку,
+# стили пишутся сразу и, если номер оказался новее, тихо заменяются. На проверочной странице KUP_BASE = '../'.
+LOADER = ("<script>(function(){if(window.KUP)return;"
+          "var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',N='kup-sha',c=null,q=[],done=0,now=Date.now();"
+          "try{c=JSON.parse(localStorage.getItem(N))}catch(e){}"
+          "var base=window.KUP_BASE||(c&&c.s?R+c.s+'/':R+'main/');"
+          "function keep(s){try{localStorage.setItem(N,JSON.stringify({s:s,t:Date.now()}))}catch(e){}}"
+          "function ask(ms,cb){var x=new XMLHttpRequest();x.open('GET','https://api.github.com/repos/kupdasha/my-site/commits/main');"
+          "x.setRequestHeader('Accept','application/vnd.github.sha');x.timeout=ms;"
+          "x.onload=function(){var s=(x.responseText||'').trim();cb(/^[0-9a-f]{40}$/.test(s)?s:null)};"
+          "x.onerror=x.ontimeout=function(){cb(null)};x.send()}"
+          "function put(f){var s=document.createElement('script');s.src=base+f;s.async=false;document.head.appendChild(s)}"
+          "function go(s){if(done)return;done=1;"
+          "if(s){keep(s);if(!(c&&c.s===s)){var old=base;base=K.base=R+s+'/';"
+          "var o=document.getElementById('kup-css');if(o){var n=document.createElement('link');n.rel='stylesheet';n.href=o.href.replace(old,base);"
+          "n.onload=function(){o.parentNode&&o.parentNode.removeChild(o);n.id='kup-css'};o.parentNode.insertBefore(n,o.nextSibling)}}}"
+          "q.forEach(put);q=[]}"
+          "var K=window.KUP={L:{},"
+          "css:function(f){if(!document.getElementById('kup-css'))document.write('<link rel=\"stylesheet\" id=\"kup-css\" href=\"'+base+f+'\">')},"
+          "js:function(fs){fs.forEach(function(f){if(K.L[f])return;K.L[f]=1;done?put(f):q.push(f)})}};"
+          "K.base=base;"
+          "if(window.KUP_BASE)go();"
+          "else if(c&&c.s&&now-c.t<6e5){go();ask(8000,function(s){if(!s)return;keep(s);if(s!==c.s)['content.js','app.js','style.css'].forEach(function(f){try{fetch(R+s+'/'+f)}catch(e){}})})}"
+          "else ask(2500,go)"
+          "})()</script>")
+
 def css_block():
     fonts = re.search(r'<link href="https://fonts.googleapis.com[^>]+>', index).group(0)
-    return ('<!-- ОФОРМЛЕНИЕ САЙТА: шрифты и стили. Это код, тексты здесь не правятся. -->\n'
+    return ('<!-- ОФОРМЛЕНИЕ САЙТА: шрифты, стили и загрузчик файлов с GitHub. Это код, тексты здесь не правятся. -->\n'
             '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+            '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>\n'
             f'{fonts}\n'
             '<!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->\n'
             "<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>\n"
-            # стили берутся с GitHub; ?v= меняется раз в час, чтобы браузер не держал старую версию
-            "<script>(function(){var B='" + CDN + "',v=Math.floor(Date.now()/36e5);"
-            "document.write('<link rel=\"stylesheet\" href=\"'+B+'style.css?v='+v+'\">')})()</script>")
+            f"{LOADER}\n"
+            "<script>KUP.css('style.css')</script>")
 
 def shared_block():
     # тексты и проекты (content.js) тоже приходят с GitHub — блок в Тильде не меняется, когда меняются тексты
     return (f'{header_html}\n\n'
             '<!-- ТЕКСТЫ И ПРОЕКТЫ сайта лежат на GitHub в content.js и подключаются отсюда. -->\n'
-            f"<script>(function(){{var B='{CDN}',v=Math.floor(Date.now()/36e5);"
-            "document.write('<script src=\"'+B+'content.js?v='+v+'\"><\\/script>')})()</script>")
+            "<script>KUP.js(['content.js'])</script>")
 
 def page_block(sid, group, note):
     # в блоке страницы — только разметка раздела; тексты берутся из content.js с GitHub
     return sections[sid]
 
 def js_block(names, note):
-    # файлы кода подключаются с GitHub по порядку; ?v= меняется раз в час.
+    # файлы кода подключаются загрузчиком (см. LOADER) по порядку, после текстов.
     # Если блок случайно вставлен на страницу дважды, каждый файл все равно подключится один раз
     files = ','.join(f"'{n}'" for n in names)
     return (f'<!-- {note} Это код, тексты здесь не правятся: сам код лежит на GitHub. -->\n'
-            f"<script>(function(){{var B='{CDN}',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{{}};"
-            f"[{files}].forEach(function(f){{if(L[f])return;L[f]=1;document.write('<script src=\"'+B+f+'?v='+v+'\"><\\/script>')}})}})()</script>")
+            f"<script>KUP.js([{files}])</script>")
 
 def once_block(html, note):
     # разметка выводится один раз: если такой блок на странице уже есть (окно кейса #case), копия ничего не добавляет
@@ -230,6 +262,7 @@ for folder, blocks in BLOCKS.items():
 with open(os.path.join(HERE, 'проверка.html'), 'w', encoding='utf-8') as f:
     f.write('<!doctype html>\n<html lang="ru">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Проверка блоков для Тильды</title>\n'
+            "<script>window.KUP_BASE='../'</script>\n"
             '</head>\n<body>\n<div id="allrecords" class="t-records">\n')
     for folder, name, html in order:
         f.write(f'<div class="r t-rec" data-record-type="131"><!-- {folder} / {name} -->\n{html.replace(CDN, "../")}\n</div>\n')

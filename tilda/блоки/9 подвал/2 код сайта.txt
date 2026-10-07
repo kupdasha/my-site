@@ -1,2 +1,2 @@
 <!-- КОД САЙТА: движок, переливы и дружеская версия. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
-<script>(function(){var B='https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{};['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){if(L[f])return;L[f]=1;document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
+<script>KUP.js(['app.js','waves.js','fun.js','shimmer.js'])</script>

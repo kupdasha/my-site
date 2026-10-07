@@ -11,4 +11,4 @@
 </header>
 
 <!-- ТЕКСТЫ И ПРОЕКТЫ сайта лежат на GitHub в content.js и подключаются отсюда. -->
-<script>(function(){var B='https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/',v=Math.floor(Date.now()/36e5);document.write('<script src="'+B+'content.js?v='+v+'"><\/script>')})()</script>
+<script>KUP.js(['content.js'])</script>

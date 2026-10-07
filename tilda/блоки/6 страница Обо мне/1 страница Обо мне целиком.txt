@@ -1,10 +1,12 @@
-<!-- ОФОРМЛЕНИЕ САЙТА: шрифты и стили. Это код, тексты здесь не правятся. -->
+<!-- ОФОРМЛЕНИЕ САЙТА: шрифты, стили и загрузчик файлов с GitHub. Это код, тексты здесь не правятся. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>
-<script>(function(){var B='https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/',v=Math.floor(Date.now()/36e5);document.write('<link rel="stylesheet" href="'+B+'style.css?v='+v+'">')})()</script>
+<script>(function(){if(window.KUP)return;var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',N='kup-sha',c=null,q=[],done=0,now=Date.now();try{c=JSON.parse(localStorage.getItem(N))}catch(e){}var base=window.KUP_BASE||(c&&c.s?R+c.s+'/':R+'main/');function keep(s){try{localStorage.setItem(N,JSON.stringify({s:s,t:Date.now()}))}catch(e){}}function ask(ms,cb){var x=new XMLHttpRequest();x.open('GET','https://api.github.com/repos/kupdasha/my-site/commits/main');x.setRequestHeader('Accept','application/vnd.github.sha');x.timeout=ms;x.onload=function(){var s=(x.responseText||'').trim();cb(/^[0-9a-f]{40}$/.test(s)?s:null)};x.onerror=x.ontimeout=function(){cb(null)};x.send()}function put(f){var s=document.createElement('script');s.src=base+f;s.async=false;document.head.appendChild(s)}function go(s){if(done)return;done=1;if(s){keep(s);if(!(c&&c.s===s)){var old=base;base=K.base=R+s+'/';var o=document.getElementById('kup-css');if(o){var n=document.createElement('link');n.rel='stylesheet';n.href=o.href.replace(old,base);n.onload=function(){o.parentNode&&o.parentNode.removeChild(o);n.id='kup-css'};o.parentNode.insertBefore(n,o.nextSibling)}}}q.forEach(put);q=[]}var K=window.KUP={L:{},css:function(f){if(!document.getElementById('kup-css'))document.write('<link rel="stylesheet" id="kup-css" href="'+base+f+'">')},js:function(fs){fs.forEach(function(f){if(K.L[f])return;K.L[f]=1;done?put(f):q.push(f)})}};K.base=base;if(window.KUP_BASE)go();else if(c&&c.s&&now-c.t<6e5){go();ask(8000,function(s){if(!s)return;keep(s);if(s!==c.s)['content.js','app.js','style.css'].forEach(function(f){try{fetch(R+s+'/'+f)}catch(e){}})})}else ask(2500,go)})()</script>
+<script>KUP.css('style.css')</script>
 
 <!-- Шапка -->
 <header class="head" id="head">
@@ -19,7 +21,7 @@
 </header>
 
 <!-- ТЕКСТЫ И ПРОЕКТЫ сайта лежат на GitHub в content.js и подключаются отсюда. -->
-<script>(function(){var B='https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/',v=Math.floor(Date.now()/36e5);document.write('<script src="'+B+'content.js?v='+v+'"><\/script>')})()</script>
+<script>KUP.js(['content.js'])</script>
 
 <!-- Обо мне -->
   <section class="about-page" id="about" data-page="about">
@@ -111,4 +113,4 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <!-- КОД САЙТА. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
-<script>(function(){var B='https://cdn.jsdelivr.net/gh/kupdasha/my-site@main/',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{};['app.js','waves.js','fun.js'].forEach(function(f){if(L[f])return;L[f]=1;document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
+<script>KUP.js(['app.js','waves.js','fun.js'])</script>
