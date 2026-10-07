@@ -2383,6 +2383,8 @@ function renderCase(k, keepScroll){
   if (p.akbars) body += `<div class="ab ab-mount"></div>`;
   // stand — универсальный стенд VK Play: план сверху, точки на общем виде, шторка «один бренд или три», куб, бегущая строка; рисует vkplay.js
   if (p.stand) body += `<div class="vp vp-mount"></div>`;
+  // suit — парашютный костюм Skolkovo: партнеры в небе с ползунком, три идеи, цепочка этапов, точки на рендере; рисует suit.js
+  if (p.suit) body += `<div class="su su-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2469,6 +2471,10 @@ function renderCase(k, keepScroll){
   if (ab) import(SCRIPT_BASE + 'akbars.js?v=' + VER)
     .then(m => m.mountAkbars(ab, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс знаков отличия Ак Барс Банка не загрузился', err));
+  const su = caseContent.querySelector('.su-mount');
+  if (su) import(SCRIPT_BASE + 'suit.js?v=' + VER)
+    .then(m => m.mountSuit(su, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс парашютного костюма не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
   if (vp) import(SCRIPT_BASE + 'vkplay.js?v=' + VER)
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))
