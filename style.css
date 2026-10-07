@@ -562,6 +562,8 @@ img,video{display:block;max-width:100%}
 .slides-nav.prev:hover{transform:translateX(-3px)}.slides-nav.next:hover{transform:translateX(3px)}
 .slides.first .slides-nav.prev,.slides.last .slides-nav.next{opacity:0;pointer-events:none}
 .slides-count{font-size:16px;opacity:.55;margin-top:12px;text-align:center}
+.slides-notes{max-width:760px;margin:8px auto 0;text-align:center;min-height:4.2em}
+.slides-notes p{font-size:18px;line-height:1.4;text-wrap:balance}
 @media (max-width:760px){.slides-nav{width:44px;height:44px;margin-top:-22px}.slides-nav.prev{left:8px}.slides-nav.next{right:8px}}
 /* несколько картинок в одной ячейке коллажа */
 .collage-stack{flex:1 1 0;min-height:0;display:flex;gap:clamp(6px,.8vw,12px);justify-content:flex-end}
@@ -1753,3 +1755,75 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .work[style*="--cw"]{width:var(--cw)}
 .work.right[style*="--cw"]{justify-self:end}
 @media (max-width:760px){.work[style*="--cw"]{width:100%}}
+
+/* упаковка из развертки (блок { fold } в галерее кейса, см. Ростех): грани — куски одной картинки развертки */
+.fold-pin{--fh:max(340px,min(72vh,62vw));height:calc(var(--fh) + 110vh)}
+.fold{position:sticky;top:calc((100vh - var(--fh)) / 2);height:var(--fh);perspective:2200px;cursor:pointer;overflow:hidden;--s:0}
+.fold-world{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+.fold-group{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
+.fold-face{position:absolute;transform-style:preserve-3d}
+.fold-face.t{transform-origin:50% 100%}.fold-face.b{transform-origin:50% 0}
+.fold-face.l{transform-origin:100% 50%}.fold-face.r{transform-origin:0 50%}
+.fold-face i{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.fold-face .f{background:var(--atlas) no-repeat;background-size:calc(var(--k)*2004px) calc(var(--k)*1890px);
+  background-position:calc(var(--k)*var(--bx)*1px) calc(var(--k)*var(--by)*1px);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.07)}
+.fold-face .f::after{content:'';position:absolute;inset:0;background:#000;opacity:calc(var(--sh)*var(--s))}
+.fold-lid .fold-face.c .f::after{background:#fff;opacity:calc(var(--sh)*var(--s)*-1)}
+.fold-face .b{background:#121212;transform:rotateY(180deg)}
+.fold-flacon{position:absolute;left:0;bottom:0;max-width:none;height:auto;transform-origin:50% 100%;pointer-events:none;opacity:0}
+.fold-hint{font-size:18px;line-height:1.4;max-width:640px;text-wrap:balance;margin-bottom:8px}
+
+/* схема совместного продакшна (блок { pipe }, см. Ростех): доля работы, две программы, мост между ними и сборка */
+.pp{display:flex;flex-direction:column;gap:clamp(20px,2.4vw,32px);margin:clamp(24px,3vw,40px) 0 clamp(40px,5vw,72px)}
+.pp-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}
+.pp-bar i{display:block;height:100%;width:0;transition:width 1.4s var(--ease)}
+.pp-bar .me{background:var(--ink)}.pp-bar .other{background:var(--accent);transition-delay:.9s}
+.pp.in .pp-bar .me{width:calc(var(--v)*1%)}.pp.in .pp-bar .other{width:calc((100 - var(--v))*1%)}
+.pp-legend{display:flex;justify-content:space-between;gap:24px;margin-top:12px;font-size:18px;line-height:1.35}
+.pp-legend p:last-child{text-align:right;opacity:.7}
+.pp-legend b{font-size:clamp(28px,3vw,40px);font-weight:600;margin-right:6px}
+.pp-flow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr) minmax(0,1fr);align-items:stretch}
+.pp-node{padding:clamp(18px,2vw,28px);border-radius:20px;background:var(--soft);display:flex;flex-direction:column;gap:8px;
+  opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s var(--ease);transition-delay:calc(var(--i)*.25s + .3s)}
+.pp-node.mine{background:var(--ink);color:var(--bg)}
+.pp.in .pp-node{opacity:1;transform:none}
+.pp-who{font-size:16px;opacity:.65}
+.pp-tool{font-size:clamp(22px,2vw,28px);font-weight:600;line-height:1.15}
+.pp ul{list-style:none;padding:0;margin:4px 0 0;display:flex;flex-direction:column;gap:6px;font-size:18px;line-height:1.35}
+.pp-node li::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin:0 10px 3px 0;opacity:.5}
+.pp-bridge{display:flex;align-items:center;opacity:0;transition:opacity .6s;transition-delay:calc(var(--i)*.25s + .3s)}
+.pp.in .pp-bridge{opacity:1}
+.pp-line{flex:1;min-width:16px;height:2px;background:linear-gradient(90deg,var(--ink) 50%,transparent 0) 0 0/12px 2px repeat-x;animation:ppRun 1s linear infinite}
+.pp-mid{border:2px solid var(--ink);border-radius:20px;padding:14px 18px;text-align:center}
+.pp-mid ul{gap:4px}
+.pp-join{height:44px;margin:0 16.66%;border:2px solid var(--ink);border-top:0;border-radius:0 0 22px 22px;position:relative;
+  clip-path:inset(0 0 100% 0);transition:clip-path .8s var(--ease);transition-delay:1.2s}
+.pp-join::after{content:'';position:absolute;left:50%;top:100%;width:2px;height:clamp(20px,2.4vw,32px);background:var(--ink);transform:translateX(-50%)}
+.pp.in .pp-join{clip-path:inset(0 0 -60px 0)}
+.pp-node.m{width:min(100%,560px);align-self:center;text-align:center;align-items:center}
+@keyframes ppRun{to{background-position:12px 0}}
+@media (prefers-reduced-motion:reduce){.pp-line{animation:none}}
+/* планшет и телефон: схема столбиком, блоки по центру */
+@media (max-width:1024px){
+  .pp-flow{grid-template-columns:minmax(0,560px);justify-content:center;gap:0}
+  .pp-node.m{width:100%;max-width:560px}
+  .pp-bridge{flex-direction:column}
+  .pp-line{width:2px;min-width:0;height:28px;flex:none;background:var(--ink);animation:none}
+  .pp-join{--g:clamp(20px,2.4vw,32px);height:calc(28px + var(--g) * 2);margin:calc(var(--g) * -1) auto;width:2px;border:0;background:var(--ink);border-radius:0}   /* линия от блока до блока, без разрывов */
+  .pp-join::after{display:none}
+}
+@media (max-width:760px){
+  .pp-legend{flex-direction:column;gap:6px}.pp-legend p:last-child{text-align:left}
+}
+
+/* раскадровка мелкой сеткой (блок { frames }, см. Ростех): без увеличения, подпись под каждым кадром */
+.frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:28px 20px}
+.frames figure{margin:0;opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s var(--ease);transition-delay:calc(var(--i)*.05s)}
+.frames.in figure{opacity:1;transform:none}
+.frames img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#000}
+.frames figcaption{font-size:16px;line-height:1.35;opacity:.7;margin-top:10px;text-wrap:pretty}
+@media (max-width:760px){.frames{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}}
+@media (prefers-reduced-motion:reduce){.frames figure{opacity:1;transform:none;transition:none}}
+.pp-ico{display:inline-block;width:1.05em;height:1.05em;margin-right:.4em;vertical-align:-.15em;background:currentColor;
+  -webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+.frames{margin-bottom:clamp(56px,7vw,104px)}   /* отступ до следующего блока кейса */

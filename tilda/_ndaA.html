@@ -1,0 +1,57 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>t</title></head><body><div id="allrecords" class="t-records"><div class="r t-rec" data-record-type="131"><!-- ОФОРМЛЕНИЕ САЙТА: шрифты и стили. Это код, тексты здесь не правятся. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5);document.write('<link rel="stylesheet" href="'+B+'style.css?v='+v+'">')})()</script>
+
+<!-- Шапка -->
+<header class="head" id="head">
+  <div class="wrap">
+    <span class="logo" data-text="name"></span>
+    <nav class="nav" id="nav"></nav>
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    </button>
+  </div>
+</header>
+
+<!-- ТЕКСТЫ И ПРОЕКТЫ сайта лежат на GitHub в content.js и подключаются отсюда. -->
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5);document.write('<script src="'+B+'content.js?v='+v+'"><\/script>')})()</script>
+
+<!-- Проекты под NDA: карточки сеткой, каждая открывает кейс. Тексты и проекты — в ndaPage (content.js) -->
+  <section class="nda-page" id="ndaPage" data-page="nda">
+    <div class="wrap case-head">
+      <h1 class="case-title split" data-text="ndaPage.title"></h1>
+      <p class="case-sub" data-reveal data-text="ndaPage.lead"></p>
+    </div>
+    <div class="wrap">
+      <div class="works" id="ndaProjects"></div>
+    </div>
+  </section>
+
+<!-- Кнопки «связаться» и «наверх», окно кейса, сообщения -->
+<!-- Кнопка «Связаться», всегда на экране -->
+<!-- Маленькая кнопка «наверх» -->
+<button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
+<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
+
+<!-- Страница кейса: заполняется при клике на карточку -->
+<div class="case" id="case" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
+  <div class="case-bar"><div class="wrap">
+    <button class="case-back" id="caseBack">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 10H4M9 5l-5 5 5 5"/></svg>
+      <span data-text="ndaPage.back"></span>
+    </button>
+  </div></div>
+  <div id="caseContent"></div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- КОД САЙТА. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
+<script>(function(){var B='../',v=Math.floor(Date.now()/36e5),L=window.KUP_LOADED=window.KUP_LOADED||{};['app.js','waves.js','fun.js','shimmer.js'].forEach(function(f){if(L[f])return;L[f]=1;document.write('<script src="'+B+f+'?v='+v+'"><\/script>')})})()</script>
+</div>
+</div></body></html>

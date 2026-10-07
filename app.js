@@ -1086,7 +1086,8 @@ function shotHTML(src){
   return `<div class="case-shot frame ${m.type}" data-reveal><iframe src="${embedURL(m, false).replace('&autoplay=1', '').replace('autoplay=1&', '')}" allow="${FRAME_ALLOW}" allowfullscreen loading="lazy"></iframe></div>`;
 }
 function heroHTML(p){
-  const m = parseMedia(legacyVideo(p));
+  // heroVideo — тихий ролик в шапке вместо основного (основной тогда стоит в галерее, см. Ростех)
+  const m = parseMedia(p.heroVideo || legacyVideo(p));
   // heroSound — ролик со звуком и кнопками управления, запускается по нажатию (см. музыкальный клип)
   if (m && m.type === 'file' && p.heroSound) return `<video class="hero-full" src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} controls preload="metadata" playsinline></video>`;
   if (m && m.type === 'file') return `<video src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} muted loop playsinline autoplay></video>`;
@@ -1458,15 +1459,17 @@ function campSlides(g){
     <button class="slides-nav prev" aria-label="Предыдущий слайд">${arrow('M12 4l-6 6 6 6')}</button>
     <button class="slides-nav next" aria-label="Следующий слайд">${arrow('M8 4l6 6-6 6')}</button>
     <p class="slides-count">1 из ${g.slides.length}</p>
-  </div></div>`;
+  </div>${g.notes ? `<div class="slides-notes">${g.notes.map((n, i) => `<p${i ? ' hidden' : ''}>${T(n)}</p>`).join('')}</div>` : ''}</div>`;
 }
 function watchSlides(box){
   const track = box.querySelector('.slides-track'), slides = [...track.children], count = box.querySelector('.slides-count');
-  const at = () => Math.round(track.scrollLeft / track.clientWidth);
+  const notes = [...(box.parentElement.querySelector('.slides-notes')?.children || [])];   // notes — подпись к каждому кадру
+  const at = () => track.clientWidth ? Math.round(track.scrollLeft / track.clientWidth) : 0;   // пока листалка не видна, ширина 0
   const go = i => track.scrollTo({ left: Math.max(0, Math.min(slides.length - 1, i)) * track.clientWidth, behavior: 'smooth' });
   const show = () => {
     const i = at();
     count.textContent = `${i + 1} из ${slides.length}`;
+    notes.forEach((n, j) => { n.hidden = j !== i; });
     box.classList.toggle('first', i === 0); box.classList.toggle('last', i === slides.length - 1);
   };
   track.addEventListener('scroll', () => requestAnimationFrame(show), { passive: true });
@@ -1669,6 +1672,115 @@ function morphOutline(name){
     out.push([a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]);
   }
   return out;
+}
+// { fold: { atlas, flacon, caption, hint } } — упаковка из развертки (см. Ростех): при прокрутке плоская развертка
+// складывается в коробку, крышка переворачивается и садится сверху; обратно — разворачивается.
+// Наведение (или нажатие) поднимает крышку, и из коробки выезжает флакон. Курсор поворачивает коробку.
+// Геометрия — в пикселях atlas (развертка 2004×1890): у каждой грани — прямоугольник на развертке
+const FOLD = {
+  W: 2004, H: 1890,
+  body: { c: [848, 846, 1084, 1083], arms: { t: [848, 114, 1084, 846], b: [848, 1083, 1084, 1815], l: [115, 846, 848, 1083], r: [1084, 846, 1816, 1083] } },
+  lid:  { c: [1454, 275, 1737, 558], arms: { t: [1454, 39, 1737, 275], b: [1454, 558, 1737, 795], l: [1218, 275, 1454, 558], r: [1737, 275, 1973, 558] } },
+};
+function foldHTML(x){
+  const face = (r, o, cls, sh) => `<div class="fold-face ${cls}" style="left:calc(var(--k)*${r[0] - o[0]}px);top:calc(var(--k)*${r[1] - o[1]}px);width:calc(var(--k)*${r[2] - r[0]}px);height:calc(var(--k)*${r[3] - r[1]}px);--bx:${-r[0]};--by:${-r[1]};--sh:${sh}"><i class="f"></i><i class="b"></i></div>`;
+  const group = (g, cls, shades) => {
+    const o = [(g.c[0] + g.c[2]) / 2, (g.c[1] + g.c[3]) / 2];
+    return `<div class="fold-group ${cls}">${face(g.c, o, 'c', shades.c)}${Object.entries(g.arms).map(([k, r]) => face(r, o, 'a ' + k, shades[k])).join('')}</div>`;
+  };
+  return `<div class="wrap camp-rowbox">${x.caption ? `<p class="camp-cap">${T(x.caption)}</p>` : ''}
+    ${x.hint ? `<p class="fold-hint">${T(x.hint)}</p>` : ''}
+    <div class="fold-pin"><div class="fold" style="--atlas:url('${x.atlas}')" role="img" aria-label="Развертка упаковки складывается в коробку">
+      <div class="fold-world">
+        ${group(FOLD.body, 'fold-body', { c: 0, t: 0, b: .55, l: .45, r: .3 })}
+        ${group(FOLD.lid, 'fold-lid', { c: -.08, t: .5, b: .2, l: .45, r: .3 })}
+        ${x.flacon ? `<img class="fold-flacon" src="${x.flacon}" alt="">` : ''}
+      </div>
+    </div></div></div>`;
+}
+function watchFold(box){
+  const world = box.querySelector('.fold-world'), body = box.querySelector('.fold-body'), lid = box.querySelector('.fold-lid');
+  const flacon = box.querySelector('.fold-flacon'), arms = [...box.querySelectorAll('.fold-face.a')];
+  const clamp = v => Math.max(0, Math.min(1, v)), ease = v => v * v * (3 - 2 * v), mix = (a, b, t) => a + (b - a) * t;
+  const B = FOLD.body.c, L = FOLD.lid.c;
+  const bc = [(B[0] + B[2]) / 2 - FOLD.W / 2, (B[1] + B[3]) / 2 - FOLD.H / 2];   // где центры граней лежат на плоской развертке
+  const lc = [(L[0] + L[2]) / 2 - FOLD.W / 2, (L[1] + L[3]) / 2 - FOLD.H / 2];
+  const TALL = FOLD.body.arms.t[3] - FOLD.body.arms.t[1], SIDE = B[2] - B[0];
+  // наклон петли: верхняя грань — rotateX(+), нижняя — rotateX(−), левая — rotateY(−), правая — rotateY(+)
+  const hinge = { t: ['X', 1], b: ['X', -1], l: ['Y', -1], r: ['Y', 1] };
+  let k = 1, zoom = 1, raf = 0, open = 0, wantOpen = 0, px = 0, py = 0, tx = 0, ty = 0, seen = false;
+  const size = () => {
+    const w = box.clientWidth, h = box.clientHeight;
+    k = Math.min(w / FOLD.W, h / FOLD.H) * .96;
+    zoom = Math.max(1, h * .82 / ((TALL + 480) * k));   // собранная коробка крупнее плоской развертки
+    box.style.setProperty('--k', k);
+  };
+  const frame = () => {
+    raf = 0;
+    // блок закреплен (sticky) внутри высокой обертки: пока она прокручивается, развертка складывается
+    const r = box.parentElement.getBoundingClientRect(), top0 = parseFloat(getComputedStyle(box).top) || 0;
+    const t = clamp((top0 - r.top) / Math.max(1, r.height - box.offsetHeight - 40));
+    const f = ease(clamp(t / .5)), s = ease(clamp((t - .15) / .55)), m = ease(clamp((t - .3) / .5)), land = ease(clamp((t - .7) / .3));
+    open += (wantOpen * land - open) * .12; px += (tx - px) * .1; py += (ty - py) * .1;
+    const deg = 90 * f;
+    arms.forEach(a => { const [ax, sg] = hinge[a.classList[2]]; a.style.transform = `rotate${ax}(${sg * deg}deg)`; });
+    box.style.setProperty('--s', s);
+    const yaw = (-32 + px * 28) * s, tilt = (-16 + py * 8) * s;
+    world.style.transform = `scale(${mix(1, zoom, s)}) rotateX(${tilt}deg) rotateY(${yaw}deg)`;
+    const base = TALL / 2 + 200;   // дно чуть ниже центра: сверху остается место для крышки и флакона
+    body.style.transform = `translate3d(${mix(bc[0], 0, s) * k}px,${mix(bc[1], base, s) * k}px,0) rotateX(${-90 * s}deg)`;
+    // открытая крышка поднимается и отъезжает вбок, чтобы флакон выехал из коробки
+    const lift = (1 - land) * 360 + open * 320;
+    lid.style.transform = `translate3d(${(mix(lc[0], 0, m) + open * SIDE * 1.5) * k}px,${mix(lc[1], base - TALL - lift, m) * k}px,0) rotateY(${90 * m}deg) rotateX(${90 * m}deg)`;
+    if (flacon) {
+      flacon.style.opacity = land;
+      flacon.style.transform = `translate3d(-50%,${(base - 8 - open * 660) * k}px,0) rotateY(${-yaw}deg)`;
+      flacon.style.width = `${SIDE * .78 * k}px`;
+    }
+    if (seen && (Math.abs(wantOpen * land - open) > .002 || Math.abs(tx - px) + Math.abs(ty - py) > .002)) raf = requestAnimationFrame(frame);
+  };
+  const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  size();
+  new ResizeObserver(() => { size(); go(); }).observe(box);
+  new IntersectionObserver(([e]) => { seen = e.isIntersecting; go(); }).observe(box);
+  // кейс прокручивается внутри своего окна, поэтому слушаем прокрутку любого элемента (capture)
+  document.addEventListener('scroll', () => { if (seen) go(); }, { passive: true, capture: true });
+  box.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const r = box.getBoundingClientRect();
+    tx = (e.clientX - r.left) / r.width - .5; ty = (e.clientY - r.top) / r.height - .5; wantOpen = 1; go();
+  });
+  box.addEventListener('pointerleave', e => { if (e.pointerType !== 'mouse') return; tx = ty = 0; wantOpen = 0; go(); });
+  box.addEventListener('click', () => { wantOpen = wantOpen ? 0 : 1; go(); });   // на телефоне — по нажатию
+}
+// { pipe: { share, left, bridge, right, merge } } — схема совместного продакшна (см. Ростех):
+// share — доля работы полосой; left и right — две программы и кто в них работал, bridge — как сцена переехала из одной в другую,
+// merge — где всё сошлось. mine: true — этап мой (темная заливка). У этапа: who, tool, items — список дел,
+// icons — однотонные логотипы программ (svg, красятся в цвет текста)
+function pipeHTML(x){
+  const node = (n, cls, i) => `<div class="pp-node ${cls}${n.mine ? ' mine' : ''}" style="--i:${i}">
+    <span class="pp-who">${T(n.who)}</span><b class="pp-tool">${(n.icons || []).map(src => `<i class="pp-ico" style="--ico:url('${src}')"></i>`).join('')}${T(n.tool)}</b>
+    <ul>${n.items.map(it => `<li>${T(it)}</li>`).join('')}</ul></div>`;
+  const sh = x.share;
+  return `<div class="wrap"><div class="pp">
+    ${sh ? `<div class="pp-share" style="--v:${sh.value}"><div class="pp-bar"><i class="me"></i><i class="other"></i></div>
+      <div class="pp-legend"><p><b>${sh.value}%</b> ${T(sh.me)}</p><p>${T(sh.other)}</p></div></div>` : ''}
+    <div class="pp-flow">
+      ${node(x.left, 'l', 0)}
+      <div class="pp-bridge" style="--i:1"><span class="pp-line"></span>
+        <div class="pp-mid"><b class="pp-tool">${T(x.bridge.tool)}</b><ul>${x.bridge.items.map(it => `<li>${T(it)}</li>`).join('')}</ul></div>
+        <span class="pp-line"></span></div>
+      ${node(x.right, 'r', 2)}
+    </div>
+    <div class="pp-join" style="--i:3" aria-hidden="true"></div>
+    ${node(x.merge, 'm', 4)}
+  </div></div>`;
+}
+// { frames: { items, notes } } — раскадровка мелкой сеткой: много маленьких кадров с подписями, без увеличения
+// (для кадров низкого качества, см. Ростех); появляются волной, когда доезжают до экрана
+function framesHTML(x){
+  return `<div class="wrap"><div class="frames">${x.items.map((src, i) => `<figure style="--i:${i}"><img src="${src}" alt="" loading="lazy">${
+    x.notes && x.notes[i] ? `<figcaption>${T(x.notes[i])}</figcaption>` : ''}</figure>`).join('')}</div></div>`;
 }
 function morphHTML(x){
   const cap = x.caption ? `<p class="camp-cap">${T(x.caption)}</p>` : '';
@@ -1956,7 +2068,7 @@ function galleryItem(x){
   // { sheet: [[…], […]], bg } — ряды макетов на серой подложке (светлые картинки не сливаются с белым фоном)
   // cls: 'keep' — ряд не складывается в столбик на телефоне, 'narrow' — без подложки, в правых двух третях
   if (x && x.sheet) return sheetHTML(x.sheet, x.bg, x.cls);
-  // { colors } — палитра с копированием кода, как в brandkit; { slides } — презентация-листалка
+  // { colors } — палитра с копированием кода, как в brandkit; { slides } — презентация-листалка, notes — подпись к каждому кадру под листалкой
   if (x && x.colors) return brandkitHTML({ colors: x.colors });
   if (x && x.slides) return campSlides(x);
   if (x && x.formula) return formulaHTML(x.formula);
@@ -1976,6 +2088,9 @@ function galleryItem(x){
   if (x && x.safe) return safeHTML(x.safe);
   if (x && x.clips) return clipsHTML(x);
   if (x && x.morph) return morphHTML(x);
+  if (x && x.fold) return foldHTML(x.fold);
+  if (x && x.pipe) return pipeHTML(x.pipe);
+  if (x && x.frames) return framesHTML(x.frames);
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   if (x && x.collage) return campCollage(x);
   // { film: 'img/….mp4', poster, caption } — ролик для просмотра: со звуком и плеером, сам не запускается, грузится по нажатию;
@@ -2164,10 +2279,12 @@ function renderCase(k, keepScroll){
   const gallery = p.gallery || [];
   caseMark = p.mark || null;   // векторы знака для блоков { stars }
   let body = '', g = 0;
-  // schemeCols: все блоки схемы одной строкой, колонками (как текст кампаний)
+  // schemeCols: все блоки схемы одной строкой, колонками (как текст кампаний);
+  // число — столько колонок в ряд, остальные блоки переносятся ниже (schemeCols: 2 — сетка 2 × 2, см. Ростех)
   if (p.schemeCols) {
+    const per = typeof p.schemeCols === 'number' ? p.schemeCols : blocks.length;
     body += `<div class="wrap"><div class="camp-head scheme-cols">${
-      blocks.map(([label, par]) => `<div class="camp-col" style="grid-column:span ${Math.floor(12 / blocks.length)}"><span class="camp-label">${T(label)}</span><p>${T(par)}</p></div>`).join('')}</div></div>`;
+      blocks.map(([label, par]) => `<div class="camp-col" style="grid-column:span ${Math.floor(12 / per)}"><span class="camp-label">${T(label)}</span><p>${T(par)}</p></div>`).join('')}</div></div>`;
     blocks = [];
   }
   // twoCols: ['solution'] — длинный блок схемы набран мельче, в две колонки
@@ -2251,6 +2368,8 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.m3d').forEach(watchMark);
   caseContent.querySelectorAll('.st, .st-grads, .st-pages').forEach(watchStars);
   caseContent.querySelectorAll('.sky').forEach(watchSky);
+  caseContent.querySelectorAll('.fold').forEach(watchFold);
+  caseContent.querySelectorAll('.pp, .frames').forEach(el => gdReveal.observe(el));
   // листалка прямо в галерее кейса (без рядов макетов watchCampaigns ее не найдет)
   if (!caseContent.querySelector('.camp-row')) caseContent.querySelectorAll('.case-body .slides').forEach(watchSlides);
   const au = caseContent.querySelector('.au-mount');
