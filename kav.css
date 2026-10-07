@@ -46,7 +46,15 @@
 .kv-pins-side{display:flex;flex-direction:column;align-items:flex-start;gap:20px}
 .kv-pins-side .kv-title,.kv-pins-side .kv-text{margin:0}
 .kv-pins-side .kv-cap{margin:0;opacity:.7}
-@media (max-width:760px){.kv-pins{grid-template-columns:minmax(0,1fr)}}
+/* телефон и планшет: подпись и заголовок над футболкой, текст и кнопки — под ней */
+@media (max-width:900px){
+  .kv-pins{grid-template-columns:minmax(0,1fr);gap:20px;padding:16px}
+  .kv-pins-side{display:contents}
+  .kv-pins-side > *{grid-column:1 / -1}
+  .kv-pins-side .case-label{order:-2}
+  .kv-pins-side .kv-title{order:-1}
+  .kv-pins-bar{margin-top:0}
+}
 .kv-pin{position:absolute;width:19%;aspect-ratio:1;translate:-50% -50%;rotate:calc(var(--r) + var(--tilt,0deg));cursor:grab;touch-action:none;
   transition:left .7s var(--ease),top .7s var(--ease),rotate .5s var(--ease),scale .25s var(--ease),filter .25s;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}
 .kv-pin svg{display:block;width:100%;height:100%;overflow:visible}
@@ -87,7 +95,7 @@
 .kv-tee-side figure{margin:0;display:flex;flex-direction:column;gap:12px;flex:1 1 0;min-height:0}
 .kv-tee-side .kv-shot{flex:1;min-height:0}
 .kv-tee-side figcaption{font-size:16px;opacity:.6}
-@media (max-width:760px){.kv-tee{grid-template-columns:minmax(0,1fr)}.kv-loupe-box{touch-action:pan-y}.kv-tee-side figure{flex:none}.kv-tee-side .kv-shot{aspect-ratio:4/5}}
+@media (max-width:900px){.kv-tee{grid-template-columns:minmax(0,1fr)}.kv-loupe-box{touch-action:pan-y}.kv-tee-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.kv-tee-side figure{flex:none}.kv-tee-side .kv-shot{aspect-ratio:4/5;flex:none}}
 
 /* ---------- лейбл ---------- */
 .kv-print{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:stretch}
@@ -133,7 +141,7 @@
 /* ролик тянется вниз до края панели с лейблом */
 .kv-print .kv-mini{position:relative;flex:1 1 0;min-height:0}
 .kv-print .kv-vid{position:absolute;left:0;top:0;height:100%;width:auto;max-width:100%;aspect-ratio:4/5}
-@media (max-width:760px){.kv-print{grid-template-columns:minmax(0,1fr)}.kv-form .btn{padding:0 22px 4px}
+@media (max-width:900px){.kv-print{grid-template-columns:minmax(0,1fr)}.kv-desk{aspect-ratio:5/4}.kv-form .btn{padding:0 22px 4px}
   .kv-print .kv-mini{flex:none;width:min(240px,70%)}.kv-print .kv-vid{position:static;width:100%;height:auto}}
 
 /* ---------- брелок ---------- */
@@ -156,7 +164,9 @@
 .kv-plush-side .kv-shot{aspect-ratio:4/5}
 .kv-plush-side .kv-mini{width:min(150px,100%)}
 .kv-plush-side .kv-vid{aspect-ratio:9/16}
-@media (max-width:760px){.kv-plush{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.kv-plush{grid-template-columns:minmax(0,1fr)}.kv-toy-box{aspect-ratio:1;max-height:78vh;width:100%}}
+@media (max-width:560px){.kv-toy-box{aspect-ratio:4/5}.kv-desk{aspect-ratio:1}}
+@media (max-width:900px){.kv-plush-side .kv-mini{width:100%}.kv-plush-side .kv-vid{aspect-ratio:4/5}}
 
 /* ---------- лукбук: коллаж — большой кадр, вокруг поменьше, ролики маленькие и парой ---------- */
 .kv-look{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6vw,24px)}
@@ -169,7 +179,9 @@
 @media (max-width:760px){
   .kv-look{grid-template-columns:repeat(2,minmax(0,1fr))}
   .kv-c0{grid-row:auto}.kv-c0 .kv-shot{aspect-ratio:4/5}
-  .kv-vids{grid-column:span 1}
+  .kv-vids{grid-column:span 2;padding:16px}
+  .kv-vids .kv-mini{height:auto;width:min(160px,42%);max-width:none}
+  .kv-vids .kv-vid{width:100%;height:auto}
 }
 
 @media (prefers-reduced-motion: reduce){
