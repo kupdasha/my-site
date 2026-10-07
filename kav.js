@@ -286,36 +286,15 @@ function liveLabel(box, c){
   liveVideos(box);
 }
 
-/* ---------- брелок: мягкая кавычка в 3D, от нажатия сминается, по краю бежит надпись ---------- */
+/* ---------- брелок: мягкая кавычка в 3D, напечатана один в один как в макете, от нажатия сминается ---------- */
 const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.186.1/+esm';
-// середина кавычки: ручка A → угол B → ручка C; толщина ручки 2R
-const CA = [1.12, 1.3], CB = [-0.96, 0], CC = [1.12, -1.3], CR = 0.8;
-// контур на расстоянии d от средней линии: точки по кругу (по часовой, если смотреть спереди)
-function outline(d, n = 24){
-  const nr = (p, q) => { const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy); return [dy / l, -dx / l]; };
-  const n1 = nr(CA, CB), n2 = nr(CB, CC);
-  const o = (p, nn, s) => [p[0] + nn[0] * d * s, p[1] + nn[1] * d * s];
-  const a1 = o(CA, n1, -1), b1 = o(CB, n1, -1), b2 = o(CB, n2, -1), c2 = o(CC, n2, -1);
-  const x1 = b1[0] - a1[0], y1 = b1[1] - a1[1], x2 = c2[0] - b2[0], y2 = c2[1] - b2[1];
-  const t = ((b2[0] - a1[0]) * y2 - (b2[1] - a1[1]) * x2) / (x1 * y2 - y1 * x2);
-  const I = [a1[0] + x1 * t, a1[1] + y1 * t];
-  const arc = (c, f, to) => {   // дуга вокруг c от угла f к углу to, обе по кратчайшему внешнему пути
-    const out = [];
-    let da = to - f;
-    while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
-    for (let i = 1; i < n; i++) { const a = f + da * i / n; out.push([c[0] + Math.cos(a) * d, c[1] + Math.sin(a) * d]); }
-    return out;
-  };
-  const ang = v => Math.atan2(v[1], v[0]);
-  // наружная сторона: +n1 вдоль A→B, скругление вокруг B, +n2 вдоль B→C; концы — полукруги
-  const pts = [o(CA, n1, 1), o(CB, n1, 1), ...arc(CB, ang(n1), ang(n2)), o(CB, n2, 1), o(CC, n2, 1)];
-  const capC = []; for (let i = 1; i < n; i++) { const a = ang(n2) + Math.PI * i / n; capC.push([CC[0] + Math.cos(a) * d, CC[1] + Math.sin(a) * d]); }
-  pts.push(...capC, o(CC, n2, -1), I, o(CA, n1, -1));
-  for (let i = 1; i < n; i++) { const a = ang(n1) + Math.PI + Math.PI * i / n; pts.push([CA[0] + Math.cos(a) * d, CA[1] + Math.sin(a) * d]); }
-  // по часовой (площадь со знаком < 0 при оси y вверх)
-  let area = 0; pts.forEach((p, i) => { const q = pts[(i + 1) % pts.length]; area += p[0] * q[1] - q[0] * p[1]; });
-  return area > 0 ? pts.reverse() : pts;
-}
+// печатный макет (PDF из Иллюстратора → plush-print.png, 300 dpi). Средняя линия кавычки и ширина
+// подобраны по надписи на макете: ручка A → угол B → ручка C в точках макета при 150 dpi (лист 1057 × 1418)
+const PAGE = [1057, 1418], PA = [749.4, 258.1], PB = [261.4, 726.9], PC = [745.7, 1162.4];
+const RING = 213.6, EDGE = 285;   // надпись идет на расстоянии RING от средней линии, край игрушки — EDGE
+const CR = 0.8, SC = CR / EDGE;   // в 3D край — 0.8 от средней линии
+const w3 = p => [(p[0] - PAGE[0] / 2) * SC, (PAGE[1] / 2 - p[1]) * SC];
+const CA = w3(PA), CB = w3(PB), CC = w3(PC);
 function plushHTML(c){
   return `<div class="kv-plush">
     <div class="kv-panel kv-toy-box">
@@ -330,60 +309,28 @@ function plushHTML(c){
 function livePlush(box, c){
   zoomable(box); liveVideos(box);
   const host = box.querySelector('.kv-toy-box');
-  import(THREE_URL).then(T3 => plush3D(host, T3, H.pick(c.ring))).catch(err => {
-    console.warn('3D-брелок не загрузился', err);
-    host.querySelector('.kv-toy-still').hidden = false;
-  });
+  const fail = err => { console.warn('3D-брелок не загрузился', err); host.querySelector('.kv-toy-still').hidden = false; };
+  const art = new Image();
+  art.crossOrigin = 'anonymous';
+  art.src = c.print;
+  Promise.all([import(THREE_URL), art.decode()]).then(([T3]) => plush3D(host, T3, art)).catch(fail);
 }
-function plush3D(host, T3, ring){
-  const N = 1024;
-  // текстура: неон, строчка по краю, надпись по контуру и название вдоль верхней ручки
-  const pts0 = outline(CR);
-  const xs = pts0.map(p => p[0]), ys = pts0.map(p => p[1]);
-  const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
-  const S = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) + .2;
-  const px = (x, y) => [(x - cx) / S * N + N / 2, N / 2 - (y - cy) / S * N];
-  const cv = document.createElement('canvas'); cv.width = cv.height = N;
+function plush3D(host, T3, art){
+  // текстура — лист макета с полями: неон, поверх — черная надпись макета (умножением белое становится неоном)
+  const PAD = 120, K = 1.6;
+  const cw = Math.round((PAGE[0] + PAD * 2) * K), ch = Math.round((PAGE[1] + PAD * 2) * K);
+  const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
   const g = cv.getContext('2d');
-  const FONT = '"Golos Text", system-ui, sans-serif';
-  // путь для бегущей надписи: контур ближе к краю, с длинами
-  const path = outline(CR - .2, 18).map(p => px(...p));
-  path.push(path[0]);
-  const lens = [0]; for (let i = 1; i < path.length; i++) lens.push(lens[i - 1] + Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]));
-  const L = lens[lens.length - 1];
-  const fs = 54;   // крупная надпись по бокам
-  g.font = `500 ${fs}px ${FONT}`;
-  const unitRaw = g.measureText(ring + '   ').width;
-  const k = Math.max(1, Math.round(L / unitRaw)), unit = L / k, stretch = unit / unitRaw;
-  const at = s => {
-    s = ((s % L) + L) % L;
-    let i = 1; while (lens[i] < s) i++;
-    const a = path[i - 1], b = path[i], t = (s - lens[i - 1]) / (lens[i] - lens[i - 1]);
-    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, Math.atan2(b[1] - a[1], b[0] - a[0])];
-  };
-  const chars = [...(ring + '   ')].map(ch => [ch, g.measureText(ch).width * stretch]);
-  const draw = off => {
-    g.fillStyle = NEON; g.fillRect(0, 0, N, N);
-    // строчка по краю
-    g.strokeStyle = '#141414'; g.lineWidth = 4; g.setLineDash([3, 12]); g.lineCap = 'round';
-    g.beginPath(); outline(CR - .07, 18).forEach((p, i) => g[i ? 'lineTo' : 'moveTo'](...px(...p))); g.closePath(); g.stroke(); g.setLineDash([]);
-    g.fillStyle = '#141414'; g.font = `500 ${fs}px ${FONT}`; g.textBaseline = 'middle'; g.textAlign = 'center';
-    for (let r = 0, s = off; r < k; r++) for (const [ch, w] of chars) {
-      const [x, y, a] = at(s + w / 2);
-      g.save(); g.translate(x, y); g.rotate(a); g.fillText(ch, 0, 0); g.restore();
-      s += w;
-    }
-    // название — вдоль верхней ручки
-    const m = px((CA[0] + CB[0]) / 2 + .02, (CA[1] + CB[1]) / 2 + .14);
-    g.save(); g.translate(...m); g.rotate(-Math.atan2(CA[1] - CB[1], CA[0] - CB[0]));
-    g.textAlign = 'left';
-    g.font = `400 64px ${FONT}`; g.fillText('одна', -140, -36);
-    g.font = `800 76px ${FONT}`; g.fillText('кавычка', -165, 36);
-    g.restore();
-  };
-  draw(0);
+  g.fillStyle = NEON; g.fillRect(0, 0, cw, ch);
+  g.globalCompositeOperation = 'multiply';
+  g.drawImage(art, PAD * K, PAD * K, PAGE[0] * K, PAGE[1] * K);
+  g.globalCompositeOperation = 'source-over';
+  // точка 3D → место на текстуре
+  const toU = x => (x / SC + PAGE[0] / 2 + PAD) / (PAGE[0] + PAD * 2);
+  const toV = y => 1 - (PAGE[1] / 2 - y / SC + PAD) / (PAGE[1] + PAD * 2);
+  const xs = [CA[0], CB[0], CC[0]], ys = [CA[1], CB[1], CC[1]];
   const tex = new T3.CanvasTexture(cv);
-  tex.colorSpace = T3.SRGBColorSpace; tex.anisotropy = 4;
+  tex.colorSpace = T3.SRGBColorSpace; tex.anisotropy = 8;
 
   // форма-подушка: точки на расстоянии меньше R от средней линии кавычки; высота — как у надутой ткани.
   // Внутренний угол скруглен (мягкий минимум расстояний до двух ручек), края сшиты с изнанкой.
@@ -399,8 +346,8 @@ function plush3D(host, T3, ring){
     return b * (1 - h) + a * h - SM * h * (1 - h);
   };
   const PUFF = .5, STEP = .036;
-  const x0 = Math.min(...xs) - .1, y0 = Math.min(...ys) - .1;
-  const nx = Math.ceil((Math.max(...xs) + .1 - x0) / STEP), ny = Math.ceil((Math.max(...ys) + .1 - y0) / STEP);
+  const x0 = Math.min(...xs) - CR - .1, y0 = Math.min(...ys) - CR - .1;
+  const nx = Math.ceil((Math.max(...xs) + CR + .1 - x0) / STEP), ny = Math.ceil((Math.max(...ys) + CR + .1 - y0) / STEP);
   const pos = [], idOf = new Int32Array((nx + 1) * (ny + 1)).fill(-1), rimOf = new Uint8Array((nx + 1) * (ny + 1));
   const front = [], back = new Int32Array((nx + 1) * (ny + 1)).fill(-1);
   for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
@@ -436,7 +383,7 @@ function plush3D(host, T3, ring){
   const geo = new T3.BufferGeometry();
   geo.setAttribute('position', new T3.Float32BufferAttribute(pos, 3));
   geo.setIndex(idx);
-  const uv = []; for (let i = 0; i < pos.length; i += 3) uv.push((pos[i] - cx) / S + .5, (pos[i + 1] - cy) / S + .5);
+  const uv = []; for (let i = 0; i < pos.length; i += 3) uv.push(toU(pos[i]), toV(pos[i + 1]));
   geo.setAttribute('uv', new T3.Float32BufferAttribute(uv, 2));
   geo.computeVertexNormals();
   const base = Float32Array.from(pos), nrm = Float32Array.from(geo.attributes.normal.array);
@@ -445,8 +392,10 @@ function plush3D(host, T3, ring){
   const mat = new T3.MeshPhysicalMaterial({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: .32, roughness: .82, sheen: 1, sheenRoughness: .5, sheenColor: new T3.Color(NEON) });
   const toy = new T3.Mesh(geo, mat);
   const ringMesh = new T3.Mesh(new T3.TorusGeometry(.26, .045, 16, 48), new T3.MeshStandardMaterial({ color: 0xc8ccd2, metalness: .7, roughness: .3 }));
-  ringMesh.position.set(CC[0] + .74, CC[1] - .58, 0); ringMesh.rotation.set(0, .9, .6);
-  const grp = new T3.Group(); grp.add(toy, ringMesh); grp.position.x = -.12;
+  // кольцо — на конце нижней ручки
+  const dl = Math.hypot(CC[0] - CB[0], CC[1] - CB[1]), dir = [(CC[0] - CB[0]) / dl, (CC[1] - CB[1]) / dl];
+  ringMesh.position.set(CC[0] + dir[0] * .92, CC[1] + dir[1] * .92, 0); ringMesh.rotation.set(0, .9, Math.atan2(dir[1], dir[0]));
+  const grp = new T3.Group(); grp.add(toy, ringMesh); grp.position.x = .07;
 
   const renderer = new T3.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio));
@@ -454,7 +403,7 @@ function plush3D(host, T3, ring){
   scene.add(new T3.HemisphereLight(0xffffff, 0x8a8a80, 1.15));
   const key = new T3.DirectionalLight(0xffffff, 2.8); key.position.set(-5, 4, 4); scene.add(key);
   const rim = new T3.DirectionalLight(0xffffff, 1.2); rim.position.set(4, -2, -3); scene.add(rim);
-  const cam = new T3.PerspectiveCamera(30, 1, .1, 50); cam.position.set(0, 0, 10.5);
+  const cam = new T3.PerspectiveCamera(30, 1, .1, 50); cam.position.set(0, 0, 9.2);
   host.appendChild(renderer.domElement);
   const cvs = renderer.domElement; cvs.className = 'kv-toy';
   const size = () => { const w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); };
@@ -462,7 +411,7 @@ function plush3D(host, T3, ring){
 
   // нажатие: вмятина там, куда нажали, игрушка сплющивается и отпружинивает
   const ray = new T3.Raycaster(), ptr = new T3.Vector2();
-  const hit = new T3.Vector3(); let press = 0, vel = 0, target = 0, tiltX = 0, tiltY = 0, mx = 0, my = 0, off = 0, speed = .9;
+  const hit = new T3.Vector3(); let press = 0, vel = 0, target = 0, tiltX = 0, tiltY = 0, mx = 0, my = 0;
   const pick = e => {
     const r = cvs.getBoundingClientRect();
     ptr.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
@@ -472,9 +421,9 @@ function plush3D(host, T3, ring){
     if (h) hit.copy(toy.worldToLocal(h.point.clone()));
     return !!h;
   };
-  cvs.addEventListener('pointerdown', e => { if (pick(e)) { target = 1; speed = 4; cvs.setPointerCapture(e.pointerId); cvs.classList.add('held'); } });
+  cvs.addEventListener('pointerdown', e => { if (pick(e)) { target = 1; cvs.setPointerCapture(e.pointerId); cvs.classList.add('held'); } });
   cvs.addEventListener('pointermove', e => { if (target) pick(e); else if (e.pointerType === 'mouse') { const r = cvs.getBoundingClientRect(); mx = (e.clientX - r.left) / r.width * 2 - 1; my = -(e.clientY - r.top) / r.height * 2 + 1; } });
-  const up = () => { target = 0; speed = .9; cvs.classList.remove('held'); };
+  const up = () => { target = 0; cvs.classList.remove('held'); };
   cvs.addEventListener('pointerup', up); cvs.addEventListener('pointercancel', up);
   cvs.addEventListener('pointerleave', () => { mx = my = 0; });
 
@@ -500,8 +449,6 @@ function plush3D(host, T3, ring){
     tiltX += (-my * .3 - tiltX) * .06;
     // игрушка чуть подается под пальцем, как будто ее толкнули
     grp.rotation.set(tiltX - hit.y * .1 * press, tiltY + hit.x * .1 * press, 0);
-    off += speed * 60 * dt;
-    if (frame++ % 2 === 0) { draw(off); tex.needsUpdate = true; }
     renderer.render(scene, cam);
     if (seen) raf = requestAnimationFrame(tick);
   };
@@ -510,8 +457,6 @@ function plush3D(host, T3, ring){
     if (v && !seen) { seen = true; last = 0; raf = requestAnimationFrame(tick); }
     else if (!v) { seen = false; cancelAnimationFrame(raf); }
   });
-  // шрифт мог догрузиться позже — перерисуем надпись
-  document.fonts?.ready.then(() => { draw(off); tex.needsUpdate = true; renderer.render(scene, cam); });
 }
 
 /* ---------- лукбук: коллаж, ролики — маленькие, парой в одной ячейке ---------- */
