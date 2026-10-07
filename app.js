@@ -953,9 +953,14 @@ if (!touch) {
 }
 /* Кейс открывается в новой вкладке; в ней сразу показан кейс, «все работы» ведут на главную */
 const openInTab = k => window.open(location.pathname + location.search + '#case-' + (+k + 1), '_blank');
+/* На странице NDA кейс открывается в той же вкладке: пароль Тильды живет только в текущей вкладке,
+   новая попросила бы его снова. «Назад» возвращает к карточкам */
 $('#ndaProjects').addEventListener('click', e => {
   const w = e.target.closest('button.work');
-  if (w) openInTab(w.dataset.k);
+  if (!w) return;
+  history.pushState(null, '', '#case-' + (+w.dataset.k + 1));
+  openedByClick = true;
+  openCase(+w.dataset.k);
 });
 $('#workList').addEventListener('click', e => {
   const w = e.target.closest('.work');
