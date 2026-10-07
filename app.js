@@ -1829,7 +1829,7 @@ function startMorph(box, list){
    #t=0.1 в адресе — первый кадр виден сразу, даже если телефон запретил автозапуск.
    «Вперед-назад» вшито в сами файлы (вторая половина ролика — он же задом наперед) */
 function clipsHTML(x){
-  return `<div class="wrap camp-rowbox">${x.caption ? `<p class="camp-cap">${T(x.caption)}</p>` : ''}<div class="clips">${
+  return `<div class="wrap camp-rowbox">${x.caption ? `<p class="camp-cap">${T(x.caption)}</p>` : ''}<div class="clips${x.tall ? ' tall' : ''}">${
     x.clips.map(src => `<div class="clip"><video src="${src}#t=0.1" muted loop playsinline autoplay preload="auto" disablepictureinpicture></video></div>`).join('')
   }</div></div>`;
 }
