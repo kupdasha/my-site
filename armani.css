@@ -27,7 +27,8 @@
 .ac-sheet:hover img{transform:scale(1.03)}
 @media (max-width:760px){.ac-desk{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* ---------- раскадровка-плеер ---------- */
+/* ---------- раскадровка-плеер: целиком в один экран ---------- */
+.ac-board{max-width:min(100%,calc((100svh - 300px) * 1400 / 785));margin:0 auto}
 .ac-screen{position:relative;aspect-ratio:1400/785;border-radius:var(--r-img);overflow:hidden;background:var(--ac-screen);isolation:isolate}
 .ac-layer{position:absolute;inset:0;opacity:0;transition:opacity 1s var(--ease)}
 .ac-layer img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:var(--ox,50%) var(--oy,50%)}
@@ -65,43 +66,53 @@
 .ac-thumb i{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--bg);transform-origin:left;transform:scaleX(0)}
 .ac-thumb.on i{transform:scaleX(var(--p,0))}
 
-/* ---------- квартира с нуля: картинка закреплена, шаги сменяются ---------- */
-.ac-build{height:calc(var(--n) * 70vh + 100vh);position:relative}
-.ac-pin{position:sticky;top:0;height:100vh;height:100svh;align-content:center;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);align-items:end}
-.ac-stage{grid-column:1 / span 8;display:grid;aspect-ratio:3/2;max-height:72vh;border-radius:var(--r-img);overflow:hidden;background:var(--soft)}
-.ac-step{grid-area:1 / 1;padding:0;opacity:0;transform:scale(1.03);transition:opacity .9s var(--ease),transform 1.2s var(--ease);cursor:zoom-in;min-height:0}
-.ac-step img{width:100%;height:100%;object-fit:contain;display:block}
-.ac-step.on{opacity:1;transform:none;z-index:1}
-.ac-side{grid-column:9 / -1;padding-bottom:4px}
-.ac-bars{display:flex;gap:6px;margin-bottom:20px}
-.ac-bars i{flex:1;height:3px;border-radius:2px;background:color-mix(in srgb,var(--ink) 15%,transparent);position:relative;overflow:hidden}
-.ac-bars i::after{content:"";position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(var(--f,0))}
-.ac-says{display:grid}
-.ac-say{grid-area:1 / 1;font-family:var(--font-read);font-size:clamp(20px,1.7vw,24px);line-height:1.4;opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease),transform .6s var(--ease)}
-.ac-say.on{opacity:1;transform:none;transition-delay:.12s}
-@media (max-width:760px){
-  .ac-pin{grid-template-columns:1fr;row-gap:20px;align-content:center}
-  .ac-stage,.ac-side{grid-column:1 / -1}
-  .ac-stage{aspect-ratio:4/3}
+/* ---------- квартира с нуля: эскизы летают вокруг текста ---------- */
+.ac-build{position:relative;min-height:clamp(760px,66vw,1020px)}
+.ac-mid{position:relative;z-index:2;width:42%;margin:0 auto;padding-top:clamp(24px,4vw,64px);text-align:left}
+.ac-mid .ac-title{margin:16px 0 20px}
+.ac-mid .ac-text{margin-bottom:24px}
+.ac-says{display:grid;gap:12px}
+.ac-say{font-size:clamp(17px,1.25vw,19px);line-height:1.45;opacity:.6;transition:opacity .35s var(--ease)}
+.ac-build.pick .ac-say{opacity:.3}
+.ac-build.pick .ac-say.on{opacity:1}
+.ac-fly{position:absolute;z-index:1;left:var(--x);top:var(--y);width:var(--w);padding:0;cursor:zoom-in;
+  transform:translate3d(0,var(--s,0px),0);transition:transform .9s var(--ease)}
+.ac-fly span{display:block;background:#fff;padding:clamp(5px,.6vw,9px);border-radius:4px;
+  box-shadow:0 1px 2px rgba(0,0,0,.08),0 18px 40px -18px rgba(0,0,0,.35);
+  transform:rotate(var(--r));animation:acFloat 9s ease-in-out var(--d) infinite;transition:box-shadow .4s var(--ease)}
+.ac-fly img{display:block;width:100%;height:auto;border-radius:2px}
+@keyframes acFloat{0%,100%{transform:translateY(0) rotate(var(--r))}50%{transform:translateY(-14px) rotate(calc(var(--r) * -.5))}}
+.ac-fly.on{z-index:3}
+.ac-fly.on span{animation:none;box-shadow:0 2px 4px rgba(0,0,0,.1),0 28px 56px -18px rgba(0,0,0,.45);transform:rotate(0) scale(1.06)}
+.ac-build.pick .ac-fly:not(.on){opacity:.55}
+.ac-fly{transition:transform .9s var(--ease),opacity .35s var(--ease)}
+@media (max-width:900px){
+  .ac-build{min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,3vw,24px)}
+  .ac-mid{grid-column:1 / -1;width:auto;padding-top:0;margin-bottom:12px}
+  .ac-fly{position:static;width:auto;transform:none}
+  .ac-fly:nth-of-type(5){grid-column:1 / -1;width:70%;justify-self:center}
 }
 
-/* ---------- свет: кнопки и ролики ---------- */
-.ac-modes{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:clamp(20px,2.4vw,32px)}
-.ac-mode{font-size:17px;line-height:1;padding:12px 20px 14px;border-radius:999px;background:var(--soft);color:var(--ink);transition:background .35s var(--ease),color .35s var(--ease)}
-.ac-mode.on{background:var(--ink);color:var(--bg)}
-.ac-panels{display:grid}
-.ac-panel{grid-area:1 / 1;visibility:hidden;opacity:0;transition:opacity .6s var(--ease),visibility 0s .6s}
-.ac-panel.on{visibility:visible;opacity:1;transition:opacity .6s var(--ease),visibility 0s}
+/* ---------- свет: сценарии друг за другом ---------- */
+.ac-mode-block+.ac-mode-block{margin-top:clamp(56px,7vw,104px)}
+.ac-mode-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);margin-bottom:clamp(20px,2.4vw,32px);align-items:baseline}
+.ac-mode-name{grid-column:1 / span 4;font-weight:500;font-size:clamp(26px,2.6vw,38px);line-height:1.1}
+.ac-mode-head .ac-about{grid-column:5 / -1;margin:0}
+@media (max-width:760px){.ac-mode-name,.ac-mode-head .ac-about{grid-column:1 / -1}.ac-mode-head .ac-about{margin-top:12px}}
 .ac-film{aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:var(--ac-screen)}
 .ac-film video{width:100%;height:100%;object-fit:cover;display:block}
-.ac-about{margin-top:clamp(16px,2vw,24px);font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:46ch}
-.ac-row{display:flex;gap:clamp(10px,1.2vw,16px);overflow-x:auto;scrollbar-width:none;margin:clamp(20px,2.4vw,32px) calc(var(--pad) * -1) 0;padding:0 var(--pad)}
+.ac-about{font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:46ch}
+.ac-row{display:flex;gap:clamp(10px,1.2vw,16px);overflow-x:auto;scrollbar-width:none;margin:clamp(14px,1.6vw,20px) calc(var(--pad) * -1) 0;padding:0 var(--pad)}
 .ac-row::-webkit-scrollbar{display:none}
 .ac-cell{flex:none;height:clamp(150px,17vw,240px);padding:0;border-radius:var(--r-img);overflow:hidden;background:var(--soft)}
 .ac-cell img,.ac-cell video{height:100%;width:auto;display:block}
 button.ac-cell{cursor:zoom-in}
 button.ac-cell img{transition:transform .6s var(--ease)}
 button.ac-cell:hover img{transform:scale(1.04)}
+
+/* ---------- полный ролик ---------- */
+.ac-final{aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:var(--ac-screen)}
+.ac-final iframe{width:100%;height:100%;border:0;display:block}
 
 /* ---------- правки: лента ---------- */
 .ac-notes{display:flex;gap:clamp(10px,1.2vw,16px);overflow-x:auto;scrollbar-width:none;margin:0 calc(var(--pad) * -1);padding:0 var(--pad);align-items:stretch}
@@ -113,5 +124,5 @@ button.ac-note img{transition:transform .6s var(--ease)}
 button.ac-note:hover img{transform:scale(1.03)}
 
 @media (prefers-reduced-motion:reduce){
-  .ac-layer.on img,.ac-screen.lit .ac-beam{animation:none}
+  .ac-layer.on img,.ac-screen.lit .ac-beam,.ac-fly span{animation:none}
 }

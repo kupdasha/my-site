@@ -90,7 +90,8 @@ function boardHTML(c){
     <p class="ac-line" aria-live="polite"></p>
     <div class="ac-reel">${c.frames.map((f, i) =>
       `<button class="ac-thumb" data-i="${i}" aria-label="${f.text.replace(/"/g, '&quot;')}"><img src="${f.img}" alt="" loading="lazy" draggable="false"><i></i></button>`).join('')}</div>
-  </div>${cap(c.hint)}`;
+    ${cap(c.hint)}
+  </div>`;
 }
 function liveBoard(box, c){
   const F = c.frames, N = F.length, DUR = 3600;
@@ -153,72 +154,69 @@ function liveBoard(box, c){
   onScreen(box, v => { seen = v; if (v) run(); }, '-15% 0px');
 }
 
-/* ---------- квартира с нуля: картинка стоит на месте, шаги сменяются при прокрутке ---------- */
-function buildHTML(c){
-  const n = c.steps.length;
-  return `<div class="ac-build" style="--n:${n}">
-    <div class="ac-pin">
-      <div class="ac-stage">${c.steps.map((s, i) =>
-        `<button class="ac-step${i ? '' : ' on'}" aria-label="Увеличить"><img src="${s.img}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>
-      <div class="ac-side">
-        <div class="ac-bars">${c.steps.map((_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</div>
-        <div class="ac-says">${c.steps.map((s, i) => `<p class="ac-say${i ? '' : ' on'}">${H.T(s.text)}</p>`).join('')}</div>
-      </div>
+/* ---------- квартира с нуля: текст в центре, эскизы летают вокруг ---------- */
+// где лежит каждый эскиз: left, top, ширина (в % поля) и наклон
+const SPOTS = [[0, 4, 28, -4], [5, 50, 19, 3], [73, 0, 26, 3], [77, 34, 23, -3], [71, 66, 28, 2]];
+function buildHTML(c, ch){
+  return `<div class="ac-build">
+    <div class="ac-mid">
+      <span class="case-label">${H.T(ch.label)}</span>
+      <h2 class="ac-title">${H.T(ch.title)}</h2>
+      ${ch.text ? `<p class="ac-text">${H.T(ch.text)}</p>` : ''}
+      <div class="ac-says">${c.steps.map((s, i) => `<p class="ac-say" data-i="${i}">${H.T(s.text)}</p>`).join('')}</div>
     </div>
+    ${c.steps.map((s, i) => { const [x, y, w, r] = SPOTS[i % SPOTS.length];
+      return `<button class="ac-fly" data-i="${i}" style="--x:${x}%;--y:${y}%;--w:${w}%;--r:${r}deg;--d:${(i * -1.7).toFixed(1)}s" aria-label="Увеличить"><span><img src="${s.img}" alt="" loading="lazy" draggable="false"></span></button>`; }).join('')}
   </div>${cap(c.hint)}`;
 }
 function liveBuild(box){
-  const steps = [...box.querySelectorAll('.ac-step')];
+  const flies = [...box.querySelectorAll('.ac-fly')];
   const says = [...box.querySelectorAll('.ac-say')];
-  const bars = [...box.querySelectorAll('.ac-bars i')];
-  const n = steps.length;
-  box.addEventListener('click', e => { const b = e.target.closest('.ac-step'); if (b) zoom(steps, b); });
-  let cur = 0;
+  box.addEventListener('click', e => { const b = e.target.closest('.ac-fly'); if (b) zoom(flies, b); });
+  // эскиз и его строчка подсвечивают друг друга
+  const mark = i => { flies.forEach((f, k) => f.classList.toggle('on', k === i)); says.forEach((p, k) => p.classList.toggle('on', k === i)); box.classList.toggle('pick', i >= 0); };
+  [...flies, ...says].forEach(el => {
+    el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') mark(+el.dataset.i); });
+    el.addEventListener('pointerleave', () => mark(-1));
+  });
+  // при прокрутке эскизы расплываются с разной скоростью — как листы в воздухе
   const upd = () => {
+    if (still()) return;
     const r = box.getBoundingClientRect(), vh = innerHeight;
-    const p = clamp(-r.top / Math.max(1, r.height - vh), 0, .9999);
-    const i = Math.floor(p * n);
-    bars.forEach((b, k) => b.style.setProperty('--f', clamp(p * n - k, 0, 1).toFixed(3)));
-    if (i === cur) return;
-    cur = i;
-    [steps, says, bars].forEach(list => list.forEach((el, k) => el.classList.toggle('on', k === i)));
+    const p = clamp((vh - r.top) / (vh + r.height), 0, 1) - .5;
+    flies.forEach((f, i) => f.style.setProperty('--s', `${(p * [70, -50, 90, -60, 40][i % 5]).toFixed(1)}px`));
   };
   upd();
   onScroll(box, upd);
 }
 
-/* ---------- свет: три сценария, кнопки переключают ролик и подборку ---------- */
+/* ---------- свет: все сценарии друг за другом ---------- */
 function lightHTML(c){
-  return `<div class="ac-light">
-    <div class="ac-modes" role="tablist">${c.modes.map((m, i) =>
-      `<button class="ac-mode${i ? '' : ' on'}" role="tab" aria-selected="${!i}" data-i="${i}">${H.T(m.name)}</button>`).join('')}</div>
-    <div class="ac-panels">${c.modes.map((m, i) => `<div class="ac-panel${i ? '' : ' on'}" role="tabpanel">
+  return `<div class="ac-light">${c.modes.map(m => `<div class="ac-mode-block">
+      <div class="ac-mode-head"><h3 class="ac-mode-name">${H.T(m.name)}</h3><p class="ac-about">${H.T(m.text)}</p></div>
       <div class="ac-film">${vid(m.video, m.poster)}</div>
-      <p class="ac-about">${H.T(m.text)}</p>
       ${m.items ? `<div class="ac-row">${m.items.map(src => isVideo(src)
         ? `<div class="ac-cell">${vid(src)}</div>`
         : `<button class="ac-cell" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>` : ''}
-    </div>`).join('')}</div>
-  </div>${cap(c.hint)}`;
+    </div>`).join('')}</div>${cap(c.hint)}`;
 }
 function liveLight(box){
-  const modes = [...box.querySelectorAll('.ac-mode')];
-  const panels = [...box.querySelectorAll('.ac-panel')];
-  let seen = false;
-  const sync = () => panels.forEach(p => p.querySelectorAll('video').forEach(v => {
-    if (seen && p.classList.contains('on') && !still()) v.play().catch(() => {}); else v.pause();
-  }));
-  modes.forEach(b => b.addEventListener('click', () => {
-    const i = +b.dataset.i;
-    modes.forEach((x, k) => { x.classList.toggle('on', k === i); x.setAttribute('aria-selected', k === i); });
-    panels.forEach((p, k) => p.classList.toggle('on', k === i));
-    sync();
-  }));
+  box.querySelectorAll('video').forEach(v => player.observe(v));
   box.addEventListener('click', e => {
     const b = e.target.closest('button.ac-cell'); if (!b) return;
     zoom([...b.closest('.ac-row').querySelectorAll('.ac-cell')], b);
   });
-  onScreen(box, v => { seen = v; sync(); }, '-10% 0px');
+}
+
+/* ---------- полный ролик в конце ---------- */
+function filmHTML(src){
+  const [kind, id] = String(src).split(':');
+  const url = kind === 'vimeo' ? `https://player.vimeo.com/video/${id}?dnt=1&title=0&byline=0&portrait=0` : src;
+  return `<div class="ac-final"><iframe data-src="${url}" title="Ролик Armani/Casa" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
+}
+function liveFilm(box){
+  const f = box.querySelector('iframe');
+  onScreen(box, v => { if (v && !f.src) f.src = f.dataset.src; }, '400px 0px');
 }
 
 /* ---------- правки: лента скриншотов с комментариями и роликов с пометками ---------- */
@@ -238,6 +236,7 @@ const KINDS = {
   board: [boardHTML, liveBoard, '.ac-board'],
   build: [buildHTML, liveBuild, '.ac-build'],
   light: [lightHTML, liveLight, '.ac-light'],
+  film:  [filmHTML, liveFilm, '.ac-final'],
   notes: [notesHTML, liveNotes, '.ac-notes'],
 };
 
@@ -261,8 +260,9 @@ export async function mountCasa(mount, p, helpers){
   await loadCSS(H.base);
   if (!mount.isConnected) return;   // кейс успели закрыть
   const chs = p.casa.map(ch => ({ ch, kind: Object.keys(KINDS).find(k => ch[k]) }));
+  // у «квартиры» заголовок стоит в центре, между эскизами, поэтому общей шапки нет
   mount.innerHTML = chs.map(({ ch, kind }) =>
-    `<section class="ac-ch wrap ac-${kind}-ch">${head(ch)}<div class="ac-viz">${kind ? KINDS[kind][0](ch[kind]) : ''}</div></section>`).join('');
+    `<section class="ac-ch wrap ac-${kind}-ch">${kind === 'build' ? '' : head(ch)}<div class="ac-viz">${kind ? KINDS[kind][0](ch[kind], ch) : ''}</div></section>`).join('');
   const secs = [...mount.querySelectorAll('.ac-ch')];
   secs.forEach((s, i) => {
     reveal.observe(s);
