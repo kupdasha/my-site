@@ -416,10 +416,20 @@ img,video{display:block;max-width:100%}
 .ph-solo .ph-text{max-width:none}
 .ph-text h3{font-weight:500;font-size:clamp(24px,2.4vw,34px);line-height:1.1;margin-bottom:16px}
 .ph-text p{font-family:var(--font-read);font-size:18px;line-height:1.5}
+/* планшет: пара телефонов сверху, текст под ними, иначе ему остается узкая колонка */
+@media (max-width:1024px){
+  .ph-many{grid-template-columns:minmax(0,560px);gap:28px}
+  .ph-many .ph-set{justify-content:center}
+}
+/* телефон: всё столбиком, ролик меньше экрана, чтобы рядом было видно текст */
 @media (max-width:760px){
-  .ph-row{grid-template-columns:1fr;gap:24px}
+  .ph-row{grid-template-columns:minmax(0,1fr);gap:24px;margin-top:56px}
   .ph-set{justify-content:center}
-  .ph-many .phone{width:calc((100vw - 32px - 12px) / 2 - 20px);max-width:240px}
+  .phone{width:min(60vw,230px);padding:8px;border-radius:32px}
+  .phone video{border-radius:24px}
+  .ph-many .phone{width:calc((100vw - 32px - 12px) / 2 - 16px);max-width:200px}
+  .ph-text h3{font-size:24px;margin-bottom:12px}
+  .ph-row:last-child{margin-bottom:56px}
 }
 /* tall: вертикальные записи с телефона — целиком, по четыре в ряд (на телефоне по два), см. AR мерч */
 .clips.tall{grid-template-columns:repeat(4,minmax(0,1fr))}
