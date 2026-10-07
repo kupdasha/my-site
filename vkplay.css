@@ -30,11 +30,15 @@
 .vp-plan-map{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:14px;row-gap:12px}
 .vp-plan-pic{position:relative;grid-column:1;grid-row:2;aspect-ratio:608/508;padding:0}
 /* чертеж: тонкие линии цвета текста, сетка через 50 см, светодиоды — голубым */
+.vp-plan-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;padding:.66% .66%;box-sizing:border-box;pointer-events:none}
+/* рендер сверху просвечивает сквозь чертеж; при наведении проступает сильнее */
+.vp-plan-veil{position:absolute;inset:0;background:var(--bg);opacity:.68;transition:opacity .7s var(--ease);pointer-events:none}
+.vp-plan-pic:hover .vp-plan-veil{opacity:.3}
 .vp-draw{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible;pointer-events:none}
 .vp-grid{fill:none;stroke:var(--ink);stroke-width:.6;opacity:.1}
 .vp-ln{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;vector-effect:non-scaling-stroke}
 .vp-ln-bold{stroke-width:2.4}
-.vp-ln-bg{fill:var(--bg)}   /* пуфы, задвинутые под арку, прячутся под ней */
+.vp-ln-bg{fill:none}
 .vp-ln-thin{stroke-width:1;opacity:.55}
 .vp-ln-fill{fill:var(--ink);fill-opacity:0;transition:fill-opacity .8s 1.6s}
 .vp-ln-led{stroke:var(--vp-blue);stroke-width:3}
@@ -109,15 +113,20 @@
 .vp-wipe.only-b .vp-wipe-name-a,.vp-wipe.only-a .vp-wipe-name-b{opacity:0}
 .vp-brands .vp-bar{margin-top:clamp(16px,2vw,24px)}
 
-/* ---------- куб VK Play ---------- */
+/* ---------- куб VK Play: куб, колонна и стойка — в одной перспективе ---------- */
+@property --w{syntax:'<length>';inherits:true;initial-value:0px}
+@property --h{syntax:'<length>';inherits:true;initial-value:0px}
 .vp-cube-box{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center}
-.vp-cube-stage{--s:clamp(110px,13vw,190px);position:relative;height:clamp(440px,46vw,640px);border-radius:var(--r-img);overflow:hidden;background:var(--vp-stage)}
-.vp-cube-spot{position:absolute;left:50%;top:12%;width:var(--s);height:var(--s);margin-left:calc(var(--s) / -2);perspective:900px;cursor:grab;touch-action:none;z-index:2;
-  transition:top 1s var(--ease)}
-.vp-cube-spot.held{cursor:grabbing}
+.vp-cube-stage{--s:clamp(92px,10vw,150px);position:relative;height:calc(var(--s) * 4.4);border-radius:var(--r-img);overflow:hidden;background:var(--vp-stage);
+  perspective:1100px;perspective-origin:50% 38%;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.vp-cube-stage.held{cursor:grabbing}
+/* вся сцена наклонена и повернута один раз — и куб, и стойка смотрят под одним углом */
+.vp-scene{position:absolute;left:50%;top:52%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-16deg) rotateY(-26deg)}
+.vp-cube-pos{position:absolute;left:calc(var(--s) / -2);top:calc(var(--s) / -2);width:var(--s);height:var(--s);transform-style:preserve-3d;
+  transform:translateY(calc(var(--s) * -1.2));transition:transform 1s var(--ease)}
 .vp-cube{position:relative;width:100%;height:100%;transform-style:preserve-3d}
 /* грани — надутые, глянцевые, с текстом из светодиодов */
-.vp-face{position:absolute;inset:0;border-radius:24%;display:grid;place-items:center;color:#fff;backface-visibility:hidden;
+.vp-face{position:absolute;inset:0;border-radius:12%;display:grid;place-items:center;color:#fff;backface-visibility:hidden;
   background:radial-gradient(120% 110% at 28% 18%,#5C9BFF 0%,#1F5CFF 34%,#0A35D6 70%,#0623A0 100%);
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.18),inset 0 -14px 30px rgba(0,10,60,.45),inset 10px 12px 26px rgba(255,255,255,.22)}
 .vp-face span,.vp-face .vp-xo{-webkit-mask:radial-gradient(circle,#000 58%,transparent 64%) 0 0/5px 5px;mask:radial-gradient(circle,#000 58%,transparent 64%) 0 0/5px 5px}
@@ -129,25 +138,51 @@
 .vp-left{transform:rotateY(-90deg) translateZ(calc(var(--s) / 2))}
 .vp-top{transform:rotateX(90deg) translateZ(calc(var(--s) / 2))}
 .vp-bottom{transform:rotateX(-90deg) translateZ(calc(var(--s) / 2))}
-/* подвес: трос сверху. Подставка: колонна от стойки, а стойка шире */
-.vp-cable{position:absolute;left:50%;top:0;width:2px;margin-left:-1px;height:calc(12% + var(--s) * .2);background:#0c0d10;transform-origin:top;transition:transform .7s var(--ease)}
-.vp-post{position:absolute;left:50%;bottom:30%;top:calc(16% + var(--s) * .85);width:clamp(16px,2vw,26px);margin-left:calc(clamp(16px,2vw,26px) / -2);border-radius:4px 4px 0 0;
-  background:linear-gradient(90deg,#1b1c21,#3d4048 45%,#1b1c21);transform:scaleY(0);transform-origin:bottom;transition:transform .9s var(--ease)}
-.vp-desk{position:absolute;left:50%;bottom:10%;width:42%;height:20%;transform:translateX(-50%);border-radius:12px 12px 4px 4px;
-  background:repeating-linear-gradient(90deg,transparent 0 22%,rgba(255,255,255,.05) 22% 22.6%),linear-gradient(180deg,#2c2f38,#121318);
-  box-shadow:0 18px 30px rgba(0,0,0,.35);transition:width .9s var(--ease);z-index:1;overflow:hidden}
-.vp-desk-led{position:absolute;left:0;right:0;top:12%;height:30%;background:#08090c;overflow:hidden;display:flex;align-items:center}
-.vp-desk .vp-led-track{font-size:clamp(14px,1.3vw,18px)}
-.vp-floor{position:absolute;left:8%;right:8%;bottom:8%;height:8%;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,rgba(10,91,255,.35),transparent 70%)}
-.vp-cube-stage[data-mode="stand"] .vp-cable{transform:scaleY(0)}
-.vp-cube-stage[data-mode="stand"] .vp-cube-spot{top:16%}
-.vp-cube-stage[data-mode="stand"] .vp-post{transform:none}
-.vp-cube-stage[data-mode="stand"] .vp-desk{width:64%}
+
+/* коробка: шесть граней по размерам --w (ширина), --h (высота), --d (глубина), центр сдвинут на --y */
+.vp-box{position:absolute;left:0;top:0;transform-style:preserve-3d;transform:translateY(var(--y,0px))}
+.vp-box > i{position:absolute;display:block}
+.vp-f,.vp-b{width:var(--w);height:var(--h);left:calc(var(--w) / -2);top:calc(var(--h) / -2)}
+.vp-l,.vp-r{width:var(--d);height:var(--h);left:calc(var(--d) / -2);top:calc(var(--h) / -2)}
+.vp-t,.vp-u{width:var(--w);height:var(--d);left:calc(var(--w) / -2);top:calc(var(--d) / -2)}
+.vp-f{transform:translateZ(calc(var(--d) / 2))}
+.vp-b{transform:rotateY(180deg) translateZ(calc(var(--d) / 2))}
+.vp-r{transform:rotateY(90deg) translateZ(calc(var(--w) / 2))}
+.vp-l{transform:rotateY(-90deg) translateZ(calc(var(--w) / 2))}
+.vp-t{transform:rotateX(90deg) translateZ(calc(var(--h) / 2))}
+.vp-u{transform:rotateX(-90deg) translateZ(calc(var(--h) / 2))}
+/* стойка: верх чуть светлее, бока темнее, спереди — бегущая строка */
+.vp-desk{--w:calc(var(--s) * 1.9);--h:calc(var(--s) * .9);--d:calc(var(--s) * 1.2);--y:calc(var(--s) * 1.1);transition:--w .9s var(--ease)}
+.vp-desk > i{background:linear-gradient(180deg,#22242b,#101115)}
+.vp-desk > .vp-t{background:#3a3d46}
+.vp-desk > .vp-l,.vp-desk > .vp-r{background:linear-gradient(180deg,#191a1f,#0b0c0f)}
+.vp-desk > .vp-u{background:#08090b}
+.vp-desk > .vp-f{background:repeating-linear-gradient(90deg,transparent 0 24%,rgba(255,255,255,.05) 24% 24.6%),linear-gradient(180deg,#262830,#111216);overflow:hidden}
+.vp-desk-led{position:absolute;left:0;right:0;top:10%;height:32%;background:#08090c;overflow:hidden;display:flex;align-items:center}
+.vp-desk .vp-led-track{font-size:calc(var(--s) * .16)}
+/* колонна под кубом: растет из стойки, когда навеса нет */
+.vp-post{--w:calc(var(--s) * .16);--d:calc(var(--s) * .16);--h:0px;--y:calc(var(--s) * .65 - var(--h) / 2);transition:--h .9s var(--ease)}
+.vp-post > i{background:linear-gradient(90deg,#1b1c21,#3d4048 50%,#1b1c21)}
+/* трос подвеса: уходит вверх за край */
+.vp-cable{--w:2px;--d:2px;--h:calc(var(--s) * 2);--y:calc(var(--s) * -2.7);transition:opacity .6s}
+.vp-cable > i{background:#0c0d10}
+/* пол: голубое пятно света под стойкой */
+.vp-floor{position:absolute;left:calc(var(--s) * -1.8);top:calc(var(--s) * -1.4);width:calc(var(--s) * 3.6);height:calc(var(--s) * 2.8);border-radius:50%;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(10,91,255,.35),transparent 70%);transform:translateY(calc(var(--s) * 1.55)) rotateX(90deg)}
+.vp-cube-stage[data-mode="stand"] .vp-cable{opacity:0}
+.vp-cube-stage[data-mode="stand"] .vp-post{--h:calc(var(--s) * 1.3)}
+.vp-cube-stage[data-mode="stand"] .vp-desk{--w:calc(var(--s) * 2.8)}
 .vp-cube-side{display:flex;flex-direction:column;gap:clamp(20px,2.4vw,28px)}
 .vp-mode-text{display:none;font-family:var(--font-read);font-size:clamp(19px,1.6vw,23px);line-height:1.45;max-width:36ch}
 .vp-mode-text.on{display:block;animation:vpFade .5s var(--ease)}
 @keyframes vpFade{from{opacity:0;transform:translateY(8px)}}
 @media (max-width:860px){.vp-cube-box{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.vp-cube-stage{--s:76px}}
+
+/* ---------- сделано в Blender ---------- */
+.vp-credit{display:flex;align-items:center;gap:clamp(16px,2vw,28px);padding:clamp(20px,2.4vw,32px) 0;border-top:2px solid var(--line);border-bottom:2px solid var(--line)}
+.vp-blender{flex:none;width:clamp(48px,5vw,72px);height:auto;color:var(--ink)}
+.vp-credit p{font-size:clamp(22px,2.2vw,32px);font-weight:500;line-height:1.2;max-width:30ch;text-wrap:balance}
 
 /* ---------- бегущая строка: светодиоды без свечения ---------- */
 .vp-led{height:clamp(96px,11vw,150px);border-radius:var(--r-img);background:#08090c;overflow:hidden;display:flex;align-items:center;
@@ -177,4 +212,3 @@
 .vp-walk-shot:hover img{transform:scale(1.03)}
 .vp-walk-item figcaption{font-size:16px;opacity:.6;margin-top:12px}
 @media (max-width:760px){.vp-walk{height:calc(100vh + var(--n) * 24vh)}.vp-walk-item{width:86vw}}
-@media (max-width:560px){.vp-cube-stage{height:400px}.vp-desk{width:64%}.vp-cube-stage[data-mode="stand"] .vp-desk{width:88%}}

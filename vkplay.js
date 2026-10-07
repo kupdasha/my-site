@@ -3,7 +3,7 @@
    Стенд из трех модулей, который брендируется под один бренд
    или под три. План сверху подсвечивает модули, на общем виде
    точки рассказывают, из чего стенд собран, шторка меняет один
-   бренд на три, куб крутится и переезжает с подвеса на подставку,
+   бренд на три, куб крутится и переезжает с подвеса на подставку (стойка — в той же перспективе),
    бегущая строка печатает ваш текст, а стенд обходится прокруткой.
    Тексты — в content.js, оформление — vkplay.css.
    ================================================================ */
@@ -42,7 +42,7 @@ const head = ch => `<div class="vp-head">
 </div>`;
 const cap = t => t ? `<p class="vp-cap">${H.T(t)}</p>` : '';
 
-/* ---------- план сверху: чертеж стенда, три модуля подсвечиваются по очереди ---------- */
+/* ---------- план сверху: чертеж поверх рендера, на просвет; три модуля подсвечиваются по очереди ---------- */
 // чертеж в масштабе: 1 единица — 1 см, площадка 600 на 500. Линии прорисовываются при появлении
 const ln = (d, c = '') => `<path class="vp-ln${c}" d="${d}" pathLength="1"/>`;
 const rr = (x, y, w, h, r) => `M${x + r} ${y}H${x + w - r}A${r} ${r} 0 0 1 ${x + w} ${y + r}V${y + h - r}A${r} ${r} 0 0 1 ${x + w - r} ${y + h}H${x + r}A${r} ${r} 0 0 1 ${x} ${y + h - r}V${y + r}A${r} ${r} 0 0 1 ${x + r} ${y}Z`;
@@ -76,6 +76,7 @@ function planHTML(c){
     <div class="vp-plan-map">
       <div class="vp-dim vp-dim-w"><i></i><span>${H.T(c.width)}</span></div>
       <div class="vp-plan-pic">
+        ${c.img ? `<img class="vp-plan-photo" src="${c.img}" alt="" draggable="false"><span class="vp-plan-veil"></span>` : ''}
         ${planSVG()}
         ${c.zones.map((z, i) => `<button class="vp-zone" data-i="${i}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%" aria-label="${esc(H.pick(z.name))}"></button>`).join('')}
       </div>
@@ -108,16 +109,14 @@ function partsHTML(c){
       ${c.spots.map((s, i) => `<button class="vp-spot" data-i="${i}" style="left:${s.x}%;top:${s.y}%" aria-label="${esc(H.pick(s.name))}"><i></i></button>`).join('')}
       <div class="vp-tip" aria-live="polite"><b></b><span></span></div>
     </div>
-    <ul class="vp-chips">${c.spots.map((s, i) => `<li><button class="chip vp-part" data-i="${i}">${H.T(s.name)}</button></li>`).join('')}</ul>
   </div>`;
 }
 function liveParts(box, c){
   const pic = box.querySelector('.vp-parts-pic'), tip = box.querySelector('.vp-tip');
-  const spots = [...box.querySelectorAll('.vp-spot')], chips = [...box.querySelectorAll('.vp-part')];
+  const spots = [...box.querySelectorAll('.vp-spot')];
   const show = i => {
     const s = c.spots[i];
     spots.forEach((el, k) => el.classList.toggle('on', k === i));
-    chips.forEach((el, k) => el.classList.toggle('on', k === i));
     tip.querySelector('b').innerHTML = H.T(s.name);
     tip.querySelector('span').innerHTML = s.text ? H.T(s.text) : '';
     // подсказка — с той стороны точки, где больше места
@@ -128,7 +127,7 @@ function liveParts(box, c){
   };
   show(0);
   const stop = autoTour(pic, c.spots.length, show, 3000);
-  [...spots, ...chips].forEach(el => {
+  spots.forEach(el => {
     el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { stop(); show(+el.dataset.i); } });
     el.addEventListener('click', () => { stop(); show(+el.dataset.i); });
   });
@@ -207,16 +206,21 @@ function liveBrands(box, c){
 /* ---------- куб VK Play: крутится, переезжает с подвеса на подставку ---------- */
 // логотип-иксоник: крестик и кружок, как на кубе в рендерах
 const XO = `<svg class="vp-xo" viewBox="0 0 100 50" aria-hidden="true"><path d="M8 9l30 32M38 9L8 41" stroke="currentColor" stroke-width="10" stroke-linecap="round"/><circle cx="74" cy="25" r="16" fill="none" stroke="currentColor" stroke-width="10"/></svg>`;
+// коробка из шести граней; размеры — в CSS-переменных --w, --h, --d, поэтому стойка плавно раздается вширь
+const box3d = (cls, front = '') => `<div class="vp-box ${cls}"><i class="vp-f">${front}</i><i class="vp-b"></i><i class="vp-l"></i><i class="vp-r"></i><i class="vp-t"></i><i class="vp-u"></i></div>`;
 function cubeHTML(c){
   const face = f => f === 'xo' ? XO : `<span>${esc(H.pick(f))}</span>`;
   const sides = ['front', 'right', 'back', 'left', 'top', 'bottom'];
+  const led = `<div class="vp-desk-led"><div class="vp-led-track">${tickerRun(H.pick(c.desk))}</div></div>`;
   return `<div class="vp-cube-box">
     <div class="vp-cube-stage" data-mode="${c.modes[0].key}">
-      <div class="vp-cable"></div>
-      <div class="vp-cube-spot"><div class="vp-cube">${sides.map((s, i) => `<div class="vp-face vp-${s}">${c.faces[i] ? face(c.faces[i]) : ''}</div>`).join('')}</div></div>
-      <div class="vp-post"></div>
-      <div class="vp-desk"><div class="vp-desk-led"><div class="vp-led-track">${tickerRun(H.pick(c.desk))}</div></div></div>
-      <div class="vp-floor"></div>
+      <div class="vp-scene">
+        <div class="vp-floor"></div>
+        ${box3d('vp-cable')}
+        ${box3d('vp-post')}
+        ${box3d('vp-desk', led)}
+        <div class="vp-cube-pos"><div class="vp-cube">${sides.map((s, i) => `<div class="vp-face vp-${s}">${c.faces[i] ? face(c.faces[i]) : ''}</div>`).join('')}</div></div>
+      </div>
     </div>
     <div class="vp-cube-side">
       <div class="vp-bar">${c.modes.map((m, i) => `<button class="btn btn-line vp-mode${i ? '' : ' on'}" data-k="${m.key}"><span class="spell">${H.T(m.name)}</span></button>`).join('')}</div>
@@ -233,33 +237,39 @@ function liveCube(box, c){
     btns.forEach(o => o.classList.toggle('on', o === b));
     texts.forEach(t => t.classList.toggle('on', t.dataset.k === b.dataset.k));
   }));
-  // вращение: само по себе медленно, пальцем или мышкой — с разгоном и затуханием
-  let ang = -28, tilt = -14, vel = .12, raf = 0, last = 0, drag = null;
+  // наклон и ракурс задает вся сцена, куб только вращается вокруг своей оси: сам медленно, пальцем — с разгоном
+  let ang = 20, vel = .12, raf = 0, last = 0, drag = null;
+  const put = () => { cube.style.transform = `rotateY(${ang.toFixed(2)}deg)`; };
   const draw = t => {
     const dt = last ? Math.min(48, t - last) : 16; last = t;
-    if (!drag) { vel += (.12 - vel) * .02 * dt / 16; ang += vel * dt / 16; tilt += (-14 - tilt) * .04; }
-    cube.style.transform = `rotateX(${tilt.toFixed(2)}deg) rotateY(${ang.toFixed(2)}deg)`;
+    if (!drag) { vel += (.12 - vel) * .02 * dt / 16; ang += vel * dt / 16; }
+    put();
     raf = requestAnimationFrame(draw);
   };
-  cube.style.transform = `rotateX(${tilt}deg) rotateY(${ang}deg)`;
-  const spot = box.querySelector('.vp-cube-spot');
-  spot.addEventListener('pointerdown', e => {
-    drag = { x: e.clientX, y: e.clientY, t: performance.now() };
-    spot.setPointerCapture(e.pointerId); spot.classList.add('held');
+  put();
+  stage.addEventListener('pointerdown', e => {
+    drag = { x: e.clientX, t: performance.now() };
+    stage.setPointerCapture(e.pointerId); stage.classList.add('held');
   });
-  spot.addEventListener('pointermove', e => {
+  stage.addEventListener('pointermove', e => {
     if (!drag) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y, now = performance.now();
-    ang += dx * .5; tilt = clamp(tilt - dy * .3, -40, 20);
+    const dx = e.clientX - drag.x, now = performance.now();
+    ang += dx * .5;
     vel = dx * .5 / Math.max(8, now - drag.t) * 16;
-    drag = { x: e.clientX, y: e.clientY, t: now };
-    if (still()) cube.style.transform = `rotateX(${tilt}deg) rotateY(${ang}deg)`;
+    drag = { x: e.clientX, t: now };
+    if (still()) put();
   });
-  const up = () => { drag = null; spot.classList.remove('held'); };
-  spot.addEventListener('pointerup', up);
-  spot.addEventListener('pointercancel', up);
+  const up = () => { drag = null; stage.classList.remove('held'); };
+  stage.addEventListener('pointerup', up);
+  stage.addEventListener('pointercancel', up);
   if (still()) return;
   onScreen(stage, v => { cancelAnimationFrame(raf); last = 0; if (v) raf = requestAnimationFrame(draw); });
+}
+
+/* ---------- сделано в Blender: значок и одна фраза ---------- */
+const BLENDER = `<svg class="vp-blender" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.51 13.214c.046-.8.438-1.506 1.03-2.006a3.424 3.424 0 0 1 2.212-.79c.85 0 1.631.3 2.211.79.592.5.983 1.206 1.028 2.005.045.823-.285 1.586-.865 2.153a3.389 3.389 0 0 1-2.374.938 3.393 3.393 0 0 1-2.376-.938c-.58-.567-.91-1.33-.865-2.152M7.35 14.831c.006.314.106.922.256 1.398a7.372 7.372 0 0 0 1.593 2.757 8.227 8.227 0 0 0 2.787 2.001 8.947 8.947 0 0 0 3.66.76 8.964 8.964 0 0 0 3.657-.772 8.285 8.285 0 0 0 2.785-2.01 7.428 7.428 0 0 0 1.592-2.762 6.964 6.964 0 0 0 .25-3.074 7.123 7.123 0 0 0-1.016-2.779 7.764 7.764 0 0 0-1.852-2.043h.002L13.566 2.55l-.02-.015c-.492-.378-1.319-.376-1.860.002-.547.382-.609 1.015-.123 1.415l-.001.001 3.126 2.543-9.53.01h-.013c-.788.001-1.545.518-1.695 1.172-.154.665.38 1.217 1.2 1.22V8.9l4.83-.01-8.62 6.617-.034.025c-.813.622-1.075 1.658-.563 2.313.52.667 1.625.668 2.447.004L7.414 14s-.069.52-.063.831zm12.09 1.741c-.97.988-2.326 1.548-3.795 1.55-1.47.004-2.827-.552-3.797-1.538a4.51 4.51 0 0 1-1.036-1.622 4.282 4.282 0 0 1 .282-3.519 4.702 4.702 0 0 1 1.153-1.371c.942-.768 2.141-1.183 3.396-1.185 1.256-.002 2.455.41 3.398 1.175.48.391.87.854 1.152 1.367a4.28 4.28 0 0 1 .522 1.706 4.236 4.236 0 0 1-.239 1.811 4.54 4.54 0 0 1-1.035 1.626"/></svg>`;
+function creditHTML(c){
+  return `<div class="vp-credit">${BLENDER}<p>${H.T(c.text)}</p></div>`;
 }
 
 /* ---------- бегущая строка: лайн, логотипы или ваш текст ---------- */
@@ -339,6 +349,7 @@ const KINDS = {
   cube:   [cubeHTML, liveCube],
   ticker: [tickerHTML, liveTicker],
   walk:   [walkHTML, liveWalk],
+  credit: [creditHTML, () => {}],
 };
 
 /* ---------- запуск ---------- */
@@ -361,7 +372,7 @@ export async function mountStand(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   const kinds = p.stand.map(ch => Object.keys(KINDS).find(k => ch[k]));
   mount.innerHTML = p.stand.map((ch, i) =>
-    `<section class="vp-ch ${kinds[i] === 'walk' ? '' : 'wrap '}vp-${kinds[i]}-ch">${kinds[i] === 'walk' ? `<div class="wrap">${head(ch)}</div>` : head(ch)}<div class="vp-viz">${
+    `<section class="vp-ch ${kinds[i] === 'walk' ? '' : 'wrap '}vp-${kinds[i]}-ch">${kinds[i] === 'credit' ? '' : kinds[i] === 'walk' ? `<div class="wrap">${head(ch)}</div>` : head(ch)}<div class="vp-viz">${
       kinds[i] ? KINDS[kinds[i]][0](ch[kinds[i]]) : ''}</div></section>`).join('');
   mount.querySelectorAll('.vp-ch').forEach(s => reveal.observe(s));
   mount.querySelectorAll('.vp-ch').forEach((s, i) => { const k = kinds[i]; if (k) KINDS[k][1](s.querySelector('.vp-viz'), p.stand[i][k]); });
