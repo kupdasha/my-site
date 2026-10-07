@@ -13,14 +13,14 @@
 if (window.__kdApp) return; window.__kdApp = true;
 
 /* На Тильде тексты (content.js) приходят с GitHub как есть, с адресами прототипа.
-   Здесь они переводятся на адреса сайта: index.html → /, about.html → /about,
+   Здесь они переводятся на адреса сайта: index.html → /, about.html → /i,
    а картинки img/… — на тот же GitHub, откуда пришел content.js */
 {
   const src = document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/app\.js(\?|$)/.test(s)) || '';
   const onTilda = !document.querySelector('script[src="content.js"]');
   const base = src.replace(/app\.js(\?.*)?$/, '');
   if (onTilda && typeof SITE !== 'undefined') {
-    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/about'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/n_d_a']];
+    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/i'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/n_d_a']];
     const fix = s => {
       if (s.startsWith('img/')) return base + s;
       for (const [re, to] of PAGES) if (re.test(s)) return s.replace(re, to).replace('/#', '/#').replace(/^\/\/+/, '/');
