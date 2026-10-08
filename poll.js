@@ -4,10 +4,15 @@
    hands — зал поднимает руки вразнобой, на экране «?»; тумблер
    «руки / телефоны»: руки опускаются, у каждого загорается телефон,
    точки-ответы летят на экран и складываются в столбики;
-   join — вход: телефон наводит камеру на QR, ноутбук набирает код
-   с экрана, участники точками садятся в ряд на экране;
-   results — одни и те же ответы облаком слов, графиком и рейтингом,
-   переключатель иконками, растут в реальном времени;
+   join — камера телефона ловит QR с экрана зала, на телефоне
+   появляются те же вопрос и варианты, что на экране; палец
+   выбирает вариант — голос летит на экран, полоска растет;
+   results — экран зала, как в «Вслухе»: десять видов ответов
+   (опрос, шарики, круговая, сетка, облако слов, число, матрица,
+   свои слова, вопросы вам, порядок), плитки-иконки, как в меню
+   «Добавить слайд», переключаются сами;
+   Цвета и формы — как в самом интерфейсе «Вслуха»: темный экран
+   зала, фиолетовый акцент, серые варианты, без обводок.
    deck — PDF раскладывается на слайды, между ними встает слайд
    с опросом, кружки меняют оформление;
    local — схема: ноутбук с пультом, проектор, телефоны; связь
@@ -204,162 +209,271 @@ function liveHands(box, c){
 }
 
 /* ================================================================
-   join — вход по QR и по коду
+   join — навел камеру на QR, на телефоне те же варианты, что на экране,
+   нажал — голос сразу виден на экране зала
    ================================================================ */
+// полоска ответа, как на экране «Вслуха»: подпись и проценты сверху, дорожка с заливкой снизу
+const rbar = (label, i) => `<div class="pl-rb" data-i="${i}"><div class="row">${label}<em>0%</em></div><div class="tr"><b></b></div></div>`;
+// подпись-заглушка: серая строка вместо слов
+const ln = w => `<i class="pl-ln0" style="width:${w}%"></i>`;
 function joinHTML(c){
-  const code = String(c.code);
+  const q = H.T(c.question);
+  const opts = H.pick(c.options);
   return `<div class="pl-stage pl-join" data-s="0">
-    <div class="pl-dev pl-phone"><div class="pl-scr">
-      <div class="pl-cam"><div class="pl-cam-qr">${qrSVG()}</div><i class="pl-scan"></i><i class="pl-corners"></i></div>
-      <div class="pl-ans">${[0, 1, 2].map(i => `<i style="--i:${i}"></i>`).join('')}</div>
-    </div></div>
-    <div class="pl-proj">
-      <div class="pl-proj-in">${qrSVG()}<div class="pl-code">${[...code].map(d => `<b>${esc(d)}</b>`).join('')}</div></div>
-      <div class="pl-seats">${Array.from({ length: 12 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}</div>
+    <div class="pl-scr pl-jscr">
+      <div class="pl-slide pl-jjoin">${qrSVG()}<div class="pl-jside"><i class="pl-ln0" style="width:70%"></i><i class="pl-ln0" style="width:46%"></i><b class="pl-jcode">${esc(c.code)}</b></div></div>
+      <div class="pl-slide pl-jq"><p class="pl-st">${q}</p><div class="pl-rbs">${opts.map((o, i) => rbar(`<span>${esc(o)}</span>`, i)).join('')}</div></div>
     </div>
-    <div class="pl-dev pl-lap"><div class="pl-lscr">
-      <i class="pl-url"></i>
-      <div class="pl-form"><div class="pl-boxes">${[...code].map(() => '<b></b>').join('')}</div><i class="pl-go"></i></div>
-      <div class="pl-ans">${[0, 1, 2].map(i => `<i style="--i:${i}"></i>`).join('')}</div>
-    </div><i class="pl-lbase"></i></div>
+    <div class="pl-tel">
+      <div class="pl-tel-in">
+        <div class="pl-cam">${qrSVG()}<i class="pl-corners"></i><i class="pl-scan"></i></div>
+        <div class="pl-pp">
+          <p class="pl-pq">${q}</p>
+          ${opts.map((o, i) => `<div class="pl-opt" data-i="${i}" style="--i:${i}"><i></i><span>${esc(o)}</span></div>`).join('')}
+          <div class="pl-send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        </div>
+        <i class="pl-flash"></i>
+      </div>
+      <i class="pl-finger" aria-hidden="true"></i>
+    </div>
   </div>`;
 }
 function liveJoin(box, c){
   const stage = box.querySelector('.pl-join');
-  const phone = box.querySelector('.pl-phone .pl-scr');
-  const lap = box.querySelector('.pl-lscr');
-  const seats = [...box.querySelectorAll('.pl-seats i')];
-  const boxes = [...box.querySelectorAll('.pl-boxes b')];
-  const code = [...String(c.code)];
+  const tel = box.querySelector('.pl-tel');
+  const finger = box.querySelector('.pl-finger');
+  const opts = [...box.querySelectorAll('.pl-opt')];
+  const send = box.querySelector('.pl-send');
+  const rows = [...box.querySelectorAll('.pl-jq .pl-rb')];
+  const n = rows.map(() => 0);
   const S = v => { stage.dataset.s = v; };
+  const draw = () => {
+    const sum = n.reduce((a, b) => a + b, 0) || 1;
+    rows.forEach((r, i) => { const p = Math.round(n[i] / sum * 100); r.style.setProperty('--w', p / 100); r.querySelector('em').textContent = p + '%'; });
+  };
+  // палец: полупрозрачный кружок касания, едет к нужному месту на телефоне
+  const touch = async el => {
+    const t = tel.getBoundingClientRect(), r = el.getBoundingClientRect();
+    finger.style.transform = `translate(${r.left - t.left + r.width * .3}px,${r.top - t.top + r.height / 2}px)`;
+    finger.classList.add('on');
+    await wait(650);
+    finger.classList.add('tap'); await wait(260); finger.classList.remove('tap');
+  };
   let on = false, busy = false;
   const reset = () => {
-    S(0); stage.classList.remove('ph-in', 'lap-in', 'go');
-    seats.forEach(s => s.classList.remove('on'));
-    boxes.forEach(b => { b.textContent = ''; });
+    S(0); n.fill(0); draw();
+    opts.forEach(o => o.classList.remove('sel'));
+    send.classList.remove('ready', 'sent');
+    finger.classList.remove('on');
   };
-  const sit = i => seats[i] && seats[i].classList.add('on');
   const loop = async () => {
     if (busy) return; busy = true;
     while (on) {
-      reset(); await wait(700); if (!on) break;
-      S(1); await wait(1700); if (!on) break;                     // камера ловит QR
-      stage.classList.add('ph-in');                               // телефон внутри: кнопки ответов
-      fly(stage, phone, seats[0], { lift: 50 }).then(() => sit(0));
-      await wait(500);
-      for (const [i, d] of code.entries()) { if (!on) break; boxes[i].textContent = d; await wait(280); }   // ноутбук набирает код с экрана
-      if (!on) break;
-      await wait(250); stage.classList.add('go'); await wait(350);
-      stage.classList.add('lap-in');
-      fly(stage, lap, seats[1], { lift: 50 }).then(() => sit(1));
-      await wait(900);
-      // остальной зал заходит сам
-      for (let i = 2; i < seats.length && on; i++) { sit(i); await wait(140); }
+      reset(); await wait(900); if (!on) break;
+      S(1); await wait(1900); if (!on) break;          // камера ловит QR с экрана
+      S(2); await wait(1300); if (!on) break;          // на телефоне — тот же вопрос и те же варианты, что на экране
+      const pick = opts[0];
+      await touch(pick); pick.classList.add('sel'); send.classList.add('ready');
+      await wait(450); if (!on) break;
+      await touch(send); send.classList.add('sent');
+      finger.classList.remove('on');
+      await fly(stage, send, rows[0].querySelector('.tr'), { dur: 900, lift: 90 });
+      n[0]++; draw(); rows[0].classList.remove('hit'); void rows[0].offsetWidth; rows[0].classList.add('hit');
+      await wait(700);
+      // остальной зал тоже отвечает
+      for (let k = 0; k < 14 && on; k++) { n[[0, 0, 1, 2, 1, 0][rnd(6)]]++; draw(); await wait(170); }
       await wait(2600);
     }
     busy = false;
   };
-  if (still()) { S(1); stage.classList.add('ph-in', 'lap-in', 'go'); boxes.forEach((b, i) => { b.textContent = code[i]; }); seats.forEach(s => s.classList.add('on')); return; }
+  if (still()) { S(2); opts[0].classList.add('sel'); n.splice(0, 3, 9, 5, 2); draw(); return; }
   onScreen(stage, v => { on = v; if (on) loop(); }, .35);
 }
 
 /* ================================================================
-   results — облако слов, график, рейтинг
+   results — экран зала: десять способов показать ответы
    ================================================================ */
-const ICON = {
-  cloud: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 24h15a5.5 5.5 0 0 0 .6-11A7.5 7.5 0 0 0 10.2 12 6 6 0 0 0 9 24z"/></svg>`,
-  bars: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26V15M13 26V7M20 26V12M27 26V19"/></svg>`,
-  rank: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8h22M5 16h15M5 24h9"/></svg>`,
+// оттенки вариантов — как в «Вслухе»: белый с убывающей плотностью
+const FADE = [1, .74, .55, .41, .31, .24];
+const fade = i => `rgba(255,255,255,${FADE[i % FADE.length]})`;
+// выбор с весами: частые ответы приходят чаще
+const pickW = w => { let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0; while ((r -= w[i]) > 0) i++; return i; };
+// иконки плиток — как в меню «Добавить слайд»: серые фигуры, без подписей
+const TILE = {
+  bars: '<rect x="4" y="7" width="24" height="5" rx="2.5"/><rect x="4" y="14" width="16" height="5" rx="2.5" opacity=".6"/><rect x="4" y="21" width="10" height="5" rx="2.5" opacity=".35"/>',
+  dots: '<circle cx="8" cy="23" r="3"/><circle cx="8" cy="16" r="3"/><circle cx="16" cy="23" r="3"/><circle cx="16" cy="16" r="3"/><circle cx="16" cy="9" r="3"/><circle cx="24" cy="23" r="3" opacity=".5"/>',
+  pie: '<path d="M16 4a12 12 0 1 1-12 12h12z"/><path d="M14 2.2A12 12 0 0 0 2.2 14H14z" opacity=".45"/>',
+  grid: '<rect x="4" y="6" width="5" height="5" rx="1.5"/><rect x="11" y="6" width="5" height="5" rx="1.5"/><rect x="18" y="6" width="5" height="5" rx="1.5"/><rect x="4" y="14" width="5" height="5" rx="1.5"/><rect x="11" y="14" width="5" height="5" rx="1.5"/><rect x="4" y="22" width="5" height="5" rx="1.5" opacity=".5"/>',
+  cloud: '<rect x="3" y="8" width="11" height="5" rx="2.5" opacity=".5"/><rect x="16" y="7" width="13" height="7" rx="3.5"/><rect x="5" y="16" width="16" height="8" rx="4"/><rect x="23" y="18" width="6" height="4" rx="2" opacity=".5"/>',
+  number: '<rect x="4" y="18" width="4" height="8" rx="1.5" opacity=".5"/><rect x="10" y="10" width="4" height="16" rx="1.5"/><rect x="16" y="6" width="4" height="20" rx="1.5"/><rect x="22" y="14" width="4" height="12" rx="1.5" opacity=".5"/>',
+  matrix: '<rect x="15" y="3" width="2" height="26" rx="1" opacity=".45"/><rect x="3" y="15" width="26" height="2" rx="1" opacity=".45"/><circle cx="9" cy="9" r="3"/><circle cx="23" cy="10" r="3"/><circle cx="22" cy="23" r="3"/><circle cx="10" cy="22" r="3" opacity=".5"/>',
+  open: '<path d="M5 6h22a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H13l-6 5v-5H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><rect x="8" y="11" width="16" height="2.4" rx="1.2" fill="#E6E9EF"/><rect x="8" y="15.5" width="10" height="2.4" rx="1.2" fill="#E6E9EF"/>',
+  qa: '<path d="M5 6h22a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H13l-6 5v-5H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><path d="M13.5 11.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.1.9-1.1 1.6" fill="none" stroke="#E6E9EF" stroke-width="2.2" stroke-linecap="round"/><circle cx="16" cy="18.4" r="1.3" fill="#E6E9EF"/>',
+  rank: '<rect x="4" y="6" width="16" height="5" rx="2.5"/><rect x="4" y="14" width="16" height="5" rx="2.5" opacity=".6"/><rect x="4" y="22" width="16" height="5" rx="2.5" opacity=".35"/><path d="M24 11l3-4 3 4z"/><path d="M24 21l3 4 3-4z" opacity=".5"/>',
 };
-// места для слов в облаке: самое частое — в центре, дальше по кругу
-const SPOTS = [[50, 50], [24, 32], [76, 66], [27, 74], [74, 30], [50, 16], [52, 86], [12, 54], [88, 48]];
+const KINDS = Object.keys(TILE);
+
+// у каждого вида: разметка, голос, сброс. Слова — только там, где они и есть суть (облако)
+const V = {
+  bars(el){
+    const L = [52, 34, 44, 26];
+    el.innerHTML = `<div class="pl-rbs">${L.map((w, i) => rbar(ln(w), i)).join('')}</div>`;
+    const rows = [...el.querySelectorAll('.pl-rb')], n = L.map(() => 0), wt = [5, 3, 2.2, 1];
+    const draw = () => { const s = n.reduce((a, b) => a + b, 0) || 1;
+      rows.forEach((r, i) => { const p = Math.round(n[i] / s * 100); r.style.setProperty('--w', p / 100); r.querySelector('em').textContent = p + '%'; }); };
+    return { vote(){ n[pickW(wt)]++; draw(); }, reset(){ n.fill(0); draw(); } };
+  },
+  dots(el){
+    el.innerHTML = `<div class="pv-dots">${[0, 1, 2, 3].map(i => `<div class="col"><div class="pile"></div><b>0</b>${ln([70, 50, 64, 40][i])}</div>`).join('')}</div>`;
+    const cols = [...el.querySelectorAll('.col')], wt = [3, 5, 2, 1.2], n = [0, 0, 0, 0];
+    return {
+      vote(){ const i = pickW(wt); n[i]++;
+        const d = document.createElement('i'); d.style.background = fade(i);
+        cols[i].querySelector('.pile').append(d); cols[i].querySelector('b').textContent = n[i]; },
+      reset(){ n.fill(0); cols.forEach(c => { c.querySelector('.pile').innerHTML = ''; c.querySelector('b').textContent = 0; }); },
+    };
+  },
+  pie(el){
+    const R = 52, C = 2 * Math.PI * R;
+    el.innerHTML = `<div class="pv-pie"><svg viewBox="0 0 120 120" aria-hidden="true"><g transform="rotate(-90 60 60)">${[0, 1, 2, 3].map(i =>
+      `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${fade(i)}" stroke-width="16"/>`).join('')}</g></svg>
+      <div class="leg">${[0, 1, 2, 3].map(i => `<div><i style="background:${fade(i)}"></i>${ln([80, 56, 68, 44][i])}<em>0%</em></div>`).join('')}</div></div>`;
+    const segs = [...el.querySelectorAll('circle')], ems = [...el.querySelectorAll('em')], wt = [5, 3, 2, 1], n = [0, 0, 0, 0];
+    const draw = () => { const s = n.reduce((a, b) => a + b, 0); let acc = 0;
+      segs.forEach((g, i) => { const part = s ? n[i] / s : 0;
+        g.setAttribute('stroke-dasharray', `${C * part} ${C}`); g.setAttribute('stroke-dashoffset', -C * acc); acc += part;
+        ems[i].textContent = Math.round(part * 100) + '%'; }); };
+    return { vote(){ n[pickW(wt)]++; draw(); }, reset(){ n.fill(0); draw(); } };
+  },
+  grid(el){
+    el.innerHTML = `<div class="pv-grid">${[0, 1, 2].map(i => `<div class="row"><div class="lb">${ln([30, 22, 26][i])}<b>0</b></div><div class="cells"></div></div>`).join('')}</div>`;
+    const rows = [...el.querySelectorAll('.row')], wt = [5, 3, 1.5], n = [0, 0, 0];
+    return {
+      vote(){ const i = pickW(wt); n[i]++;
+        const d = document.createElement('i'); d.style.background = fade(i);
+        rows[i].querySelector('.cells').append(d); rows[i].querySelector('b').textContent = n[i]; },
+      reset(){ n.fill(0); rows.forEach(r => { r.querySelector('.cells').innerHTML = ''; r.querySelector('b').textContent = 0; }); },
+    };
+  },
+  cloud(el, c){
+    const words = c.words;
+    el.innerHTML = `<div class="pv-cloud">${words.map(w => `<span>${esc(w)}</span>`).join('')}</div>`;
+    const sp = [...el.querySelectorAll('span')], n = words.map(() => 0);
+    const wt = words.map((_, i) => [6, 4, 3.4, 2.6, 2, 1.6, 1.2, 1, .8, .6][i] || .5);
+    const draw = () => { const max = Math.max(1, ...n);
+      // частое слово крупнее и плотнее, редкое — мельче и бледнее, как в «Вслухе»
+      sp.forEach((s, i) => { const k = n[i] / max;
+        s.style.setProperty('--f', (n[i] ? 18 + 58 * k : 0).toFixed(1));
+        s.style.opacity = n[i] ? FADE[Math.min(5, Math.round((1 - k) * 4))] : 0; }); };
+    return { vote(){ n[pickW(wt)]++; draw(); }, reset(){ n.fill(0); draw(); } };
+  },
+  number(el){
+    el.innerHTML = `<div class="pv-num"><div class="hist">${Array.from({ length: 12 }, () => '<i></i>').join('')}</div><b class="big">0</b></div>`;
+    const bars = [...el.querySelectorAll('.hist i')], big = el.querySelector('.big'), n = bars.map(() => 0);
+    const wt = bars.map((_, i) => Math.exp(-((i - 6.2) ** 2) / 7) + .05);
+    const draw = () => { const max = Math.max(1, ...n), s = n.reduce((a, b) => a + b, 0);
+      bars.forEach((b, i) => b.style.setProperty('--h', n[i] / max));
+      big.textContent = s ? (n.reduce((a, v, i) => a + v * (i + 1), 0) / s).toFixed(1).replace('.', ',') : '0'; };
+    return { vote(){ n[pickW(wt)]++; draw(); }, reset(){ n.fill(0); draw(); } };
+  },
+  matrix(el){
+    el.innerHTML = `<div class="pv-mx"><i class="ax x"></i><i class="ax y"></i></div>`;
+    const box = el.querySelector('.pv-mx');
+    const CL = [[.26, .3], [.72, .24], [.7, .74], [.3, .7]];
+    return {
+      vote(){ const i = pickW([3, 4, 2, 1.4]); const [cx, cy] = CL[i];
+        const p = document.createElement('i'); p.className = 'pt'; p.style.background = fade(i);
+        p.style.left = (cx + (Math.random() - .5) * .3) * 100 + '%'; p.style.top = (cy + (Math.random() - .5) * .3) * 100 + '%';
+        box.append(p); },
+      reset(){ box.querySelectorAll('.pt').forEach(p => p.remove()); },
+    };
+  },
+  open(el){
+    el.innerHTML = `<div class="pv-open"></div>`;
+    const box = el.querySelector('.pv-open');
+    return {
+      vote(){ if (box.children.length >= 9) box.firstElementChild.remove();
+        const d = document.createElement('div'); d.className = 'card';
+        d.innerHTML = ln(60 + rnd(36)) + ln(30 + rnd(40));
+        box.append(d); },
+      reset(){ box.innerHTML = ''; },
+    };
+  },
+  qa(el){
+    el.innerHTML = `<div class="pv-qa">${[0, 1, 2, 3].map(i => `<div class="q" style="--r:${i}"><b>▲0</b><div>${ln([86, 70, 92, 64][i])}${ln([50, 34, 58, 40][i])}</div></div>`).join('')}</div>`;
+    const qs = [...el.querySelectorAll('.q')], wt = [1, 4, 2, 3], n = [0, 0, 0, 0];
+    // за вопрос голосуют стрелкой, популярный поднимается наверх
+    const draw = () => { const ord = n.map((v, i) => i).sort((a, b) => n[b] - n[a] || a - b);
+      ord.forEach((i, r) => { qs[i].style.setProperty('--r', r); qs[i].querySelector('b').textContent = '▲' + n[i]; }); };
+    return { vote(){ n[pickW(wt)]++; draw(); }, reset(){ n.fill(0); draw(); } };
+  },
+  rank(el){
+    const L = [40, 28, 50, 34];
+    el.innerHTML = `<div class="pv-rank">${L.map((w, i) => `<div class="pl-rb" style="--r:${i}"><div class="row"><span class="no">${i + 1}</span>${ln(w)}<em>0</em></div><div class="tr"><b></b></div></div>`).join('')}</div>`;
+    const rows = [...el.querySelectorAll('.pl-rb')], wt = [1, 3, 5, 2], n = [0, 0, 0, 0];
+    // порядок: за первое место больше очков, строки сами переставляются
+    const draw = () => { const max = Math.max(1, ...n);
+      const ord = n.map((v, i) => i).sort((a, b) => n[b] - n[a] || a - b);
+      ord.forEach((i, r) => { rows[i].style.setProperty('--r', r); rows[i].style.setProperty('--w', n[i] / max);
+        rows[i].querySelector('.no').textContent = r + 1; rows[i].querySelector('em').textContent = n[i]; }); };
+    return { vote(){ const i = pickW(wt); n[i] += 1 + rnd(4); draw(); }, reset(){ n.fill(0); draw(); } };
+  },
+};
 function resHTML(c){
-  const names = H.pick(c.views);
+  const names = H.pick(c.types);
   return `<div class="pl-stage pl-res">
-    <div class="pl-tabs">${['cloud', 'bars', 'rank'].map((k, i) =>
-      `<button class="pl-tab" type="button" data-v="${i}" aria-label="${esc(names[i])}" aria-pressed="${i === 0}">${ICON[k]}<i class="pl-tab-t"></i></button>`).join('')}</div>
-    <div class="pl-board" data-v="0">
-      <div class="pl-view pl-cloud">${c.words.map((w, i) => `<span class="pl-wd" data-i="${i}">${esc(w)}</span>`).join('')}</div>
-      <div class="pl-view pl-cols">${c.words.map((w, i) => `<div class="pl-col" data-i="${i}"><i><b></b></i><span>${esc(w)}</span></div>`).join('')}</div>
-      <div class="pl-view pl-rank">${c.words.map((w, i) => `<div class="pl-row" data-i="${i}"><span>${esc(w)}</span><i><b></b></i><em>0</em></div>`).join('')}</div>
-    </div>
+    <div class="pl-scr pl-rscr"><div class="pl-slide"><div class="pl-sth"><i class="pl-ln0" style="width:46%"></i><i class="pl-ln0" style="width:28%"></i></div><div class="pl-vz"></div></div></div>
+    <div class="pl-tiles">${KINDS.map((k, i) =>
+      `<button class="pl-tile" type="button" data-k="${k}" aria-label="${esc(names[i] || k)}" aria-pressed="false"><svg viewBox="0 0 32 32" aria-hidden="true">${TILE[k]}</svg><i class="pl-tile-t"></i></button>`).join('')}</div>
   </div>`;
 }
 function liveRes(box, c){
-  const board = box.querySelector('.pl-board');
-  const tabs = [...box.querySelectorAll('.pl-tab')];
-  const N = c.words.length;
-  const words = [...box.querySelectorAll('.pl-wd')];
-  const cols = [...box.querySelectorAll('.pl-col')];
-  const rows = [...box.querySelectorAll('.pl-row')];
-  const nums = rows.map(r => r.querySelector('em'));
-  let val = [], weight = [];
-  const fresh = () => { val = Array(N).fill(0); weight = shuffle([6, 4.5, 3.5, 2.5, 1.6, 1.2, 1, .8].slice(0, N)); };
-  const draw = hit => {
-    const max = Math.max(1, ...val);
-    const order = val.map((v, i) => i).sort((a, b) => val[b] - val[a] || a - b);
-    order.forEach((i, r) => {
-      const k = val[i] / max;
-      const [x, y] = SPOTS[r % SPOTS.length];
-      const wd = words[i];
-      wd.style.left = x + '%'; wd.style.top = y + '%';
-      wd.style.setProperty('--f', (val[i] ? 20 + 64 * k : 16).toFixed(1));
-      wd.classList.toggle('best', r === 0 && val[i] > 0);
-      wd.classList.toggle('zero', val[i] === 0);
-      cols[i].style.setProperty('--h', k.toFixed(3));
-      cols[i].classList.toggle('best', r === 0 && val[i] > 0);
-      rows[i].style.setProperty('--r', r);
-      rows[i].style.setProperty('--w', k.toFixed(3));
-      rows[i].classList.toggle('best', r === 0 && val[i] > 0);
-      nums[i].textContent = val[i];
-    });
-    if (hit != null) [words[hit], cols[hit], rows[hit]].forEach(el => { el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); });
-  };
-  // голоса приходят по одному, частые слова — чаще
-  const voteOne = () => {
-    const sum = weight.reduce((a, b) => a + b, 0);
-    let r = Math.random() * sum, i = 0;
-    while ((r -= weight[i]) > 0) i++;
-    val[i]++; draw(i);
-  };
-  let view = 0, touched = false, on = false, vt = 0, vtimer = 0, ticking = false;
-  const setView = (v, user) => {
+  const vz = box.querySelector('.pl-vz');
+  const tiles = [...box.querySelectorAll('.pl-tile')];
+  const MS = 4800;
+  let cur = -1, viz = null, touched = false, on = false, timer = 0, ticking = false;
+  const show = (i, user) => {
     if (user) touched = true;
-    view = v; board.dataset.v = v;
-    tabs.forEach((t, i) => { t.classList.toggle('on', i === v); t.setAttribute('aria-pressed', i === v); t.classList.remove('run'); });
-    clearTimeout(vtimer);
+    cur = i;
+    tiles.forEach((t, k) => { t.classList.toggle('on', k === i); t.setAttribute('aria-pressed', k === i); t.classList.remove('run'); });
+    vz.className = 'pl-vz is-' + KINDS[i];
+    viz = V[KINDS[i]](vz, c);
+    viz.reset();
+    for (let k = 0; k < 3; k++) viz.vote();   // пара первых ответов уже есть
+    clearTimeout(timer);
     if (!touched && on && !still()) {
-      const t = tabs[v]; void t.offsetWidth; t.classList.add('run');
-      vtimer = setTimeout(() => setView((view + 1) % 3), 4600);
+      const t = tiles[i]; void t.offsetWidth; t.classList.add('run');
+      timer = setTimeout(() => show((cur + 1) % KINDS.length), MS);
     }
   };
-  tabs.forEach((t, i) => t.addEventListener('click', () => setView(i, true)));
+  tiles.forEach((t, i) => t.addEventListener('click', () => show(i, true)));
   const tick = async () => {
     if (ticking) return; ticking = true;
+    let k = 0;
     while (on) {
-      voteOne();
-      if (Math.max(...val) >= 26) { await wait(2400); if (!on) break; fresh(); draw(); await wait(700); }
-      await wait(260 + rnd(260));
+      viz.vote();
+      // у вручную выбранного вида ответы со временем начинаются заново, чтобы рост был виден снова
+      if (touched && ++k > 40) { k = 0; await wait(1600); if (!on) break; viz.reset(); }
+      await wait(220 + rnd(240));
     }
     ticking = false;
   };
-  fresh();
-  if (still()) { for (let i = 0; i < 40; i++) voteOne(); setView(0); return; }
-  for (let i = 0; i < 6; i++) voteOne();
-  draw();
-  setView(0);
-  onScreen(board, v => { on = v; clearTimeout(vt); if (on) { tick(); setView(view); } else { clearTimeout(vtimer); tabs.forEach(t => t.classList.remove('run')); } }, .3);
+  show(0);
+  if (still()) { for (let k = 0; k < 20; k++) viz.vote(); return; }
+  onScreen(vz, v => { on = v; clearTimeout(timer); if (on) { show(cur); tick(); } else tiles.forEach(t => t.classList.remove('run')); }, .3);
 }
 
 /* ================================================================
    deck — свой PDF и свое оформление
    ================================================================ */
 // оформления: фон слайда, текст, акцент; у последнего — шрифт с засечками
+// оформления — настоящие темы «Вслуха»: Монохром, Полночь, Бумага (со шрифтом с засечками, как «Журнал»), Графит, Сигнал
 const THEMES = [
-  { bg: '#FFFFFF', ink: '#1D222A', acc: '#E2FB5A' },
-  { bg: '#1D222A', ink: '#F4F4F6', acc: '#E2FB5A' },
-  { bg: '#E7ECFB', ink: '#203A86', acc: '#86A3F2' },
-  { bg: '#EEF2E6', ink: '#26402F', acc: '#A7C784', serif: true },
+  { bg: '#0E0E12', ink: '#FFFFFF', acc: '#FFFFFF' },
+  { bg: '#0B0B14', ink: '#FFFFFF', acc: '#5B4BFF' },
+  { bg: '#F4F5F7', ink: '#17181C', acc: '#5B4BFF', serif: true },
+  { bg: '#20242B', ink: '#F2F4F7', acc: '#4C8DFF' },
+  { bg: '#FFD933', ink: '#17181C', acc: '#17181C' },
 ];
 // рисунки слайдов — из простых форм, слов нет
 const SLIDE = {
@@ -444,6 +558,7 @@ function localHTML(){
   const wires = PHONES.map(x => `<path class="pl-wire" d="M${x} 362L${LAP.x} 300"/>`).join('');
   return `<div class="pl-stage pl-local">
     <svg class="pl-net" viewBox="0 0 660 460" aria-hidden="true">
+      <defs><linearGradient id="plGrad" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5B4BFF"/><stop offset="1" stop-color="#8B7BFF"/></linearGradient></defs>
       <path class="pl-wire" d="M262 214L208 150"/>
       ${wires}
       <g class="pl-web">

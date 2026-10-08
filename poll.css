@@ -1,10 +1,16 @@
 /* ================================================================
    КЕЙС «ИНТЕРАКТИВНЫЕ ПРЕЗЕНТАЦИИ» (poll.js, поле poll у проекта)
-   Цвета — сайта: текст --ink, подложки --soft, экраны --bg,
-   лаймовый --accent — ответы зала. Люди в зале — серые.
+   Иллюстрации — в цветах самого «Вслуха»: экран зала темный (тема
+   «Полночь»), акцент фиолетовый с переходом, телефон участника —
+   светло-серый, варианты — серые плашки. Без обводок и теней:
+   поверхности разделяет фон. Люди в зале — серые.
+   Подписи глав, тумблер и кнопка демо — в стиле сайта.
    ================================================================ */
-.pl{overflow-x:clip;--pl-gap:clamp(72px,9vw,144px);--pl-man:#C4C7CE;--pl-arm:#8E939C}
-:root[data-theme="dark"] .pl{--pl-man:#3B3E46;--pl-arm:#6E737D}
+.pl{overflow-x:clip;--pl-gap:clamp(72px,9vw,144px);--pl-man:#C4C7CE;--pl-arm:#8E939C;
+  --v-scr:#0B0B14;--v-ink:#17181C;--v-bg:#F0F2F5;--v-sunken:#E6E9EF;--v-surface:#FFFFFF;--v-muted:#8A90A0;
+  --v-acc:#5B4BFF;--v-acc2:#8B7BFF;--v-soft:#ECEAFF;--v-soft-ink:#4A3BD8;--v-card:rgba(255,255,255,.08);
+  --v-grad:linear-gradient(90deg,var(--v-acc),var(--v-acc2));--v-dev:#17181C}
+:root[data-theme="dark"] .pl{--pl-man:#3B3E46;--pl-arm:#6E737D;--v-dev:#2E3038}
 .pl-ch{margin-bottom:var(--pl-gap)}
 .pl-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
 .pl-label{grid-column:1 / span 3;grid-row:1}
@@ -23,8 +29,8 @@
 
 /* общая подложка живых блоков */
 .pl-stage{position:relative;border-radius:var(--r-img);background:var(--soft);overflow:hidden}
-/* точка-ответ: лаймовая, с темным ободком — видна и на светлом, и на темном */
-.pl-dot{position:absolute;left:0;top:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px var(--ink);pointer-events:none;z-index:5}
+/* точка-ответ: фиолетовая, как акцент «Вслуха» */
+.pl-dot{position:absolute;left:0;top:0;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--v-acc);pointer-events:none;z-index:5}
 
 /* ---------- в две колонки: сцена слева, текст справа ---------- */
 .pl-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
@@ -47,19 +53,33 @@
 .pl-split.after .pl-sw.run{animation:plToInk var(--ms) linear both}
 @keyframes plToGray{from{background:var(--ink)}to{background:var(--pl-sw-gray)}}
 @keyframes plToInk{from{background:var(--pl-sw-gray)}to{background:var(--ink)}}
-.pl-sw:focus-visible,.pl-tab:focus-visible,.pl-th:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.pl-sw:focus-visible,.pl-tile:focus-visible,.pl-th:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+/* ---------- экран зала «Вслуха»: темный, текст белый, заголовок слайда сверху ---------- */
+.pl-scr{position:relative;aspect-ratio:16/9;border-radius:14px;background:var(--v-scr);color:#fff;overflow:hidden;container-type:inline-size;font-family:'Manrope','Golos Text',var(--font),sans-serif}
+.pl-slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:6.5cqw 7cqw;transition:opacity .5s var(--ease),transform .6s var(--ease)}
+.pl-st{font-size:max(16px,3.6cqw);font-weight:600;line-height:1.15;letter-spacing:-.01em;margin-bottom:4cqw}
+/* подпись-заглушка: строка вместо слов */
+.pl-ln0{display:block;height:max(6px,1.1cqw);border-radius:99px;background:rgba(255,255,255,.34);flex:none}
+/* полоса ответа: подпись и проценты, ниже дорожка с фиолетовой заливкой */
+.pl-rbs{display:flex;flex-direction:column;justify-content:center;gap:2.6cqw;flex:1}
+.pl-rb .row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:1cqw;font-size:max(16px,2.4cqw);line-height:1.2}
+.pl-rb .row em{font-style:normal;font-variant-numeric:tabular-nums;color:#C9C2FF}
+.pl-rb .tr{height:max(10px,2cqw);border-radius:99px;background:var(--v-card);overflow:hidden}
+.pl-rb .tr b{display:block;height:100%;border-radius:99px;background:var(--v-grad);transform-origin:0 50%;transform:scaleX(var(--w,0));transition:transform .55s cubic-bezier(.22,1,.36,1)}
+.pl-rb.hit .tr{animation:plGlow .7s var(--ease)}
+@keyframes plGlow{40%{background:rgba(139,123,255,.35)}}
 
 /* ---------- hands: зал и экран ---------- */
 .pl-hall{display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2vw,24px);padding:clamp(20px,3.4vw,44px) clamp(12px,2.4vw,32px) 0}
-.pl-proj0{position:relative;width:min(62%,420px);aspect-ratio:16/7;border-radius:10px;background:var(--bg);box-shadow:0 18px 40px -28px rgba(20,24,32,.35)}
+.pl-proj0{position:relative;width:min(62%,420px);aspect-ratio:16/7;border-radius:12px;background:var(--v-scr);color:#fff}
 .pl-q{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(56px,7vw,96px);font-weight:500;line-height:1;transition:opacity .4s,transform .5s var(--ease)}
 .pl-hall:not(.is-ph) .pl-q{animation:plQ 1.6s var(--ease-io) infinite}
 @keyframes plQ{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) scale(1.06)}}
 .pl-hall.is-ph .pl-q{opacity:0;transform:scale(.6)}
 .pl-bars{position:absolute;inset:16% 22% 14%;display:flex;align-items:flex-end;justify-content:center;gap:12%}
 .pl-bar{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}
-.pl-bar b{display:block;width:100%;height:100%;border-radius:4px;background:var(--ink);transform-origin:50% 100%;transform:scaleY(var(--h,0));transition:transform .45s var(--ease),background .4s}
-.pl-bar.best b{background:var(--accent);box-shadow:inset 0 0 0 2px var(--ink)}
+.pl-bar b{display:block;width:100%;height:100%;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,var(--v-acc2),var(--v-acc));transform-origin:50% 100%;transform:scaleY(var(--h,0));transition:transform .45s var(--ease)}
 .pl-crowd{display:block;width:100%;height:auto;overflow:visible}
 .pl-body,.pl-head{fill:var(--pl-man)}
 /* рука: растет из плеча, у каждого свой наклон; наполовину — рука согнута в сторону */
@@ -67,118 +87,151 @@
   transition:transform .45s var(--ease),opacity .3s}
 .pl-p.up .pl-arm{transform:rotate(var(--a)) scaleY(1);opacity:1}
 .pl-p.half .pl-arm{transform:rotate(58deg) scaleY(.62);opacity:1}
-/* телефон: загорается лаймовым, руки опущены */
-.pl-ph{fill:var(--accent);stroke:var(--ink);stroke-width:2;transform:scale(0);transform-box:fill-box;transform-origin:50% 50%;transition:transform .4s var(--ease)}
+/* телефон: загорается фиолетовым, руки опущены */
+.pl-ph{fill:var(--v-acc);transform:scale(0);transform-box:fill-box;transform-origin:50% 50%;transition:transform .4s var(--ease)}
 .pl-p.ph .pl-ph{transform:none}
 
-/* ---------- join: телефон, экран с QR и ноутбук ---------- */
-.pl-join{display:grid;grid-template-columns:1fr 2.1fr 1.5fr;align-items:center;gap:clamp(16px,3vw,48px);padding:clamp(28px,4.4vw,64px) clamp(16px,4vw,64px)}
-.pl-proj{display:flex;flex-direction:column;align-items:center;gap:16px}
-.pl-proj-in{display:flex;align-items:center;justify-content:center;gap:clamp(14px,2.4vw,32px);width:100%;aspect-ratio:16/9;border-radius:10px;background:var(--bg);box-shadow:0 18px 40px -28px rgba(20,24,32,.35);padding:6%}
-.pl-proj-in .pl-qr{width:40%;height:auto;border-radius:6px}
-.pl-code{display:flex;gap:6px}
-.pl-code b{display:grid;place-items:center;width:clamp(26px,2.8vw,40px);aspect-ratio:3/4;border-radius:6px;background:var(--soft);font-size:clamp(18px,2vw,30px);font-weight:500;line-height:1;font-variant-numeric:tabular-nums}
-/* места в зале: кто вошел — темная точка, первые двое — лаймовые, это наши телефон и ноутбук */
-.pl-seats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;min-height:16px}
-.pl-seats i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--line);transition:background .3s,box-shadow .3s,transform .4s var(--ease)}
-.pl-seats i.on{background:var(--ink);box-shadow:none;animation:plPop .45s var(--ease)}
-.pl-seats i.on:nth-child(-n+2){background:var(--accent);box-shadow:inset 0 0 0 2px var(--ink)}
-@keyframes plPop{from{transform:scale(.2)}60%{transform:scale(1.3)}to{transform:none}}
-/* телефон: в камере QR, по нему бежит полоса; потом — кнопки ответа */
-.pl-phone{justify-self:end;width:min(100%,128px);aspect-ratio:9/18;border-radius:20px;background:var(--ink);padding:7px}
-.pl-scr{position:relative;height:100%;border-radius:14px;background:var(--bg);overflow:hidden}
-.pl-cam{position:absolute;inset:0;display:grid;place-items:center;background:#2B2F37;transition:opacity .4s}
-.pl-cam-qr{width:62%;opacity:0;transform:scale(.7) rotate(-8deg);transition:opacity .5s,transform .8s var(--ease)}
-.pl-cam-qr .pl-qr{display:block;width:100%;height:auto;border-radius:4px}
-.pl-join[data-s="1"] .pl-cam-qr{opacity:1;transform:none}
-.pl-corners{position:absolute;inset:26% 12%;background:
-  linear-gradient(var(--accent),var(--accent)) 0 0 / 18px 3px no-repeat,linear-gradient(var(--accent),var(--accent)) 0 0 / 3px 18px no-repeat,
-  linear-gradient(var(--accent),var(--accent)) 100% 0 / 18px 3px no-repeat,linear-gradient(var(--accent),var(--accent)) 100% 0 / 3px 18px no-repeat,
-  linear-gradient(var(--accent),var(--accent)) 0 100% / 18px 3px no-repeat,linear-gradient(var(--accent),var(--accent)) 0 100% / 3px 18px no-repeat,
-  linear-gradient(var(--accent),var(--accent)) 100% 100% / 18px 3px no-repeat,linear-gradient(var(--accent),var(--accent)) 100% 100% / 3px 18px no-repeat}
-.pl-scan{position:absolute;left:12%;right:12%;top:26%;height:2px;background:var(--accent);opacity:0}
-.pl-join[data-s="1"]:not(.ph-in) .pl-scan{animation:plScan 1.1s var(--ease-io) .5s infinite}
-@keyframes plScan{0%{top:26%;opacity:0}15%,85%{opacity:1}100%{top:74%;opacity:0}}
-.pl-join.ph-in .pl-phone .pl-cam{opacity:0}
-.pl-ans{position:absolute;inset:auto 12% 12%;display:flex;flex-direction:column;gap:8px}
-.pl-ans i{display:block;height:20px;border-radius:99px;background:var(--soft);opacity:0;transform:translateY(10px);transition:opacity .4s calc(var(--i) * 90ms),transform .5s var(--ease) calc(var(--i) * 90ms),background .3s}
-.pl-ans i:first-child{background:var(--accent);box-shadow:inset 0 0 0 2px var(--ink);transition-delay:0s,0s,0s}
-.pl-join.ph-in .pl-phone .pl-ans i,.pl-join.lap-in .pl-lscr .pl-ans i{opacity:1;transform:none}
-.pl-phone .pl-ans{top:22%;bottom:auto}
-/* ноутбук: строка адреса, четыре клетки под код и лаймовая кнопка входа */
-.pl-lap{justify-self:start;width:min(100%,250px)}
-.pl-lscr{position:relative;aspect-ratio:16/10;border:7px solid var(--ink);border-bottom-width:9px;border-radius:12px 12px 4px 4px;background:var(--bg);overflow:hidden}
-.pl-lbase{display:block;height:10px;margin:0 -9%;border-radius:0 0 10px 10px;background:var(--ink)}
-.pl-url{position:absolute;left:8%;right:8%;top:8%;height:10px;border-radius:99px;background:var(--soft)}
-.pl-form{position:absolute;inset:30% 8% auto;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .35s}
-.pl-boxes{display:flex;gap:4px}
-.pl-boxes b{display:grid;place-items:center;width:clamp(20px,2vw,28px);aspect-ratio:3/4;border-radius:5px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:clamp(16px,1.5vw,20px);font-weight:500;line-height:1;font-variant-numeric:tabular-nums}
-.pl-boxes b:not(:empty){box-shadow:inset 0 0 0 1.5px var(--ink);animation:plPop .35s var(--ease)}
-.pl-go{flex:none;width:clamp(22px,2.2vw,30px);aspect-ratio:1;border-radius:50%;background:var(--accent);box-shadow:inset 0 0 0 1.5px var(--ink);transition:transform .2s}
-.pl-go::after{content:"";display:block;width:34%;height:34%;margin:33% 0 0 28%;border:solid var(--ink);border-width:2px 2px 0 0;transform:rotate(45deg)}
-.pl-join.go .pl-go{transform:scale(.8)}
-.pl-join.lap-in .pl-form{opacity:0}
-.pl-lscr .pl-ans{inset:28% 18% auto;gap:6px}
-.pl-lscr .pl-ans i{height:12px}
+/* ---------- join: экран зала и телефон в руке ---------- */
+.pl-join{display:grid;grid-template-columns:minmax(0,1fr) clamp(170px,19vw,240px);align-items:center;gap:clamp(24px,5vw,80px);padding:clamp(28px,4.4vw,64px) clamp(16px,5vw,80px)}
+/* слайд входа: QR слева, код встречи справа */
+.pl-jjoin{flex-direction:row;align-items:center;gap:6cqw}
+.pl-jjoin .pl-qr{width:34cqw;height:auto;border-radius:1.4cqw;flex:none}
+.pl-jside{display:flex;flex-direction:column;gap:2cqw;flex:1}
+.pl-jcode{margin-top:2cqw;font-size:max(20px,6.4cqw);font-weight:600;letter-spacing:.02em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pl-jq{opacity:0;transform:translateY(4%)}
+.pl-join[data-s="2"] .pl-jjoin{opacity:0;transform:translateY(-4%)}
+.pl-join[data-s="2"] .pl-jq{opacity:1;transform:none}
+/* телефон участника: светлый, как страница «Вслуха» */
+.pl-tel{position:relative;width:100%;aspect-ratio:9/18.5;border-radius:clamp(26px,3vw,36px);background:var(--v-dev);padding:clamp(7px,.8vw,10px)}
+.pl-tel-in{position:relative;height:100%;border-radius:clamp(20px,2.3vw,28px);background:var(--v-bg);overflow:hidden;color:var(--v-ink);font-family:'Manrope','Golos Text',var(--font),sans-serif}
+/* камера: темная картинка, в ней — QR с экрана, по нему бежит полоса */
+.pl-cam{position:absolute;inset:0;display:grid;place-items:center;background:#2A2C33;transition:opacity .35s}
+.pl-cam .pl-qr{width:58%;height:auto;border-radius:6px;opacity:.25;filter:blur(3px);transform:scale(.8) rotate(-6deg);transition:opacity .6s,filter .8s,transform 1s var(--ease)}
+.pl-join[data-s="1"] .pl-cam .pl-qr{opacity:1;filter:none;transform:none}
+.pl-corners{position:absolute;inset:calc(50% - 38%) 13%;aspect-ratio:1;margin:auto;height:auto;--c:#fff;background:
+  linear-gradient(var(--c),var(--c)) 0 0 / 22px 4px no-repeat,linear-gradient(var(--c),var(--c)) 0 0 / 4px 22px no-repeat,
+  linear-gradient(var(--c),var(--c)) 100% 0 / 22px 4px no-repeat,linear-gradient(var(--c),var(--c)) 100% 0 / 4px 22px no-repeat,
+  linear-gradient(var(--c),var(--c)) 0 100% / 22px 4px no-repeat,linear-gradient(var(--c),var(--c)) 0 100% / 4px 22px no-repeat,
+  linear-gradient(var(--c),var(--c)) 100% 100% / 22px 4px no-repeat,linear-gradient(var(--c),var(--c)) 100% 100% / 4px 22px no-repeat;
+  transition:transform .6s var(--ease)}
+.pl-join[data-s="1"] .pl-corners{--c:var(--v-acc2);transform:scale(.94)}
+.pl-scan{position:absolute;left:16%;right:16%;top:30%;height:3px;border-radius:2px;background:var(--v-acc2);opacity:0}
+.pl-join[data-s="1"] .pl-scan{animation:plScan 1.2s var(--ease-io) .4s infinite}
+@keyframes plScan{0%{top:30%;opacity:0}15%,85%{opacity:1}100%{top:68%;opacity:0}}
+.pl-join[data-s="2"] .pl-cam{opacity:0}
+/* вспышка при переходе с камеры на страницу участника */
+.pl-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.pl-join[data-s="2"] .pl-flash{animation:plFlash .5s ease-out}
+@keyframes plFlash{0%{opacity:.9}100%{opacity:0}}
+/* страница участника: вопрос и варианты — серые плашки с белым кружком, выбранный — сиреневый */
+.pl-pp{position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;padding:22% 9% 9%}
+.pl-pq{font-size:16px;font-weight:600;line-height:1.2;margin-bottom:6px;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .5s var(--ease)}
+.pl-opt{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px;border-radius:14px;background:var(--v-sunken);font-size:16px;line-height:1.1;
+  opacity:0;transform:translateY(12px);transition:opacity .4s calc(.1s + var(--i) * 90ms),transform .5s var(--ease) calc(.1s + var(--i) * 90ms),background .25s,color .25s}
+.pl-opt i{flex:none;width:18px;height:18px;border-radius:50%;background:#fff;transition:background .25s}
+.pl-opt.sel{background:var(--v-soft);color:var(--v-soft-ink);font-weight:600}
+.pl-opt.sel i{background:var(--v-acc)}
+.pl-send{display:grid;place-items:center;height:46px;margin-top:auto;border-radius:99px;background:#D5D5DE;transition:background .25s,transform .15s;
+  opacity:0;transition:opacity .4s .45s,background .25s,transform .15s}
+.pl-send svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.pl-send.ready{background:var(--v-acc)}
+.pl-send.sent{transform:scale(.94)}
+.pl-join[data-s="2"] .pl-pq,.pl-join[data-s="2"] .pl-opt,.pl-join[data-s="2"] .pl-send{opacity:1;transform:none}
+/* палец: кружок касания */
+.pl-finger{position:absolute;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(23,24,28,.28);opacity:0;pointer-events:none;
+  transition:transform .6s var(--ease),opacity .3s,scale .2s}
+.pl-finger.on{opacity:1}
+.pl-finger.tap{scale:.75}
 @media (max-width:640px){
-  .pl-join{grid-template-columns:1fr 1.5fr;grid-template-areas:"proj proj" "ph lap";row-gap:28px;padding:22px 16px}
-  .pl-proj{grid-area:proj}.pl-phone{grid-area:ph;justify-self:center;width:min(100%,88px)}.pl-lap{grid-area:lap;justify-self:center}
+  .pl-join{grid-template-columns:1fr;justify-items:center;row-gap:24px;padding:20px 16px}
+  .pl-tel{width:min(62vw,220px)}
+  .pl-jscr{width:100%}
 }
 
-/* ---------- results: облако, график, рейтинг ---------- */
-.pl-res{padding:clamp(16px,2.6vw,32px)}
-.pl-tabs{position:absolute;top:clamp(16px,2.6vw,32px);left:50%;z-index:2;display:flex;gap:6px;padding:5px;border-radius:99px;background:var(--bg);transform:translateX(-50%);box-shadow:0 8px 24px -18px rgba(20,24,32,.4)}
-.pl-tab{position:relative;display:grid;place-items:center;width:52px;height:42px;border-radius:99px;background:transparent;color:var(--ink);cursor:pointer;overflow:hidden;transition:background .3s,color .3s}
-.pl-tab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.pl-tab:hover{background:var(--soft)}
-.pl-tab.on{background:var(--ink);color:var(--bg)}
-/* полоска времени под активной иконкой: когда дойдет — переключится сама */
-.pl-tab-t{position:absolute;left:14px;right:14px;bottom:6px;height:2px;border-radius:2px;background:var(--accent);transform:scaleX(0);transform-origin:0 50%}
-.pl-tab.run .pl-tab-t{animation:plT 4.6s linear both}
+/* ---------- results: экран зала и плитки видов, как в меню «Добавить слайд» ---------- */
+.pl-res{display:flex;flex-direction:column;align-items:center;gap:clamp(18px,2.4vw,28px);padding:clamp(20px,3.6vw,52px) clamp(16px,4vw,64px)}
+.pl-rscr{width:100%;max-width:960px}
+.pl-sth{display:flex;flex-direction:column;gap:1.4cqw;margin-bottom:4cqw}
+.pl-sth .pl-ln0{height:max(8px,1.8cqw);background:#fff}
+.pl-vz{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.pl-tiles{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;width:100%;max-width:960px}
+.pl-tile{position:relative;display:grid;place-items:center;aspect-ratio:1;max-height:76px;border-radius:16px;background:var(--v-sunken);color:var(--v-muted);cursor:pointer;overflow:hidden;transition:background .25s,color .25s}
+:root[data-theme="dark"] .pl-tile{background:#24262D;color:#8A90A0}
+.pl-tile svg{width:56%;height:auto;fill:currentColor}
+.pl-tile:hover{color:var(--v-ink)}
+:root[data-theme="dark"] .pl-tile:hover{color:#fff}
+.pl-tile.on,:root[data-theme="dark"] .pl-tile.on{background:var(--v-soft);color:var(--v-acc)}
+/* полоска времени: дойдет до конца — плитка сменится сама */
+.pl-tile-t{position:absolute;left:18%;right:18%;bottom:9%;height:3px;border-radius:2px;background:var(--v-acc);transform:scaleX(0);transform-origin:0 50%}
+.pl-tile.run .pl-tile-t{animation:plT 4.8s linear both}
 @keyframes plT{to{transform:none}}
-.pl-board{position:relative;container-type:inline-size;aspect-ratio:16/8;min-height:300px;margin-top:clamp(48px,5vw,64px)}
-.pl-view{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .5s var(--ease),visibility 0s .5s}
-.pl-board[data-v="0"] .pl-cloud,.pl-board[data-v="1"] .pl-cols,.pl-board[data-v="2"] .pl-rank{opacity:1;visibility:visible;transition:opacity .6s var(--ease) .1s,visibility 0s}
-/* облако: слово растет с каждым голосом, самое частое уходит в центр и становится лаймовым */
-.pl-wd{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;font-weight:500;line-height:1;letter-spacing:-.01em;
-  font-size:max(16px,calc(var(--f,16) * 100cqw / 900));transition:left .9s var(--ease),top .9s var(--ease),font-size .5s var(--ease),opacity .4s}
-.pl-wd.zero{opacity:.3}
-.pl-wd.best{padding:.04em .16em .1em;border-radius:.16em;background:var(--accent);color:var(--accent-text)}
-.pl-wd.hit{animation:plHit .5s var(--ease)}
-@keyframes plHit{40%{scale:1.08}}
-/* график: столбики снизу, под ними подписи */
-.pl-cols{display:flex;align-items:stretch;justify-content:center;gap:clamp(10px,3cqw,40px);padding:0 4%}
-.pl-col{flex:1;max-width:110px;display:flex;flex-direction:column;align-items:center;gap:10px}
-.pl-col i{position:relative;flex:1;width:100%;display:flex;align-items:flex-end}
-.pl-col b{display:block;width:100%;height:100%;border-radius:6px;background:var(--ink);transform-origin:50% 100%;transform:scaleY(calc(var(--h,0) * .86));transition:transform .5s var(--ease),background .3s}
-.pl-col.best b{background:var(--accent);box-shadow:inset 0 0 0 2px var(--ink)}
-.pl-col span{font-size:16px;line-height:1.2;white-space:nowrap}
-/* рейтинг: строки сами переставляются, кто выше — тот выше */
-.pl-rank{--rh:calc(100% / 6)}
-.pl-row{position:absolute;left:4%;right:4%;height:calc(var(--rh) - 8px);top:calc(var(--r) * var(--rh));display:grid;grid-template-columns:minmax(80px,20%) 1fr 48px;align-items:center;gap:16px;transition:top .7s var(--ease)}
-.pl-row span{font-size:clamp(16px,2.2cqw,24px);font-weight:500;line-height:1;white-space:nowrap}
-.pl-row i{height:62%;display:flex}
-.pl-row b{display:block;width:100%;border-radius:6px;background:var(--ink);transform-origin:0 50%;transform:scaleX(var(--w,0));transition:transform .5s var(--ease)}
-.pl-row.best b{background:var(--accent);box-shadow:inset 0 0 0 2px var(--ink)}
-.pl-row em{font-style:normal;font-size:clamp(16px,2cqw,22px);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
-@media (max-width:640px){
-  .pl-board{aspect-ratio:auto;height:340px;min-height:0}
-  .pl-col span{font-size:16px;writing-mode:vertical-rl;transform:rotate(180deg)}
-  .pl-row{grid-template-columns:auto 1fr 32px;gap:10px}
-}
+@media (max-width:640px){.pl-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}.pl-rscr{aspect-ratio:4/3.4}}
+
+/* опрос — полосы; порядок — те же полосы, строки переставляются */
+.pv-rank{position:relative;flex:1}
+.pv-rank .pl-rb{position:absolute;left:0;right:0;top:calc(var(--r) * 25%);transition:top .7s var(--ease)}
+.pv-rank .no{flex:none;min-width:1.4em;font-weight:600}
+.pv-rank .row{justify-content:flex-start}
+.pv-rank .row em{margin-left:auto}
+.pv-rank .pl-ln0,.pl-rb .row .pl-ln0{flex:none}
+/* шарики: каждый голос — кружок над своим вариантом */
+.pv-dots{display:flex;align-items:flex-end;justify-content:center;gap:5cqw;flex:1}
+.pv-dots .col{flex:1;max-width:16cqw;display:flex;flex-direction:column;align-items:center;gap:1.2cqw;height:100%;justify-content:flex-end}
+.pv-dots .pile{display:flex;flex-wrap:wrap-reverse;justify-content:center;gap:.7cqw;width:100%;align-content:flex-start}
+.pv-dots .pile i{width:2.4cqw;aspect-ratio:1;border-radius:50%;animation:plPop .45s cubic-bezier(.34,1.56,.64,1) both}
+.pv-dots b{font-size:max(18px,4.4cqw);font-weight:500;line-height:1;font-variant-numeric:tabular-nums}
+.pv-dots .pl-ln0{align-self:center}
+@keyframes plPop{from{transform:scale(0)}}
+/* круговая: доли одного круга и легенда */
+.pv-pie{display:flex;align-items:center;justify-content:center;gap:6cqw;flex:1}
+.pv-pie svg{height:100%;max-height:30cqw;width:auto;flex:none}
+.pv-pie circle{transition:stroke-dasharray .55s var(--ease),stroke-dashoffset .55s var(--ease)}
+.pv-pie .leg{display:flex;flex-direction:column;gap:2cqw;width:34cqw}
+.pv-pie .leg div{display:flex;align-items:center;gap:1.6cqw;font-size:max(16px,2.4cqw)}
+.pv-pie .leg i{flex:none;width:1.8cqw;aspect-ratio:1;border-radius:50%}
+.pv-pie .leg em{margin-left:auto;font-style:normal;font-variant-numeric:tabular-nums}
+/* сетка: голос — квадратик */
+.pv-grid{display:flex;flex-direction:column;justify-content:center;gap:2.6cqw;flex:1}
+.pv-grid .lb{display:flex;align-items:center;gap:1.4cqw;margin-bottom:1cqw;font-size:max(16px,2.2cqw)}
+.pv-grid .lb b{font-weight:400;font-variant-numeric:tabular-nums;opacity:.8}
+.pv-grid .cells{display:flex;flex-wrap:wrap;gap:.7cqw;min-height:2.6cqw}
+.pv-grid .cells i{width:2.6cqw;aspect-ratio:1;border-radius:.6cqw;animation:plPop .45s cubic-bezier(.34,1.56,.64,1) both}
+/* облако слов: частое — крупнее и плотнее */
+.pv-cloud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.6cqw 2.6cqw;flex:1;align-content:center}
+.pv-cloud span{font-size:calc(var(--f,0) * 1cqw / 9.6);font-weight:600;line-height:1.05;letter-spacing:-.02em;white-space:nowrap;transition:font-size .5s var(--ease),opacity .5s}
+/* число: гистограмма и крупное среднее */
+.pv-num{display:flex;align-items:flex-end;gap:5cqw;flex:1}
+.pv-num .hist{flex:1;height:100%;display:flex;align-items:flex-end;gap:.6cqw}
+.pv-num .hist i{flex:1;height:100%;border-radius:.8cqw .8cqw 0 0;background:linear-gradient(180deg,var(--v-acc2),var(--v-acc));transform-origin:50% 100%;transform:scaleY(max(.02,var(--h,0)));transition:transform .5s var(--ease)}
+.pv-num .big{font-size:max(36px,11cqw);font-weight:500;letter-spacing:-.04em;line-height:.9;font-variant-numeric:tabular-nums}
+/* матрица: поле на четыре части, точки — ответы */
+.pv-mx{position:relative;flex:1;border-radius:1.6cqw;background:var(--v-card)}
+.pv-mx .ax{position:absolute;background:rgba(255,255,255,.16)}
+.pv-mx .ax.x{left:0;right:0;top:50%;height:1.5px}
+.pv-mx .ax.y{top:0;bottom:0;left:50%;width:1.5px}
+.pv-mx .pt{position:absolute;width:1.8cqw;aspect-ratio:1;margin:-.9cqw 0 0 -.9cqw;border-radius:50%;animation:plPop .45s cubic-bezier(.34,1.56,.64,1) both}
+/* свои слова: карточки ответов */
+.pv-open{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:min-content;gap:1.6cqw;flex:1;align-content:start}
+.pv-open .card{display:flex;flex-direction:column;gap:1.2cqw;padding:2cqw;border-radius:1.6cqw;background:var(--v-card);animation:plCard .45s var(--ease) both}
+@keyframes plCard{from{opacity:0;transform:translateY(10px)}}
+/* вопросы вам: голоса стрелкой, популярный вопрос поднимается */
+.pv-qa{position:relative;flex:1}
+.pv-qa .q{position:absolute;left:0;right:0;top:calc(var(--r) * 25%);height:calc(25% - 1.4cqw);display:flex;align-items:center;gap:2cqw;padding:0 2.4cqw;border-radius:1.6cqw;background:var(--v-card);transition:top .7s var(--ease)}
+.pv-qa .q b{flex:none;min-width:3.4em;font-size:max(16px,2.2cqw);font-weight:400;color:var(--v-acc2);font-variant-numeric:tabular-nums}
+.pv-qa .q div{flex:1;display:flex;flex-direction:column;gap:1cqw}
+@media (max-width:640px){.pv-open{grid-template-columns:repeat(2,minmax(0,1fr))}.pv-open .card:nth-child(n+7){display:none}}
 
 /* ---------- deck: файл PDF раскладывается на слайды, между ними — опрос ---------- */
 .pl-deck{display:flex;flex-direction:column;align-items:center;gap:clamp(20px,2.6vw,32px);padding:clamp(24px,4vw,52px) clamp(16px,3vw,44px);min-height:clamp(380px,36vw,520px);justify-content:center}
 .pl-pdf{position:absolute;left:50%;top:44%;width:clamp(84px,9vw,120px);transform:translate(-50%,-50%) scale(.6);opacity:0;transition:opacity .45s,transform .6s var(--ease)}
 .pl-pdf svg{display:block;width:100%;height:auto}
-.pl-pdf svg path{fill:var(--bg);stroke:var(--ink);stroke-width:2.4;stroke-linejoin:round}
-.pl-pdf svg path.f{fill:none}
-.pl-pdf span{position:absolute;left:-12%;bottom:18%;padding:3px 10px 5px;border-radius:6px;background:var(--ink);color:var(--bg);font-size:16px;font-weight:500;line-height:1}
+.pl-pdf svg path{fill:var(--v-surface)}
+.pl-pdf svg path.f{fill:var(--v-sunken)}
+.pl-pdf span{position:absolute;left:-12%;bottom:18%;padding:3px 10px 5px;border-radius:6px;background:var(--v-acc);color:#fff;font-size:16px;font-weight:600;line-height:1}
 .pl-deck[data-s="1"] .pl-pdf{opacity:1;transform:translate(-50%,-50%)}
 .pl-deck[data-s="2"] .pl-pdf{opacity:0;transform:translate(-50%,-50%) scale(1.4)}
-.pl-grid{--sb:#fff;--si:#1D222A;--sa:#E2FB5A;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.4vw,18px);width:100%;max-width:640px}
-.pl-sl{aspect-ratio:16/10;border-radius:6px;padding:9% 9%;display:flex;flex-direction:column;justify-content:center;gap:9%;background:var(--sb);color:var(--si);
-  box-shadow:0 1px 2px rgba(20,24,32,.08),0 14px 30px -22px rgba(20,24,32,.4);
+.pl-grid{--sb:#0E0E12;--si:#fff;--sa:#fff;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.4vw,18px);width:100%;max-width:640px}
+.pl-sl{aspect-ratio:16/10;border-radius:8px;padding:9% 9%;display:flex;flex-direction:column;justify-content:center;gap:9%;background:var(--sb);color:var(--si);
   opacity:0;transform:scale(.5);transition:opacity .4s calc(var(--i) * 80ms),transform .6s var(--ease) calc(var(--i) * 80ms),background .6s var(--ease),color .6s var(--ease)}
 .pl-deck[data-s="2"] .pl-sl,.pl-deck[data-s="3"] .pl-sl{opacity:1;transform:none}
 .pl-deck[data-s="4"] .pl-sl{opacity:0;transform:translateY(16px);transition-delay:calc(var(--i) * 40ms)}
@@ -187,64 +240,63 @@
 .pl-sl-poll{display:none}
 .pl-grid.has-poll .pl-sl-poll{display:flex;animation:plIn .7s var(--ease) both}
 @keyframes plIn{from{opacity:0;transform:translateY(-30px) scale(.8)}}
-.pl-sl-poll{box-shadow:0 0 0 3px var(--sa),0 14px 30px -22px rgba(20,24,32,.4)}
-.pl-ln{display:block;height:7%;min-height:4px;border-radius:99px;background:currentColor;opacity:.22;transition:background .6s}
+.pl-ln{display:block;height:7%;min-height:4px;border-radius:99px;background:currentColor;opacity:.3;transition:background .6s}
 .pl-ln.h{width:58%;height:11%;opacity:1}
 .pl-ln.s{width:62%}
-.pl-aa{font-size:clamp(22px,2.6vw,36px);font-weight:500;line-height:1;letter-spacing:-.01em;transition:font-family 0s}
+.pl-aa{font-size:clamp(22px,2.6vw,36px);font-weight:600;line-height:1;letter-spacing:-.01em}
 .pl-grid.serif .pl-aa{font-family:var(--font-read);font-weight:400}
 .pl-two{display:grid;grid-template-columns:1fr 1fr;gap:10%;height:70%}
 .pl-two > div{display:flex;flex-direction:column;justify-content:center;gap:14%}
 .pl-pic{display:block;border-radius:4px;background:var(--sa);transition:background .6s}
-.pl-mini{display:flex;align-items:flex-end;gap:10%;height:52%}
-.pl-mini i{flex:1;height:100%;border-radius:3px;background:currentColor;opacity:.25;transform-origin:50% 100%;transform:scaleY(var(--h))}
-.pl-mini i:first-child{background:var(--sa);opacity:1;box-shadow:inset 0 0 0 1.5px currentColor}
-.pl-grid.has-poll .pl-mini i{animation:plGrow .9s var(--ease) calc(.3s + var(--i) * 120ms) both}
-@keyframes plGrow{from{transform:scaleY(0)}}
+/* слайд-опрос: полосы ответов в цвет акцента темы */
+.pl-mini{display:flex;flex-direction:column;justify-content:center;gap:12%;height:52%}
+.pl-mini i{display:block;height:22%;border-radius:99px;background:color-mix(in srgb,currentColor 14%,transparent);position:relative;overflow:hidden}
+.pl-mini i::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--sa);transform-origin:0 50%;transform:scaleX(var(--h));transition:background .6s}
+.pl-grid.has-poll .pl-mini i::after{animation:plGrowX .9s var(--ease) calc(.3s + var(--i) * 120ms) both}
+@keyframes plGrowX{from{transform:scaleX(0)}}
 .pl-dots3{display:flex;gap:12%}
-.pl-dots3 i{flex:1;aspect-ratio:1;border-radius:50%;background:currentColor;opacity:.22}
+.pl-dots3 i{flex:1;aspect-ratio:1;border-radius:50%;background:currentColor;opacity:.3}
 .pl-dots3 i:nth-child(2){background:var(--sa);opacity:1}
 .pl-circ{display:block;align-self:center;height:66%;aspect-ratio:1;border-radius:50%;background:var(--sa);transition:background .6s}
-/* кружки оформления: половина — фон слайда, половина — акцент */
+/* кружки оформления: половина — фон слайда, половина — акцент; выбранный — сиреневое кольцо */
 .pl-themes{display:flex;gap:12px;opacity:0;transition:opacity .5s .4s}
 .pl-deck[data-s="3"] .pl-themes,.pl-deck[data-s="2"] .pl-themes{opacity:1}
-.pl-th{width:40px;height:40px;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--a) 50%,var(--b) 50%);box-shadow:inset 0 0 0 1.5px rgba(20,24,32,.18);transition:transform .3s var(--ease),box-shadow .3s}
+.pl-th{width:40px;height:40px;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--a) 50%,var(--b) 50%);transition:transform .3s var(--ease),box-shadow .3s}
 .pl-th:hover{transform:scale(1.08)}
-.pl-th.on{box-shadow:inset 0 0 0 1.5px rgba(20,24,32,.18),0 0 0 3px var(--soft),0 0 0 5px var(--ink)}
+.pl-th.on{box-shadow:0 0 0 3px var(--soft),0 0 0 6px var(--v-acc)}
 @media (max-width:640px){.pl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pl-deck{min-height:440px}}
 
 /* ---------- local: свой компьютер, интернет обрывается, ответы идут ---------- */
 .pl-local{padding:clamp(12px,2vw,28px)}
 .pl-net{display:block;width:100%;height:auto;overflow:visible}
-.pl-wire{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-dasharray:3 9;stroke-linecap:round;opacity:.45;animation:plFlow 1.2s linear infinite}
+.pl-wire{fill:none;stroke:var(--v-muted);stroke-width:2.5;stroke-dasharray:3 9;stroke-linecap:round;animation:plFlow 1.2s linear infinite}
 @keyframes plFlow{to{stroke-dashoffset:-24}}
-.pl-cut{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-dasharray:3 9;stroke-linecap:round;opacity:.45;animation:plFlow 1.2s linear infinite;transition:transform .7s var(--ease),opacity .5s}
-.pl-net.cut .pl-cut{animation:none;opacity:.25}
+.pl-cut{fill:none;stroke:var(--v-muted);stroke-width:2.5;stroke-dasharray:3 9;stroke-linecap:round;animation:plFlow 1.2s linear infinite;transition:transform .7s var(--ease),opacity .5s}
+.pl-net.cut .pl-cut{animation:none;opacity:.35}
 .pl-net.cut .pl-cut.a{transform:translate(-14px,10px)}
 .pl-net.cut .pl-cut.b{transform:translate(14px,-10px)}
 .pl-slash{fill:none;stroke:var(--ink);stroke-width:4;stroke-linecap:round;stroke-dasharray:46;stroke-dashoffset:46;transition:stroke-dashoffset .5s var(--ease) .3s}
 .pl-net.cut .pl-slash{stroke-dashoffset:0}
-.pl-globe{fill:none;stroke:var(--ink);stroke-width:2.5;transition:opacity .6s}
-.pl-globe circle{fill:var(--bg)}
-.pl-net.cut .pl-globe{opacity:.28}
-.pl-scrn > rect:first-child{fill:var(--bg);stroke:var(--ink);stroke-width:2.5}
-.pl-leg{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
-.pl-pb{fill:var(--ink);transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(var(--h,.06));transition:transform .45s var(--ease)}
-.pl-pb[data-i="0"]{fill:var(--accent);stroke:var(--ink);stroke-width:2}
-.pl-lap-s{fill:var(--bg);stroke:var(--ink);stroke-width:2.5}
-.pl-lap-b{fill:var(--ink)}
+.pl-globe{fill:none;stroke:var(--v-surface);stroke-width:2.5;transition:opacity .6s}
+.pl-globe circle:first-child{fill:var(--v-acc);stroke:none}
+.pl-net.cut .pl-globe{opacity:.3}
+.pl-scrn > rect:first-child{fill:var(--v-scr)}
+.pl-leg{fill:none;stroke:var(--v-dev);stroke-width:3;stroke-linecap:round}
+.pl-pb{fill:url(#plGrad);transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(var(--h,.06));transition:transform .45s var(--ease)}
+.pl-lap-s{fill:var(--v-scr)}
+.pl-lap-b{fill:var(--v-dev)}
 /* замок на ноутбуке: пульт открывается только здесь; когда телефон стучится — вздрагивает */
-.pl-lock circle{fill:var(--ink)}
-.pl-lock rect{fill:var(--bg)}
-.pl-lock .sh{fill:none;stroke:var(--bg);stroke-width:3;stroke-linecap:round}
+.pl-lock circle{fill:var(--v-acc)}
+.pl-lock rect{fill:#fff}
+.pl-lock .sh{fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round}
 .pl-lock.deny{animation:plNo .5s var(--ease)}
 @keyframes plNo{20%{translate:-6px 0}40%{translate:6px 0}60%{translate:-4px 0}80%{translate:3px 0}}
-.pl-lph rect{fill:var(--ink)}
-.pl-lph rect.s{fill:var(--bg);transition:fill .2s}
+.pl-lph rect{fill:var(--v-dev)}
+.pl-lph rect.s{fill:var(--v-bg)}
 .pl-lph.tap rect.s{animation:plTap .6s var(--ease)}
-@keyframes plTap{30%{fill:var(--accent)}}
-.pl-ldot{fill:var(--accent);stroke:var(--ink);stroke-width:2.5}
-.pl-ldot.no{fill:var(--bg)}
+@keyframes plTap{30%{fill:var(--v-soft)}}
+.pl-ldot{fill:var(--v-acc)}
+.pl-ldot.no{fill:var(--v-muted)}
 
 /* ---------- демо под текстом последней главы ---------- */
 .pl-try{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:clamp(16px,2.4vw,32px);padding-top:clamp(20px,2.4vw,32px);border-top:1.5px solid var(--line);transition-delay:.45s}
@@ -266,5 +318,5 @@
 @media (max-width:480px){.pl-title,.pl-side .pl-title{font-size:min(7.4vw,32px)}}
 @media (prefers-reduced-motion:reduce){
   .pl-w > span,.pl-text,.pl-label,.pl-viz,.pl-switch,.pl-try{transition:none;transform:none;opacity:1}
-  .pl-wire,.pl-cut,.pl-q{animation:none}
+  .pl-wire,.pl-cut,.pl-q,.pl-scan{animation:none}
 }
