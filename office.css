@@ -45,7 +45,7 @@
 .ro-bar > b{display:block;width:34%;height:7px;border-radius:4px;background:var(--m)}
 /* ---------- one: четыре пастельные иконки складываются в одну ---------- */
 /* размеры — в процентах ширины сцены: иконка 17 %, в общей иконке — 13,3 % по четвертям */
-.ro-one{position:relative;aspect-ratio:16/9;container-type:inline-size}
+.ro-one{position:relative;aspect-ratio:16/9;container-type:inline-size;background:none;overflow:visible}
 .ro-ic{--sz:17cqw;--sc:1;position:absolute;left:var(--x);top:50%;width:var(--sz);aspect-ratio:1;border-radius:22%;background:var(--c1);
   transform:translate(-50%,-50%) scale(var(--sc));container-type:inline-size;
   transition:left .9s var(--ease-io) calc(var(--i) * 70ms),top .9s var(--ease-io) calc(var(--i) * 70ms),transform .9s var(--ease-io) calc(var(--i) * 70ms),border-radius .9s var(--ease-io)}
@@ -67,8 +67,8 @@
 .ic-h b{font-size:17cqw;letter-spacing:-.04em}
 /* HTML стоит чуть поодаль, за тонкой чертой */
 .ro-sep{position:absolute;left:71%;top:36%;bottom:36%;width:2px;border-radius:2px;background:color-mix(in srgb,var(--ink) 12%,var(--soft));transition:opacity .5s}
-/* общая иконка: светлый скругленный квадрат, в нем четыре иконки по четвертям */
-.ro-frame{position:absolute;left:50%;top:50%;width:31.5cqw;aspect-ratio:1;border-radius:24%;background:#FFFFFF;box-shadow:0 20px 50px -28px rgba(60,70,110,.35);
+/* общая иконка: белый квадрат, в нем четыре иконки по четвертям; скругление = скругление иконки (26 % от 13,3cqw) + поле, без серой подложки сцены */
+.ro-frame{position:absolute;left:50%;top:50%;width:31.5cqw;aspect-ratio:1;border-radius:5.2cqw;background:#FFFFFF;box-shadow:0 0 0 1px rgba(60,70,110,.07),0 18px 44px -22px rgba(60,70,110,.3);
   transform:translate(-50%,-50%) scale(.6);opacity:0;transition:opacity .5s var(--ease),transform .9s var(--ease-io)}
 .ro-one[data-step="1"] .ro-frame{opacity:1;transform:translate(-50%,-50%);transition-delay:.25s}
 .ro-one[data-step="1"] .ro-sep{opacity:0}
