@@ -47,26 +47,31 @@
 .nv-type svg{width:22px;height:22px}
 .nv-type.on{background:var(--ink);color:var(--bg)}
 .nv-type:not(.on):hover{background:var(--ink);color:var(--bg)}
-.nv-info{flex:1;min-height:0;display:grid;grid-template-columns:40px auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) 36px;column-gap:clamp(12px,1.6vw,24px)}
-.nv-plate-box{grid-column:2;grid-row:1;width:clamp(140px,14vw,220px);min-height:0;display:flex;align-items:center;justify-content:center}
-/* размерные линии */
-.nv-dim{position:relative;display:flex;align-items:center;justify-content:center;font-size:16px;opacity:.55}
-.nv-dim-h{grid-column:1;grid-row:1}
-.nv-dim-h::before{content:"";position:absolute;left:50%;top:50%;height:var(--ph,0);transform:translateY(-50%);border-left:1.5px solid currentColor;transition:height .4s var(--ease)}
-.nv-dim-h span{position:relative;transform:rotate(-90deg);white-space:nowrap;background:var(--nv-panel);padding:0 8px}
-.nv-dim-w{grid-column:2;grid-row:2}
-.nv-dim-w::before{content:"";position:absolute;top:50%;left:50%;width:var(--pw,0);transform:translateX(-50%);border-top:1.5px solid currentColor;transition:width .4s var(--ease)}
-.nv-dim-w span{position:relative;background:var(--nv-panel);padding:0 8px;white-space:nowrap}
-/* выноски: линия от плиты, иконка, два-три слова */
-.nv-calls{grid-column:3;grid-row:1;position:relative;min-width:0}
-.nv-call{position:absolute;left:0;right:0;transform:translateY(-50%);margin:0;display:flex;align-items:center;gap:10px;font-size:17px;line-height:1.25;transition:top .45s var(--ease)}
-.nv-call::before{content:"";flex:none;width:clamp(14px,1.8vw,28px);border-top:1.5px solid currentColor;opacity:.3}
-.nv-call .nv-ic{flex:0 0 32px;width:32px;height:32px;margin:0;background:color-mix(in srgb,var(--nv-ok) 15%,transparent);color:var(--nv-ok)}
-.nv-call .nv-ic svg{width:19px;height:19px}
-.nv-call.bad{color:var(--nv-fix)}
-.nv-call.bad .nv-ic{background:color-mix(in srgb,var(--nv-fix) 16%,transparent);color:var(--nv-fix)}
-.nv-call.pop .nv-ic{animation:nvBounce .5s var(--ease)}
-@keyframes nvBounce{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.nv-info{position:relative;flex:1;min-height:0;display:flex;justify-content:center}
+.nv-plate-box{width:clamp(150px,15vw,230px);min-height:0;display:flex;align-items:center;justify-content:center}
+.nv-plate-box .nv-nm{cursor:text}
+.nv-info.wide .nv-plate-box{width:min(100%,clamp(260px,26vw,400px))}
+/* подсказка без слов: в конце строки на табличке мигает курсор, рядом «пишет» карандаш */
+.nv-caret,.nv-pencil{position:absolute;opacity:0;pointer-events:none;transition:opacity .4s,top .45s var(--ease),left .45s var(--ease)}
+.nv-info.hinting .nv-caret,.nv-info.hinting .nv-pencil{opacity:1}
+.nv-caret{width:2px;border-radius:1px;animation:nvBlink .9s steps(1) infinite}
+@keyframes nvBlink{50%{visibility:hidden}}
+.nv-info.writing .nv-caret{animation:none}
+.nv-pencil{width:44px;height:44px;margin-top:-22px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center}
+.nv-pencil svg{width:22px;height:22px;transform-origin:20% 80%}
+.nv-info.hinting .nv-pencil svg{animation:nvWrite 1.4s var(--ease) infinite}
+.nv-info.writing .nv-pencil svg{animation-duration:.35s}
+@keyframes nvWrite{0%,100%{transform:rotate(0) translate(0,0)}25%{transform:rotate(-12deg) translate(-2px,1px)}50%{transform:rotate(6deg) translate(2px,-1px)}75%{transform:rotate(-6deg) translate(-1px,1px)}}
+/* пояснение у тактильной: для кого она */
+.nv-type-note{display:flex;align-items:center;gap:10px;margin:-6px 0 0;font-size:16px;line-height:1.35;opacity:.75;text-wrap:balance}
+.nv-type-note svg{flex:none;width:20px;height:20px}
+.nv-type-note[hidden]{display:none}
+/* лупа над Брайлем у тактильной: круг с крупными точками и линия к строке на табличке */
+.nv-loupe{position:absolute;width:132px;height:132px;margin-top:-66px;border-radius:50%;box-shadow:0 0 0 4px var(--bg),0 0 0 5.5px var(--ink),0 18px 40px -16px rgba(0,0,0,.4);display:none;align-items:center;justify-content:flex-start;overflow:hidden;pointer-events:none;animation:nvIn .45s var(--ease) both}
+.nv-loupe > span{padding-left:18px;animation:nvRead 6s linear infinite alternate}
+.nv-info.braille .nv-loupe{display:flex}
+.nv-info.braille .nv-pencil{display:none}
+@keyframes nvRead{to{transform:translateX(calc(-100% + 110px))}}
 .nv-paint{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;transition:opacity .3s}
 .nv-paint.off{opacity:.25;pointer-events:none}
 .nv-swatch i{display:block;width:32px;height:32px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(127,127,127,.35);transition:box-shadow .3s,transform .3s var(--ease)}
@@ -103,18 +108,15 @@
 .nv-del svg,.nv-add svg{width:18px;height:18px}
 .nv-add{width:48px;height:48px;background:var(--soft);color:var(--ink)}
 .nv-add:hover{background:var(--ink);color:var(--bg);transform:rotate(90deg)}
-@media (prefers-reduced-motion:reduce){.nv-arrow.nudge::after,.nv-call.pop .nv-ic,.nv-row{animation:none}}
+@media (prefers-reduced-motion:reduce){.nv-arrow.nudge::after,.nv-row,.nv-caret,.nv-pencil svg{animation:none!important}}
 @media (max-width:900px),(max-height:620px){
   .nv-build{grid-template-columns:1fr;height:auto}
   .nv-build-side{order:-1}
   .nv-build-plate{height:min(80vh,620px)}
 }
 @media (max-width:560px){
-  .nv-info{grid-template-columns:28px auto minmax(0,1fr);column-gap:10px}
-  .nv-plate-box{width:100px}
-  .nv-call{font-size:16px;gap:6px}
-  .nv-call::before{width:8px}
-  .nv-call .nv-ic{flex-basis:26px;width:26px;height:26px}
+  .nv-plate-box{width:120px}
+  .nv-pencil{width:38px;height:38px;margin-top:-19px}
   .nv-type span{display:none}
   .nv-type{padding:0 12px}
 }
