@@ -1945,7 +1945,7 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .foot-legal a{color:inherit;opacity:.7;text-decoration:underline;text-underline-offset:.2em;transition:opacity .3s}
 .foot-legal a:hover{opacity:1}
 /* плашка про cookie: одна строка внизу слева, маленькая и тихая; кнопка «ок» залитая (черная, в дружеской — лаймовая) */
-.cookie-bar{position:fixed;left:16px;bottom:16px;z-index:96;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 32px);padding:6px 6px 6px 16px;
+.cookie-bar{position:fixed;left:16px;bottom:16px;z-index:96;margin:0;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 32px);padding:6px 6px 6px 16px;
   border-radius:99px;background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--line);font-size:16px;line-height:1.2;
   opacity:0;translate:0 8px;transition:opacity .4s var(--ease),translate .5s var(--ease)}
 .cookie-bar.show{opacity:.92;translate:0 0}
@@ -1954,7 +1954,12 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .cookie-bar a{color:inherit;text-decoration:underline;text-underline-offset:.2em}
 .cookie-ok{flex:none;height:32px;padding:0 14px 2px;border:0;border-radius:99px;background:var(--ink);color:var(--bg);font:inherit;font-size:16px;cursor:pointer}
 :root[data-theme="dark"] .cookie-ok{background:#E2FB5A;color:#1D222A}
-@media (max-width:520px){.cookie-bar{border-radius:18px;padding:8px 8px 8px 14px}.cookie-bar p{white-space:normal}}
+/* на телефоне — внизу во всю ширину; кнопки «связаться» и «наверх» на это время поднимаются над ней (--cookie-h ставит app.js) */
+@media (max-width:760px){
+  .cookie-bar{left:16px;right:16px;bottom:16px;max-width:none;border-radius:18px;padding:8px 8px 8px 14px;justify-content:space-between}
+  .cookie-bar p{white-space:normal}
+  :root.cookie-on :is(.fab,.to-top){translate:0 calc(-1 * var(--cookie-h,0px));transition:translate .4s var(--ease)}
+}
 
 /* ШРИФТЫ — со своего сервера (папка fonts), не с Google: адрес посетителя не уходит за границу */
 @font-face {
@@ -2153,3 +2158,5 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 /* тег «в процессе оформления» — на обложке неоформленного кейса (слева сверху) и рядом с названием в «других работах» */
 .work-wip{position:absolute;left:12px;top:12px;z-index:2;padding:4px 12px 6px;border-radius:99px;background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 4px 14px -6px rgba(14,15,18,.25);font-size:16px;font-weight:400;line-height:1.2;white-space:nowrap;pointer-events:none}
 .article-title .work-wip{position:static;display:inline-block;vertical-align:middle;margin-left:12px;border:1px solid currentColor;background:none;box-shadow:none;opacity:.6}
+/* на телефоне низ подвала не прячется под кнопкой «связаться» и плашкой cookie */
+@media (max-width:760px){.foot{padding-bottom:88px}:root.cookie-on .foot{padding-bottom:calc(88px + var(--cookie-h,0px))}}

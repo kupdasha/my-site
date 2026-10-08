@@ -3092,9 +3092,22 @@ function renderLegal(){
     bar.addEventListener('click', e => {
       if (!e.target.closest('.cookie-ok')) return;
       try { localStorage.setItem('kd-cookie', '1'); } catch (er) {}
-      bar.classList.remove('show'); setTimeout(() => bar.remove(), 400);
+      bar.classList.remove('show'); root.classList.remove('cookie-on'); setTimeout(() => bar.remove(), 400);
     });
-    setTimeout(() => bar.classList.add('show'), 600);
+    // кнопки «связаться» и «наверх» поднимаются над плашкой на ее высоту (только на телефоне, см. style.css)
+    // насколько поднять: низ кнопки (без текущего подъема) должен оказаться на 8 px выше верха плашки
+    const lift = () => {
+      const fab = document.getElementById('fab'); if (!fab) return;
+      // низ кнопки без подъема — из ее bottom в стилях (не зависит от анимации); верх плашки — тоже из стилей
+      const fabBottom = innerHeight - (parseFloat(getComputedStyle(fab).bottom) || 0);
+      const barTop = innerHeight - (parseFloat(getComputedStyle(bar).bottom) || 0) - bar.offsetHeight;
+      const need = fabBottom - (barTop - 8);
+      root.style.setProperty('--cookie-h', Math.max(0, Math.round(need)) + 'px');
+    };
+    setTimeout(() => { bar.classList.add('show'); lift(); root.classList.add('cookie-on'); }, 600);
+    let liftQ = 0;
+    const relift = () => { if (!bar.isConnected || liftQ) return; liftQ = requestAnimationFrame(() => { liftQ = 0; lift(); }); };
+    addEventListener('resize', relift); addEventListener('scroll', relift, { passive: true });
   }
   const C = L.cookie;
   bar.innerHTML = `<p>${T(C.text)} <a href="${L.links[0].link}" target="_blank" rel="noopener">${T(C.policy)}</a></p><button class="cookie-ok" type="button">${T(C.accept)}</button>`;
