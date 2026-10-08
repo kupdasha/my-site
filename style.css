@@ -2173,3 +2173,6 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 
 /* окно «спасибо» от спрятанной формы Тильды не показываем — ответ посетителю пишет сама игра */
 .kd-sending .t-form-success-popup{visibility:hidden!important}
+
+/* значок Telegram в кнопке «связаться» */
+.fab .fab-tg{flex:none;width:22px;height:22px;margin:2px 10px 0 -6px}

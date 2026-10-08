@@ -3165,6 +3165,13 @@ function renderLegal(){
 }
 renderLegal();
 addEventListener('theme:apply', renderLegal);
+
+/* у кнопки «связаться» — значок Telegram, чтобы было понятно, куда она ведет (разметку Тильды не трогаем) */
+{
+  const fab = document.getElementById('fab');
+  if (fab && !fab.querySelector('.fab-tg')) fab.insertAdjacentHTML('afterbegin',
+    '<svg class="fab-tg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.4 4.3 2.9 11.4c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.8.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.3-1.9Zm-3.3 4-8 7.2-.3 3.3-1.5-4.6 9.4-5.9c.4-.3.8 0 .4 0Z"/></svg>');
+}
 placeFab();
 requestAnimationFrame(() => requestAnimationFrame(() => watchReveals(document, true)));
 if (document.fonts) document.fonts.ready.then(layoutStrings);
