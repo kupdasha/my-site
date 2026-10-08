@@ -114,7 +114,7 @@
 :root:not([data-theme="dark"]) .ro-sidest.mark-on .ro-letter .mark::after{box-shadow:inset 0 -2px 0 rgba(29,34,42,.25)}
 .ro-letter .ft{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
 .ro-letter .ft i{width:26%}
-.ro-letter svg,.ro-card .ft svg{width:30%;fill:none;stroke:var(--ro-doc);stroke-width:2;stroke-linecap:round}
+.ro-letter svg{width:30%;fill:none;stroke:var(--ro-doc);stroke-width:2;stroke-linecap:round}
 /* смета: строки с суммами разной длины, внизу итог */
 .ro-smeta .rows{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px}
 .ro-smeta i,.ro-smeta u{display:block;height:14px;border-radius:3px;background:var(--line)}
@@ -135,46 +135,6 @@
 .ro-chip{position:absolute;left:14px;top:18px;width:40px;height:14px;border-radius:4px;background:var(--ro-sheet);box-shadow:0 0 0 2px var(--ro-mark);
   opacity:0;transform:scale(.4);transition:opacity .25s,transform .35s var(--ease)}
 .ro-sidest.carry .ro-chip{opacity:1;transform:none}
-
-/* ---------- templates: заявление, Гант и формулы заполняются сами ---------- */
-.ro-tpls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.6vw,22px);padding:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,40px);align-items:center}
-.ro-tpl{margin:0}
-.ro-card{position:relative;aspect-ratio:3/4;background:var(--bg);border-radius:8px;border-top:4px solid var(--m);padding:14% 12%;display:flex;flex-direction:column;gap:7%;
-  box-shadow:0 18px 40px -26px rgba(20,24,32,.3);overflow:hidden}
-.ro-card i{display:block;flex:none;height:6px;border-radius:3px;background:var(--line);transform-origin:0 50%}
-/* строки печатаются по очереди: ширина от нуля */
-.ro-tpl.ro-m-doc .ro-card i{transform:scaleX(0);transition:transform .45s var(--ease) var(--d,0ms)}
-.ro-tpls.go .ro-tpl.ro-m-doc .ro-card i{transform:none}
-.ro-tpl .to{display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-bottom:4%}
-.ro-tpl .to i{width:52%;transform-origin:100% 50%}.ro-tpl .to i.s{width:36%}
-.ro-tpl .tt{width:42%;height:8px;margin:0 auto;background:var(--ink);transform-origin:50% 50%}
-.ro-tpl i.s{width:64%}
-.ro-card .ft{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
-.ro-card .ft i{width:30%}
-.ro-card .ft svg{width:42%}
-.ro-card .ft path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s var(--ease) 1.1s}
-.ro-tpls.go .ro-card .ft path{stroke-dashoffset:0}
-/* Гант: строки задач, полосы растут по очереди, вертикаль «сегодня» */
-.ro-gantt .ro-card{justify-content:center;gap:9%}
-.ro-gantt .row{display:grid;grid-template-columns:28% 1fr;gap:8%;align-items:center}
-.ro-gantt .row span{position:relative;height:12px}
-.ro-gantt .row b{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--m);transform:scaleX(0);transform-origin:0 50%;transition:transform .6s var(--ease) var(--d)}
-.ro-tpls.go .ro-gantt .row b{transform:none}
-.ro-gantt .now{position:absolute;top:10%;bottom:10%;left:56%;width:2px;background:var(--ro-slide);text-decoration:none;opacity:0;transition:opacity .4s 1.6s}
-.ro-tpls.go .ro-gantt .now{opacity:1}
-/* формулы: значения подсвечиваются по очереди, итог растет */
-.ro-sums .ro-card{gap:6%}
-.ro-sums .sigma{width:26%;align-self:flex-end;fill:none;stroke:var(--m);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2%}
-.ro-sums .row{display:grid;grid-template-columns:40% 1fr;gap:8%;align-items:center}
-.ro-sums .row u{display:block;justify-self:end;height:10px;border-radius:3px;background:var(--line);outline:2px solid transparent;outline-offset:1px;transition:outline-color .3s var(--d)}
-.ro-tpls.go .ro-sums .row:not(.res) u{outline-color:var(--m);animation:roOff .3s linear calc(var(--d) + 300ms) forwards}
-@keyframes roOff{to{outline-color:transparent}}
-.ro-sums .res{margin-top:auto;padding-top:8%;border-top:2px solid var(--ink)}
-.ro-sums .res i{background:var(--ink)}
-.ro-sums .res u{width:100%;height:14px;background:var(--m);transform:scaleX(0);transform-origin:100% 50%;transition:transform .7s var(--ease) 1.5s}
-.ro-tpls.go .ro-sums .res u{transform:none}
-.ro-tpls.out .ro-card{opacity:0;transition:opacity .4s}
-.ro-tpls.out .ro-card *{transition:none !important}
 
 /* ---------- qr: код собирается на листе ---------- */
 .ro-qrst{display:grid;place-items:center;padding:clamp(20px,3.4vw,48px)}
@@ -245,7 +205,7 @@
 .ro-net .pk-out{fill:var(--ink)}
 .ro-net .ring{fill:none;stroke:var(--ink);stroke-width:2.4}
 
-/* ---------- kits: сменный набор шаблонов ---------- */
+/* ---------- templates: шаблоны заполняются сами, набор сменный ---------- */
 .ro-kitst{padding:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,40px)}
 .ro-sets{display:flex;justify-content:center;gap:clamp(10px,1.4vw,16px);margin-bottom:clamp(20px,2.8vw,36px)}
 .ro-set{position:relative;display:grid;place-items:center;width:clamp(52px,5vw,64px);aspect-ratio:1;border-radius:50%;border:0;background:var(--bg);color:var(--ink);cursor:pointer;overflow:hidden;
@@ -288,6 +248,27 @@
 .ro-kin .sg{display:flex;justify-content:space-between;margin-top:auto}.ro-kin .sg i{width:34%;background:var(--ink)}
 .ro-kin .qr{display:block;width:28%;aspect-ratio:1;margin-top:auto;align-self:flex-end;border-radius:2px;
   background:repeating-conic-gradient(#1D222A 0 25%,transparent 0 50%) 0 0 / 33.3% 33.3%;outline:2px solid #1D222A;outline-offset:1px}
+/* формулы: значок суммы, значения и итог под чертой */
+.ro-kin .sig{width:18%;flex:none;align-self:flex-end;margin-bottom:-4%;fill:none;stroke:var(--m);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.ro-kin .fx{display:grid;grid-template-columns:40% 1fr;gap:6px 10%;align-items:center}
+.ro-kin .fx u{display:block;justify-self:end;height:6px;border-radius:3px;background:var(--line)}
+.ro-kin .fx.res{margin-top:auto;padding-top:6%;border-top:2px solid var(--ink)}
+.ro-kin .fx.res i{background:var(--ink)}
+.ro-kin .fx.res u{width:100%;height:8px;background:var(--m)}
+/* шаблон заполняется сам: строки печатаются слева направо, полосы Ганта и итог растут, столбики поднимаются */
+.ro-kin i,.ro-kin .fx u,.ro-kin .gt b,.ro-kin .cd b,.ro-kin .pill{transform-origin:0 50%;transition:transform .45s var(--ease) calc(var(--i) * 90ms + var(--j,0) * 70ms)}
+.ro-kin .to i{transform-origin:100% 50%}
+.ro-kin .tt{transform-origin:50% 50%}
+.ro-kin .fx.res u{transform-origin:100% 50%;transition-delay:calc(var(--i) * 90ms + 600ms)}
+.ro-kin .cht b,.ro-kin .sl b{transform-origin:50% 100%;transition:transform .5s var(--ease) calc(var(--i) * 90ms + var(--j,0) * 70ms)}
+.ro-kin .tb u,.ro-kin .gh,.ro-kin .qr,.ro-kin .emb{transition:opacity .4s var(--ease) calc(var(--i) * 90ms + var(--j,0) * 50ms)}
+.ro-kit:not(.fill) .ro-kin :is(i,.fx u,.gt b,.cd b,.pill){transform:scaleX(0)}
+.ro-kit:not(.fill) .ro-kin :is(.cht b,.sl b){transform:scaleY(0)}
+.ro-kit:not(.fill) .ro-kin :is(.tb u,.gh,.qr,.emb){opacity:0}
+.ro-kit:not(.fill) .ro-kin *{transition-duration:0s !important;transition-delay:0s !important}
+.ro-kin > :nth-child(2),.ro-kin * > :nth-child(2){--j:1}.ro-kin > :nth-child(3),.ro-kin * > :nth-child(3){--j:2}
+.ro-kin > :nth-child(4),.ro-kin * > :nth-child(4){--j:3}.ro-kin > :nth-child(5),.ro-kin * > :nth-child(5){--j:4}
+.ro-kin > :nth-child(6),.ro-kin * > :nth-child(6){--j:5}.ro-kin * > :nth-child(n+7){--j:6}
 @media (max-width:480px){.ro-kit{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* ---------- демо под текстом последней главы ---------- */
@@ -295,13 +276,17 @@
 .ro-try-title{font-size:clamp(22px,1.8vw,28px);font-weight:500;line-height:1.15}
 .ro-try-text{font-family:var(--font-read);font-size:19px;line-height:1.4;max-width:30ch}
 .ro-try-btn{margin-top:8px}
-/* на телефоне и планшете: текст главы, набор, и уже потом демо */
+/* кнопка демо — светло-зеленая (лаймовая) в обеих версиях, как у анонимайзера */
+:root .ro-try .ro-try-btn{background:var(--accent);color:var(--accent-text)}
+:root .ro-try .ro-try-btn::after{display:block}
+:root .ro-try .ro-try-btn:hover{background:var(--ink);color:var(--bg)}
+/* на телефоне и планшете: текст главы, рисунок, и уже потом демо */
 @media (max-width:900px){
-  .ro-kits-ch{row-gap:20px}
-  .ro-kits-ch .ro-side{display:contents}
-  .ro-kits-ch .ro-label,.ro-kits-ch .ro-title,.ro-kits-ch .ro-text{order:-1;grid-column:1 / -1}
-  .ro-kits-ch > .ro-viz{margin-top:12px}
-  .ro-kits-ch .ro-try{order:1;grid-column:1 / -1;border-top:0;padding-top:0}
+  .ro-split:has(.ro-try){row-gap:20px}
+  .ro-split:has(.ro-try) .ro-side{display:contents}
+  .ro-split:has(.ro-try) :is(.ro-label,.ro-title,.ro-text){order:-1;grid-column:1 / -1}
+  .ro-split:has(.ro-try) > .ro-viz{margin-top:12px}
+  .ro-split:has(.ro-try) .ro-try{order:1;grid-column:1 / -1;border-top:0;padding-top:0}
 }
 
 /* ---------- текст в начале кейса: на планшете задача и решение рядом, результат ниже ---------- */

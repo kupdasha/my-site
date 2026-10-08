@@ -5,13 +5,13 @@
    улетают, окна складываются в одно с четырьмя вкладками;
    side — одно окно, внутри рядом заявление, смета и презентация,
    курсор переносит итог сметы в график и в заявление;
-   templates — заявление, диаграмма Ганта и формулы заполняются сами;
+   templates — шаблоны заполняются сами, а набор сменный: госорган,
+   дивизион, компания, переключается сам, пока не тронули;
    qr — QR-код собирается прямо на листе, по нему проходит сканер;
    page — мини-лендинг из блоков, редактор сворачивается в браузер;
    closed — закрытый контур: данные ходят внутри, наружу не выходят —
    отскакивают от границы, облако и интернет снаружи без связи;
-   kits — сменный набор шаблонов: госорган, дивизион, компания,
-   переключается сам, пока не тронули; справа — кнопка демо.
+   справа под текстом последней главы с рисунком сбоку — кнопка демо.
    Цвета вкладок — как в самом приложении: документ синий, таблица
    зеленая, HTML лаймовый; презентация — малиновая (оранжевого
    на сайте нет). Тексты — в content.js, оформление — office.css.
@@ -178,38 +178,6 @@ function liveSide(box){
     async () => { await move(total, .5, .5, 800); await click(); st.classList.add('carry'); await wait(200);
       await move(mark, .7, .5, 1000); await click(); st.classList.remove('carry'); st.classList.add('mark-on'); await wait(2200); },
   ], .35);
-}
-
-/* ================================================================
-   templates — заявление, диаграмма Ганта и формулы заполняются сами
-   ================================================================ */
-function templatesHTML(){
-  const d = (i, base) => `style="--d:${base + i * 90}ms"`;
-  const letter = `<figure class="ro-tpl ro-m-doc"><div class="ro-card">
-      <div class="to">${[0, 1, 2].map(i => `<i ${d(i, 0)}${i === 2 ? ' class="s"' : ''}></i>`).join('')}</div>
-      <i class="tt" ${d(3, 0)}></i>
-      ${[4, 5, 6, 7, 8].map(i => `<i ${d(i, 0)}${i % 3 === 0 ? ' class="s"' : ''}></i>`).join('')}
-      <div class="ft"><i ${d(9, 0)}></i><svg viewBox="0 0 60 20" aria-hidden="true"><path pathLength="1" d="M2 14c6-10 9 6 14-2s6-8 9 0 7 4 10-3 6 4 12 1 9-4 11-2"/></svg></div>
-    </div></figure>`;
-  const gantt = `<figure class="ro-tpl ro-m-sheet ro-gantt"><div class="ro-card">
-      ${[[0, 30], [18, 34], [40, 22], [52, 30], [70, 26]].map(([x, w], i) =>
-        `<div class="row"><i></i><span><b style="left:${x}%;width:${w}%;--d:${300 + i * 260}ms"></b></span></div>`).join('')}
-      <s class="now"></s>
-    </div></figure>`;
-  const sums = `<figure class="ro-tpl ro-m-sheet ro-sums"><div class="ro-card">
-      <svg class="sigma" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5H6l6.5 7L6 19h12"/></svg>
-      ${[70, 45, 85, 55, 60].map((w, i) => `<div class="row" style="--d:${300 + i * 220}ms"><i></i><u style="width:${w}%"></u></div>`).join('')}
-      <div class="row res"><i></i><u></u></div>
-    </div></figure>`;
-  return `<div class="ro-stage ro-tpls">${letter}${gantt}${sums}</div>`;
-}
-function liveTemplates(box){
-  const st = box.querySelector('.ro-tpls');
-  if (still()) { st.classList.add('go'); return; }
-  cycle(st, [
-    async () => { st.classList.add('go'); await wait(4800); },
-    async () => { st.classList.remove('go'); st.classList.add('out'); await wait(600); st.classList.remove('out'); await wait(300); },
-  ]);
 }
 
 /* ================================================================
@@ -390,11 +358,12 @@ function liveClosed(box){
 }
 
 /* ================================================================
-   kits — сменный набор шаблонов
+   templates — шаблоны заполняются сами; набор сменный
    ================================================================ */
-// рисунки шаблонов: письмо, приказ (с гербом-кружком), служебка, таблица, Гант, график, слайды, лендинг, счет, договор, QR
+// рисунки шаблонов: заявление, приказ (с гербом-кружком), служебка, таблица, Гант, формулы, график, слайды, лендинг, счет, договор, QR
 const MINI = {
   letter:   () => `<div class="to"><i></i><i class="s"></i></div><i class="tt"></i><i></i><i></i><i class="s"></i>`,
+  sums:     () => `<svg class="sig" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5H6l6.5 7L6 19h12"/></svg><div class="fx">${[70, 45, 85].map(w => `<i></i><u style="width:${w}%"></u>`).join('')}</div><div class="fx res"><i></i><u></u></div>`,
   order:    () => `<span class="emb"></span><i class="tt"></i><i></i><i></i><i class="s"></i><i></i>`,
   memo:     () => `<i class="tt l"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i>`,
   table:    () => `<div class="tb">${Array.from({ length: 12 }, (_, k) => `<u${k < 3 ? ' class="th"' : ''}></u>`).join('')}</div>`,
@@ -406,9 +375,9 @@ const MINI = {
   contract: () => `<i class="tt"></i><i></i><i></i><i></i><i class="s"></i><div class="sg"><i></i><i></i></div>`,
   qrdoc:    () => `<i class="tt l"></i><i></i><i class="s"></i><span class="qr"></span>`,
 };
-const MODE_OF = { letter: 'doc', order: 'doc', memo: 'doc', contract: 'doc', qrdoc: 'doc', table: 'sheet', gantt: 'sheet', invoice: 'sheet', chart: 'slide', slides: 'slide', landing: 'html' };
+const MODE_OF = { sums: 'sheet', letter: 'doc', order: 'doc', memo: 'doc', contract: 'doc', qrdoc: 'doc', table: 'sheet', gantt: 'sheet', invoice: 'sheet', chart: 'slide', slides: 'slide', landing: 'html' };
 const SETS = [
-  ['letter', 'order', 'memo', 'table', 'gantt', 'slides'],      // госорган
+  ['letter', 'gantt', 'sums', 'order', 'memo', 'table'],        // госорган: заявление, Гант, формулы — первыми
   ['gantt', 'table', 'chart', 'memo', 'slides', 'letter'],      // дивизион
   ['contract', 'invoice', 'landing', 'chart', 'qrdoc', 'slides'], // компания
 ];
@@ -418,7 +387,7 @@ function kitsHTML(c){
   return `<div class="ro-stage ro-kitst">
     <div class="ro-sets" role="tablist">${names.map((n, i) =>
       `<button class="ro-set${i ? '' : ' on'}" type="button" role="tab" aria-selected="${!i}" aria-label="${esc(n)}" data-i="${i}">${SET_ICON[i]}<s></s></button>`).join('')}</div>
-    <div class="ro-kit">${SETS[0].map(card).join('')}</div>
+    <div class="ro-kit fill">${SETS[0].map(card).join('')}</div>
   </div>`;
 }
 function liveKits(box){
@@ -445,12 +414,16 @@ function liveKits(box){
     if (!still()) { cards.forEach(el => el.classList.add('flip')); await wait(320 + cards.length * 50); }
     if (my !== gen) return;
     SETS[i].forEach((k, n) => { const el = cards[n]; el.className = `ro-k ro-m-${MODE_OF[k]} k-${k}${still() ? '' : ' flip'}`; el.firstElementChild.innerHTML = MINI[k](); });
+    kit.classList.remove('fill');
     await wait(30);
     if (my !== gen) return;
     cards.forEach(el => el.classList.remove('flip'));
+    void kit.offsetWidth; kit.classList.add('fill');   // строки печатаются, полосы и столбики растут
   };
   btns.forEach(b => b.addEventListener('click', () => set(+b.dataset.i, true)));
-  onScreen(st, v => { on = v; run(); }, .3);
+  let seen = false;
+  if (!still()) kit.classList.remove('fill');
+  onScreen(st, v => { on = v; run(); if (v && !seen) { seen = true; requestAnimationFrame(() => kit.classList.add('fill')); } }, .3);
 }
 
 /* ---------- демо: справа под текстом последней главы ---------- */
@@ -466,11 +439,10 @@ const tryHTML = t => t ? `<div class="ro-try">
 const CHAPTERS = [
   ['one', oneHTML, liveOne, 'wide'],
   ['side', sideHTML, liveSide, 'wide'],
-  ['templates', templatesHTML, liveTemplates, 'left'],
+  ['templates', kitsHTML, liveKits, 'left'],
   ['qr', qrHTML, liveQR, 'right'],
-  ['page', pageHTML, livePage, 'left'],
   ['closed', closedHTML, liveClosed, 'wide'],
-  ['kits', kitsHTML, liveKits, 'left'],
+  ['page', pageHTML, livePage, 'left'],   // последняя: под текстом — кнопка демо
 ];
 
 let cssReady;
