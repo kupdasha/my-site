@@ -470,7 +470,7 @@ document.addEventListener('click', e => {
   evOpenViewer(+f.dataset.i, from);
 });   // подписи к фото в просмотре (у хроники выступлений)
 function viewShow(){
-  const count = viewList.length > 1 ? `${viewAt + 1} из ${viewList.length}` : '';
+  const count = viewList.length > 1 ? `${viewAt + 1}\u00a0из\u00a0${viewList.length}` : '';   // неразрывные пробелы: «из» не висит в конце строки
   viewer.querySelector('.viewer-count').innerHTML = viewCaps[viewAt] ? `${T(viewCaps[viewAt])} <span class="viewer-n">${count}</span>` : count;
   viewer.classList.toggle('single', viewList.length < 2);
 }
@@ -1496,7 +1496,7 @@ function campSlides(g){
     <div class="slides-track">${g.slides.map((src, i) => `<button class="slide" aria-label="Слайд ${i + 1}"><img src="${src}" alt="" loading="lazy"></button>`).join('')}</div>
     <button class="slides-nav prev" aria-label="Предыдущий слайд">${arrow('M12 4l-6 6 6 6')}</button>
     <button class="slides-nav next" aria-label="Следующий слайд">${arrow('M8 4l6 6-6 6')}</button>
-    <p class="slides-count">1 из ${g.slides.length}</p>
+    <p class="slides-count">1\u00a0из\u00a0${g.slides.length}</p>
   </div>${g.notes ? `<div class="slides-notes">${g.notes.map((n, i) => `<p${i ? ' hidden' : ''}>${T(n)}</p>`).join('')}</div>` : ''}</div>`;
 }
 function watchSlides(box){
@@ -1506,7 +1506,7 @@ function watchSlides(box){
   const go = i => track.scrollTo({ left: Math.max(0, Math.min(slides.length - 1, i)) * track.clientWidth, behavior: 'smooth' });
   const show = () => {
     const i = at();
-    count.textContent = `${i + 1} из ${slides.length}`;
+    count.textContent = `${i + 1}\u00a0из\u00a0${slides.length}`;
     notes.forEach((n, j) => { n.hidden = j !== i; });
     box.classList.toggle('first', i === 0); box.classList.toggle('last', i === slides.length - 1);
   };
