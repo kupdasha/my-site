@@ -40,7 +40,11 @@
 .ad-types{display:grid;grid-template-columns:1fr;gap:clamp(16px,2vw,28px)}
 .ad-types figure{background:var(--soft);border-radius:clamp(20px,3vw,40px);padding:clamp(12px,2vw,28px);display:flex;flex-direction:column;gap:12px}
 .ad-types figcaption{font-size:16px;opacity:.6;text-align:center;text-wrap:balance}
-.ad-type{width:100%;height:auto;aspect-ratio:1 / 1;flex:none;display:block;overflow:visible}   /* пропорции явно: в Safari svg без них в колонке схлопывается до нуля */
+/* квадрат задает рамка с отступом 100% снизу, svg лежит в ней поверх: так размер одинаковый во всех браузерах,
+   без расчета высоты svg (в Safari он в колонке схлопывался до нуля) */
+.ad-sq{position:relative;width:100%;height:0;padding-bottom:100%;flex:none}
+.ad-type{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.ad-wave{overflow:hidden}
 .ad-type text{fill:var(--ink);font:500 22px var(--font)}
 .ad-ring text{font-size:27px}
 .ad-ring .ad-core{font-size:36px}

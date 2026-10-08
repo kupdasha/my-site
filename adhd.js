@@ -152,9 +152,9 @@ function waveSVG(t){
 }
 function typeHTML(c){
   return `<div class="ad-types">
-    <figure>${ringSVG(c)}${c.notes ? `<figcaption>${H.T(c.notes[0])}</figcaption>` : ''}</figure>
-    <figure>${slowSVG(c)}${c.notes ? `<figcaption>${H.T(c.notes[1])}</figcaption>` : ''}</figure>
-    <figure>${waveSVG(c)}${c.notes ? `<figcaption>${H.T(c.notes[2])}</figcaption>` : ''}</figure>
+    <figure><div class="ad-sq">${ringSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[0])}</figcaption>` : ''}</figure>
+    <figure><div class="ad-sq">${slowSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[1])}</figcaption>` : ''}</figure>
+    <figure><div class="ad-sq">${waveSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[2])}</figcaption>` : ''}</figure>
   </div>${cap(c.hint)}`;
 }
 function liveSlow(svg){
