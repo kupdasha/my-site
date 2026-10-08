@@ -428,8 +428,11 @@ function rotateEvents(strip){
 }
 function swapEvent(slot, next, k){
   const item = SITE.photos.events.items[next];
-  if (+slot.dataset.i === next) return;
+  // окошко еще меняет прошлую картинку (новая долго грузилась) — новую смену не начинаем, иначе картинки встают друг под другом
+  if (+slot.dataset.i === next || slot.dataset.busy) return;
+  slot.dataset.busy = '1';
   const old = slot.querySelector('img'), img = new Image();
+  img.onerror = () => { delete slot.dataset.busy; };
   img.alt = pick(item.caption); img.className = 'ev-next';
   img.style.setProperty('--k', k);
   img.onload = () => {
@@ -437,7 +440,10 @@ function swapEvent(slot, next, k){
     requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('on')));
     const cap = slot.querySelector('figcaption'); cap.style.setProperty('--k', k); cap.classList.add('swap');
     setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, 420 + k * 70);
-    setTimeout(() => { old.remove(); img.className = ''; img.style.removeProperty('--k'); slot.dataset.i = next; }, 1100 + k * 70);
+    setTimeout(() => {
+      slot.querySelectorAll('img').forEach(x => { if (x !== img) x.remove(); });
+      img.className = ''; img.style.removeProperty('--k'); slot.dataset.i = next; delete slot.dataset.busy;
+    }, 1100 + k * 70);
   };
   img.src = item.thumb || item.src;
 }
@@ -2670,11 +2676,11 @@ function skMark(img){
 const caseLoad = {
   on: false, total: 0, done: 0, t0: 0, shown: 0, eta: Infinity, timer: 0, el: null,
   start(){
-    this.on = true; this.total = 0; this.done = 0; this.t0 = performance.now(); this.eta = Infinity; this.shown = 0;
+    this.on = true; this.total = 0; this.done = 0; this.t0 = this.last = performance.now(); this.eta = Infinity; this.shown = 0;
     clearInterval(this.timer); this.timer = setInterval(() => this.draw(), 250);
   },
   add(){ if (this.on) this.total++; },
-  tick(){ if (!this.on) return; this.done++; this.draw(); },
+  tick(){ if (!this.on) return; this.done++; this.last = performance.now(); this.draw(); },
   pill(){
     if (this.el) return this.el;
     let el = document.getElementById('caseWait');
@@ -2686,6 +2692,9 @@ const caseLoad = {
     const L = SITE.works.loading || {}, el = this.pill(), t = (performance.now() - this.t0) / 1000;
     const frac = this.total ? this.done / this.total : 0;
     if (this.total && this.done >= this.total) return this.stop();
+    // предохранители: что-то так и не догрузилось (картинка в листалке, до которой не дошли, глава без признака готовности) —
+    // плашка не висит вечно: уходит, если на последних процентах ничего не меняется 2,5 с, и в любом случае через 15 с
+    if (t > 15 || (frac >= 0.8 && performance.now() - this.last > 2500)) return this.stop();
     if (t < 0.7 && !this.shown) return;
     if (!this.total) return this.stop();   // ждать нечего (ролики грузятся по нажатию или наведению) — плашку не показываем, иначе она висит вечно
     if (!el.querySelector('b')) el.innerHTML = '<b></b><span></span><i></i>';
