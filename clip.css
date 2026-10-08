@@ -116,7 +116,7 @@
 .cl-rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,28px);margin-top:clamp(36px,4vw,56px)}
 .cl-rules h3{font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.1;margin-bottom:10px;text-wrap:balance}
 .cl-rules p{font-family:var(--font-read);font-size:clamp(18px,1.4vw,20px);line-height:1.4}
-@media (max-width:640px){.cl-rules{grid-template-columns:1fr}}
+@media (max-width:900px){.cl-rules{grid-template-columns:1fr;max-width:40em}}   /* на планшете и телефоне правила столбиком — заголовки не ломаются по словам */
 
 /* ---------- клип в одну полоску ---------- */
 .cl-score{--x:0;position:relative;padding-top:clamp(120px,14vw,190px);touch-action:pan-y;user-select:none;cursor:ew-resize}

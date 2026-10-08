@@ -1208,7 +1208,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 @keyframes stripDrop{0%,40%{opacity:0;transform:translateY(-190%) scale(.6)}47%{opacity:1;transform:translateY(0) scale(1)}54%{opacity:1;transform:scale(1)}62%,100%{opacity:0;transform:scale(2.4)}}
 @keyframes stripClean{0%,52%{opacity:0}62%,88%{opacity:1}96%,100%{opacity:0}}
 .strip-phases{position:relative;height:1.4em;margin-top:16px;font-size:16px}
-.strip-phases span{position:absolute;left:0;top:0;opacity:0;animation:6s var(--ease-io) infinite;animation-play-state:var(--run)}
+.strip-phases span{position:absolute;left:0;top:0;opacity:0;white-space:nowrap;animation:6s var(--ease-io) infinite;animation-play-state:var(--run)}
 .strip-phases .ph1{animation-name:ph1}.strip-phases .ph2{left:36%;animation-name:ph2}
 @keyframes ph1{0%,28%{opacity:0}36%,52%{opacity:.75}58%,100%{opacity:0}}
 @keyframes ph2{0%,54%{opacity:0}62%,88%{opacity:.75}94%,100%{opacity:0}}
