@@ -2552,9 +2552,31 @@ function renderCase(k, keepScroll){
   if (!keepScroll) caseEl.scrollTop = 0;
 }
 
+/* Скелет загрузки: картинки кейса, пока грузятся, — серые плашки с переливом (класс sk-wait);
+   у картинки без размеров плашка 16:10 (sk-box), чтобы ее было видно. Следит и за картинками,
+   которые живые главы дорисовывают позже */
+function skMark(img){
+  if (img.dataset.sk || (img.complete && img.naturalWidth)) return;
+  img.dataset.sk = '1';
+  img.classList.add('sk-wait');
+  if (img.getBoundingClientRect().height < 2) img.classList.add('sk-box');
+  const done = () => img.classList.remove('sk-wait', 'sk-box');
+  img.addEventListener('load', done, { once: true });
+  img.addEventListener('error', done, { once: true });
+}
+const skScan = scope => scope.querySelectorAll && scope.querySelectorAll('img').forEach(skMark);
+new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
+  if (n.nodeType !== 1) return;
+  if (n.tagName === 'IMG') skMark(n); else skScan(n);
+}))).observe(caseContent, { childList: true, subtree: true });
+// снять скелет страницы, который показала разметка окна кейса до загрузки кода
+function unboot(){ caseEl.classList.remove('boot'); root.classList.remove('case-boot'); }
+
 function openCase(k){
   caseIndex = k;
+  unboot();
   renderCase(k);
+  skScan(caseContent);
   caseEl.classList.add('open');
   placeFab(); setTimeout(placeToTop, 100);
   document.body.classList.add('locked');
@@ -2572,7 +2594,10 @@ function readHash(){
   const m = /^#case-(\d+)$/.exec(location.hash);
   const k = m ? +m[1] - 1 : null;
   if (k != null && caseItems()[k] && caseItems()[k].page == null) { openedByClick = openedByClick || false; openCase(k); }
-  else closeCase();
+  else {
+    if (caseEl.classList.contains('boot')) { unboot(); caseEl.classList.remove('open'); caseContent.innerHTML = ''; }
+    closeCase();
+  }
 }
 addEventListener('hashchange', () => { openedByClick = true; readHash(); });
 $('#caseBack').addEventListener('click', () => {

@@ -1871,3 +1871,33 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .client-preview video{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-img);background:var(--soft)}
 /* heroPhone — на телефоне широкая шапка обрезается до этих пропорций по центру (см. Ростех) */
 @media (max-width:760px){.case-hero[style*="--hp"]{aspect-ratio:var(--hp) !important}}
+
+/* ================================================================
+   СКЕЛЕТ ЗАГРУЗКИ КЕЙСА: серые плашки с мягким переливом там, где сейчас появятся текст и картинки
+   ================================================================ */
+:root{--sk:#EEF0F3;--sk-hi:rgba(255,255,255,.75)}
+:root[data-theme="dark"]{--sk:rgba(255,255,255,.07);--sk-hi:rgba(255,255,255,.08)}
+@keyframes skRun{from{background-position:150% 0}to{background-position:-50% 0}}
+.sk,.case img.sk-wait,.case-body [class*="-mount"]:empty{
+  background-color:var(--sk);
+  background-image:linear-gradient(100deg,transparent 30%,var(--sk-hi) 50%,transparent 70%);
+  background-size:200% 100%;background-repeat:no-repeat;
+  animation:skRun 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.sk,.case img.sk-wait,.case-body [class*="-mount"]:empty{animation:none;background-image:none}}
+/* окно кейса, открытое по ссылке, появляется сразу, без шторки */
+.case.boot{transition:none}
+.case-skel .sk{display:block;border-radius:12px}
+.case-skel .sk-t{height:clamp(40px,5.4vw,80px);width:min(70%,760px);border-radius:16px}
+.case-skel .sk-t2{width:min(45%,480px);margin-top:14px}
+.case-skel .sk-hero{width:100%;aspect-ratio:16/9;max-height:80vh;border-radius:0}
+.case-skel .sk-body{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,4vw,64px);padding-top:clamp(64px,8vw,120px)}
+.case-skel .sk-l{height:18px;margin-bottom:14px}
+.case-skel .sk-l:nth-child(4n+2){width:92%}.case-skel .sk-l:nth-child(4n+3){width:96%}.case-skel .sk-l:nth-child(4n){width:60%}
+.case-skel .sk-s{width:50%}
+@media (max-width:760px){.case-skel .sk-body{grid-template-columns:1fr}}
+/* картинка без своих размеров, пока грузится, — плашка 16:10 */
+.case img.sk-box{width:100%;aspect-ratio:16/10;min-height:120px}
+/* живая глава, пока подгружается ее код, — высокая плашка */
+.case-body [class*="-mount"]:empty{min-height:60vh;border-radius:var(--r-img)}
+/* шапка кейса переливается, пока не показались обложка или ролик */
+.case-hero{background-color:var(--sk)}

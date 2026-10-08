@@ -134,6 +134,8 @@
   </div></div>
   <div id="caseContent"></div>
 </div>
+<!-- Кейс открыт по ссылке (#case-N): пока грузятся тексты и код, сразу видна страница-скелет -->
+<script>(function(){if(!/^#case-\d+$/.test(location.hash))return;var c=document.getElementById('case'),b=document.getElementById('caseContent');if(!c||!b||b.firstChild)return;c.classList.add('open','boot');document.documentElement.classList.add('case-boot');var l='';for(var i=0;i<4;i++)l+='<i class="sk sk-l"></i>';b.innerHTML='<div class="case-skel" aria-hidden="true"><div class="wrap case-head"><i class="sk sk-t"></i><i class="sk sk-t sk-t2"></i></div><i class="sk sk-hero"></i><div class="wrap sk-body"><div class="sk-col"><i class="sk sk-l sk-s"></i></div><div class="sk-col">'+l+'</div></div></div>'})()</script>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
