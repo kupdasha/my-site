@@ -6,7 +6,6 @@
 <title>Таплинк Купяши</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@400&display=swap" rel="stylesheet">
 <style>
 /* один экран: имя, четыре равные кнопки, сетка соцсетей 3×3; снизу экран наполнен «жидкостью» из искр, она переливается при наклоне */
 :root{
@@ -189,6 +188,25 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 (() => {
   const root = document.documentElement, sw = document.getElementById('switch');
   const page = document.getElementById('tl');
+
+  /* ШРИФТЫ — только те буквы, что есть на странице (в обеих версиях): Google отдает их одним
+     маленьким файлом вместо полного набора (~90 КБ) — на медленной связи текст встает быстрее.
+     Тексты меняются — список букв собирается сам. Пока шрифт грузится, текст виден системным. */
+  {
+    const uniq = t => [...new Set(t.replace(/\s+/g, ''))].sort().join('') + ' ';
+    const extra = [...document.querySelectorAll('[data-fun],[data-serious]')].map(e => e.dataset.fun + e.dataset.serious).join('');
+    const font = (fam, text) => {
+      const l = document.createElement('link'); l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=' + fam + '&display=swap&text=' + encodeURIComponent(uniq(text));
+      document.head.appendChild(l);
+    };
+    font('Golos+Text:wght@400;500;600', page.textContent + extra + '«»—…');
+    font('Spectral:wght@400', document.querySelector('.bio').textContent);
+  }
+
+  /* СЛАБЫЙ ТЕЛЕФОН ИЛИ МЕДЛЕННАЯ СВЯЗЬ: искр меньше и холст попроще, чтобы ничего не тормозило */
+  const conn = navigator.connection || {};
+  let lite = !!conn.saveData || /(^|-)2g/.test(conn.effectiveType || '');   // число ядер не смотрим: Safari на айфоне всегда занижает его, судим по кадрам
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const touch = matchMedia('(pointer: coarse)').matches;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -244,7 +262,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   let dpr, vw, vh, n, u, v, quiet = [];
   const colW = 8;
   function measure() {
-    dpr = Math.min(2, devicePixelRatio || 1);
+    dpr = Math.min(lite ? 1.25 : 2, devicePixelRatio || 1);
     vw = innerWidth; vh = innerHeight;
     cv.width = vw * dpr; cv.height = vh * dpr;
     n = Math.ceil(vw / colW) + 1;
@@ -335,7 +353,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   }
 
   function render(t, dt) {
-    const s = fun ? LIQ.dark : LIQ.light, c = LIQ.cell;
+    const s = fun ? LIQ.dark : LIQ.light, c = lite ? 14 : LIQ.cell;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, vw, vh);
     const air = Array.from({ length: BINS }, () => new Path2D());
@@ -534,11 +552,13 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
     while (k > .5 && page.offsetHeight > innerHeight + 1) { k -= .04; page.style.setProperty('--k', k.toFixed(2)); }
   }
 
-  let prev = performance.now(), t0 = prev;
+  let prev = performance.now(), t0 = prev, slow = 0;
   function frame(now) {
     const dt = Math.min(.05, (now - prev) / 1000); prev = now;
     const t = (now - t0) / 1000;
     simulate(dt, t); stepRunners(dt, now); render(t, dt);
+    // если кадры идут медленнее ~40 в секунду — переходим на облегченную анимацию
+    if (!lite && t > 1.5) { slow = slow * .95 + (dt > .025 ? .05 : 0); if (slow > .5) { lite = true; measure(); } }
     requestAnimationFrame(frame);
   }
   function relayout() { const keep = runners.map(r => [r.x, r.y]); resetRunners(); fit(); measure(); measureRunners();

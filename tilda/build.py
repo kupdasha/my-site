@@ -199,22 +199,32 @@ def once_block(html, note):
 
 def taplink_block():
     # таплинк — отдельная страница Тильды из одного блока; вся страница (разметка, тексты, стили, код)
-    # лежит на GitHub в taplink.html, блок только подтягивает ее, поэтому перевставлять его не нужно
+    # лежит на GitHub в taplink.html, блок только подтягивает ее, поэтому перевставлять его не нужно.
+    # Под медленную связь: номер свежей версии спрашиваем у воркера kup-version (40 байт); если в телефоне
+    # уже лежит копия этой версии — показываем сразу, без загрузки. Иначе берем taplink.html по номеру
+    # с jsDelivr (быстрый CDN, файл ~12 КБ), запасной путь — прямо с GitHub. Соединения со шрифтами и CDN
+    # открываются заранее, пока ждем ответ.
     return ('<!-- ТАПЛИНК. Весь таплинк лежит на GitHub в taplink.html и подключается отсюда. Блок не менять. -->\n'
             '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>\n'
-            "<script>(function(){var B='" + CDN + "',v=Math.floor(Date.now()/36e5),root=document.getElementById('taplink-root');\n"
-            # пока грузится — фон сразу в цвет выбранной версии, чтобы не мигало
+            "<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',\n"
+            "G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
+            "['https://cdn.jsdelivr.net','https://fonts.googleapis.com','https://fonts.gstatic.com'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});\n"
             "try{if(localStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}\n"
-            # сначала прямо с GitHub (свежая версия через пару минут после публикации), если не ответил за 4 с — с jsDelivr
-            "var G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html';\n"
-            "function get(u,ms){return new Promise(function(ok,no){var t=setTimeout(no,ms);fetch(u).then(function(r){clearTimeout(t);r.ok?r.text().then(ok,no):no()},no)})}\n"
-            "get(G+'?v='+Math.floor(Date.now()/6e4),4000).catch(function(){return get(B+'taplink.html?v='+v,15000)}).then(function(html){\n"
-            "var doc=new DOMParser().parseFromString(html,'text/html');\n"
+            "try{c=JSON.parse(localStorage.getItem(K))}catch(e){}\n"
+            "function get(u,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);x.timeout=ms;x.onload=function(){cb(x.status==200?x.responseText:null)};x.onerror=x.ontimeout=function(){cb(null)};x.send()}\n"
+            "function save(s,h){try{localStorage.setItem(K,JSON.stringify({s:s,h:h}))}catch(e){}}\n"
+            "function show(h){if(shown||!h)return;shown=1;var doc=new DOMParser().parseFromString(h,'text/html');\n"
             "[].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});\n"
             "[].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});\n"
             # вставленные так скрипты сами не запускаются — пересоздаем их
             "[].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});\n"
-            "root.style.minHeight='';root.style.background=''})})()</script>")
+            "root.style.minHeight='';root.style.background=''}\n"
+            "function github(s){get(G+'?t='+Date.now(),25000,function(h){if(h)save(s,h);show(h||(c&&c.h))})}\n"
+            "get(W,2500,function(s){s=(s||'').trim();if(!/^[0-9a-f]{40}$/.test(s))s='';\n"
+            "if(s&&c&&c.s===s&&c.h)return show(c.h);\n"
+            "if(s)return get(R+s+'/taplink.html',20000,function(h){if(h){save(s,h);show(h)}else github(s)});\n"
+            # номер не узнали — показываем копию из телефона (если есть) и обновляем ее с GitHub на следующий раз
+            "if(c&&c.h)show(c.h);github('')})})()</script>")
 
 BLOCKS = {
     '1 шапка': [
