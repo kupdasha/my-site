@@ -2183,3 +2183,5 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .ttt-fields{display:flex;flex-direction:column;gap:12px;flex-basis:100%;max-width:420px;margin-inline:auto}
 .ttt-fields .ttt-input{width:100%;min-width:0}
 .ttt-form .btn{flex-basis:100%;max-width:420px;justify-content:center}
+/* короткие подписи инфографики Доставки — ровными строками, без одинокого слова внизу */
+.ys-total p,.ys-label,.ys-source,.yru-item p,.yst-step p,.zm-text p,.big-sub,.case-badge{text-wrap:balance}
