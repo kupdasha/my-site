@@ -1890,6 +1890,20 @@ function phonesInit(root){
     box.addEventListener('mouseleave', () => v.pause());
   });
 }
+/* ПЛЕЕР ПО НАЖАТИЮ (поле { film: 'vimeo:ID', poster } в галерее кейса, см. AR мерч):
+   на месте плеера — заставка и круглая кнопка; окно плеера со звуком встает только после нажатия */
+function filmCoverHTML(src, poster){
+  const m = parseMedia(src);
+  const url = embedURL(m, false).replace('muted=1&', '').replace('loop=1&', '');
+  return `<div class="case-shot frame film-cover" data-reveal data-src="${url}"><img src="${poster}" alt="" loading="lazy">`
+    + `<button type="button" class="film-play" aria-label="смотреть видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button></div>`;
+}
+function filmInit(root){
+  root.querySelectorAll('.film-cover').forEach(box => box.addEventListener('click', () => {
+    box.innerHTML = `<iframe src="${box.dataset.src}" allow="${FRAME_ALLOW}" allowfullscreen></iframe>`;
+    box.classList.remove('film-cover');
+  }, { once: true }));
+}
 /* ГАЙДЛАЙН ЗНАКА (см. MANGO OFFICE)
    { formula: { parts: [картинки], logo, tags: [слова] } } — части знака встают через «+», под ними собирается
    логотип, следом по одному появляются теги-ценности;
@@ -2156,7 +2170,8 @@ function galleryItem(x){
   if (x && x.collage) return campCollage(x);
   // { film: 'img/….mp4', poster, caption } — ролик для просмотра: со звуком и плеером, сам не запускается, грузится по нажатию;
   // film: 'kinescope:ID' и другие плееры — встраиваются окном, с теми же отступами
-  if (x && x.film) return `<div class="wrap case-film">${/\.mp4$/.test(x.film) ? `<div class="case-shot" data-reveal><video src="${x.film}" style="aspect-ratio:16/9"${x.poster ? ` poster="${x.poster}"` : ''} controls playsinline preload="none"></video></div>` : shotHTML(x.film)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
+  // film: 'vimeo:ID' с poster — сначала легкая картинка с кнопкой, плеер грузится только по нажатию (Vimeo в России тянется долго)
+  if (x && x.film) return `<div class="wrap case-film">${/\.mp4$/.test(x.film) ? `<div class="case-shot" data-reveal><video src="${x.film}" style="aspect-ratio:16/9"${x.poster ? ` poster="${x.poster}"` : ''} controls playsinline preload="none"></video></div>` : x.poster ? filmCoverHTML(x.film, x.poster) : shotHTML(x.film)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   // { src: 'kinescope:ID', caption: 'подпись' } — ролик или картинка с подписью под ней
   if (x && x.src) return `<div class="wrap">${shotHTML(x.src)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   return `<div class="wrap">${shotHTML(x)}</div>`;
@@ -2508,6 +2523,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.ys, .zm, .yst, .yru').forEach(el => ysReveal.observe(el));
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   phonesInit(caseContent);   // ролики в телефонах — по наведению
+  filmInit(caseContent);     // плееры по нажатию
   caseContent.querySelectorAll('.world').forEach(watchWorld);
   caseContent.querySelectorAll('.m3d').forEach(watchMark);
   caseContent.querySelectorAll('.st, .st-grads, .st-pages').forEach(watchStars);
@@ -2603,8 +2619,9 @@ function skMark(img){
   img.dataset.sk = '1';
   img.classList.add('sk-wait');
   if (img.getBoundingClientRect().height < 2) img.classList.add('sk-box');
-  // в плашку загрузки идут картинки первых двух экранов: остальные грузятся по прокрутке
-  const counted = caseLoad.on && (img.loading !== 'lazy' || img.getBoundingClientRect().top < innerHeight * 2);
+  // в плашку загрузки идут обычные картинки и ленивые (loading="lazy") только с первого экрана:
+  // ниже браузер ленивые не грузит, пока не долистают, и плашка висела бы до прокрутки
+  const counted = caseLoad.on && (img.loading !== 'lazy' || img.getBoundingClientRect().top < innerHeight);
   if (counted) caseLoad.add();
   const done = () => { img.classList.remove('sk-wait', 'sk-box'); if (counted) caseLoad.tick(); };
   img.addEventListener('load', done, { once: true });
@@ -2633,6 +2650,7 @@ const caseLoad = {
     const frac = this.total ? this.done / this.total : 0;
     if (this.total && this.done >= this.total) return this.stop();
     if (t < 0.7 && !this.shown) return;
+    if (!this.total) return this.stop();   // ждать нечего (ролики грузятся по нажатию или наведению) — плашку не показываем, иначе она висит вечно
     if (!el.querySelector('b')) el.innerHTML = '<b></b><span></span><i></i>';
     this.shown = 1;
     // оставшееся время: прошедшее × доля, которая еще не загрузилась; число только уменьшается
