@@ -13,22 +13,22 @@ const onScreen = (el, cb, margin = '0px') =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: margin }).observe(el);
 
 // hint — подсказка к живой схеме: стоит в той же колонке, что и текст главы
-const head = (ch, hint) => `<div class="ad-head">
-  <span class="case-label ad-label">${H.T(ch.label)}</span>
-  <h2 class="ad-title">${H.T(ch.title)}</h2>
-  ${ch.text ? `<p class="ad-text">${H.T(ch.text)}</p>` : ''}
-  ${hint ? `<p class="ad-cap ad-head-cap">${H.T(hint)}</p>` : ''}
+const head = (ch, hint) => `<div class="sd-head">
+  <span class="case-label sd-label">${H.T(ch.label)}</span>
+  <h2 class="sd-title">${H.T(ch.title)}</h2>
+  ${ch.text ? `<p class="sd-text">${H.T(ch.text)}</p>` : ''}
+  ${hint ? `<p class="sd-cap sd-head-cap">${H.T(hint)}</p>` : ''}
 </div>`;
-const cap = (t, cls) => t ? `<p class="ad-cap${cls ? ' ' + cls : ''}">${H.T(t)}</p>` : '';
+const cap = (t, cls) => t ? `<p class="sd-cap${cls ? ' ' + cls : ''}">${H.T(t)}</p>` : '';
 
 /* ---------- мысли: одна в фокусе, остальные расплываются и дрейфуют ---------- */
 function thoughtsHTML(c){
-  return `<div class="ad-thoughts" aria-label="${c.items.map(x => H.pick(x)).join(', ')}">
-    ${c.items.map((t, i) => `<span class="ad-th" style="--i:${i}" aria-hidden="true">${H.T(t)}</span>`).join('')}
+  return `<div class="sd-thoughts" aria-label="${c.items.map(x => H.pick(x)).join(', ')}">
+    ${c.items.map((t, i) => `<span class="sd-th" style="--i:${i}" aria-hidden="true">${H.T(t)}</span>`).join('')}
   </div>`;
 }
 function liveThoughts(box){
-  const els = [...box.querySelectorAll('.ad-th')];
+  const els = [...box.querySelectorAll('.sd-th')];
   const n = els.length;
   let pos = [], seen = false, raf = 0, t0 = performance.now();
   // fk — фраза в фокусе: она всегда полностью резкая, остальные расплываются тем сильнее, чем дальше от нее
@@ -92,20 +92,20 @@ function liveThoughts(box){
 
 /* ---------- наброски: разбросаны по столу и собираются в сетку при прокрутке ---------- */
 function boardHTML(c){
-  return `<div class="ad-board">${c.items.map((x, i) => {
+  return `<div class="sd-board">${c.items.map((x, i) => {
     const it = typeof x === 'string' ? { img: x } : x;
-    return `<button class="ad-sk${it.fit ? ' fit' : ''}" style="--i:${i}" aria-label="Увеличить набросок"><img src="${it.img}" alt="" loading="lazy" draggable="false"></button>`;
+    return `<button class="sd-sk${it.fit ? ' fit' : ''}" style="--i:${i}" aria-label="Увеличить набросок"><img src="${it.img}" alt="" loading="lazy" draggable="false"></button>`;
   }).join('')}</div>${cap(c.hint)}`;
 }
 function liveBoard(box){
-  const tiles = [...box.querySelectorAll('.ad-sk')];
+  const tiles = [...box.querySelectorAll('.sd-sk')];
   tiles.forEach(t => {
     t.style.setProperty('--dx', rnd(-40, 40).toFixed(1) + '%');
     t.style.setProperty('--dy', rnd(-30, 50).toFixed(1) + '%');
     t.style.setProperty('--r', rnd(-16, 16).toFixed(1) + 'deg');
   });
   box.addEventListener('click', e => {
-    const b = e.target.closest('.ad-sk'); if (!b) return;
+    const b = e.target.closest('.sd-sk'); if (!b) return;
     const imgs = tiles.map(t => t.querySelector('img'));
     H.openViewer(imgs.map(i => i.currentSrc || i.src), tiles.indexOf(b), imgs);
   });
@@ -129,36 +129,36 @@ function liveBoard(box){
 // кольцо «многоозадаченность» крутится; на наведении — быстрее, как будто взялась за всё сразу
 function ringSVG(t){
   const word = (H.pick(t.ring) + '\u00A0\u00A0').repeat(2);   // неразрывные пробелы: на стыке кольца отступ не пропадает
-  return `<svg class="ad-type ad-ring" viewBox="0 0 400 400" aria-hidden="true">
+  return `<svg class="sd-type sd-ring" viewBox="0 0 400 400" aria-hidden="true">
     <defs><path id="adRing" d="M200 200m-150 0a150 150 0 1 1 300 0a150 150 0 1 1-300 0"/></defs>
-    <g class="ad-spin"><text><textPath href="#adRing" textLength="938" lengthAdjust="spacing">${word}</textPath></text></g>
-    <text class="ad-core" x="200" y="208" text-anchor="middle">${H.pick(t.core)}</text>
+    <g class="sd-spin"><text><textPath href="#adRing" textLength="938" lengthAdjust="spacing">${word}</textPath></text></g>
+    <text class="sd-core" x="200" y="208" text-anchor="middle">${H.pick(t.core)}</text>
   </svg>`;
 }
 // «всё вокруг в слоумо»: фраза без конца медленно едет по крючку, как принт на футболке;
 // крючок нарисован от хвоста к верху, чтобы текст читался слева направо и стоял ровно по середине полосы
 const HOOK = 'M40 352C80 352 130 346 176 322C214 302 246 330 224 354C200 380 150 360 168 306C190 236 290 150 336 44';
 function slowSVG(t){
-  return `<svg class="ad-type ad-slow" viewBox="0 0 400 400" aria-hidden="true">
+  return `<svg class="sd-type sd-slow" viewBox="0 0 400 400" aria-hidden="true">
     <path id="adHook" d="${HOOK}" fill="none"/>
-    <path class="ad-hook" d="${HOOK}" fill="none"/>
-    <text dominant-baseline="central"><textPath class="ad-slow-path" href="#adHook" startOffset="0" data-s="${H.pick(t.slow)}"></textPath></text>
+    <path class="sd-hook" d="${HOOK}" fill="none"/>
+    <text dominant-baseline="central"><textPath class="sd-slow-path" href="#adHook" startOffset="0" data-s="${H.pick(t.slow)}"></textPath></text>
   </svg>`;
 }
 // «я вас слушаю очень невнимательно»: строчки повторяются, и с каждой следующей у фразы отваливается конец —
 // буквы по одной соскальзывают и падают, как внимание на долгом созвоне; потом «ой, простите» — и всё снова на месте
 function waveSVG(t){
-  return `<svg class="ad-type ad-wave" viewBox="0 0 400 400" aria-hidden="true" data-s="${H.pick(t.wave)}"></svg>`;
+  return `<svg class="sd-type sd-wave" viewBox="0 0 400 400" aria-hidden="true" data-s="${H.pick(t.wave)}"></svg>`;
 }
 function typeHTML(c){
-  return `<div class="ad-types">
-    <figure><div class="ad-sq">${ringSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[0])}</figcaption>` : ''}</figure>
-    <figure><div class="ad-sq">${slowSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[1])}</figcaption>` : ''}</figure>
-    <figure><div class="ad-sq">${waveSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[2])}</figcaption>` : ''}</figure>
+  return `<div class="sd-types">
+    <figure><div class="sd-sq">${ringSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[0])}</figcaption>` : ''}</figure>
+    <figure><div class="sd-sq">${slowSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[1])}</figcaption>` : ''}</figure>
+    <figure><div class="sd-sq">${waveSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[2])}</figcaption>` : ''}</figure>
   </div>${cap(c.hint)}`;
 }
 function liveSlow(svg){
-  const tp = svg.querySelector('.ad-slow-path'), word = tp.dataset.s + '   ';
+  const tp = svg.querySelector('.sd-slow-path'), word = tp.dataset.s + '   ';
   const L = svg.querySelector('#adHook').getTotalLength();
   // мерим одну фразу и повторяем ее с запасом: строка всегда закрывает крючок целиком
   tp.textContent = word;
@@ -199,9 +199,9 @@ function liveFall(svg){
   };
 }
 function liveType(box){
-  const slow = liveSlow(box.querySelector('.ad-slow'));
-  const fall = liveFall(box.querySelector('.ad-wave'));
-  const ring = box.querySelector('.ad-spin');
+  const slow = liveSlow(box.querySelector('.sd-slow'));
+  const fall = liveFall(box.querySelector('.sd-wave'));
+  const ring = box.querySelector('.sd-spin');
   let raf = 0, seen = false, t0 = performance.now(), ang = 0, speed = .05, goal = .05, last = t0;
   slow(0); fall(0);
   if (still()) return;
@@ -222,21 +222,21 @@ function liveType(box){
 
 /* ---------- версии: каждая футболка сама перескакивает между вариантами ---------- */
 function versionsHTML(c){
-  return `<div class="ad-vers">${c.items.map((x, i) => `
-    <figure class="ad-ver" style="--i:${i}" data-k="0">
-      <div class="ad-ver-stack">${x.imgs.map((src, j) => `<img class="${j ? '' : 'on'}" src="${src}" alt="" loading="lazy" draggable="false">`).join('')}
-        ${x.tag ? `<span class="ad-tag">${H.T(x.tag)}</span>` : ''}</div>
+  return `<div class="sd-vers">${c.items.map((x, i) => `
+    <figure class="sd-ver" style="--i:${i}" data-k="0">
+      <div class="sd-ver-stack">${x.imgs.map((src, j) => `<img class="${j ? '' : 'on'}" src="${src}" alt="" loading="lazy" draggable="false">`).join('')}
+        ${x.tag ? `<span class="sd-tag">${H.T(x.tag)}</span>` : ''}</div>
       <figcaption>
-        <span class="ad-ver-name">${H.T(x.phrase)}</span>
-        <span class="ad-dots">${x.imgs.map((_, j) => `<button class="${j ? '' : 'on'}" aria-label="Вариант ${j + 1} из ${x.imgs.length}"></button>`).join('')}</span>
+        <span class="sd-ver-name">${H.T(x.phrase)}</span>
+        <span class="sd-dots">${x.imgs.map((_, j) => `<button class="${j ? '' : 'on'}" aria-label="Вариант ${j + 1} из ${x.imgs.length}"></button>`).join('')}</span>
       </figcaption>
     </figure>`).join('')}</div>${cap(c.hint)}`;
 }
 function liveVersions(box){
-  const cards = [...box.querySelectorAll('.ad-ver')];
+  const cards = [...box.querySelectorAll('.sd-ver')];
   let seen = false;
   cards.forEach(card => {
-    const imgs = [...card.querySelectorAll('.ad-ver-stack img')], dots = [...card.querySelectorAll('.ad-dots button')];
+    const imgs = [...card.querySelectorAll('.sd-ver-stack img')], dots = [...card.querySelectorAll('.sd-dots button')];
     let k = 0, timer = 0, held = false;
     const show = i => {
       k = (i + imgs.length) % imgs.length;
@@ -250,7 +250,7 @@ function liveVersions(box){
       timer = setTimeout(() => { show(k + 1); tick(); }, rnd(1400, 3800));
     };
     card._tick = tick;
-    const stack = card.querySelector('.ad-ver-stack');
+    const stack = card.querySelector('.sd-ver-stack');
     // мышью: курсор ведет по версиям слева направо, автоперебор на паузе
     stack.addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse') return;
@@ -274,20 +274,20 @@ function liveVersions(box){
 // наведение останавливает круг и показывает подпись под курсором
 function detailsHTML(c){
   const n = c.items.length;
-  return `<div class="ad-orbit" style="--n:${n}">
-    <div class="ad-orb-ring">${c.items.map((x, i) => `
-      <button class="ad-orb" style="--a:${(360 / n * i).toFixed(2)}deg" data-i="${i}" aria-label="${H.pick(x.note) || 'Увеличить'}">
-        <span class="ad-orb-in"><img src="${x.img}" alt="" loading="lazy" draggable="false"></span>
+  return `<div class="sd-orbit" style="--n:${n}">
+    <div class="sd-orb-ring">${c.items.map((x, i) => `
+      <button class="sd-orb" style="--a:${(360 / n * i).toFixed(2)}deg" data-i="${i}" aria-label="${H.pick(x.note) || 'Увеличить'}">
+        <span class="sd-orb-in"><img src="${x.img}" alt="" loading="lazy" draggable="false"></span>
       </button>`).join('')}</div>
-    <div class="ad-orb-core">
-      ${c.center ? `<b class="ad-orb-title">${H.T(c.center)}</b>` : ''}
-      <div class="ad-orb-notes">${c.items.map((x, i) => `<p class="ad-orb-note${i ? '' : ' on'}" data-i="${i}">${H.T(x.note)}</p>`).join('')}</div>
+    <div class="sd-orb-core">
+      ${c.center ? `<b class="sd-orb-title">${H.T(c.center)}</b>` : ''}
+      <div class="sd-orb-notes">${c.items.map((x, i) => `<p class="sd-orb-note${i ? '' : ' on'}" data-i="${i}">${H.T(x.note)}</p>`).join('')}</div>
     </div>
   </div>${cap(c.hint)}`;
 }
 function liveDetails(box){
-  const orbs = [...box.querySelectorAll('.ad-orb')], notes = [...box.querySelectorAll('.ad-orb-note')];
-  const ring = box.querySelector('.ad-orb-ring'), n = orbs.length;
+  const orbs = [...box.querySelectorAll('.sd-orb')], notes = [...box.querySelectorAll('.sd-orb-note')];
+  const ring = box.querySelector('.sd-orb-ring'), n = orbs.length;
   let ang = 0, k = 0, held = false, seen = false, raf = 0, last = 0, next = 0;
   const show = i => {
     k = i;
@@ -310,7 +310,7 @@ function liveDetails(box){
     o.addEventListener('pointerleave', () => { held = false; next = performance.now() + 2600; });
   });
   box.addEventListener('click', e => {
-    const b = e.target.closest('.ad-orb'); if (!b) return;
+    const b = e.target.closest('.sd-orb'); if (!b) return;
     const i = orbs.indexOf(b);
     // пальцем: первое касание — подпись, второе — увеличить
     if (e.pointerType && e.pointerType !== 'mouse' && k !== i) { show(i); held = true; setTimeout(() => { held = false; }, 4000); return; }
@@ -328,20 +328,20 @@ function liveDetails(box){
 // у каждой — подпись и ряд фото и роликов; ролики играют без звука, только когда на экране
 function finMedia(src){
   return /\.mp4$/.test(src)
-    ? `<div class="ad-fin vid"><video src="${src}" muted loop playsinline preload="metadata"></video></div>`
-    : `<button class="ad-fin" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`;
+    ? `<div class="sd-fin vid"><video src="${src}" muted loop playsinline preload="metadata"></video></div>`
+    : `<button class="sd-fin" aria-label="Увеличить"><img src="${src}" alt="" loading="lazy"></button>`;
 }
 function finalHTML(c){
-  return `<div class="ad-finals">${c.items.map((g, i) => `
-    <div class="ad-fin-group" style="--i:${i}">
-      <p class="ad-fin-name">${H.T(g.name)}</p>
-      <div class="ad-final">${g.media.map(finMedia).join('')}</div>
+  return `<div class="sd-finals">${c.items.map((g, i) => `
+    <div class="sd-fin-group" style="--i:${i}">
+      <p class="sd-fin-name">${H.T(g.name)}</p>
+      <div class="sd-final">${g.media.map(finMedia).join('')}</div>
     </div>`).join('')}</div>${cap(c.hint)}`;
 }
 function liveFinal(box){
-  const btns = [...box.querySelectorAll('button.ad-fin')];
+  const btns = [...box.querySelectorAll('button.sd-fin')];
   box.addEventListener('click', e => {
-    const b = e.target.closest('button.ad-fin'); if (!b) return;
+    const b = e.target.closest('button.sd-fin'); if (!b) return;
     const imgs = btns.map(t => t.querySelector('img'));
     H.openViewer(imgs.map(i => i.currentSrc || i.src), btns.indexOf(b), imgs);
   });
@@ -352,7 +352,7 @@ function liveFinal(box){
 
 /* ---------- о проекте писали: названия изданий крупно ---------- */
 function pressHTML(c){
-  return `<ul class="ad-press">${c.items.map((x, i) => `<li style="--i:${i}"><a class="ad-press-a" href="${x.link}" target="_blank" rel="noopener">
+  return `<ul class="sd-press">${c.items.map((x, i) => `<li style="--i:${i}"><a class="sd-press-a" href="${x.link}" target="_blank" rel="noopener">
     <b>${H.T(x.name)}</b><span>${H.T(x.note)}</span></a></li>`).join('')}</ul>`;
 }
 
@@ -361,18 +361,18 @@ function pressHTML(c){
 const CAR_MS = 3500;
 function carouselHTML(c){
   const arrow = d => `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="${d}"/></svg>`;
-  return `<div class="ad-car">
-    <button class="ad-car-btn prev" aria-label="Предыдущий слайд">${arrow('M12 4l-6 6 6 6')}</button>
-    <div class="ad-car-view" tabindex="0" aria-label="Карусель, ${c.items.length} слайдов" aria-roledescription="carousel">
-      <div class="ad-car-track">${c.items.map((src, i) => `<button class="ad-car-card" aria-label="Слайд ${i + 1}, увеличить"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>
+  return `<div class="sd-car">
+    <button class="sd-car-btn prev" aria-label="Предыдущий слайд">${arrow('M12 4l-6 6 6 6')}</button>
+    <div class="sd-car-view" tabindex="0" aria-label="Карусель, ${c.items.length} слайдов" aria-roledescription="carousel">
+      <div class="sd-car-track">${c.items.map((src, i) => `<button class="sd-car-card" aria-label="Слайд ${i + 1}, увеличить"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>
     </div>
-    <button class="ad-car-btn next" aria-label="Следующий слайд">${arrow('M8 4l6 6-6 6')}</button>
-    <div class="ad-car-dots"></div>
+    <button class="sd-car-btn next" aria-label="Следующий слайд">${arrow('M8 4l6 6-6 6')}</button>
+    <div class="sd-car-dots"></div>
   </div>${cap(c.hint)}`;
 }
 function liveCarousel(box){
-  const view = box.querySelector('.ad-car-view'), track = box.querySelector('.ad-car-track'), cards = [...track.children];
-  const dotsBox = box.querySelector('.ad-car-dots');
+  const view = box.querySelector('.sd-car-view'), track = box.querySelector('.sd-car-track'), cards = [...track.children];
+  const dotsBox = box.querySelector('.sd-car-dots');
   let k = 0, seen = false, held = false, timer = 0;
   const per = () => Math.max(1, Math.round(view.clientWidth / cards[0].offsetWidth));   // сколько слайдов видно
   const last = () => cards.length - per();
@@ -406,7 +406,7 @@ function liveCarousel(box){
     if (Math.abs(dx) > 40) { swiped = true; go(k + (dx < 0 ? 1 : -1)); }
   });
   track.addEventListener('click', e => {
-    const b = e.target.closest('.ad-car-card'); if (!b || swiped) return;
+    const b = e.target.closest('.sd-car-card'); if (!b || swiped) return;
     const imgs = cards.map(c => c.querySelector('img'));
     H.openViewer(imgs.map(i => i.currentSrc || i.src), cards.indexOf(b), imgs);
   });
@@ -421,30 +421,30 @@ function liveCarousel(box){
 /* ---------- первые эскизы: коллаж, кадры проявляются шторкой по очереди ---------- */
 // { img, big: true } — ячейка 2 × 2, { img, wide: true } — 2 × 1; остальные — по одной клетке
 function firstHTML(c){
-  return `<div class="ad-first">${c.items.map((x, i) => {
+  return `<div class="sd-first">${c.items.map((x, i) => {
     const it = typeof x === 'string' ? { img: x } : x;
-    return `<button class="ad-fs${it.big ? ' big' : it.wide ? ' wide' : ''}" style="--i:${i}" aria-label="Увеличить эскиз"><img src="${it.img}" alt="" loading="lazy" draggable="false"></button>`;
+    return `<button class="sd-fs${it.big ? ' big' : it.wide ? ' wide' : ''}" style="--i:${i}" aria-label="Увеличить эскиз"><img src="${it.img}" alt="" loading="lazy" draggable="false"></button>`;
   }).join('')}</div>${cap(c.hint)}`;
 }
 function liveFirst(box){
-  const tiles = [...box.querySelectorAll('.ad-fs')];
+  const tiles = [...box.querySelectorAll('.sd-fs')];
   box.addEventListener('click', e => {
-    const b = e.target.closest('.ad-fs'); if (!b) return;
+    const b = e.target.closest('.sd-fs'); if (!b) return;
     const imgs = tiles.map(t => t.querySelector('img'));
     H.openViewer(imgs.map(i => i.currentSrc || i.src), tiles.indexOf(b), imgs);
   });
 }
 
 const KINDS = {
-  first:    [firstHTML, liveFirst, '.ad-first'],
-  thoughts: [thoughtsHTML, liveThoughts, '.ad-thoughts'],
-  board:    [boardHTML, liveBoard, '.ad-board'],
-  type:     [typeHTML, liveType, '.ad-types'],
-  versions: [versionsHTML, liveVersions, '.ad-vers'],
-  details:  [detailsHTML, liveDetails, '.ad-orbit'],
-  final:    [finalHTML, liveFinal, '.ad-final'],
-  press:    [pressHTML, null, '.ad-press'],
-  carousel: [carouselHTML, liveCarousel, '.ad-car'],
+  first:    [firstHTML, liveFirst, '.sd-first'],
+  thoughts: [thoughtsHTML, liveThoughts, '.sd-thoughts'],
+  board:    [boardHTML, liveBoard, '.sd-board'],
+  type:     [typeHTML, liveType, '.sd-types'],
+  versions: [versionsHTML, liveVersions, '.sd-vers'],
+  details:  [detailsHTML, liveDetails, '.sd-orbit'],
+  final:    [finalHTML, liveFinal, '.sd-final'],
+  press:    [pressHTML, null, '.sd-press'],
+  carousel: [carouselHTML, liveCarousel, '.sd-car'],
 };
 
 /* ---------- запуск ---------- */
@@ -468,8 +468,8 @@ export async function mountADHD(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   mount.innerHTML = p.adhd.map(ch => {
     const kind = Object.keys(KINDS).find(k => ch[k]);
-    return `<section class="ad-ch wrap ad-${kind}-ch">${head(ch, kind === 'thoughts' && ch.thoughts.hint)}<div class="ad-viz">${kind ? KINDS[kind][0](ch[kind]) : ''}</div></section>`;
+    return `<section class="sd-ch wrap sd-${kind}-ch">${head(ch, kind === 'thoughts' && ch.thoughts.hint)}<div class="sd-viz">${kind ? KINDS[kind][0](ch[kind]) : ''}</div></section>`;
   }).join('');
-  mount.querySelectorAll('.ad-ch').forEach(s => reveal.observe(s));
+  mount.querySelectorAll('.sd-ch').forEach(s => reveal.observe(s));
   Object.values(KINDS).forEach(([, live, sel]) => live && mount.querySelectorAll(sel).forEach(live));
 }

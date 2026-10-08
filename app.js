@@ -139,6 +139,8 @@ function toHTML(text, { first = true, center = false } = {}){
   let h = esc(text).replace(/\n/g, '<br>');   // перенос строки: в тексте content.js пишется \n
   // ссылка внутри текста: [слово](https://адрес) — открывается в новой вкладке
   h = h.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a class="link" href="$2" target="_blank" rel="noopener">$1</a>');
+  // жирный внутри текста: **слова**
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
   h = h.replace(/([A-Za-zА-Яа-яЁё0-9]+(?:-[A-Za-zА-Яа-яЁё0-9]+)+)/g, '<span class="nobr">$1</span>');
   h = h.replace(/(^|[^A-Za-zА-Яа-яЁё])([A-ZА-ЯЁ]{2,})(?=$|[^A-Za-zА-Яа-яЁё])/g, '$1<span class="caps">$2</span>');
   if (first) h = h.replace(/^([«„])/, '<span class="hang-q">$1</span>').replace(/^\(/, '<span class="hang-b">(</span>');
