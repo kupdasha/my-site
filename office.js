@@ -5,8 +5,9 @@
    улетают, окна складываются в одно с четырьмя вкладками;
    side — одно окно, внутри рядом заявление, смета и презентация,
    курсор переносит итог сметы в график и в заявление;
-   templates — шаблоны заполняются сами, а набор сменный: госорган,
-   дивизион, компания, переключается сам, пока не тронули;
+   templates — одно окно, три сцены по очереди (кнопки-иконки сверху):
+   таблицы счетчиков и налогов с формулами, заявления в Word,
+   «причесать» — неряшливый график или таблица встают ровно;
    qr — QR-код собирается прямо на листе, по нему проходит сканер;
    page — мини-лендинг из блоков, редактор сворачивается в браузер;
    closed — закрытый контур: данные ходят внутри, наружу не выходят —
@@ -35,12 +36,16 @@ const at = (el, stage, fx = .5, fy = .5) => {
 /* ---------- значки ---------- */
 const KEY = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="4.2"/><path d="M12.2 12H21M17.5 12v3.4M20.2 12v2.4"/></svg>`;
 const CURSOR = `<svg class="ro-cur" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8.2-6.1 1.3L10 18.6z"/></svg>`;
-// значки наборов: госорган — фронтон с колоннами, дивизион — цех, компания — башня-офис
-const SET_ICON = [
-  `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 12L16 5l12 7z"/><path d="M7 13v11M12.5 13v11M19.5 13v11M25 13v11M4 27h24"/></svg>`,
-  `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 27V15l7 4v-4l7 4v-4l7 4V6h3v21z"/><path d="M9 23h3M15 23h3M21 23h3"/></svg>`,
-  `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 27V5h14v22M4 27h24"/><path d="M13 10h2M17 10h2M13 15h2M17 15h2M13 20h2M17 20h2"/></svg>`,
+// значки сцен главы «шаблоны»: таблица, документ, слайд с графиком
+const TAB_ICON = [
+  `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="6" width="22" height="20" rx="3"/><path d="M5 12h22M5 19h22M13 6v20"/></svg>`,
+  `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 4h11l6 6v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4v6h6M11 16h10M11 21h7"/></svg>`,
+  `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="6" width="24" height="17" rx="3"/><path d="M16 23v4M11 27h10M10 18v-3M15 18v-6M20 18v-4"/></svg>`,
 ];
+// счетчики: капля и молния; налоги — знак процента; искры — у кнопки «причесать»
+const METER = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 5c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12z"/><path d="M23 4l-5 10h5l-3 9 8-12h-5l3-7z"/></svg>`;
+const PCT = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="9" cy="9" r="4"/><circle cx="23" cy="23" r="4"/><path d="M25 6L7 26"/></svg>`;
+const SPARK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3l1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8zM18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/></svg>`;
 
 /* ---------- содержимое вкладок: рисунки из простых форм ---------- */
 const MODES = ['doc', 'sheet', 'slide', 'html'];
@@ -358,72 +363,120 @@ function liveClosed(box){
 }
 
 /* ================================================================
-   templates — шаблоны заполняются сами; набор сменный
+   templates — одно окно, три сцены по очереди: таблицы с формулами
+   (счетчики и налоги), заявления в Word, «причесать» (неряшливый
+   график или таблица становятся аккуратными); кнопки-иконки сверху
    ================================================================ */
-// рисунки шаблонов: заявление, приказ (с гербом-кружком), служебка, таблица, Гант, формулы, график, слайды, лендинг, счет, договор, QR
-const MINI = {
-  letter:   () => `<div class="to"><i></i><i class="s"></i></div><i class="tt"></i><i></i><i></i><i class="s"></i>`,
-  sums:     () => `<svg class="sig" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5H6l6.5 7L6 19h12"/></svg><div class="fx">${[70, 45, 85].map(w => `<i></i><u style="width:${w}%"></u>`).join('')}</div><div class="fx res"><i></i><u></u></div>`,
-  order:    () => `<span class="emb"></span><i class="tt"></i><i></i><i></i><i class="s"></i><i></i>`,
-  memo:     () => `<i class="tt l"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i>`,
-  table:    () => `<div class="tb">${Array.from({ length: 12 }, (_, k) => `<u${k < 3 ? ' class="th"' : ''}></u>`).join('')}</div>`,
-  gantt:    () => `<div class="gt">${[[0, 40], [25, 35], [50, 30], [65, 35]].map(([x, w]) => `<span><b style="left:${x}%;width:${w}%"></b></span>`).join('')}</div>`,
-  chart:    () => `<div class="cht">${[35, 60, 45, 80, 65].map(h => `<b style="height:${h}%"></b>`).join('')}</div>`,
-  slides:   () => `<i class="tt l"></i><div class="sl"><b></b><b></b></div>`,
-  landing:  () => `<span class="gh"></span><div class="cd"><b></b><b></b><b></b></div><span class="pill"></span>`,
-  invoice:  () => `<i class="tt l"></i><div class="tb sm">${Array.from({ length: 6 }, () => '<u></u>').join('')}</div><i class="s r"></i>`,
-  contract: () => `<i class="tt"></i><i></i><i></i><i></i><i class="s"></i><div class="sg"><i></i><i></i></div>`,
-  qrdoc:    () => `<i class="tt l"></i><i></i><i class="s"></i><span class="qr"></span>`,
-};
-const MODE_OF = { sums: 'sheet', letter: 'doc', order: 'doc', memo: 'doc', contract: 'doc', qrdoc: 'doc', table: 'sheet', gantt: 'sheet', invoice: 'sheet', chart: 'slide', slides: 'slide', landing: 'html' };
-const SETS = [
-  ['letter', 'gantt', 'sums', 'order', 'memo', 'table'],        // госорган: заявление, Гант, формулы — первыми
-  ['gantt', 'table', 'chart', 'memo', 'slides', 'letter'],      // дивизион
-  ['contract', 'invoice', 'landing', 'chart', 'qrdoc', 'slides'], // компания
+// таблица-расчет: значок, строки «подпись — значение», под чертой итог по формуле
+const calc = (icon, ws) => `<div class="ro-calc"><span class="ico">${icon}</span>
+  ${ws.map((w, k) => `<div class="r" style="--k:${k}"><i></i><u style="width:${w}%"></u></div>`).join('')}
+  <div class="r res" style="--k:${ws.length}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6h10M3 10h10"/></svg><u></u></div></div>`;
+// лист заявления: кому и от кого справа, заголовок по центру, текст, дата и подпись
+const page = k => `<div class="ro-pg" data-k="${k}"><div class="to"><i></i><i></i><i class="s"></i></div><i class="tt"></i>
+  <i></i><i></i><i class="s"></i><i></i><div class="ft"><i></i><i></i></div>${k === 0 ? '<span class="ro-docx">DOCX</span>' : ''}</div>`;
+// «причесать»: пять блоков схемы — неряшливо (u…) и ровно (n…), в процентах холста
+const BOXES = [
+  { u: [2, 5, 30, 22, -6], n: [5, 12, 24, 28] },
+  { u: [14, 60, 20, 30, 4], n: [5, 60, 24, 28] },
+  { u: [42, 22, 20, 32, -3], n: [38, 30, 24, 40] },
+  { u: [66, 6, 32, 20, 7], n: [71, 12, 24, 28] },
+  { u: [72, 58, 22, 34, -9], n: [71, 60, 24, 28] },
 ];
-const card = (k, i) => `<div class="ro-k ro-m-${MODE_OF[k]} k-${k}" style="--i:${i}"><div class="ro-kin">${MINI[k]()}</div></div>`;
-function kitsHTML(c){
-  const names = H.pick(c.sets);
-  return `<div class="ro-stage ro-kitst">
+function boxStyle(b){
+  const [ux, uy, uw, uh, ur] = b.u, [nx, ny, nw, nh] = b.n;
+  return `--ux:${ux}%;--uy:${uy}%;--uw:${uw}%;--uh:${uh}%;--ur:${ur}deg;--nx:${nx}%;--ny:${ny}%;--nw:${nw}%;--nh:${nh}%`;
+}
+function templatesHTML(c){
+  const names = H.pick(c.tabs);
+  const cells = Array.from({ length: 20 }, (_, k) => `<span class="c" style="--k:${k}"><i></i></span>`).join('');
+  return `<div class="ro-stage ro-tst" data-scene="sheet">
     <div class="ro-sets" role="tablist">${names.map((n, i) =>
-      `<button class="ro-set${i ? '' : ' on'}" type="button" role="tab" aria-selected="${!i}" aria-label="${esc(n)}" data-i="${i}">${SET_ICON[i]}<s></s></button>`).join('')}</div>
-    <div class="ro-kit fill">${SETS[0].map(card).join('')}</div>
+      `<button class="ro-set${i ? '' : ' on'} ro-m-${['sheet', 'doc', 'slide'][i]}" type="button" role="tab" aria-selected="${!i}" aria-label="${esc(n)}" data-i="${i}">${TAB_ICON[i]}<s></s></button>`).join('')}</div>
+    <div class="ro-app ro-tw">
+      <div class="ro-bar"><b></b></div>
+      <div class="ro-scenes">
+        <div class="sc sc-sheet">${calc(METER, [62, 80, 48])}${calc(PCT, [86, 40, 70])}</div>
+        <div class="sc sc-doc"><div class="ro-pgs">${page(2)}${page(1)}${page(0)}</div></div>
+        <div class="sc sc-comb" data-v="chart">
+          <div class="ro-canvas">
+            <span class="ro-file"></span>
+            <svg class="lk ugly" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M17 16L52 38M24 75L50 42M56 36L82 16M58 46L83 75"/></svg>
+            <svg class="lk neat" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M29 26H33.5V45H38M29 74H33.5V55H38M62 45H66.5V26H71M62 55H66.5V74H71"/></svg>
+            ${BOXES.map((b, k) => `<div class="bx" style="${boxStyle(b)};--k:${k}"><i></i><i class="s"></i></div>`).join('')}
+            <div class="ro-tab">${cells}</div>
+          </div>
+          <div class="ro-cbar"><span class="ro-comb">${SPARK}<span>${H.T(c.comb)}</span></span></div>
+          <div class="ro-hand">${CURSOR}</div>
+        </div>
+      </div>
+    </div>
   </div>`;
 }
-function liveKits(box){
-  const st = box.querySelector('.ro-kitst');
-  const kit = st.querySelector('.ro-kit');
+function liveTemplates(box){
+  const st = box.querySelector('.ro-tst');
   const btns = [...st.querySelectorAll('.ro-set')];
-  const MS = 3400;
-  let cur = 0, timer = 0, on = false, touched = false, gen = 0;
-  const run = () => {
-    clearTimeout(timer);
-    btns.forEach(b => b.classList.remove('run'));
-    if (!on || touched || still()) return;
-    const b = btns[cur]; void b.offsetWidth; b.style.setProperty('--ms', MS + 'ms'); b.classList.add('run');
-    timer = setTimeout(() => set((cur + 1) % SETS.length), MS);
+  const ORDER = ['sheet', 'doc', 'comb'];
+  const sheet = st.querySelector('.sc-sheet'), comb = st.querySelector('.sc-comb');
+  const pages = [...st.querySelectorAll('.ro-pg')];
+  const hand = comb.querySelector('.ro-hand'), btn = comb.querySelector('.ro-comb');
+  let cur = 0, on = false, touched = false, tok = 0, busy = false;
+  const show = (i, ms) => {
+    cur = i; st.dataset.scene = ORDER[i];
+    btns.forEach((b, k) => { b.classList.toggle('on', k === i); b.setAttribute('aria-selected', k === i); b.classList.remove('run'); });
+    if (ms && !touched) { const b = btns[i]; void b.offsetWidth; b.style.setProperty('--ms', ms + 'ms'); b.classList.add('run'); }
   };
-  // карточки переворачиваются по очереди: старый набор уходит, на его месте — новый
-  const set = async (i, user) => {
-    if (user) touched = true;
-    cur = i;
-    btns.forEach((b, k) => { b.classList.toggle('on', k === i); b.setAttribute('aria-selected', k === i); });
-    run();
-    const my = ++gen;
-    const cards = [...kit.children];
-    if (!still()) { cards.forEach(el => el.classList.add('flip')); await wait(320 + cards.length * 50); }
-    if (my !== gen) return;
-    SETS[i].forEach((k, n) => { const el = cards[n]; el.className = `ro-k ro-m-${MODE_OF[k]} k-${k}${still() ? '' : ' flip'}`; el.firstElementChild.innerHTML = MINI[k](); });
-    kit.classList.remove('fill');
-    await wait(30);
-    if (my !== gen) return;
-    cards.forEach(el => el.classList.remove('flip'));
-    void kit.offsetWidth; kit.classList.add('fill');   // строки печатаются, полосы и столбики растут
+  // таблицы: значения вписываются по строкам, итог считается сам
+  const playSheet = async ok => { sheet.classList.remove('go'); await wait(250); if (!ok()) return; sheet.classList.add('go'); await wait(4300); };
+  // заявления: передний лист заполняется и уходит назад, вперед выходит следующий
+  const order = [0, 1, 2];
+  const playDoc = async ok => {
+    for (let n = 0; n < 3 && ok(); n++) {
+      pages.forEach(p => { p.dataset.pos = order.indexOf(+p.dataset.k); p.classList.toggle('go', +p.dataset.pos === 0); });
+      await wait(1700);
+      order.push(order.shift());
+    }
   };
-  btns.forEach(b => b.addEventListener('click', () => set(+b.dataset.i, true)));
-  let seen = false;
-  if (!still()) kit.classList.remove('fill');
-  onScreen(st, v => { on = v; run(); if (v && !seen) { seen = true; requestAnimationFrame(() => kit.classList.add('fill')); } }, .3);
+  // «причесать»: файл падает на холст, появляется как есть, курсор жмет кнопку — всё встает ровно
+  const move = (el, ms) => {
+    const [x, y] = at(el, comb, .5, .6);
+    hand.style.transition = `transform ${ms}ms var(--ease-io), opacity .3s`;
+    hand.style.transform = `translate(${x}px,${y}px)`;
+    return wait(ms);
+  };
+  const playComb = async ok => {
+    for (const v of ['chart', 'table']) {
+      if (!ok()) return;
+      comb.classList.remove('neat', 'ugly', 'drop', 'hand'); comb.dataset.v = v;
+      hand.style.transition = 'none'; hand.style.transform = `translate(${comb.clientWidth * .3}px,${comb.clientHeight * .95}px)`;
+      await wait(150); comb.classList.add('drop'); await wait(700); if (!ok()) return;
+      comb.classList.add('ugly'); await wait(1300); if (!ok()) return;
+      comb.classList.add('hand'); await move(btn, 800); if (!ok()) return;
+      hand.classList.add('press'); btn.classList.add('hit'); await wait(180); hand.classList.remove('press'); btn.classList.remove('hit');
+      if (!ok()) return;
+      comb.classList.add('neat'); comb.classList.remove('hand'); await wait(2600);
+    }
+  };
+  const PLAY = { sheet: playSheet, doc: playDoc, comb: playComb };
+  const MS = { sheet: 4550, doc: 5100, comb: 13000 };
+  const loop = async () => {
+    if (busy) return; busy = true;
+    const t = tok, ok = () => on && t === tok;
+    while (ok()) {
+      show(cur, MS[ORDER[cur]]);
+      await PLAY[ORDER[cur]](ok);
+      if (ok() && !touched) cur = (cur + 1) % ORDER.length;
+    }
+    busy = false;
+    if (on && t !== tok) loop();
+  };
+  btns.forEach(b => b.addEventListener('click', () => {
+    touched = true; tok++; show(+b.dataset.i);
+    if (still()) { sheet.classList.add('go'); comb.classList.add('ugly', 'neat'); return; }
+    loop();
+  }));
+  if (still()) { show(2); comb.classList.add('ugly', 'neat'); sheet.classList.add('go'); pages.forEach(p => { p.dataset.pos = p.dataset.k; p.classList.add('go'); }); return; }
+  pages.forEach(p => { p.dataset.pos = p.dataset.k; });
+  onScreen(st, v => { on = v; if (on) loop(); else tok++; }, .3);
 }
 
 /* ---------- демо: справа под текстом последней главы ---------- */
@@ -439,7 +492,7 @@ const tryHTML = t => t ? `<div class="ro-try">
 const CHAPTERS = [
   ['one', oneHTML, liveOne, 'wide'],
   ['side', sideHTML, liveSide, 'wide'],
-  ['templates', kitsHTML, liveKits, 'left'],
+  ['templates', templatesHTML, liveTemplates, 'left'],
   ['qr', qrHTML, liveQR, 'right'],
   ['closed', closedHTML, liveClosed, 'wide'],
   ['page', pageHTML, livePage, 'left'],   // последняя: под текстом — кнопка демо

@@ -2391,12 +2391,13 @@ function renderCase(k, keepScroll){
     body += `<div class="wrap"><div class="case-text${twoCols.includes(key) ? ' cols2' : ''}" data-reveal><span class="case-label">${T(label)}</span>${text}${
       key === 'role' && p.team ? teamHTML(p.team) : ''}</div></div>`;
     if (p.thermal && p.thermal.after === key) body += thermalHTML(p.thermal);
-    if (g < gallery.length) body += galleryItem(gallery[g++]);
+    if (!p.galleryEnd && g < gallery.length) body += galleryItem(gallery[g++]);
     if (p.brandkit && p.brandkit.after === key) body += brandkitHTML(p.brandkit);
     // world.after — ключ схемы ('solution') или номер абзаца story, считая с нуля
     if (p.world && p.world.after != null && (p.world.after === key || p.world.after === i)) body += worldHTML(p.world);
   });
-  while (g < gallery.length) body += galleryItem(gallery[g++]);
+  // galleryEnd — картинки gallery не между текстом, а в самом конце, после живых глав (см. русский офис)
+  if (!p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // кампании внутри кейса: меню, у каждой — текст в три колонки (название, задача, решение) и макеты рядами
   if (p.campaigns && p.campaigns.length) body += campaignsHTML(p.campaigns, W.campaigns);
   // audit — аудит как дизайн-кейс: главы с живой инфографикой, их рисует audit.js
@@ -2430,6 +2431,7 @@ function renderCase(k, keepScroll){
   if (p.poll) body += `<div class="pl pl-mount"></div>`;
   // office — «русский офис»: три редактора в одном окне, рядом, шаблоны, QR, мини-лендинг, закрытый контур, сменный набор; рисует office.js
   if (p.office) body += `<div class="ro ro-mount"></div>`;
+  if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
