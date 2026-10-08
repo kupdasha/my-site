@@ -83,7 +83,7 @@ function planHTML(c){
       <div class="vp-dim vp-dim-h"><i></i><span>${H.T(c.height)}</span></div>
     </div>
     <ul class="vp-zones">${c.zones.map((z, i) => `<li data-i="${i}"><h3>${H.T(z.name)}</h3><p>${H.T(z.text)}</p></li>`).join('')}
-      <li class="vp-area">${H.T(c.area)}</li></ul>
+      ${c.area ? `<li class="vp-area">${H.T(c.area)}</li>` : ''}</ul>
   </div>`;
 }
 function livePlan(box, c){
