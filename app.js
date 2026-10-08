@@ -3007,6 +3007,20 @@ function sendGameContact(contact, data = {}){
     f.querySelectorAll('.js-phonemask-result, [name="Phone"], [name="phone"], [name="Телефон"]').forEach(el => { el.value = full; });
     data.phone = full;
   }
+  // остальные видимые поля формы заполняем по их подписи: обязательные поля Тильда проверяет и на сервере
+  // (поле в форме могут добавить в Тильде в любой момент — например, «Telegram» с именем Input)
+  f.querySelectorAll('input[type="text"], input[type="email"], textarea').forEach(el => {
+    if (el.value.trim() || el.name === 'form-spec-comments' || el.type === 'hidden') return;
+    const g = el.closest('[data-field-name]');
+    const label = [el.placeholder, el.name, g && g.dataset.fieldName, g && g.textContent].join(' ').toLowerCase();
+    const mailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+    const v = /telegram|телеграм|\btg\b|\bтг\b|ник/.test(label) ? data.tg
+      : /mail|почт/.test(label) ? (mailOk ? contact : '')
+      : /имя|name|фио/.test(label) ? data.name
+      : /телефон|phone/.test(label) ? data.phone
+      : `${contact} (${src})`;
+    if (v) el.value = v;
+  });
   const extra = (name, v) => { let el = f.querySelector(`input[name="${name}"]`); if (!el) { el = document.createElement('input'); el.type = 'hidden'; el.name = name; f.appendChild(el); } el.value = v; };
   if (data.tg) extra('Telegram', data.tg);
   if (data.name) extra('Источник', src);
