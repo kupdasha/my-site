@@ -2889,9 +2889,9 @@ function renderGame(status){
   const G = SITE.game, box = $('#ttt');
   const w = winnerOf(board);
   let after = '';
-  // две галочки по 152-ФЗ: без них форма не отправится; ссылка «согласие» открывает его текст, «политика» — страницу политики
+  // две галочки по 152-ФЗ: без них форма не отправится; ссылки — на страницы согласия и политики
   const agree = G.agree ? `<div class="ttt-consent">
-      <label><input type="checkbox" name="agree" required><span>${T(G.agree[0])}<a href="#" class="ttt-doc">${T(G.agree[1])}</a></span></label>
+      <label><input type="checkbox" name="agree" required><span>${T(G.agree[0])}<a href="${G.agreeLink}" target="_blank" rel="noopener">${T(G.agree[1])}</a></span></label>
       <label><input type="checkbox" name="policy" required><span>${T(G.policy[0])}<a href="${G.policyLink}" target="_blank" rel="noopener">${T(G.policy[1])}</a></span></label>
     </div>` : '';
   if (w && w.who === 'x') after = `<form class="ttt-form" id="tttForm"><input class="ttt-input" name="contact" required placeholder="${G.field}" aria-label="${G.field}"><button class="btn btn-accent"><span class="spell">${T(G.send)}</span><span class="arr">→</span></button>${agree}</form>`;
@@ -2966,21 +2966,6 @@ $('#ttt').addEventListener('submit', e => {
     if (!tildaGameForm()) { location.href = `${SITE.telegram}?text=${encodeURIComponent(G.message + contact)}`; status.innerHTML = T(G.sent); }
     else status.innerHTML = `${T(G.failed)} <a href="${SITE.telegram}?text=${encodeURIComponent(G.message + contact)}">Telegram</a>`;
   });
-});
-// текст согласия — в окне поверх страницы
-$('#ttt').addEventListener('click', e => {
-  if (!e.target.closest('.ttt-doc')) return;
-  e.preventDefault();
-  const G = SITE.game;
-  let d = document.getElementById('consentDoc');
-  if (!d) {
-    d = document.createElement('dialog'); d.id = 'consentDoc'; d.className = 'consent-doc';
-    d.innerHTML = `<h3>${T(G.consentTitle)}</h3>${G.consentDoc.map(t => `<p>${T(t)}</p>`).join('')}<button class="btn" type="button"><span>${T(G.close)}</span></button>`;
-    d.querySelector('button').addEventListener('click', () => d.close());
-    d.addEventListener('click', ev => { if (ev.target === d) d.close(); });
-    document.body.appendChild(d);
-  }
-  d.showModal();
 });
 
 
