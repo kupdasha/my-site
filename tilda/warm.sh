@@ -22,7 +22,7 @@ global.window=global; require('./content.js');
 const out=new Set(); const add=v=>{ if (typeof v==='string' && v.startsWith('img/')) out.add(v) };
 SITE.works.items.forEach(p=>['thumb','image','preview','listPreview','video'].forEach(k=>add(p[k])));
 (SITE.photos&&SITE.photos.events&&SITE.photos.events.items||[]).forEach(e=>{add(e.thumb)});
-console.log([...out].join('\\n'));" 2>/dev/null; } | sort -u | xargs -P 8 -I{} curl -s -o /dev/null --max-time 60 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/{}"
+console.log([...out].join('\\n'));" 2>/dev/null; } | sort -u | xargs -P 16 -I{} curl -s -o /dev/null --max-time 40 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/{}"
 
 blob=$(print -n "$sha" | git hash-object -w --stdin)
 tree=$(print "100644 blob $blob\tversion.txt" | git mktree)
