@@ -3,13 +3,15 @@
    Главы почти без слов — иконки и короткие анимации:
    one — три отдельных редактора, у каждого ключ-лицензия; ключи
    улетают, окна складываются в одно с четырьмя вкладками;
-   side — одно окно, внутри рядом заявление, смета и презентация,
+   side — одно окно, внутри рядом готовые шаблоны: заявление в Word,
+   смета со значками счетчиков и итогом по формуле, презентация;
    курсор переносит итог сметы в график и в заявление;
-   templates — одно окно, три сцены по очереди (кнопки-иконки сверху):
-   таблицы счетчиков и налогов с формулами, заявления в Word,
-   «причесать» — неряшливый график или таблица встают ровно;
-   qr — QR-код собирается прямо на листе, по нему проходит сканер;
-   page — мини-лендинг из блоков, редактор сворачивается в браузер;
+   comb — кнопка «причесать»: на холст падает неряшливая схема из
+   PowerPoint или пестрая таблица из Excel, курсор жмет кнопку —
+   всё встает ровно;
+   html — вкладка HTML: презентация с анимацией становится лендингом
+   и сама подстраивается под ноутбук, планшет и телефон; файл легкий,
+   уходит по почте и в мессенджеры, открывается без интернета;
    closed — закрытый контур: данные ходят внутри, наружу не выходят —
    отскакивают от границы, облако и интернет снаружи без связи;
    справа под текстом последней главы с рисунком сбоку — кнопка демо.
@@ -36,15 +38,11 @@ const at = (el, stage, fx = .5, fy = .5) => {
 /* ---------- значки ---------- */
 const KEY = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="4.2"/><path d="M12.2 12H21M17.5 12v3.4M20.2 12v2.4"/></svg>`;
 const CURSOR = `<svg class="ro-cur" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8.2-6.1 1.3L10 18.6z"/></svg>`;
-// значки сцен главы «шаблоны»: таблица, документ, слайд с графиком
-const TAB_ICON = [
-  `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="6" width="22" height="20" rx="3"/><path d="M5 12h22M5 19h22M13 6v20"/></svg>`,
-  `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 4h11l6 6v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4v6h6M11 16h10M11 21h7"/></svg>`,
-  `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="6" width="24" height="17" rx="3"/><path d="M16 23v4M11 27h10M10 18v-3M15 18v-6M20 18v-4"/></svg>`,
-];
-// счетчики: капля и молния; налоги — знак процента; искры — у кнопки «причесать»
+// счетчики: капля и молния; искры — у кнопки «причесать»; почта, мессенджер и «нет сети» — у HTML
 const METER = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 5c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12z"/><path d="M23 4l-5 10h5l-3 9 8-12h-5l3-7z"/></svg>`;
-const PCT = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="9" cy="9" r="4"/><circle cx="23" cy="23" r="4"/><path d="M25 6L7 26"/></svg>`;
+const MAIL = `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="3"/><path d="M5 9l11 8 11-8"/></svg>`;
+const PLANE = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M28 5L4 14.5l9 3.5 2.5 9 4.5-6 6.5 4.5z"/><path d="M13 18l15-13"/></svg>`;
+const NONET = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 12.5a17 17 0 0 1 24 0M8.5 17a11 11 0 0 1 15 0M13 21.5a5 5 0 0 1 6 0"/><circle cx="16" cy="25.5" r="1.4"/><path d="M5 5l22 22"/></svg>`;
 const SPARK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3l1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8zM18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/></svg>`;
 
 /* ---------- содержимое вкладок: рисунки из простых форм ---------- */
@@ -134,9 +132,9 @@ function liveOne(box){
 function sideHTML(){
   // заявление: шапка справа (кому, от кого), заголовок по центру, текст, дата и подпись
   const letter = `<div class="ro-letter"><div class="to"><i></i><i></i><i class="s"></i></div><i class="tt"></i>
-    <i></i><i class="mark"></i><i></i><i class="s"></i><div class="ft"><i></i><svg viewBox="0 0 60 20" aria-hidden="true"><path d="M2 14c6-10 9 6 14-2s6-8 9 0 7 4 10-3 6 4 12 1 9-4 11-2"/></svg></div></div>`;
+    <i></i><i class="mark"></i><i></i><i class="s"></i><div class="ft"><i></i><svg viewBox="0 0 60 20" aria-hidden="true"><path d="M2 14c6-10 9 6 14-2s6-8 9 0 7 4 10-3 6 4 12 1 9-4 11-2"/></svg></div><span class="ro-docx">DOCX</span></div>`;
   const cells = Array.from({ length: 5 }, () => `<i></i><u></u>`).join('');
-  const sheet = `<div class="ro-smeta"><div class="rows">${cells}</div><div class="sum"><i></i><u class="total"></u></div></div>`;
+  const sheet = `<div class="ro-smeta"><span class="ico">${METER}</span><div class="rows">${cells}</div><div class="sum"><i></i><u class="total"></u></div></div>`;
   const slide = `<div class="ro-deck"><i class="h"></i><div class="bars">${[40, 58, 46, 30].map(h => `<b style="--h:${h}%"></b>`).join('')}</div></div>`;
   return `<div class="ro-stage ro-sidest">
     <div class="ro-app ro-wide">
@@ -185,9 +183,7 @@ function liveSide(box){
   ], .35);
 }
 
-/* ================================================================
-   qr — код собирается прямо на листе
-   ================================================================ */
+/* ---------- QR-код: три квадрата по углам, остальное вразброс ---------- */
 const N = 21;   // QR версии 1: 21 × 21 модуль
 function qrModules(){
   const m = [];
@@ -209,69 +205,6 @@ function qrSVG(){
   return `<svg class="ro-qr-svg" viewBox="-1 -1 ${N + 2} ${N + 2}" aria-hidden="true">${qrModules().map(([x, y, f]) =>
     `<rect x="${x}" y="${y}" width="1.04" height="1.04" style="--d:${Math.round(f ? rnd(0, 300) : rnd(350, 1500))}ms"/>`).join('')}</svg>`;
 }
-function qrHTML(){
-  return `<div class="ro-stage ro-qrst">
-    <div class="ro-sheet">
-      <i class="h"></i><i></i><i></i><i class="s"></i><i></i>
-      <div class="ro-qrrow"><div class="lines"><i></i><i class="s"></i><i></i><i class="s"></i></div>
-        <div class="ro-qr"><div class="ro-qr-in">${qrSVG()}</div><s class="scan"></s></div></div>
-    </div>
-  </div>`;
-}
-function liveQR(box){
-  const st = box.querySelector('.ro-qrst');
-  const inner = box.querySelector('.ro-qr-in');
-  if (still()) { st.classList.add('go'); return; }
-  cycle(st, [
-    async () => { st.classList.add('go'); await wait(1900); },
-    async () => { st.classList.add('scan'); await wait(1600); },
-    async () => { await wait(1400); st.classList.add('fade'); await wait(500);
-      st.classList.remove('go', 'scan', 'fade'); inner.innerHTML = qrSVG(); await wait(300); },
-  ]);
-}
-
-/* ================================================================
-   page — мини-лендинг из блоков открывается как сайт
-   ================================================================ */
-function pageHTML(){
-  const pal = `<div class="ro-pal">${['hero', 'pic', 'cards', 'btn'].map(k => `<span class="p-${k}"></span>`).join('')}</div>`;
-  return `<div class="ro-stage ro-pagest" data-step="0">
-    <div class="ro-app ro-browser">
-      <div class="ro-bar ro-pbar"><span class="dots"><b></b><b></b><b></b></span><span class="tab ro-m-html"></span><span class="addr"></span></div>
-      <div class="ro-ed">${pal}
-        <div class="ro-site">
-          <div class="b b-hero" style="--k:0"><i></i><i class="s"></i></div>
-          <div class="b b-pic" style="--k:1"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40L28 14l18 16 14-10 40 20z"/><circle cx="78" cy="11" r="5"/></svg></div>
-          <div class="b b-cards" style="--k:2"><b></b><b></b><b></b></div>
-          <div class="b b-btn" style="--k:3"><span></span></div>
-        </div>
-      </div>
-    </div>
-    <div class="ro-hand">${CURSOR}</div>
-  </div>`;
-}
-function livePage(box){
-  const st = box.querySelector('.ro-pagest');
-  const hand = box.querySelector('.ro-hand');
-  const btn = box.querySelector('.b-btn span');
-  if (still()) { st.dataset.step = 2; return; }
-  const move = (el, ms) => {
-    const [x, y] = at(el, st, .6, .6);
-    hand.style.transition = `transform ${ms}ms var(--ease-io), opacity .3s`;
-    hand.style.transform = `translate(${x}px,${y}px)`;
-    return wait(ms);
-  };
-  cycle(st, [
-    async () => { st.dataset.step = 0; await wait(500); st.dataset.step = 1; await wait(2200); },   // блоки встают на место
-    async () => { st.dataset.step = 2; await wait(1300); },                                         // редактор сворачивается в браузер
-    async () => {
-      // курсор появляется внизу справа и идет к кнопке
-      hand.style.transition = 'none'; hand.style.transform = `translate(${st.clientWidth * .8}px,${st.clientHeight * .9}px)`;
-      void hand.offsetWidth; st.classList.add('hand'); await wait(300); await move(btn, 900); hand.classList.add('press'); btn.classList.add('hit');
-      await wait(200); hand.classList.remove('press'); await wait(1600); btn.classList.remove('hit'); st.classList.remove('hand'); await wait(600); },
-  ]);
-}
-
 /* ================================================================
    closed — закрытый контур: данные ходят внутри, наружу не выходят
    ================================================================ */
@@ -363,18 +296,9 @@ function liveClosed(box){
 }
 
 /* ================================================================
-   templates — одно окно, три сцены по очереди: таблицы с формулами
-   (счетчики и налоги), заявления в Word, «причесать» (неряшливый
-   график или таблица становятся аккуратными); кнопки-иконки сверху
+   comb — кнопка «причесать»: неряшливая схема или таблица встают ровно
    ================================================================ */
-// таблица-расчет: значок, строки «подпись — значение», под чертой итог по формуле
-const calc = (icon, ws) => `<div class="ro-calc"><span class="ico">${icon}</span>
-  ${ws.map((w, k) => `<div class="r" style="--k:${k}"><i></i><u style="width:${w}%"></u></div>`).join('')}
-  <div class="r res" style="--k:${ws.length}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6h10M3 10h10"/></svg><u></u></div></div>`;
-// лист заявления: кому и от кого справа, заголовок по центру, текст, дата и подпись
-const page = k => `<div class="ro-pg" data-k="${k}"><div class="to"><i></i><i></i><i class="s"></i></div><i class="tt"></i>
-  <i></i><i></i><i class="s"></i><i></i><div class="ft"><i></i><i></i></div>${k === 0 ? '<span class="ro-docx">DOCX</span>' : ''}</div>`;
-// «причесать»: пять блоков схемы — неряшливо (u…) и ровно (n…), в процентах холста
+// пять блоков схемы — неряшливо (u…) и ровно (n…), в процентах холста
 const BOXES = [
   { u: [2, 5, 30, 22, -6], n: [5, 12, 24, 28] },
   { u: [14, 60, 20, 30, 4], n: [5, 60, 24, 28] },
@@ -386,17 +310,12 @@ function boxStyle(b){
   const [ux, uy, uw, uh, ur] = b.u, [nx, ny, nw, nh] = b.n;
   return `--ux:${ux}%;--uy:${uy}%;--uw:${uw}%;--uh:${uh}%;--ur:${ur}deg;--nx:${nx}%;--ny:${ny}%;--nw:${nw}%;--nh:${nh}%`;
 }
-function templatesHTML(c){
-  const names = H.pick(c.tabs);
+function combHTML(c){
   const cells = Array.from({ length: 20 }, (_, k) => `<span class="c" style="--k:${k}"><i></i></span>`).join('');
-  return `<div class="ro-stage ro-tst" data-scene="sheet">
-    <div class="ro-sets" role="tablist">${names.map((n, i) =>
-      `<button class="ro-set${i ? '' : ' on'} ro-m-${['sheet', 'doc', 'slide'][i]}" type="button" role="tab" aria-selected="${!i}" aria-label="${esc(n)}" data-i="${i}">${TAB_ICON[i]}<s></s></button>`).join('')}</div>
-    <div class="ro-app ro-tw">
+  return `<div class="ro-stage ro-combst">
+    <div class="ro-app ro-tw ro-m-slide">
       <div class="ro-bar"><b></b></div>
       <div class="ro-scenes">
-        <div class="sc sc-sheet">${calc(METER, [62, 80, 48])}${calc(PCT, [86, 40, 70])}</div>
-        <div class="sc sc-doc"><div class="ro-pgs">${page(2)}${page(1)}${page(0)}</div></div>
         <div class="sc sc-comb" data-v="chart">
           <div class="ro-canvas">
             <span class="ro-file"></span>
@@ -405,78 +324,68 @@ function templatesHTML(c){
             ${BOXES.map((b, k) => `<div class="bx" style="${boxStyle(b)};--k:${k}"><i></i><i class="s"></i></div>`).join('')}
             <div class="ro-tab">${cells}</div>
           </div>
-          <div class="ro-cbar"><span class="ro-comb">${SPARK}<span>${H.T(c.comb)}</span></span></div>
+          <div class="ro-cbar"><span class="ro-comb">${SPARK}<span>${H.T(c.btn)}</span></span></div>
           <div class="ro-hand">${CURSOR}</div>
         </div>
       </div>
     </div>
   </div>`;
 }
-function liveTemplates(box){
-  const st = box.querySelector('.ro-tst');
-  const btns = [...st.querySelectorAll('.ro-set')];
-  const ORDER = ['sheet', 'doc', 'comb'];
-  const sheet = st.querySelector('.sc-sheet'), comb = st.querySelector('.sc-comb');
-  const pages = [...st.querySelectorAll('.ro-pg')];
+function liveComb(box){
+  const comb = box.querySelector('.sc-comb');
   const hand = comb.querySelector('.ro-hand'), btn = comb.querySelector('.ro-comb');
-  let cur = 0, on = false, touched = false, tok = 0, busy = false;
-  const show = (i, ms) => {
-    cur = i; st.dataset.scene = ORDER[i];
-    btns.forEach((b, k) => { b.classList.toggle('on', k === i); b.setAttribute('aria-selected', k === i); b.classList.remove('run'); });
-    if (ms && !touched) { const b = btns[i]; void b.offsetWidth; b.style.setProperty('--ms', ms + 'ms'); b.classList.add('run'); }
-  };
-  // таблицы: значения вписываются по строкам, итог считается сам
-  const playSheet = async ok => { sheet.classList.remove('go'); await wait(250); if (!ok()) return; sheet.classList.add('go'); await wait(4300); };
-  // заявления: передний лист заполняется и уходит назад, вперед выходит следующий
-  const order = [0, 1, 2];
-  const playDoc = async ok => {
-    for (let n = 0; n < 3 && ok(); n++) {
-      pages.forEach(p => { p.dataset.pos = order.indexOf(+p.dataset.k); p.classList.toggle('go', +p.dataset.pos === 0); });
-      await wait(1700);
-      order.push(order.shift());
-    }
-  };
-  // «причесать»: файл падает на холст, появляется как есть, курсор жмет кнопку — всё встает ровно
+  if (still()) { comb.classList.add('ugly', 'neat'); return; }
   const move = (el, ms) => {
     const [x, y] = at(el, comb, .5, .6);
     hand.style.transition = `transform ${ms}ms var(--ease-io), opacity .3s`;
     hand.style.transform = `translate(${x}px,${y}px)`;
     return wait(ms);
   };
-  const playComb = async ok => {
-    for (const v of ['chart', 'table']) {
-      if (!ok()) return;
+  // файл падает на холст, появляется как есть, курсор жмет «причесать» — всё встает ровно; сначала схема, потом таблица
+  let v = 'table';
+  cycle(comb, [
+    async () => {
+      v = v === 'chart' ? 'table' : 'chart';
       comb.classList.remove('neat', 'ugly', 'drop', 'hand'); comb.dataset.v = v;
       hand.style.transition = 'none'; hand.style.transform = `translate(${comb.clientWidth * .3}px,${comb.clientHeight * .95}px)`;
-      await wait(150); comb.classList.add('drop'); await wait(700); if (!ok()) return;
-      comb.classList.add('ugly'); await wait(1300); if (!ok()) return;
-      comb.classList.add('hand'); await move(btn, 800); if (!ok()) return;
+      await wait(250); comb.classList.add('drop'); await wait(700);
+    },
+    async () => { comb.classList.add('ugly'); await wait(1400); },
+    async () => { comb.classList.add('hand'); await move(btn, 800);
       hand.classList.add('press'); btn.classList.add('hit'); await wait(180); hand.classList.remove('press'); btn.classList.remove('hit');
-      if (!ok()) return;
-      comb.classList.add('neat'); comb.classList.remove('hand'); await wait(2600);
-    }
-  };
-  const PLAY = { sheet: playSheet, doc: playDoc, comb: playComb };
-  const MS = { sheet: 4550, doc: 5100, comb: 13000 };
-  const loop = async () => {
-    if (busy) return; busy = true;
-    const t = tok, ok = () => on && t === tok;
-    while (ok()) {
-      show(cur, MS[ORDER[cur]]);
-      await PLAY[ORDER[cur]](ok);
-      if (ok() && !touched) cur = (cur + 1) % ORDER.length;
-    }
-    busy = false;
-    if (on && t !== tok) loop();
-  };
-  btns.forEach(b => b.addEventListener('click', () => {
-    touched = true; tok++; show(+b.dataset.i);
-    if (still()) { sheet.classList.add('go'); comb.classList.add('ugly', 'neat'); return; }
-    loop();
-  }));
-  if (still()) { show(2); comb.classList.add('ugly', 'neat'); sheet.classList.add('go'); pages.forEach(p => { p.dataset.pos = p.dataset.k; p.classList.add('go'); }); return; }
-  pages.forEach(p => { p.dataset.pos = p.dataset.k; });
-  onScreen(st, v => { on = v; if (on) loop(); else tok++; }, .3);
+      comb.classList.add('neat'); comb.classList.remove('hand'); await wait(2800); },
+  ], .35);
+}
+
+/* ================================================================
+   html — презентация лендингом: ноутбук, планшет, телефон; почта и мессенджер
+   ================================================================ */
+// лендинг одинаковый, раскладка своя: карточки в ноутбуке в ряд, в планшете по две, в телефоне столбиком
+const landing = qr => `<div class="ld"><div class="lb lh" style="--k:0"><i></i><i class="s"></i><span class="dot"></span></div>
+  <div class="lb lp" style="--k:1"><svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40L28 14l18 16 14-10 40 20z"/></svg></div>
+  <div class="lb lc" style="--k:2"><b></b><b></b><b></b></div>${qr ? `<div class="lb lq" style="--k:3">${qrSVG()}</div>` : ''}</div>`;
+function htmlHTML(){
+  return `<div class="ro-stage ro-htst">
+    <div class="ro-devs">
+      <div class="dv dv-lap"><div class="scr">${landing(true)}</div><span class="base"></span></div>
+      <div class="dv dv-tab"><div class="scr">${landing()}</div></div>
+      <div class="dv dv-pho"><div class="scr">${landing()}</div></div>
+    </div>
+    <div class="ro-send">
+      <span class="ro-file-h">HTML<i></i></span>
+      <span class="road"><s></s></span>
+      <span class="to t1">${MAIL}</span><span class="to t2">${PLANE}</span>
+      <span class="off">${NONET}</span>
+    </div>
+  </div>`;
+}
+function liveHtml(box){
+  const st = box.querySelector('.ro-htst');
+  if (still()) { st.classList.add('go', 'sent'); return; }
+  cycle(st, [
+    async () => { st.classList.remove('go', 'sent'); await wait(400); st.classList.add('go'); await wait(2200); },   // блоки встают на всех трех экранах
+    async () => { st.classList.add('sent'); await wait(2600); },                                                    // файл уходит по почте и в мессенджер
+  ], .35);
 }
 
 /* ---------- демо: справа под текстом последней главы ---------- */
@@ -492,10 +401,9 @@ const tryHTML = t => t ? `<div class="ro-try">
 const CHAPTERS = [
   ['one', oneHTML, liveOne, 'wide'],
   ['side', sideHTML, liveSide, 'wide'],
-  ['templates', templatesHTML, liveTemplates, 'left'],
-  ['qr', qrHTML, liveQR, 'right'],
+  ['comb', combHTML, liveComb, 'left'],
   ['closed', closedHTML, liveClosed, 'wide'],
-  ['page', pageHTML, livePage, 'left'],   // последняя: под текстом — кнопка демо
+  ['html', htmlHTML, liveHtml, 'right'],   // последняя: под текстом — кнопка демо
 ];
 
 let cssReady;

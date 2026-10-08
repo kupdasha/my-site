@@ -33,7 +33,7 @@
 .ro-split.rev > .ro-side{grid-column:1 / span 4}
 .ro-side .ro-title{font-size:clamp(30px,3.2vw,48px);max-width:none}
 .ro-side .ro-text{font-size:clamp(19px,1.5vw,22px)}
-@media (max-width:900px){.ro-split > .ro-viz,.ro-split > .ro-side,.ro-split.rev > .ro-viz,.ro-split.rev > .ro-side{grid-column:1 / -1}.ro-split > .ro-side{order:-1}}
+@media (max-width:900px){.ro-split > .ro-viz,.ro-split > .ro-side,.ro-split.rev > .ro-viz,.ro-split.rev > .ro-side{grid-column:1 / -1}.ro-split.rev > .ro-viz{order:0}.ro-split > .ro-side{order:-1}}
 @media (max-width:480px){.ro-title,.ro-side .ro-title{font-size:min(7.4vw,32px)}}
 
 /* общая подложка живых блоков */
@@ -115,6 +115,12 @@
 .ro-letter .ft{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
 .ro-letter .ft i{width:26%}
 .ro-letter svg{width:30%;fill:none;stroke:var(--ro-doc);stroke-width:2;stroke-linecap:round}
+/* у заявления плашка DOCX, у сметы — значки счетчиков */
+.ro-letter{position:relative}
+.ro-docx{position:absolute;padding:4px 10px 5px;border-radius:6px;background:var(--ro-doc);color:#fff;font-size:16px;font-weight:500;line-height:1}
+.ro-letter .ro-docx{left:0;top:0}
+.ro-smeta .ico{display:block;width:clamp(28px,2.8vw,36px);color:var(--ro-sheet);margin-bottom:10px}
+.ro-smeta .ico svg{display:block;width:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* смета: строки с суммами разной длины, внизу итог */
 .ro-smeta .rows{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px}
 .ro-smeta i,.ro-smeta u{display:block;height:14px;border-radius:3px;background:var(--line)}
@@ -136,56 +142,6 @@
   opacity:0;transform:scale(.4);transition:opacity .25s,transform .35s var(--ease)}
 .ro-sidest.carry .ro-chip{opacity:1;transform:none}
 
-/* ---------- qr: код собирается на листе ---------- */
-.ro-qrst{display:grid;place-items:center;padding:clamp(20px,3.4vw,48px)}
-.ro-sheet{width:min(100%,460px);aspect-ratio:1/1.06;background:var(--ro-paper);border-radius:4px;padding:9% 9%;display:flex;flex-direction:column;gap:3.4%;
-  box-shadow:0 1px 2px rgba(20,24,32,.06),0 24px 60px -30px rgba(20,24,32,.25)}
-.ro-sheet i{display:block;height:8px;border-radius:4px;background:var(--ro-paper-line)}
-.ro-sheet i.h{height:12px;width:56%;background:#1D222A;margin-bottom:2%}
-.ro-sheet i.s{width:64%}
-.ro-qrrow{display:grid;grid-template-columns:1fr 40%;gap:8%;align-items:end;margin-top:auto}
-.ro-qrrow .lines{display:flex;flex-direction:column;gap:12px;padding-bottom:4px}
-.ro-qr{position:relative;aspect-ratio:1;overflow:hidden}
-.ro-qr-svg{display:block;width:100%;height:100%}
-.ro-qr-svg rect{fill:#1D222A;opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.2)}
-.ro-qrst.go .ro-qr-svg rect{opacity:1;transform:none;transition:opacity .2s var(--d),transform .35s var(--ease) var(--d)}
-.ro-qrst.fade .ro-qr-svg{opacity:0;transition:opacity .45s}
-/* сканер: лаймовая полоса проходит сверху вниз */
-.ro-qr .scan{position:absolute;left:-4%;right:-4%;top:0;height:3px;background:var(--ro-mark);box-shadow:0 0 0 1px rgba(29,34,42,.15);text-decoration:none;opacity:0}
-.ro-qrst.scan .ro-qr .scan{animation:roScan 1.4s var(--ease-io) both}
-@keyframes roScan{0%{top:0;opacity:0}12%{opacity:1}50%{top:calc(100% - 3px)}88%{opacity:1}100%{top:0;opacity:0}}
-
-/* ---------- page: мини-лендинг из блоков открывается как сайт ---------- */
-.ro-pagest{padding:clamp(20px,3.4vw,48px)}
-.ro-browser{--m:var(--ro-html)}
-.ro-pbar{gap:10px;height:clamp(30px,3vw,40px);border-bottom:1.5px solid var(--line)}
-.ro-pbar .dots{display:flex;gap:5px}.ro-pbar .dots b{width:9px;height:9px;border-radius:50%;background:var(--line)}
-.ro-pbar .tab{display:block;width:clamp(40px,6vw,72px);height:10px;border-radius:5px;background:var(--ro-html);transition:opacity .4s,width .5s var(--ease)}
-/* в браузере вместо вкладки редактора — адресная строка */
-.ro-pbar .addr{display:block;height:16px;width:0;border-radius:99px;background:var(--soft);transition:width .7s var(--ease) .2s}
-.ro-pagest[data-step="2"] .ro-pbar .tab{opacity:0;width:0}
-.ro-pagest[data-step="2"] .ro-pbar .addr{width:52%}
-.ro-ed{display:grid;grid-template-columns:var(--pal,22%) 1fr;transition:grid-template-columns .8s var(--ease-io)}
-.ro-pagest[data-step="2"] .ro-ed{--pal:0%}
-.ro-pal{display:flex;flex-direction:column;gap:12px;padding:16px 12% 16px;border-right:1.5px solid var(--line);overflow:hidden;transition:opacity .4s,padding .8s var(--ease-io)}
-.ro-pagest[data-step="2"] .ro-pal{opacity:0;padding-inline:0;border-right-color:transparent}
-.ro-pal span{display:block;height:22px;border-radius:5px;background:var(--line)}
-.ro-pal .p-hero{background:var(--ro-mark)}.ro-pal .p-btn{width:60%;height:14px;border-radius:99px;background:var(--ink)}
-.ro-site{display:flex;flex-direction:column;gap:clamp(8px,1vw,14px);padding:clamp(14px,2.2vw,28px);min-height:clamp(240px,26vw,360px)}
-.ro-site .b{opacity:0;transform:translateX(-30px) scale(.96);transition:opacity .45s var(--ease) calc(var(--k) * 380ms),transform .6s var(--ease) calc(var(--k) * 380ms)}
-.ro-pagest:not([data-step="0"]) .ro-site .b{opacity:1;transform:none}
-.ro-pagest[data-step="0"] .ro-site .b{transition:none}
-.b-hero{display:flex;flex-direction:column;gap:8px;padding:clamp(14px,2vw,26px);border-radius:8px;background:var(--ro-mark)}
-.b-hero i{display:block;height:12px;width:62%;border-radius:6px;background:#1D222A}
-.b-hero i.s{width:40%;height:8px;opacity:.35}
-.b-pic svg{display:block;width:100%;height:clamp(50px,6vw,80px);border-radius:8px;background:var(--line);fill:color-mix(in srgb,var(--ink) 22%,var(--line))}
-.b-cards{display:flex;gap:clamp(6px,1vw,12px)}
-.b-cards b{flex:1;height:clamp(28px,3.4vw,44px);border-radius:6px;background:var(--soft);border:1.5px solid var(--line)}
-.b-btn span{display:block;width:clamp(70px,9vw,120px);height:clamp(20px,2.4vw,30px);border-radius:99px;background:var(--ink);transition:transform .25s var(--ease),background .3s}
-.b-btn span.hit{transform:scale(.92);background:color-mix(in srgb,var(--ink) 75%,var(--ro-html))}
-.ro-pagest .ro-hand{opacity:0;transition:opacity .3s}
-.ro-pagest.hand .ro-hand{opacity:1}
-
 /* ---------- closed: закрытый контур ---------- */
 .ro-closedst{padding:clamp(12px,2.6vw,40px)}
 .ro-net{display:block;width:100%;height:auto;max-width:1040px;margin:0 auto;overflow:visible}
@@ -205,65 +161,11 @@
 .ro-net .pk-out{fill:var(--ink)}
 .ro-net .ring{fill:none;stroke:var(--ink);stroke-width:2.4}
 
-/* ---------- templates: одно окно, три сцены — таблицы, заявления, «причесать» ---------- */
-.ro-tst{padding:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,40px)}
-.ro-sets{display:flex;justify-content:center;gap:clamp(10px,1.4vw,16px);margin-bottom:clamp(18px,2.4vw,28px)}
-.ro-set{position:relative;display:grid;place-items:center;width:clamp(52px,5vw,64px);aspect-ratio:1;border-radius:50%;border:0;background:var(--bg);color:var(--m);cursor:pointer;overflow:hidden;
-  transition:background .35s,color .35s,transform .3s var(--ease)}
-.ro-set:hover{transform:translateY(-2px)}
-.ro-set.on{background:var(--m);color:#fff}
-.ro-set svg{width:52%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* полоса таймера: сцена сменится сама, пока кнопки не трогали */
-.ro-set s{position:absolute;left:24%;right:24%;bottom:12%;height:2px;border-radius:2px;background:currentColor;opacity:.8;transform:scaleX(0);transform-origin:0 50%;text-decoration:none}
-.ro-set.run s{animation:roTimer var(--ms) linear both}
-@keyframes roTimer{to{transform:none}}
-.ro-set:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-.ro-tw{transition:none}
-.ro-tst[data-scene="sheet"] .ro-tw{--m:var(--ro-sheet)}.ro-tst[data-scene="doc"] .ro-tw{--m:var(--ro-doc)}.ro-tst[data-scene="comb"] .ro-tw{--m:var(--ro-slide)}
-.ro-tw .ro-bar,.ro-tw .ro-bar b{transition:background .4s,border-color .4s}
+/* ---------- comb: кнопка «причесать» ---------- */
+.ro-combst{padding:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,40px)}
 .ro-scenes{position:relative;aspect-ratio:16/10.5}
 @media (max-width:640px){.ro-scenes{aspect-ratio:4/3.6}}
-.sc{position:absolute;inset:0;min-width:0;opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
-.ro-tst[data-scene="sheet"] .sc-sheet,.ro-tst[data-scene="doc"] .sc-doc,.ro-tst[data-scene="comb"] .sc-comb{opacity:1;visibility:visible;transition:opacity .4s .1s}
-
-/* таблицы: счетчики и налоги, итог под чертой считается сам */
-.sc-sheet{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2.4vw,32px);padding:clamp(16px,3vw,40px);align-items:center}
-.ro-calc{display:flex;flex-direction:column;gap:clamp(8px,1vw,12px);padding:clamp(12px,1.8vw,22px);border-radius:8px;border:1.5px solid var(--line)}
-.ro-calc .ico{width:clamp(30px,3.4vw,44px);color:var(--ro-sheet);margin-bottom:4px}
-.ro-calc .ico svg{display:block;width:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ro-calc .r{display:grid;grid-template-columns:38% 1fr;gap:10%;align-items:center}
-.ro-calc i{display:block;height:8px;border-radius:4px;background:var(--line)}
-.ro-calc u{display:block;justify-self:end;height:clamp(12px,1.5vw,18px);border-radius:3px;background:color-mix(in srgb,var(--ro-sheet) 30%,var(--bg));
-  transform:scaleX(0);transform-origin:100% 50%;transition:transform .45s var(--ease) calc(300ms + var(--k) * 380ms)}
-.ro-calc .res{margin-top:6px;padding-top:12px;border-top:2px solid var(--ink)}
-.ro-calc .res svg{width:clamp(16px,1.6vw,22px);fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linecap:round}
-.ro-calc .res u{width:100%;background:var(--ro-sheet);outline:3px solid transparent;outline-offset:2px;transition:transform .7s var(--ease) calc(500ms + var(--k) * 380ms),outline-color .3s calc(1200ms + var(--k) * 380ms)}
-.sc-sheet.go .ro-calc u{transform:none}
-.sc-sheet.go .ro-calc .res u{outline-color:var(--ro-mark)}
-.sc-sheet:not(.go) .ro-calc u{transition:none}
-
-/* заявления: веер листов, передний заполняется и уходит назад */
-.sc-doc{display:grid;place-items:center}
-.ro-pgs{position:relative;height:84%;aspect-ratio:3/3.8}
-.ro-pg{position:absolute;inset:0;padding:10% 11%;display:flex;flex-direction:column;gap:5.5%;background:var(--ro-paper);border-radius:4px;
-  box-shadow:0 1px 2px rgba(20,24,32,.08),0 14px 30px -18px rgba(20,24,32,.35);transition:transform .7s var(--ease),z-index 0s .25s}
-.ro-pg[data-pos="0"]{z-index:3;transform:none}
-.ro-pg[data-pos="1"]{z-index:2;transform:translate(16%,3%) rotate(6deg)}
-.ro-pg[data-pos="2"]{z-index:1;transform:translate(-16%,3%) rotate(-6deg)}
-.ro-pg i{display:block;flex:none;height:7px;border-radius:4px;background:var(--ro-paper-line);transform-origin:0 50%}
-.ro-pg .to{display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-bottom:4%}
-.ro-pg .to i{width:52%;transform-origin:100% 50%}.ro-pg .to i.s{width:36%}
-.ro-pg .tt{width:40%;height:9px;margin:0 auto;background:#1D222A;transform-origin:50% 50%}
-.ro-pg i.s{width:64%}
-.ro-pg .ft{display:flex;justify-content:space-between;margin-top:auto}
-.ro-pg .ft i{width:30%}.ro-pg .ft i + i{background:var(--ro-doc)}
-.ro-pg[data-pos="0"]:not(.go) i{transform:scaleX(0);transition:none}
-.ro-pg.go i{transition:transform .4s var(--ease)}
-.ro-pg.go > :nth-child(1) i,.ro-pg.go > i:nth-child(2){transition-delay:.2s}
-.ro-pg.go > i:nth-child(3){transition-delay:.4s}.ro-pg.go > i:nth-child(4){transition-delay:.5s}
-.ro-pg.go > i:nth-child(5){transition-delay:.6s}.ro-pg.go > i:nth-child(6){transition-delay:.7s}.ro-pg.go .ft i{transition-delay:.9s}
-.ro-docx{position:absolute;left:-10px;top:14%;padding:4px 10px 5px;border-radius:6px;background:var(--ro-doc);color:#fff;font-size:16px;font-weight:500;line-height:1}
-
+.sc{position:absolute;inset:0;min-width:0}
 /* «причесать»: холст, файл падает, всё встает ровно */
 .sc-comb{display:flex;flex-direction:column}
 .ro-canvas{position:relative;flex:1;margin:clamp(10px,1.6vw,18px) clamp(10px,1.6vw,18px) 0}
@@ -314,6 +216,52 @@
 .ro-comb.hit{transform:scale(.92)}
 .sc-comb .ro-hand{opacity:0;transition:opacity .3s}
 .sc-comb.hand .ro-hand{opacity:1}
+
+/* ---------- html: презентация лендингом на трех экранах, легкий файл уходит по почте и в мессенджер ---------- */
+.ro-htst{padding:clamp(24px,3.6vw,52px) clamp(14px,2.6vw,40px) clamp(20px,3vw,40px)}
+.ro-devs{display:flex;align-items:flex-end;justify-content:center;gap:4%}
+.dv{position:relative;flex:none}
+.dv .scr{position:relative;overflow:hidden;background:var(--bg);border:clamp(4px,.5vw,7px) solid var(--ink);border-radius:clamp(8px,1vw,12px)}
+.dv-lap{width:56%}.dv-lap .scr{aspect-ratio:16/10;border-radius:8px 8px 2px 2px}
+.dv-lap .base{display:block;height:clamp(6px,.8vw,10px);margin:0 -7%;border-radius:0 0 8px 8px;background:var(--ink)}
+.dv-tab{width:22%}.dv-tab .scr{aspect-ratio:3/4}
+.dv-pho{width:12%}.dv-pho .scr{aspect-ratio:9/18;border-radius:clamp(10px,1.4vw,16px)}
+/* сам лендинг: блоки проявляются по очереди, как анимация презентации */
+.ld{display:grid;gap:6%;align-content:start;height:100%;padding:7%}
+.dv-lap .ld{grid-template-columns:1.3fr 1fr;grid-template-rows:auto auto;gap:5% 4%}
+.dv-lap .lh{grid-column:1;grid-row:1}.dv-lap .lp{grid-column:2;grid-row:1}.dv-lap .lc{grid-column:1;grid-row:2}.dv-lap .lq{grid-column:2;grid-row:2;justify-self:end;width:46%}
+.lb{opacity:0;transform:translateY(12px);transition:opacity .45s var(--ease) calc(var(--k) * 300ms),transform .6s var(--ease) calc(var(--k) * 300ms)}
+.ro-htst.go .lb{opacity:1;transform:none}
+.ro-htst:not(.go) .lb{transition:none}
+.lh{position:relative;display:flex;flex-direction:column;gap:5px;padding:9% 8%;border-radius:5px;background:var(--ro-mark);min-height:2.6em}
+.lh i{display:block;height:5px;width:72%;border-radius:3px;background:#1D222A}
+.lh i.s{width:44%;opacity:.35}
+/* точка в лендинге пульсирует — в нем живая анимация */
+.lh .dot{position:absolute;right:9%;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:#1D222A;animation:roPulse 1.4s var(--ease) infinite}
+@keyframes roPulse{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.15);opacity:1}}
+.lp svg{display:block;width:100%;aspect-ratio:5/2;border-radius:4px;background:var(--line);fill:color-mix(in srgb,var(--ink) 22%,var(--line))}
+.dv-lap .lp svg{aspect-ratio:auto;height:100%}
+.lc{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.dv-tab .lc{grid-template-columns:repeat(2,1fr)}.dv-tab .lc b:last-child{grid-column:1 / -1}
+.dv-pho .lc{grid-template-columns:1fr}
+.lc b{display:block;height:clamp(10px,1.4vw,18px);border-radius:3px;background:var(--soft);border:1px solid var(--line)}
+.lq svg{display:block;width:100%;height:auto}
+.lq rect{fill:var(--ink)}
+/* легкий файл: плашка HTML с короткой полоской «веса», по пунктиру — в почту и в мессенджер; рядом — «нет сети» */
+.ro-send{display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.6vw,18px);margin-top:clamp(22px,3vw,36px)}
+.ro-file-h{display:inline-flex;flex-direction:column;gap:5px;padding:7px 12px 8px;border-radius:6px;background:var(--ro-html);color:#1D222A;font-size:16px;font-weight:500;line-height:1}
+.ro-file-h i{display:block;height:3px;width:30%;border-radius:2px;background:#1D222A;opacity:.6}
+.ro-send .road{position:relative;width:clamp(40px,8vw,110px);height:2px;background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 9px);opacity:.5}
+.ro-send .road s{position:absolute;left:0;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--ro-html);box-shadow:0 0 0 2px var(--ink);opacity:0;text-decoration:none}
+.ro-htst.sent .road s{animation:roSend 1.6s var(--ease-io) both}
+@keyframes roSend{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 10px);opacity:0}}
+.ro-send .to,.ro-send .off{display:grid;place-items:center;width:clamp(40px,4.4vw,52px);aspect-ratio:1;border-radius:50%;background:var(--bg);color:var(--ink);transition:transform .35s var(--ease),background .3s}
+.ro-send svg{width:56%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ro-send .off circle{fill:currentColor;stroke:none}
+.ro-send .off{margin-left:clamp(6px,1.4vw,18px);background:none;box-shadow:inset 0 0 0 1.5px var(--line)}
+.ro-htst.sent .t1{animation:roHit .5s var(--ease) 1.45s}
+.ro-htst.sent .t2{animation:roHit .5s var(--ease) 1.65s}
+@keyframes roHit{50%{transform:scale(1.18);background:var(--ro-mark);color:#1D222A}}
 
 /* ---------- демо под текстом последней главы ---------- */
 .ro-try{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:clamp(16px,2.4vw,32px);padding-top:clamp(20px,2.4vw,32px);border-top:1.5px solid var(--line)}

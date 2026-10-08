@@ -648,8 +648,10 @@ function liveBuild(box, c){
    мишень, нажатие ставит точку и открывает замечание; кнопка
    «согласовать». Отправленное замечание улетает точкой к кнопке
    «студия», на ней растет счетчик.
-   Роль видно по окну вокруг карты и панели: у студии — окно
-   программы с инструментами, у заказчика — браузер с адресом.
+   Под окном — подпись (не часть интерфейса): у студии — программа
+   на компьютере дизайнера, у заказчика — ссылка в браузере; у
+   заказчика окно в фиолетовой рамке. В студии — ТЗ носителя;
+   у заказчика поле замечания всегда открыто, точка — по желанию.
    Нажатие на метку — подлет вплотную, на плите настоящий макет;
    вблизи тянуть — обойти вокруг, стрелка назад — к карте.
    Подсказки: рука «нажимает» на метку, пока не нажали; вблизи —
@@ -667,6 +669,7 @@ const CI = {
   home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6M5 9v11h14V9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   hand: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.5 15a1.5 1.5 0 0 1 2.4-1.8L9 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   en: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
+  laptop: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 19h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
   back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   layers: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 5-9 5-9-5zM3 14l9 5 9-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
   ruler: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16L16 4l4 4L8 20zM8 12l2 2M11 9l2 2M14 6l2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>',
@@ -679,7 +682,6 @@ function campusHTML(c){
     <div class="nv-roles" role="tablist">${['studio', 'client'].map((m, i) =>
       `<button class="nv-role-btn${i ? '' : ' on'}" data-m="${m}" role="tab" aria-selected="${!i}">${CI[m]}<span>${H.T(c.modes[i])}</span>${i ? '' : '<b class="nv-badge" hidden>0</b>'}</button>`).join('')}</div>
     <div class="nv-device">
-      <div class="nv-titlebar" aria-hidden="true"><span class="nv-lights"><i></i><i></i><i></i></span><span class="nv-chrome"></span></div>
       <div class="nv-device-body">
         <div class="nv-scene">
           <canvas class="nv-cv"></canvas>
@@ -691,10 +693,11 @@ function campusHTML(c){
         <aside class="nv-panel"></aside>
       </div>
     </div>
+    <p class="nv-device-cap"></p>
   </div>`;
 }
 function liveCampus(box, c){
-  const cv = box.querySelector('.nv-cv'), panel = box.querySelector('.nv-panel'), chrome = box.querySelector('.nv-chrome'), root = box.querySelector('.nv-campus');
+  const cv = box.querySelector('.nv-cv'), panel = box.querySelector('.nv-panel'), cap = box.querySelector('.nv-device-cap'), root = box.querySelector('.nv-campus');
   const badge = box.querySelector('.nv-badge'), scene = box.querySelector('.nv-scene');
   const HOME = { yaw: .46, pitch: .7, dist: 680, tx: 0, ty: -20, tz: 0 };
   const cam = { ...HOME };
@@ -769,18 +772,31 @@ function liveCampus(box, c){
     (st.notes[b.id] || []).map((n, i) => n.done ? '' : `<span class="nv-dot" style="left:${n.x}%;top:${n.y}%">${i + 1}</span>`).join('')}${
     st.pin ? `<span class="nv-dot new" style="left:${st.pin.x}%;top:${st.pin.y}%">${(st.notes[b.id] || []).length + 1}</span>` : ''}${
     target && !st.pinned && !st.pin ? '<span class="nv-target" aria-hidden="true"></span>' : ''}</div>`;
+  // ТЗ носителя «для вида»: размеры, дистанция чтения, буквы, лимит строк, контраст и краски — из правил типа
+  const specHTML = b => {
+    const t = TYPES[b.type], tac = t.kind === 'tactile', L = c.spec;
+    const rows = [
+      [L.plate, `${t.width} × ${t.height} мм`],
+      [L.dist, tac ? H.pick(L.touch) : `${t.dist} м`],
+      [L.xh, `${tac ? CFG.tactileX : t.dist * CFG.K} мм`],
+      b.type === 'D2' ? [L.dirs, `до ${t.maxMsg}`] : [L.lines, `до ${t.maxLines}`],
+      [L.contrast, `от ${CFG.contrastMin}`],
+      [L.paint, tac ? 'RAL 1023 / 9004' : 'RAL 9004 / 9016'],
+    ];
+    return `<div class="nv-spec"><span class="nv-mini-label">${H.T(L.title)}</span><dl>${rows.map(([k, v]) => `<dt>${H.T(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`;
+  };
   const head = (b) => `<div class="nv-side-head"><span class="nv-type-ic" title="${esc(TYPES[b.type].name)}">${ICON[b.type]}</span><b>№${b.n}</b><span>${H.T(b.zone)}</span></div>`;
   function renderPanel(){
     const b = board(), notes = st.notes[b.id] || [], live = open(b.id);
-    chrome.innerHTML = st.mode === 'studio'
-      ? `<span class="nv-tools">${[CI.studio, CI.layers, CI.ruler, CI.export].map((ic, i) => `<i${i ? '' : ' class="on"'}>${ic}</i>`).join('')}</span>`
-      : `<span class="nv-url">${CI.lock}<span>${esc(H.pick(c.url))}</span></span>`;
+    // подпись под окном, не часть интерфейса: где открыта карта
+    cap.innerHTML = st.mode === 'studio' ? `${CI.laptop}<span>${H.T(c.studioCap)}</span>` : `${CI.link}<span>${H.T(c.clientCap)}</span>`;
     if (st.mode === 'studio') {
       const p = prepEdited(b);
       panel.innerHTML = `${head(b)}
         <div class="nv-side-body">${plateWithPins(b, 140, 220)}
           <div class="nv-edit">${p.ms.map((m, i) => `<label class="nv-pen${!i && !st.edited ? ' nudge' : ''}">${CI.studio}<input class="nv-line" data-i="${i}" value="${esc(m.ru)}" aria-label="${esc(H.pick(c.edit))}"></label>`).join('')}</div></div>
         <div class="nv-issues">${issueHTML(b)}</div>
+        ${specHTML(b)}
         ${live.length ? `<div class="nv-notes">${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p><button class="nv-round nv-resolve" data-i="${i}" aria-label="${esc(H.pick(c.resolve))}" title="${esc(H.pick(c.resolve))}">${CI.check}</button></div>`).join('')}</div>` : ''}`;
       panel.querySelectorAll('.nv-edit .nv-line').forEach(inp => inp.addEventListener('input', () => {
         st.edited = true; panel.querySelector('.nudge')?.classList.remove('nudge');
@@ -797,24 +813,28 @@ function liveCampus(box, c){
       const done = BOARDS.filter(x => st.status[x.id] === 'ok').length, ok = st.status[b.id] === 'ok';
       panel.innerHTML = `${head(b)}
         <div class="nv-client-plate">${plateWithPins(b, 190, 280, true)}</div>
-        ${st.pin ? `<div class="nv-bubble"><input class="nv-line" placeholder="${esc(H.pick(c.note))}" aria-label="${esc(H.pick(c.note))}"><button class="nv-round nv-send" aria-label="${esc(H.pick(c.send))}">${CI.send}</button></div>` : ''}
+        <div class="nv-bubble"><textarea class="nv-input" rows="2" placeholder="${esc(H.pick(c.note))}" aria-label="${esc(H.pick(c.note))}"></textarea><button class="nv-round nv-send" aria-label="${esc(H.pick(c.send))}">${CI.send}</button></div>
         ${live.length ? `<div class="nv-notes">${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p></div>`).join('')}</div>` : ''}
         <div class="nv-approve"><button class="btn nv-ok${ok ? ' on' : ''}">${CI.check}<span class="spell">${H.T(ok ? c.done : c.ok)}</span></button><span class="nv-count">${done}/${BOARDS.length}</span></div>`;
       panel.querySelector('.nv-pinbox').addEventListener('click', e => {
         const r = e.currentTarget.getBoundingClientRect();
         st.pin = { x: clamp((e.clientX - r.left) / r.width * 100, 4, 96), y: clamp((e.clientY - r.top) / r.height * 100, 4, 96) };
-        st.pinned = true; renderPanel(); panel.querySelector('.nv-bubble input').focus();
+        const draft = panel.querySelector('.nv-bubble textarea').value;
+        st.pinned = true; renderPanel();
+        const ta = panel.querySelector('.nv-bubble textarea'); ta.value = draft; ta.focus();
       });
       const send = () => {
-        const inp = panel.querySelector('.nv-bubble input'), v = inp.value.trim();
+        const inp = panel.querySelector('.nv-bubble textarea'), v = inp.value.trim();
         if (!v) return inp.focus();
-        const from = panel.querySelector('.nv-dot.new')?.getBoundingClientRect();
-        (st.notes[b.id] || (st.notes[b.id] = [])).push({ ...st.pin, t: v }); delete st.status[b.id];
+        // без точки замечание крепится в правый верхний угол таблички
+        const pin = st.pin || { x: 88, y: 8 };
+        const from = (panel.querySelector('.nv-dot.new') || panel.querySelector('.nv-pinbox'))?.getBoundingClientRect();
+        (st.notes[b.id] || (st.notes[b.id] = [])).push({ ...pin, t: v }); delete st.status[b.id];
         st.pin = null; renderPanel(); redraw();
         flyToStudio(from);
       };
       panel.querySelector('.nv-send')?.addEventListener('click', send);
-      panel.querySelector('.nv-bubble input')?.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+      panel.querySelector('.nv-bubble textarea').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
       panel.querySelector('.nv-ok').addEventListener('click', () => { st.status[b.id] = ok ? '' : 'ok'; st.pin = null; renderPanel(); redraw(); });
     }
   }
