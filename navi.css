@@ -109,16 +109,27 @@
 .nv-add{width:48px;height:48px;background:var(--soft);color:var(--ink)}
 .nv-add:hover{background:var(--ink);color:var(--bg);transform:rotate(90deg)}
 @media (prefers-reduced-motion:reduce){.nv-arrow.nudge::after,.nv-row,.nv-caret,.nv-pencil svg{animation:none!important}}
-@media (max-width:900px),(max-height:620px){
-  .nv-build{grid-template-columns:1fr;height:auto}
-  .nv-build-side{order:-1}
-  .nv-build-plate{height:min(80vh,620px)}
+/* планшет: заголовок сверху во всю ширину, под ним табличка и строки рядом; телефон: заголовок, табличка, строки */
+@media (max-width:1024px),(max-height:620px){
+  .nv-build{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"head head" "plate rows";height:auto;row-gap:28px;align-items:start}
+  .nv-build-side{display:contents}
+  .nv-build-side .nv-head{grid-area:head}
+  .nv-build-plate{grid-area:plate;height:min(72vh,600px)}
+  .nv-rows{grid-area:rows;align-self:center}
+  .nv-plate-box{width:min(100%,200px)}
+  .nv-info.wide .nv-plate-box{width:min(100%,280px)}
+  .nv-loupe{width:104px;height:104px;margin-top:-52px}
 }
-@media (max-width:560px){
-  .nv-plate-box{width:120px}
+@media (max-width:640px){
+  .nv-build{grid-template-columns:1fr;grid-template-areas:"head" "plate" "rows";row-gap:20px}
+  .nv-build-plate{height:min(54vh,460px);padding:16px}
+  .nv-plate-box{width:130px}
+  .nv-info.wide .nv-plate-box{width:min(62%,230px)}
   .nv-pencil{width:38px;height:38px;margin-top:-19px}
   .nv-type span{display:none}
   .nv-type{padding:0 12px}
+  .nv-type-note{margin-top:0}
+  .nv-loupe{width:92px;height:92px;margin-top:-46px}
 }
 
 /* ---------- 3D-кампус: две роли, разница без слов ---------- */

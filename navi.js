@@ -585,7 +585,7 @@ function liveBuild(box, c){
     const tr = range.getBoundingClientRect();
     const x = Math.min(tr.right, pr.right - 6) - ir.left + 2;
     caret.style.cssText = `left:${x}px;top:${r.top - ir.top}px;height:${r.height}px;background:${RAL[ink()][1]}`;
-    pencil.style.cssText = `left:${pr.right - ir.left + 14}px;top:${r.top - ir.top + r.height / 2}px`;
+    pencil.style.cssText = `left:${Math.min(pr.right - ir.left + 14, ir.width - (pencil.offsetWidth || 44))}px;top:${r.top - ir.top + r.height / 2}px`;
   }
   function render(){
     const t = TYPES[st.type], tac = t.kind === 'tactile';
@@ -617,7 +617,8 @@ function liveBuild(box, c){
     if (br) {
       const ir = info.getBoundingClientRect(), r = br.getBoundingClientRect(), pr = plateBox.querySelector('.nv-plate').getBoundingClientRect();
       loupe.firstElementChild.innerHTML = brailleSvg(items[0].ru, 90, v => (v * 5).toFixed(1) + 'px', RAL[ink()][1]);
-      loupe.style.cssText = `left:${pr.right - ir.left + 24}px;top:${r.top - ir.top + r.height / 2}px;--x:${r.left - pr.right - 24}px;background:${RAL[st.plate][1]}`;
+      // справа от таблички, а если места нет — заходит на ее край
+      loupe.style.cssText = `left:${Math.min(pr.right - ir.left + 24, ir.width - (loupe.offsetWidth || 132))}px;top:${r.top - ir.top + r.height / 2}px;--x:${r.left - pr.right - 24}px;background:${RAL[st.plate][1]}`;
     }
     info.classList.toggle('wide', st.type !== 'D2');   // табличка и тактильная шире указателя — иначе не видно Брайля
     placeHint(plateBox.querySelector('.nv-plate'));
