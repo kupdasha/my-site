@@ -3040,11 +3040,14 @@ function sendGameContact(contact, data = {}){
   const bad = () => [...f.querySelectorAll('.js-errorbox-all, .t-form__errorbox-wrapper')].some(vis);
   f.addEventListener('tildaform:aftersuccess', () => { done = true; }, { once: true });
   window.jQuery?.(f).one?.('tildaform:aftersuccess', () => { done = true; });
+  const captcha = () => [...document.querySelectorAll('.tildaformcaptchabox')].some(b => getComputedStyle(b).display !== 'none' && b.offsetHeight > 0);
   return new Promise((resolve, reject) => {
-    const t0 = Date.now();
+    let t0 = Date.now();
     (f.querySelector('[type="submit"], .t-submit') || {}).click?.();
     const iv = setInterval(() => {
       if (ok()) { clearInterval(iv); document.querySelectorAll('.t-form-success-popup').forEach(p => { p.style.display = 'none'; }); document.body.classList.remove('t-body_success-popup-showed'); setTimeout(() => root.classList.remove('kd-sending'), 300); resolve(); }
+      // если Тильда показала проверку «я не робот» (бывает после нескольких заявок подряд), ждем, пока посетитель ее пройдет
+      else if (captcha()) { t0 = Date.now(); }
       else if (bad() || Date.now() - t0 > 12000) { clearInterval(iv); root.classList.remove('kd-sending'); reject(new Error('форма Тильды не приняла заявку')); }
     }, 200);
   });
