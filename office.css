@@ -28,7 +28,8 @@
 /* сцена в половину ширины: рисунок с одной стороны, текст с другой */
 .ro-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
 .ro-split > .ro-viz{grid-column:1 / span 7}
-.ro-side{grid-column:9 / -1;display:flex;flex-direction:column;gap:20px}
+.ro-side{grid-column:9 / -1;display:flex;flex-direction:column;gap:20px;min-width:0}
+.ro-side .ro-title{overflow-wrap:break-word}
 .ro-split.rev > .ro-viz{grid-column:6 / -1;order:2}
 .ro-split.rev > .ro-side{grid-column:1 / span 4}
 .ro-side .ro-title{font-size:clamp(30px,3.2vw,48px);max-width:none}
@@ -152,61 +153,36 @@
 .ro-net .pk-out{fill:var(--ink)}
 .ro-net .ring{fill:none;stroke:var(--ink);stroke-width:2.4}
 
-/* ---------- comb: кнопка «причесать» ---------- */
-.ro-combst{padding:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,40px)}
-.ro-scenes{position:relative;aspect-ratio:16/10.5}
-@media (max-width:640px){.ro-scenes{aspect-ratio:4/3.6}}
-.sc{position:absolute;inset:0;min-width:0}
-/* «причесать»: холст, файл падает, всё встает ровно */
-.sc-comb{display:flex;flex-direction:column}
-.ro-canvas{position:relative;flex:1;margin:clamp(10px,1.6vw,18px) clamp(10px,1.6vw,18px) 0}
-.ro-file{position:absolute;left:50%;top:40%;width:clamp(34px,4vw,48px);aspect-ratio:3/4;margin-left:calc(clamp(34px,4vw,48px) / -2);border-radius:4px;background:var(--ro-slide);
-  opacity:0;transform:translateY(-60px)}
-.sc-comb[data-v="table"] .ro-file{background:var(--ro-sheet)}
-.sc-comb.drop:not(.ugly) .ro-file{opacity:1;transform:none;transition:opacity .3s,transform .6s var(--ease)}
-.sc-comb.ugly .ro-file{opacity:0;transform:scale(1.6);transition:opacity .3s,transform .4s}
-/* схема: неряшливо — кривые яркие блоки с жирной рамкой, ровно — сетка, тонкие связи */
-.bx{position:absolute;left:var(--ux);top:var(--uy);width:var(--uw);height:var(--uh);transform:rotate(var(--ur));display:flex;flex-direction:column;justify-content:center;gap:8px;padding:0 clamp(8px,1.2vw,16px);  border:3px solid #111;border-radius:2px;opacity:0;transition:left .8s var(--ease-io) calc(var(--k) * 60ms),top .8s var(--ease-io) calc(var(--k) * 60ms),width .8s var(--ease-io) calc(var(--k) * 60ms),
-  height .8s var(--ease-io) calc(var(--k) * 60ms),transform .8s var(--ease-io) calc(var(--k) * 60ms),background .6s,border-color .6s,border-radius .6s,box-shadow .6s,opacity .3s}
-.bx:nth-of-type(1){background:#3A6FF7}.bx:nth-of-type(2){background:#F2E14B}.bx:nth-of-type(3){background:#E83FA0}.bx:nth-of-type(4){background:#6BD16B}.bx:nth-of-type(5){background:#9B9B9B}
-.bx i{display:block;height:7px;border-radius:2px;background:#111;width:80%;align-self:center;transition:background .6s,width .6s,align-self .6s}
-.bx i.s{width:50%}
-.sc-comb[data-v="chart"].ugly .bx{opacity:1}
-.sc-comb.neat .bx{left:var(--nx);top:var(--ny);width:var(--nw);height:var(--nh);transform:none;background:var(--bg);border:1.5px solid var(--line);border-left:5px solid var(--ro-slide);border-radius:8px;
-  box-shadow:0 10px 24px -18px rgba(20,24,32,.35)}
-.sc-comb.neat .bx:nth-of-type(3){border-left-color:var(--ink)}
-.sc-comb.neat .bx i{background:var(--ink);align-self:flex-start;width:70%}
-.sc-comb.neat .bx i.s{background:var(--line);width:46%}
-.lk{position:absolute;inset:0;width:100%;height:100%;fill:none;overflow:visible}
-.lk path{vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
-.lk.ugly path{stroke:#111;stroke-width:4}
-.lk.ugly{opacity:0;transition:opacity .3s}
-.sc-comb[data-v="chart"].ugly:not(.neat) .lk.ugly{opacity:1}
-.lk.neat path{stroke:var(--ro-slide);stroke-width:2;stroke-dasharray:1;stroke-dashoffset:1}
-.sc-comb[data-v="chart"].neat .lk.neat path{stroke-dashoffset:0;transition:stroke-dashoffset .9s var(--ease) .6s}
-/* таблица из Excel: жирные рамки и пестрые ячейки → шапка, зебра, тонкие линии */
-.ro-tab{position:absolute;left:8%;right:8%;top:8%;bottom:8%;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;grid-auto-rows:1fr;gap:0;
-  border:3px solid #111;transform:rotate(-2deg);opacity:0;transition:transform .8s var(--ease-io),border-color .6s,border-radius .6s,opacity .3s}
-.ro-tab .c{display:flex;align-items:center;padding:0 clamp(6px,1vw,12px);border:2px solid #111;transition:background .6s,border-color .6s}
-.ro-tab .c:nth-child(3n){background:#F2E14B}.ro-tab .c:nth-child(5n+1){background:#E83FA0}.ro-tab .c:nth-child(7n+2){background:#3A6FF7}
-.ro-tab .c i{display:block;width:70%;height:6px;border-radius:2px;background:#111;transition:background .6s,width .6s}
-.ro-tab .c:nth-child(4n+1) i{width:90%}
-.sc-comb[data-v="table"].ugly .ro-tab{opacity:1}
-.sc-comb.neat .ro-tab{transform:none;border-color:var(--line);border-width:1.5px;border-radius:8px;overflow:hidden}
-.sc-comb.neat .ro-tab .c{background:var(--bg);border:0;border-bottom:1px solid var(--line)}
-.sc-comb.neat .ro-tab .c:nth-child(-n+4){background:var(--ro-slide)}
-.sc-comb.neat .ro-tab .c:nth-child(-n+4) i{background:#fff;opacity:.9}
-.sc-comb.neat .ro-tab .c:nth-child(8n+5),.sc-comb.neat .ro-tab .c:nth-child(8n+6),.sc-comb.neat .ro-tab .c:nth-child(8n+7),.sc-comb.neat .ro-tab .c:nth-child(8n+8){background:var(--soft)}
-.sc-comb.neat .ro-tab .c i{background:var(--line)}
-.sc-comb.neat .ro-tab .c:nth-child(4n+1) i{background:var(--ink);width:70%}
-/* полоса снизу с кнопкой «причесать» */
-.ro-cbar{display:flex;justify-content:flex-end;padding:clamp(10px,1.4vw,16px) clamp(10px,1.6vw,18px)}
-.ro-comb{display:inline-flex;align-items:center;gap:8px;padding:8px 16px 9px 12px;border-radius:99px;background:var(--ro-mark);color:#1D222A;font-size:16px;font-weight:500;line-height:1;
-  transition:transform .2s var(--ease)}
+/* ---------- comb: кнопка «причесать» — страшная таблица становится понятной ---------- */
+/* без фона и окна: таблица и под ней кнопка; всё пастельное */
+.ro-combst{background:none;overflow:visible;display:flex;flex-direction:column;align-items:center;gap:clamp(18px,2.4vw,28px);padding:clamp(8px,1.6vw,20px) 0}
+.ro-tbl{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;width:min(100%,560px);border:3px solid #7E8492;transform:rotate(-1.6deg);
+  transition:transform .9s var(--ease-io),border-color .7s,border-width .7s,border-radius .7s,box-shadow .7s}
+.ro-tbl .c{display:flex;align-items:center;height:clamp(34px,4vw,48px);padding:0 clamp(8px,1vw,14px);border:2px solid #7E8492;background:#fff;
+  transition:background .7s,border-color .7s}
+/* пестро: заливки вразнобой */
+.ro-tbl .c:nth-child(3n+1){background:#F7C9D6}.ro-tbl .c:nth-child(5n+2){background:#C9DBFB}.ro-tbl .c:nth-child(7n+3){background:#E9F5A8}
+.ro-tbl .c:nth-child(11n+4){background:#CDEFDB}
+.ro-tbl .c i{display:block;width:var(--w);height:7px;border-radius:2px;background:#7E8492;transition:width .7s var(--ease-io),margin .7s var(--ease-io),background .7s,height .7s}
+/* текст скачет: то слева, то по центру, то справа */
+.ro-tbl .a-c i{margin:0 auto}.ro-tbl .a-r i{margin-left:auto}.ro-tbl .a-l i{margin-right:auto}
+/* причесано: ровно, тонкие линии, пастельная шапка, легкая зебра; названия слева, числа справа одной длины */
+.neat .ro-tbl{transform:none;border:1.5px solid #E6E8EE;border-radius:12px;overflow:hidden;box-shadow:0 16px 40px -28px rgba(60,70,110,.35)}
+.neat .ro-tbl .c{background:#fff;border:0;border-bottom:1px solid #EEF0F4}
+.neat .ro-tbl .c:nth-child(-n+4){background:#E4ECFB}
+.neat .ro-tbl .c:nth-child(8n+5),.neat .ro-tbl .c:nth-child(8n+6),.neat .ro-tbl .c:nth-child(8n+7),.neat .ro-tbl .c:nth-child(8n+8){background:#F8F9FC}
+.neat .ro-tbl .c:nth-last-child(-n+4){border-bottom:0}
+.neat .ro-tbl .c i{background:#D9DDE6;height:6px;border-radius:3px;margin:0 auto 0 0}
+.neat .ro-tbl .c.n i{width:44%;margin:0 0 0 auto;background:#C7CDD9}
+.neat .ro-tbl .c:nth-child(-n+4) i{background:#9DB4E4}
+.neat .ro-tbl .c:nth-child(4n+1):not(:nth-child(1)) i{background:#AEB5C3}
+/* кнопка «причесать» — светло-лаймовая, нажимается сама */
+.ro-comb{display:inline-flex;align-items:center;gap:8px;padding:9px 18px 10px 14px;border-radius:99px;background:#EDF7C9;color:#5E7417;font-size:16px;font-weight:500;line-height:1;
+  transition:transform .2s var(--ease),background .3s}
 .ro-comb svg{width:18px;height:18px;fill:currentColor}
-.ro-comb.hit{transform:scale(.92)}
-.sc-comb .ro-hand{opacity:0;transition:opacity .3s}
-.sc-comb.hand .ro-hand{opacity:1}
+.ro-comb.hit{transform:scale(.9);background:#DDEFA0}
+:root[data-theme="dark"] .ro-tbl .c,:root[data-theme="dark"] .neat .ro-tbl .c{background:#fff}
+:root[data-theme="dark"] .neat .ro-tbl .c:nth-child(-n+4){background:#E4ECFB}
 
 /* ---------- html: презентация лендингом на трех экранах, легкий файл уходит по почте и в мессенджер ---------- */
 .ro-htst{padding:clamp(24px,3.6vw,52px) clamp(14px,2.6vw,40px) clamp(20px,3vw,40px)}

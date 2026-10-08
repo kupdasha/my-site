@@ -7,9 +7,9 @@
    side — одно окно, внутри рядом готовые шаблоны: заявление в Word,
    смета со значками счетчиков и итогом по формуле, презентация;
    курсор переносит итог сметы в график и в заявление;
-   comb — кнопка «причесать»: на холст падает неряшливая схема из
-   PowerPoint или пестрая таблица из Excel, курсор жмет кнопку —
-   всё встает ровно;
+   comb — кнопка «причесать»: страшная таблица (жирные рамки, пестрые
+   ячейки, вкривь) после нажатия становится аккуратной и понятной —
+   пастельная шапка, ровные строки; без фона, минимум объектов;
    html — вкладка HTML: презентация с анимацией становится лендингом
    и сама подстраивается под ноутбук, планшет и телефон; файл легкий,
    уходит по почте и в мессенджеры, открывается без интернета;
@@ -289,64 +289,27 @@ function liveClosed(box){
 }
 
 /* ================================================================
-   comb — кнопка «причесать»: неряшливая схема или таблица встают ровно
+   comb — кнопка «причесать»: страшная таблица становится понятной
    ================================================================ */
-// пять блоков схемы — неряшливо (u…) и ровно (n…), в процентах холста
-const BOXES = [
-  { u: [2, 5, 30, 22, -6], n: [5, 12, 24, 28] },
-  { u: [14, 60, 20, 30, 4], n: [5, 60, 24, 28] },
-  { u: [42, 22, 20, 32, -3], n: [38, 30, 24, 40] },
-  { u: [66, 6, 32, 20, 7], n: [71, 12, 24, 28] },
-  { u: [72, 58, 22, 34, -9], n: [71, 60, 24, 28] },
-];
-function boxStyle(b){
-  const [ux, uy, uw, uh, ur] = b.u, [nx, ny, nw, nh] = b.n;
-  return `--ux:${ux}%;--uy:${uy}%;--uw:${uw}%;--uh:${uh}%;--ur:${ur}deg;--nx:${nx}%;--ny:${ny}%;--nw:${nw}%;--nh:${nh}%`;
-}
+// 5 строк × 4 столбца: первый — названия, остальные — числа; у каждой ячейки длина строки своя,
+// в страшной таблице текст скачет (слева, по центру, справа), в причесанной — названия слева, числа справа
+const COMB_W = [[54, 40, 46, 38], [70, 34, 52, 44], [48, 58, 30, 50], [62, 44, 40, 56], [44, 50, 60, 36]];
+const COMB_AL = ['c', 'r', 'l', 'c', 'r', 'l', 'l', 'c', 'r', 'r', 'c', 'l', 'l', 'r', 'c', 'c', 'r', 'l', 'c', 'l'];
 function combHTML(c){
-  const cells = Array.from({ length: 20 }, (_, k) => `<span class="c" style="--k:${k}"><i></i></span>`).join('');
+  const cells = COMB_W.flatMap((row, r) => row.map((w, k) =>
+    `<span class="c a-${COMB_AL[r * 4 + k]}${k ? ' n' : ''}"><i style="--w:${w}%"></i></span>`)).join('');
   return `<div class="ro-stage ro-combst">
-    <div class="ro-app ro-tw ro-m-slide">
-      <div class="ro-bar"><b></b></div>
-      <div class="ro-scenes">
-        <div class="sc sc-comb" data-v="chart">
-          <div class="ro-canvas">
-            <span class="ro-file"></span>
-            <svg class="lk ugly" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M17 16L52 38M24 75L50 42M56 36L82 16M58 46L83 75"/></svg>
-            <svg class="lk neat" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M29 26H33.5V45H38M29 74H33.5V55H38M62 45H66.5V26H71M62 55H66.5V74H71"/></svg>
-            ${BOXES.map((b, k) => `<div class="bx" style="${boxStyle(b)};--k:${k}"><i></i><i class="s"></i></div>`).join('')}
-            <div class="ro-tab">${cells}</div>
-          </div>
-          <div class="ro-cbar"><span class="ro-comb">${SPARK}<span>${H.T(c.btn)}</span></span></div>
-          <div class="ro-hand">${CURSOR}</div>
-        </div>
-      </div>
-    </div>
+    <div class="ro-tbl">${cells}</div>
+    <span class="ro-comb">${SPARK}<span>${H.T(c.btn)}</span></span>
   </div>`;
 }
 function liveComb(box){
-  const comb = box.querySelector('.sc-comb');
-  const hand = comb.querySelector('.ro-hand'), btn = comb.querySelector('.ro-comb');
-  if (still()) { comb.classList.add('ugly', 'neat'); return; }
-  const move = (el, ms) => {
-    const [x, y] = at(el, comb, .5, .6);
-    hand.style.transition = `transform ${ms}ms var(--ease-io), opacity .3s`;
-    hand.style.transform = `translate(${x}px,${y}px)`;
-    return wait(ms);
-  };
-  // файл падает на холст, появляется как есть, курсор жмет «причесать» — всё встает ровно; сначала схема, потом таблица
-  let v = 'table';
-  cycle(comb, [
-    async () => {
-      v = v === 'chart' ? 'table' : 'chart';
-      comb.classList.remove('neat', 'ugly', 'drop', 'hand'); comb.dataset.v = v;
-      hand.style.transition = 'none'; hand.style.transform = `translate(${comb.clientWidth * .3}px,${comb.clientHeight * .95}px)`;
-      await wait(250); comb.classList.add('drop'); await wait(700);
-    },
-    async () => { comb.classList.add('ugly'); await wait(1400); },
-    async () => { comb.classList.add('hand'); await move(btn, 800);
-      hand.classList.add('press'); btn.classList.add('hit'); await wait(180); hand.classList.remove('press'); btn.classList.remove('hit');
-      comb.classList.add('neat'); comb.classList.remove('hand'); await wait(2800); },
+  const st = box.querySelector('.ro-combst'), btn = st.querySelector('.ro-comb');
+  if (still()) { st.classList.add('neat'); return; }
+  cycle(st, [
+    async () => { st.classList.remove('neat'); await wait(2000); },                                   // страшная таблица
+    async () => { btn.classList.add('hit'); await wait(220); btn.classList.remove('hit');              // нажали «причесать»
+      st.classList.add('neat'); await wait(3400); },                                                  // аккуратная и понятная
   ], .35);
 }
 
