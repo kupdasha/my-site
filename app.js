@@ -879,7 +879,7 @@ function renderWorks(){
     const ratio = p.cardRatio || p.ratio || (legacyVideo(p) || size === 'большой' ? '16/9' : '16/10');   // у видео всегда 16:9
     return `
     <button class="work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}" data-k="${k}" data-reveal${p.cardWidth ? ` style="--cw:${p.cardWidth}"` : ''}>
-      <span class="media${p.cardRatio ? ' whole' : ''}" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
+      <span class="media${p.cardRatio ? ' whole' : ''}" style="aspect-ratio:${ratio}">${mediaHTML(p)}${p.wip ? `<span class="work-wip">${T(W.wip)}</span>` : ''}</span>
       <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}
     </button>`;
@@ -889,7 +889,7 @@ function renderWorks(){
   $('#otherWorks').hidden = !other.length;
   // между строками — струны: в серьезной версии это просто линии, в веселой они звенят и светятся радугой
   $('#otherList').innerHTML = STRING_HTML + other.map(([p, k]) =>
-    `<button class="article" data-k="${k}"><span class="article-source">${T(p.tag || [].concat(p.cat)[0])}</span><span class="article-title">${T(p.title)}${yearHTML(p)}</span><span class="go">${ARROW}</span></button>${STRING_HTML}`).join('');
+    `<button class="article" data-k="${k}"><span class="article-source">${T(p.tag || [].concat(p.cat)[0])}</span><span class="article-title">${T(p.title)}${yearHTML(p)}${p.wip ? `<span class="work-wip">${T(SITE.works.wip)}</span>` : ''}</span><span class="go">${ARROW}</span></button>${STRING_HTML}`).join('');
   collectStrings();
   dispatchEvent(new CustomEvent('strings:rendered'));
 }
