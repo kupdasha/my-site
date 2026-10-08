@@ -100,7 +100,10 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
 :root[data-mode="fun"] .actions .btn::before{background:var(--btn)}
 :root[data-mode="fun"] .actions .btn:hover::before{background:var(--btn-hover)}
 :root[data-mode="fun"] .soc a::before{background:var(--brand)}
-:root[data-mode="fun"] .soc a:is([href*="tiktok"],[href*="unsplash"])::before{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+/* веселая версия (просьба 08.10): Unsplash — белая плитка с черным текстом, TikTok — розово-бирюзовый, как в логотипе; ножки в тон */
+:root[data-mode="fun"] .soc a[href*="unsplash"]{--brand:#FFFFFF;--brand-text:#111111;--legc:#FFFFFF}
+:root[data-mode="fun"] .soc a[href*="tiktok"]{--brand:linear-gradient(120deg,#25F4EE 8%,#A99BF5 50%,#FE2C55 92%);--brand-text:#0E0F12;--legc:#25F4EE}
+:root[data-mode="fun"] .soc a[href*="tiktok"] .legs i:nth-child(even){--legc:#FE2C55}
 
 .legal{position:relative;z-index:1;max-width:330px;margin:calc(14px*var(--k)) auto 0;font-size:11px;line-height:1.3;color:var(--muted);text-align:center;text-wrap:balance}
 
