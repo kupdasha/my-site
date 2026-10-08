@@ -133,6 +133,7 @@ about_service_html = between('<!-- Кнопка «Связаться»', '<scrip
 # стили пишутся сразу и, если номер оказался новее, тихо заменяются. На проверочной странице KUP_BASE = '../'.
 LOADER = ("<script>(function(){if(window.KUP)return;"
           "var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',"
+          "W='https://kup-version.kupdaria26.workers.dev/',"
           "V='https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t=',"
           "N='kup-sha',c=null,q=[],done=0,now=Date.now();"
           "try{c=JSON.parse(localStorage.getItem(N))}catch(e){}"
@@ -141,9 +142,10 @@ LOADER = ("<script>(function(){if(window.KUP)return;"
           "function get(u,h,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=ms;"
           "x.onload=function(){var s=(x.status==200&&x.responseText||'').trim();cb(/^[0-9a-f]{40}$/.test(s)?s:null)};"
           "x.onerror=x.ontimeout=function(){cb(null)};x.send()}"
-          # номер свежей версии: служебная ветка version на raw.githubusercontent (без лимита и кеша, пишет tilda/warm.sh),
-          # если не ответила — GitHub API (60 запросов в час с адреса)
-          "function ask(ms,cb){get(V+now,0,ms,function(s){s?cb(s):get('https://api.github.com/repos/kupdasha/my-site/commits/main','application/vnd.github.sha',ms,cb)})}"
+          # номер свежей версии: 1) воркер kup-version (tilda/version-worker) — читает main прямо из git, мгновенно и без лимита;
+          # 2) GitHub API — мгновенно, но 60 запросов в час с адреса; 3) служебная ветка version на raw.githubusercontent
+          # (пишет tilda/warm.sh) — без лимита, но с задержкой до 5 минут
+          "function ask(ms,cb){get(W,0,ms,function(s){s?cb(s):get('https://api.github.com/repos/kupdasha/my-site/commits/main','application/vnd.github.sha',ms,function(s){s?cb(s):get(V+now,0,ms,cb)})})}"
           "function put(f){var s=document.createElement('script');s.src=base+f;s.async=false;document.head.appendChild(s)}"
           "function go(s){if(done)return;done=1;"
           "if(s){keep(s);if(!(c&&c.s===s)){var old=base;base=K.base=R+s+'/';"
