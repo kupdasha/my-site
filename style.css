@@ -1927,3 +1927,17 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 :root[data-theme="dark"] .nda-more+.nda-cta{margin-top:clamp(40px,5vw,64px)}
 /* картинка-обложка под роликом: пока ролик играет, ее не видно */
 .media.vplay>img{visibility:hidden}
+
+/* игра: галочки согласия под полем контакта (152-ФЗ) */
+.ttt-consent{flex-basis:100%;display:flex;flex-direction:column;gap:10px;margin-top:8px;text-align:left;max-width:520px;margin-inline:auto}
+.ttt-consent label{display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.35;cursor:pointer}
+.ttt-consent input{flex:none;width:22px;height:22px;margin:0;accent-color:var(--accent,#E2FB5A);cursor:pointer}
+.ttt-consent a{color:inherit;text-decoration:underline;text-underline-offset:.2em}
+/* окно с текстом согласия */
+.consent-doc{max-width:min(640px,calc(100vw - 32px));max-height:80vh;overflow:auto;padding:32px;border:0;border-radius:24px;background:var(--bg);color:var(--ink)}
+.consent-doc::backdrop{background:rgba(14,15,18,.55)}
+.consent-doc h3{font-weight:500;font-size:24px;margin:0 0 16px}
+.consent-doc p{font-size:16px;line-height:1.5;margin:0 0 12px}
+.consent-doc .btn{margin-top:12px}
+/* спрятанная форма Тильды, через которую уходит контакт из игры (поле kd_contact): на странице ее не видно */
+.t-rec:has(input[name="kd_contact"]){position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;pointer-events:none}

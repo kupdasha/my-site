@@ -2889,7 +2889,12 @@ function renderGame(status){
   const G = SITE.game, box = $('#ttt');
   const w = winnerOf(board);
   let after = '';
-  if (w && w.who === 'x') after = `<form class="ttt-form" id="tttForm"><input class="ttt-input" name="contact" required placeholder="${G.field}" aria-label="${G.field}"><button class="btn btn-accent"><span class="spell">${T(G.send)}</span><span class="arr">→</span></button></form>`;
+  // две галочки по 152-ФЗ: без них форма не отправится; ссылка «согласие» открывает его текст, «политика» — страницу политики
+  const agree = G.agree ? `<div class="ttt-consent">
+      <label><input type="checkbox" name="agree" required><span>${T(G.agree[0])}<a href="#" class="ttt-doc">${T(G.agree[1])}</a></span></label>
+      <label><input type="checkbox" name="policy" required><span>${T(G.policy[0])}<a href="${G.policyLink}" target="_blank" rel="noopener">${T(G.policy[1])}</a></span></label>
+    </div>` : '';
+  if (w && w.who === 'x') after = `<form class="ttt-form" id="tttForm"><input class="ttt-input" name="contact" required placeholder="${G.field}" aria-label="${G.field}"><button class="btn btn-accent"><span class="spell">${T(G.send)}</span><span class="arr">→</span></button>${agree}</form>`;
   if (w && w.who !== 'x') after = `<a class="btn btn-accent" href="${SITE.telegram}"><span class="spell">${T(G.write)}</span><span class="arr">→</span></a>`;
   box.innerHTML = `
     <h3 class="ttt-title"><span class="iris" data-t="${G.title}">${T(G.title)}</span></h3>
@@ -2922,13 +2927,60 @@ $('#ttt').addEventListener('click', e => {
     if (!finish()) renderGame(SITE.game.yourTurn);
   }, 650);
 });
+/* КОНТАКТ ИЗ ИГРЫ уходит заявкой через спрятанную форму Тильды (блок в «Подвале» с полем kd_contact):
+   Тильда сама отправит ее туда, куда подключены формы, — в Tilda CRM, на почту, в Telegram.
+   Если такой формы на странице нет (прототип) или она не ответила, — как раньше: готовое сообщение в Telegram */
+function tildaGameForm(){
+  const inp = document.querySelector('form input[name="kd_contact"]');
+  return inp ? inp.closest('form') : null;
+}
+function sendGameContact(contact){
+  const f = tildaGameForm();
+  if (!f) return Promise.reject(new Error('нет формы Тильды'));
+  const set = (name, v) => { const el = f.querySelector(`[name="${name}"]`); if (el) { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } };
+  set('kd_contact', contact);
+  set('kd_source', 'крестики-нолики на сайте: победа посетителя');
+  f.querySelectorAll('input[type="checkbox"]').forEach(c => { if (!c.checked) c.click(); });   // галочки посетитель уже отметил в игре
+  const ok = () => f.classList.contains('js-send-form-success') || [...f.querySelectorAll('.js-successbox, .t-form__successbox')].some(b => b.offsetParent || getComputedStyle(b).display !== 'none');
+  return new Promise((resolve, reject) => {
+    const t0 = Date.now();
+    (f.querySelector('[type="submit"], .t-submit') || {}).click?.();
+    const iv = setInterval(() => {
+      if (ok()) { clearInterval(iv); resolve(); }
+      else if (Date.now() - t0 > 9000) { clearInterval(iv); reject(new Error('форма Тильды не ответила')); }
+    }, 250);
+  });
+}
 $('#ttt').addEventListener('submit', e => {
   e.preventDefault();
-  const contact = e.target.contact.value.trim();
+  const G = SITE.game, form = e.target, contact = form.contact.value.trim();
   if (!contact) return;
-  // контакт уходит Даше в Telegram готовым сообщением — посетителю остается нажать «отправить»
-  location.href = `${SITE.telegram}?text=${encodeURIComponent(SITE.game.message + contact)}`;
-  $('.ttt-status').innerHTML = T(SITE.game.sent);
+  const status = $('.ttt-status'), btn = form.querySelector('.btn');
+  btn.disabled = true; status.innerHTML = T(G.sending || '');
+  sendGameContact(contact).then(() => {
+    status.innerHTML = T(G.sent);
+    form.remove();
+  }).catch(() => {
+    // запасной путь: контакт уходит в Telegram готовым сообщением — посетителю остается нажать «отправить»
+    btn.disabled = false;
+    if (!tildaGameForm()) { location.href = `${SITE.telegram}?text=${encodeURIComponent(G.message + contact)}`; status.innerHTML = T(G.sent); }
+    else status.innerHTML = `${T(G.failed)} <a href="${SITE.telegram}?text=${encodeURIComponent(G.message + contact)}">Telegram</a>`;
+  });
+});
+// текст согласия — в окне поверх страницы
+$('#ttt').addEventListener('click', e => {
+  if (!e.target.closest('.ttt-doc')) return;
+  e.preventDefault();
+  const G = SITE.game;
+  let d = document.getElementById('consentDoc');
+  if (!d) {
+    d = document.createElement('dialog'); d.id = 'consentDoc'; d.className = 'consent-doc';
+    d.innerHTML = `<h3>${T(G.consentTitle)}</h3>${G.consentDoc.map(t => `<p>${T(t)}</p>`).join('')}<button class="btn" type="button"><span>${T(G.close)}</span></button>`;
+    d.querySelector('button').addEventListener('click', () => d.close());
+    d.addEventListener('click', ev => { if (ev.target === d) d.close(); });
+    document.body.appendChild(d);
+  }
+  d.showModal();
 });
 
 
