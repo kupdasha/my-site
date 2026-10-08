@@ -2426,6 +2426,8 @@ function renderCase(k, keepScroll){
   if (p.navi) body += `<div class="nv nv-mount"></div>`;
   // anon — анонимайзер: слово меняется на выдуманное той же длины, документ до и после, что чистится внутри файла, возврат; рисует anon.js
   if (p.anon) body += `<div class="an an-mount"></div>`;
+  // poll — интерактивные презентации: лес рук и телефоны, вход по QR и коду, облако / график / рейтинг, свой PDF, без интернета; рисует poll.js
+  if (p.poll) body += `<div class="pl pl-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2538,6 +2540,10 @@ function renderCase(k, keepScroll){
   if (an) import(SCRIPT_BASE + 'anon.js?v=' + VER)
     .then(m => m.mountAnon(an, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс анонимайзера не загрузился', err));
+  const pl = caseContent.querySelector('.pl-mount');
+  if (pl) import(SCRIPT_BASE + 'poll.js?v=' + VER)
+    .then(m => m.mountPoll(pl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс интерактивных презентаций не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
   if (vp) import(SCRIPT_BASE + 'vkplay.js?v=' + VER)
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))
