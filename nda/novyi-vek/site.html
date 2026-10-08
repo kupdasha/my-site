@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Новый век — прототип сайта</title>
-<script src="../nda.js"></script>
+<script src="../nda.js?v=14"></script>
 <script>/* прототип тоже под паролем: без пароля — на страницу проекта, там замок */
 (function(){var ok=!!window.NDA_EMBED;try{ok=ok||sessionStorage.getItem('nda-pass')===NDA.PASS||localStorage.getItem('nda-pass')===NDA.PASS}catch(e){} if(!ok) location.replace('./');})();
 if('scrollRestoration' in history) history.scrollRestoration='manual';</script>
@@ -864,6 +864,7 @@ function buildNews(){
   $('.ngrid').innerHTML=DATA.news.map(function(n,i){
     return '<a class="ncard" href="#news" style="animation-delay:'+(i*0.09+0.15)+'s"><div class="im"><img src="'+n.img+'" alt=""></div><div class="d">'+n.date+'</div><h4>'+n.title+'</h4><p>'+n.text+'</p><span class="more">читать полностью</span></a>';
   }).join('');
+  if(window.nvTypoDom) nvTypoDom($('.ngrid'));
   $$('.ncard').forEach(function(c){
     c.addEventListener('mousemove',function(e){ var r=c.getBoundingClientRect(); c.style.setProperty('--px',((e.clientX-r.left)/r.width-.5)*-14+'px'); c.style.setProperty('--py',((e.clientY-r.top)/r.height-.5)*-10+'px'); });
     c.addEventListener('mouseleave',function(){ c.style.setProperty('--px','0px'); c.style.setProperty('--py','0px'); });
@@ -975,6 +976,7 @@ function startDemo(){
 
 document.documentElement.classList.add('loaded');
 show();
+if(window.nvTypoDom) nvTypoDom(document.body);
 if(DEMO) startDemo();
 })();
 </script>

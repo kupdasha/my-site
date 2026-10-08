@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Spectral:wght@300;400&family=Onest:wght@100..900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../nda.css?v=13">
-<link rel="stylesheet" href="case/case.css?v=13">
+<link rel="stylesheet" href="../nda.css?v=14">
+<link rel="stylesheet" href="case/case.css?v=14">
 </head>
 <body>
 <!-- Страница проекта «Новый век» внутри раздела NDA. Тексты — в ../nda.js (NDA.novyiVek), прототип — site.html -->
@@ -31,7 +31,7 @@
     <div class="head"><h2 data-t="protoTitle"></h2><p class="mute" data-t="protoText"></p></div>
     <div class="ptabs"></div>
     <div class="frame"><iframe title="Прототип сайта «Новый век»" loading="lazy"></iframe></div>
-    <a class="full" href="site.html?v=13" data-t="full"></a>
+    <a class="full" href="site.html?v=14" data-t="full"></a>
   </section>
 
   <div class="lives"></div>
@@ -45,10 +45,10 @@
 
   <div class="end"><a href="../">← <span data-t="back"></span></a></div>
 </div>
-<script src="../nda.js?v=13"></script>
+<script src="../nda.js?v=14"></script>
 <script src="https://cdn.jsdelivr.net/npm/flubber@0.4.2/build/flubber.min.js"></script>
-<script src="case/logo-data.js?v=13"></script>
-<script src="case/case.js?v=13"></script>
+<script src="case/logo-data.js?v=14"></script>
+<script src="case/case.js?v=14"></script>
 <script>
 ndaGate(function(){
   try{ nvCase(); }catch(e){ console.error(e); }
@@ -62,7 +62,7 @@ ndaGate(function(){
 
   /* прототип: вкладки переключают страницы внутри окна */
   var frame = $('.frame iframe');
-  frame.src = 'site.html?v=13#main';
+  frame.src = 'site.html?v=14#main';
   $('.ptabs').innerHTML = T.tabs.map(function(t,i){return '<button data-go="'+t.go+'"'+(i===0?' class="on"':'')+'>'+t.label+'</button>'}).join('');
   var tabs = document.querySelectorAll('.ptabs button');
   function mark(go){ tabs.forEach(function(b){ b.classList.toggle('on', b.dataset.go===go); }); }
@@ -80,7 +80,7 @@ ndaGate(function(){
   /* живые экраны: окна с прототипом, где курсор сам всё показывает */
   $('.lives').innerHTML = T.live.map(function(m){
     return '<section class="live"><div class="head"><h2>'+m.title+'</h2><p class="mute">'+m.text+'</p></div>'+
-      '<div class="lframe" style="aspect-ratio:'+m.ratio+'"><iframe src="site.html?v=13&demo='+m.demo+'" title="'+m.title+'" loading="lazy"></iframe></div>'+
+      '<div class="lframe" style="aspect-ratio:'+m.ratio+'"><iframe src="site.html?v=14&demo='+m.demo+'" title="'+m.title+'" loading="lazy"></iframe></div>'+
       '<p class="hint">'+T.liveHint+'</p></section>';
   }).join('');
   /* живые экраны работают, только пока видны */
@@ -108,6 +108,9 @@ ndaGate(function(){
   addEventListener('scroll', function(){ requestAnimationFrame(slide); }, {passive:true});
   addEventListener('resize', slide);
   slide();
+
+  /* висячие предлоги и союзы — на следующую строку вместе со словом */
+  nvTypoDom(document.querySelector('.page'));
 });
 </script>
 </body>

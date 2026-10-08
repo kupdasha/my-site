@@ -51,7 +51,7 @@ function nvCase(){
 
   /* шрифт */
   h.push('<section class="cs font-cs"><h2 data-rv>'+B.fontTitle+'</h2><div class="font-name">'+B.fontName+'</div>'+
-    '<p class="font-sample">'+B.fontText.split(' ').map(function(w){ return '<span>'+w+'</span>'; }).join(' ')+'</p>'+
+    '<p class="font-sample">'+nvTypo(B.fontText).split(' ').map(function(w){ return '<span>'+w+'</span>'; }).join(' ')+'</p>'+
     '<p class="font-rule" data-rv>'+B.fontRule+'</p></section>');
 
   /* палитра */
