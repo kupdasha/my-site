@@ -3071,6 +3071,36 @@ function placeFab(){
 addEventListener('scroll', placeFab, { passive: true });
 addEventListener('resize', placeFab);
 addEventListener('theme:apply', placeFab);
+
+/* ================================================================
+   ОБЯЗАТЕЛЬНОЕ ПО ЗАКОНУ: ссылки на политику и согласие в подвале и окно про cookie.
+   Тексты — SITE.legal в content.js. Разметку Тильды не трогаем: всё добавляется кодом
+   ================================================================ */
+function renderLegal(){
+  const L = SITE.legal; if (!L) return;
+  document.querySelectorAll('.foot').forEach(f => {
+    let box = f.querySelector('.foot-legal');
+    if (!box) { box = document.createElement('span'); box.className = 'foot-legal'; f.appendChild(box); }
+    box.innerHTML = L.links.map(x => `<a href="${x.link}" target="_blank" rel="noopener">${T(x.text)}</a>`).join('');
+  });
+  let ok = false; try { ok = localStorage.getItem('kd-cookie') === '1'; } catch (e) {}
+  let bar = document.getElementById('cookieBar');
+  if (ok) { bar?.remove(); return; }
+  if (!bar) {
+    bar = document.createElement('div'); bar.id = 'cookieBar'; bar.className = 'cookie-bar'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'cookie');
+    document.body.appendChild(bar);
+    bar.addEventListener('click', e => {
+      if (!e.target.closest('.cookie-ok')) return;
+      try { localStorage.setItem('kd-cookie', '1'); } catch (er) {}
+      bar.classList.remove('show'); setTimeout(() => bar.remove(), 400);
+    });
+    setTimeout(() => bar.classList.add('show'), 600);
+  }
+  const C = L.cookie;
+  bar.innerHTML = `<p>${T(C.text)}<a href="${L.links[0].link}" target="_blank" rel="noopener">${T(C.policy)}</a></p><button class="btn btn-accent cookie-ok" type="button"><span>${T(C.accept)}</span></button>`;
+}
+renderLegal();
+addEventListener('theme:apply', renderLegal);
 placeFab();
 requestAnimationFrame(() => requestAnimationFrame(() => watchReveals(document, true)));
 if (document.fonts) document.fonts.ready.then(layoutStrings);
