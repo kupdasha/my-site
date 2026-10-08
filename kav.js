@@ -16,9 +16,11 @@ const onScreen = (el, cb, margin = '0px') =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: margin }).observe(el);
 const NEON = '#E4FF1A';
 
+// последнее слово заголовка держится за предыдущим — одно слово не остается строкой
+const tail = h => h.replace(/ ([^ <>]+)$/, '\u00a0$1');
 const head = ch => `<div class="kv-head">
   <span class="case-label kv-label">${H.T(ch.label)}</span>
-  <h2 class="kv-title">${H.T(ch.title)}</h2>
+  <h2 class="kv-title">${tail(H.T(ch.title))}</h2>
   ${ch.text ? `<p class="kv-text">${H.T(ch.text)}</p>` : ''}
 </div>`;
 const cap = t => t ? `<p class="kv-cap">${H.T(t)}</p>` : '';
@@ -82,7 +84,7 @@ function pinsHTML(c, ch){
     </div>
     <div class="kv-pins-side">
       <span class="case-label">${H.T(ch.label)}</span>
-      <h2 class="kv-title">${H.T(ch.title)}</h2>
+      <h2 class="kv-title">${tail(H.T(ch.title))}</h2>
       ${ch.text ? `<p class="kv-text">${H.T(ch.text)}</p>` : ''}
       <div class="kv-pins-bar">
         <button class="btn btn-line kv-shuffle"><span class="spell">${H.T(c.shuffle)}</span></button>
