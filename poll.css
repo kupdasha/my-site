@@ -22,8 +22,8 @@
 .pl-w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
 .pl-w > span{display:inline-block;transform:translateY(105%);transition:transform .9s var(--ease) calc(var(--i) * 55ms)}
 .pl-ch.in .pl-w > span{transform:none}
-.pl-text,.pl-label,.pl-switch,.pl-try{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease) .25s,transform .9s var(--ease) .25s}
-.pl-ch.in .pl-text,.pl-ch.in .pl-label,.pl-ch.in .pl-switch,.pl-ch.in .pl-try{opacity:1;transform:none}
+.pl-text,.pl-label,.pl-try{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease) .25s,transform .9s var(--ease) .25s}
+.pl-ch.in .pl-text,.pl-ch.in .pl-label,.pl-ch.in .pl-try{opacity:1;transform:none}
 .pl-viz{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .3s,transform 1.1s var(--ease) .3s}
 .pl-ch.in .pl-viz{opacity:1;transform:none}
 
@@ -40,20 +40,7 @@
 .pl-side .pl-text{font-size:clamp(19px,1.5vw,22px)}
 @media (max-width:900px){.pl-split > .pl-viz,.pl-side{grid-column:1 / -1}.pl-side{order:-1}}
 
-/* тумблер «руки / телефоны»: как в анонимайзере — сам переключается, пока не тронули */
-.pl-switch{display:flex;align-items:center;gap:14px;margin-top:12px;font-size:20px;font-weight:500;line-height:1}
-.pl-sw-l{cursor:pointer;opacity:.38;transition:opacity .35s;padding-bottom:3px}
-.pl-split:not(.after) .pl-sw-l[data-v="0"],.pl-split.after .pl-sw-l[data-v="1"]{opacity:1}
-.pl-sw{--pl-sw-gray:#D4D5D9;position:relative;flex:none;width:76px;height:42px;border-radius:99px;background:var(--ink);cursor:pointer;transition:background .45s var(--ease);overflow:hidden}
-.pl-split.after .pl-sw{background:var(--pl-sw-gray)}
-:root[data-theme="dark"] .pl-sw{--pl-sw-gray:#80858E}
-.pl-knob{position:absolute;top:5px;left:5px;width:32px;height:32px;border-radius:50%;background:var(--bg);box-shadow:0 1px 3px rgba(20,24,32,.28);transition:transform .55s var(--ease)}
-.pl-split.after .pl-knob{transform:translateX(34px)}
-.pl-split:not(.after) .pl-sw.run{animation:plToGray var(--ms) linear both}
-.pl-split.after .pl-sw.run{animation:plToInk var(--ms) linear both}
-@keyframes plToGray{from{background:var(--ink)}to{background:var(--pl-sw-gray)}}
-@keyframes plToInk{from{background:var(--pl-sw-gray)}to{background:var(--ink)}}
-.pl-sw:focus-visible,.pl-tile:focus-visible,.pl-th:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.pl-tile:focus-visible,.pl-th:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 
 /* ---------- экран зала «Вслуха»: темный, текст белый, заголовок слайда сверху ---------- */
 .pl-scr{position:relative;aspect-ratio:16/9;border-radius:14px;background:var(--v-scr);color:#fff;overflow:hidden;container-type:inline-size;font-family:'Manrope','Golos Text',var(--font),sans-serif}
@@ -70,26 +57,23 @@
 .pl-rb.hit .tr{animation:plGlow .7s var(--ease)}
 @keyframes plGlow{40%{background:rgba(139,123,255,.35)}}
 
-/* ---------- hands: зал и экран ---------- */
-.pl-hall{display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2vw,24px);padding:clamp(20px,3.4vw,44px) clamp(12px,2.4vw,32px) 0}
-.pl-proj0{position:relative;width:min(62%,420px);aspect-ratio:16/7;border-radius:12px;background:var(--v-scr);color:#fff}
-.pl-q{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(56px,7vw,96px);font-weight:500;line-height:1;transition:opacity .4s,transform .5s var(--ease)}
-.pl-hall:not(.is-ph) .pl-q{animation:plQ 1.6s var(--ease-io) infinite}
-@keyframes plQ{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) scale(1.06)}}
-.pl-hall.is-ph .pl-q{opacity:0;transform:scale(.6)}
-.pl-bars{position:absolute;inset:16% 22% 14%;display:flex;align-items:flex-end;justify-content:center;gap:12%}
-.pl-bar{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}
-.pl-bar b{display:block;width:100%;height:100%;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,var(--v-acc2),var(--v-acc));transform-origin:50% 100%;transform:scaleY(var(--h,0));transition:transform .45s var(--ease)}
-.pl-crowd{display:block;width:100%;height:auto;overflow:visible}
-.pl-body,.pl-head{fill:var(--pl-man)}
-/* рука: растет из плеча, у каждого свой наклон; наполовину — рука согнута в сторону */
-.pl-arm{stroke:var(--pl-arm);stroke-width:12;stroke-linecap:round;fill:var(--pl-arm);transform:rotate(var(--a)) scaleY(0);opacity:0;
-  transition:transform .45s var(--ease),opacity .3s}
-.pl-p.up .pl-arm{transform:rotate(var(--a)) scaleY(1);opacity:1}
-.pl-p.half .pl-arm{transform:rotate(58deg) scaleY(.62);opacity:1}
-/* телефон: загорается фиолетовым, руки опущены */
-.pl-ph{fill:var(--v-acc);transform:scale(0);transform-box:fill-box;transform-origin:50% 50%;transition:transform .4s var(--ease)}
-.pl-p.ph .pl-ph{transform:none}
+/* ---------- hands: текст главы на экране зала, перед экраном — лес рук ---------- */
+.pl-hall{position:relative;padding:clamp(20px,3vw,40px) clamp(16px,3vw,40px) 0;overflow:hidden}
+.pl-wall{position:relative;border-radius:14px;background:var(--v-scr);color:#fff;padding:clamp(28px,4.4vw,64px) clamp(24px,4.4vw,64px) clamp(150px,19vw,270px);min-height:clamp(420px,42vw,600px)}
+/* на экране: подпись, заголовок и текст главы — белым, как слайд «Вслуха» */
+.pl-wall .pl-head{margin-bottom:0}
+.pl-wall .pl-label{color:rgba(255,255,255,.58)}
+.pl-wall .pl-text{color:rgba(255,255,255,.74)}
+/* ряд людей стоит перед экраном и закрывает его низ */
+.pl-crowd{position:absolute;left:0;right:0;bottom:0;display:block;width:100%;height:clamp(190px,24vw,330px);overflow:visible;cursor:default}
+.pl-body,.pl-hd{fill:var(--pl-man)}
+.pl-arm{fill:var(--pl-arm)}
+.pl-arm path{stroke:var(--pl-arm);stroke-width:15;stroke-linecap:round;fill:none}
+:root:not([data-theme="dark"]) .pl{--pl-man:#B9BDC6;--pl-arm:#9DA2AC}
+@media (max-width:760px){
+  .pl-wall{padding-bottom:150px;min-height:0}
+  .pl-crowd{height:170px}
+}
 
 /* ---------- join: экран зала и телефон в руке ---------- */
 .pl-join{display:grid;grid-template-columns:minmax(0,1fr) clamp(170px,19vw,240px);align-items:center;gap:clamp(24px,5vw,80px);padding:clamp(28px,4.4vw,64px) clamp(16px,5vw,80px)}
@@ -175,6 +159,16 @@
 .pv-rank .row{justify-content:flex-start}
 .pv-rank .row em{margin-left:auto}
 .pv-rank .pl-ln0,.pl-rb .row .pl-ln0{flex:none}
+/* рост ответов: линия с заливкой тянется вправо, справа — счетчик, у конца линии всплывает прибавка */
+.pv-grow{display:flex;align-items:flex-end;gap:5cqw;flex:1;min-height:0}
+.pv-grow .ch{position:relative;flex:1;height:100%}
+.pv-grow svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pv-grow .li{fill:none;stroke:var(--v-acc2);stroke-width:3;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.pv-grow .hd{position:absolute;width:2cqw;aspect-ratio:1;margin:-1cqw 0 0 -1cqw;border-radius:50%;background:#fff;transition:left .3s,top .3s}
+.pv-grow .dl{position:absolute;margin:-6cqw 0 0 -2cqw;font-style:normal;font-size:max(16px,2.2cqw);font-weight:600;color:#C9C2FF;opacity:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pv-grow .dl.up{animation:plUp .9s var(--ease) both}
+@keyframes plUp{0%{opacity:0;transform:translateY(8px)}25%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.pv-grow .big{min-width:3ch;text-align:right;font-size:max(36px,11cqw);font-weight:500;letter-spacing:-.04em;line-height:.9;font-variant-numeric:tabular-nums}
 /* шарики: каждый голос — кружок над своим вариантом */
 .pv-dots{display:flex;align-items:flex-end;justify-content:center;gap:5cqw;flex:1}
 .pv-dots .col{flex:1;max-width:16cqw;display:flex;flex-direction:column;align-items:center;gap:1.2cqw;height:100%;justify-content:flex-end}
@@ -318,6 +312,6 @@
 /* на телефоне заголовки чуть мельче: строки, склеенные неразрывными пробелами, не вылезают за край */
 @media (max-width:480px){.pl-title,.pl-side .pl-title{font-size:min(7.4vw,32px)}}
 @media (prefers-reduced-motion:reduce){
-  .pl-w > span,.pl-text,.pl-label,.pl-viz,.pl-switch,.pl-try{transition:none;transform:none;opacity:1}
+  .pl-w > span,.pl-text,.pl-label,.pl-viz,.pl-try{transition:none;transform:none;opacity:1}
   .pl-wire,.pl-cut,.pl-q,.pl-scan{animation:none}
 }

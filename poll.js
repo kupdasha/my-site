@@ -1,14 +1,14 @@
 /* ================================================================
    КЕЙС «ИНТЕРАКТИВНЫЕ ПРЕЗЕНТАЦИИ» (поле poll у проекта)
    Всё объясняется картинкой, почти без слов:
-   hands — зал поднимает руки вразнобой, на экране «?»; тумблер
-   «руки / телефоны»: руки опускаются, у каждого загорается телефон,
-   точки-ответы летят на экран и складываются в столбики;
+   hands — заголовок и текст главы написаны на экране зала, перед
+   экраном ряд людей с поднятыми руками: руки тянутся к курсору,
+   без курсора по ряду гуляет волна;
    join — камера телефона ловит QR с экрана зала, на телефоне
    появляются те же вопрос и варианты, что на экране; палец
    выбирает вариант — голос летит на экран, полоска растет;
    results — экран зала, как в «Вслухе»: десять видов ответов
-   (опрос, шарики, круговая, сетка, облако слов, число, матрица,
+   (рост ответов, шарики, круговая, сетка, облако слов, число, матрица,
    свои слова, вопросы вам, порядок), плитки-иконки, как в меню
    «Добавить слайд», переключаются сами;
    Цвета и формы — как в самом интерфейсе «Вслуха»: темный экран
@@ -97,115 +97,63 @@ function qrSVG(seed = 11){
   return `<svg class="pl-qr" viewBox="-2 -2 25 25" aria-hidden="true" shape-rendering="crispEdges"><rect x="-2" y="-2" width="25" height="25" fill="#fff"/><path d="${d}" fill="#1D222A" fill-rule="evenodd"/></svg>`;
 }
 
-/* ---------- тумблер, который переключается сам, пока его не тронули ---------- */
-function switchHTML(pair){
-  const [off, on] = H.pick(pair);
-  return `<div class="pl-switch">
-    <span class="pl-sw-l" data-v="0">${H.T(off)}</span>
-    <button class="pl-sw" type="button" role="switch" aria-checked="false" aria-label="${esc(off + ' / ' + on)}"><i class="pl-knob"></i></button>
-    <span class="pl-sw-l" data-v="1">${H.T(on)}</span>
-  </div>`;
-}
-function liveSwitch(box, watch, ms, onSet){
-  const sw = box.querySelector('.pl-sw');
-  let cur = 0, timer = 0, on = false, touched = false;
-  const run = () => {
-    clearTimeout(timer);
-    sw.classList.remove('run');
-    if (!on || touched || still()) return;
-    const t = ms[cur];
-    void sw.offsetWidth; sw.style.setProperty('--ms', t + 'ms'); sw.classList.add('run');
-    timer = setTimeout(() => set(1 - cur), t);
-  };
-  const set = (v, user) => {
-    if (user) touched = true;
-    cur = v;
-    sw.setAttribute('aria-checked', cur === 1);
-    box.classList.toggle('after', cur === 1);
-    onSet(cur);
-    run();
-  };
-  sw.addEventListener('click', () => set(1 - cur, true));
-  box.querySelectorAll('.pl-sw-l').forEach(l => l.addEventListener('click', () => set(+l.dataset.v, true)));
-  onScreen(watch, v => { on = v; if (on) onSet(cur, true); run(); }, .25);
-  return { get on(){ return on; } };
-}
-
 /* ================================================================
-   hands — лес рук и телефоны
+   hands — лес рук: текст главы написан на экране зала, перед экраном
+   ряд людей с поднятыми руками; руки тянутся к курсору, рядом с ним
+   поднимаются выше; без курсора по ряду гуляет волна
    ================================================================ */
-function hallHTML(){
-  // три ряда: задний мельче, передний крупнее; рисуем от заднего к переднему
-  const rows = [{ n: 7, y: 120, s: .78 }, { n: 8, y: 186, s: .9 }, { n: 9, y: 262, s: 1.04 }];
-  let k = 0, ppl = '';
-  rows.forEach((r, ri) => {
-    const w = 640 / r.n;
-    for (let i = 0; i < r.n; i++) {
-      const x = 30 + w * (i + .5) + (ri % 2 ? 0 : w * .15);
-      const a = -18 + rnd(30);
-      ppl += `<g class="pl-p" style="--k:${k++}" transform="translate(${x.toFixed(1)} ${r.y}) scale(${r.s})">
-        <g transform="translate(15 12)"><g class="pl-arm" style="--a:${a}deg"><path d="M0 0V-46"/><circle cy="-50" r="8"/></g></g>
-        <path class="pl-body" d="M-25 60V26C-25 11-13 4 0 4s25 7 25 22v34z"/>
-        <circle class="pl-head" cy="-15" r="14"/>
-        <rect class="pl-ph" x="-9" y="18" width="18" height="27" rx="3.5"/>
-      </g>`;
-    }
-  });
+// ладонь в силуэте: ладонь, четыре пальца и большой палец; рисуется вверх от конца руки
+const palm = L => `<rect x="-12" y="${-L - 24}" width="24" height="27" rx="9"/>
+  ${[-11.5, -5.5, .5, 6.5].map((x, k) => `<rect x="${x}" y="${-L - 38 + (k === 0 || k === 3 ? 5 : 0)}" width="5.4" height="18" rx="2.7"/>`).join('')}
+  <rect x="-5" y="-6" width="6" height="16" rx="3" transform="translate(-10 ${-L - 12}) rotate(-38)"/>`;
+function hallHTML(c){
+  const N = 15, W = 1000;
+  let ppl = '';
+  for (let i = 0; i < N; i++) {
+    const x = (i + .5) * W / N + (i % 2 ? 6 : -6);
+    const side = i % 3 === 1 ? -1 : 1;             // кто-то поднимает левую, кто-то правую
+    const L = 92 + (i * 37 % 46);                   // руки разной длины — лес, а не забор
+    ppl += `<g class="pl-p" transform="translate(${x.toFixed(1)} 0)">
+      <g class="pl-arm" data-x="${(x + side * 20).toFixed(1)}" data-l="${L}" transform="translate(${side * 20} 236)"><path d="M0 0V${-L + 2}"/>${palm(L)}</g>
+      <path class="pl-body" d="M-34 300V266C-34 250-20 240 0 240s34 10 34 26v34z"/>
+      <circle class="pl-hd" cy="214" r="25"/>
+    </g>`;
+  }
   return `<div class="pl-stage pl-hall">
-    <div class="pl-proj0"><span class="pl-q" aria-hidden="true">?</span>
-      <div class="pl-bars">${[0, 1, 2].map(i => `<i class="pl-bar" style="--i:${i}"><b></b></i>`).join('')}</div></div>
-    <svg class="pl-crowd" viewBox="0 0 700 330" aria-hidden="true">${ppl}</svg>
+    <div class="pl-wall">${head(c)}</div>
+    <svg class="pl-crowd" viewBox="0 0 ${W} 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${ppl}</svg>
   </div>`;
 }
-function liveHands(box, c){
+function liveHands(box){
   const stage = box.querySelector('.pl-hall');
-  const ppl = [...box.querySelectorAll('.pl-p')];
-  const bars = [...box.querySelectorAll('.pl-bar')];
-  // у каждого свой ответ: так столбики выходят разной высоты
-  const vote = ppl.map(() => { const r = Math.random(); return r < .5 ? 0 : r < .82 ? 1 : 2; });
-  const count = [0, 0, 0];
-  let gen = 0, chaos = 0;
-  const draw = () => {
-    const lead = Math.max(...count);
-    bars.forEach((b, i) => {
-      b.style.setProperty('--h', (count[i] / ppl.length * 1.7).toFixed(3));
-      b.classList.toggle('best', lead > 0 && count[i] === lead);
+  const svg = box.querySelector('.pl-crowd');
+  const arms = [...box.querySelectorAll('.pl-arm')].map((g, i) => ({
+    g, x: +g.dataset.x, side: +g.getAttribute('transform').match(/translate\((-?\d+)/)[1],
+    a: 0, s: .8, ph: i * 1.7,
+  }));
+  let tx = null, ty = 0, on = false, raf = 0, t0 = performance.now();
+  // курсор в координатах ряда: x от 0 до 1000, y — от верха ряда (выше ряда — отрицательный)
+  const toXY = e => { const r = svg.getBoundingClientRect(); const k = 300 / r.height;
+    return [(e.clientX - r.left - r.width / 2) * k + 500, (e.clientY - r.top) * k]; };
+  stage.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') [tx, ty] = toXY(e); });
+  stage.addEventListener('pointerleave', () => { tx = null; });
+  const frame = now => {
+    const t = (now - t0) / 1000;
+    // без курсора «цель» плавно ходит над рядом туда-обратно — по рукам идет волна
+    const gx = tx ?? 500 + Math.sin(t * .55) * 430, gy = tx == null ? -120 + Math.sin(t * .9) * 40 : ty;
+    arms.forEach(h => {
+      const dx = gx - h.x, dy = Math.min(-30, gy - 236);
+      // рука показывает прямо на курсор; ближние тянутся выше
+      const wantA = Math.max(-50, Math.min(50, Math.atan2(dx, -dy) * 180 / Math.PI)) + Math.sin(t * 2.2 + h.ph) * 3;
+      const near = Math.exp(-(dx * dx) / (2 * 190 * 190));
+      const wantS = .6 + near * .45 + Math.sin(t * 1.6 + h.ph) * .03;
+      h.a += (wantA - h.a) * .12; h.s += (wantS - h.s) * .1;
+      h.g.setAttribute('transform', `translate(${h.side} 236) rotate(${h.a.toFixed(2)}) scale(1 ${h.s.toFixed(3)})`);
     });
+    if (on) raf = requestAnimationFrame(frame);
   };
-  // руки: кто-то поднимает, кто-то опускает, кто-то держит наполовину — посчитать нельзя
-  const hands = () => {
-    const g = ++gen;
-    count.fill(0); draw();
-    ppl.forEach(p => { p.classList.remove('ph'); p.classList.toggle('up', Math.random() < .45); });
-    clearInterval(chaos);
-    if (still()) return;
-    chaos = setInterval(() => {
-      if (g !== gen) { clearInterval(chaos); return; }
-      for (let i = 0; i < 6; i++) {
-        const p = ppl[rnd(ppl.length)];
-        const r = Math.random();
-        p.classList.toggle('up', r < .5);
-        p.classList.toggle('half', r >= .5 && r < .72);
-      }
-    }, 560);
-  };
-  // телефоны: руки вниз, экраны загораются, ответы летят на экран и считаются по одному
-  const phones = async () => {
-    const g = ++gen;
-    clearInterval(chaos);
-    count.fill(0); draw();
-    ppl.forEach(p => p.classList.remove('up', 'half'));
-    if (still()) { ppl.forEach((p, i) => { p.classList.add('ph'); count[vote[i]]++; }); draw(); return; }
-    await wait(350);
-    for (const i of shuffle(ppl.map((_, i) => i))) {
-      if (g !== gen) return;
-      ppl[i].classList.add('ph');
-      fly(stage, ppl[i].querySelector('.pl-ph'), bars[vote[i]], { dur: 820, lift: 40 })
-        .then(() => { if (g === gen) { count[vote[i]]++; draw(); } });
-      await wait(80);
-    }
-  };
-  liveSwitch(box, stage, [3800, 6200], v => { stage.classList.toggle('is-ph', v === 1); (v ? phones : hands)(); });
+  if (still()) return;
+  onScreen(stage, v => { on = v; cancelAnimationFrame(raf); if (on) raf = requestAnimationFrame(frame); }, .1);
 }
 
 /* ================================================================
@@ -300,7 +248,7 @@ const fade = i => `rgba(255,255,255,${FADE[i % FADE.length]})`;
 const pickW = w => { let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0; while ((r -= w[i]) > 0) i++; return i; };
 // иконки плиток — как в меню «Добавить слайд»: серые фигуры, без подписей
 const TILE = {
-  bars: '<rect x="4" y="7" width="24" height="5" rx="2.5"/><rect x="4" y="14" width="16" height="5" rx="2.5" opacity=".6"/><rect x="4" y="21" width="10" height="5" rx="2.5" opacity=".35"/>',
+  grow: '<path d="M3 28V20l7-6 6 4 7-9 6-4v23z" opacity=".4"/><path d="M3 20l7-6 6 4 7-9 6-4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
   dots: '<circle cx="8" cy="23" r="3"/><circle cx="8" cy="16" r="3"/><circle cx="16" cy="23" r="3"/><circle cx="16" cy="16" r="3"/><circle cx="16" cy="9" r="3"/><circle cx="24" cy="23" r="3" opacity=".5"/>',
   pie: '<path d="M16 4a12 12 0 1 1-12 12h12z"/><path d="M14 2.2A12 12 0 0 0 2.2 14H14z" opacity=".45"/>',
   grid: '<rect x="4" y="6" width="5" height="5" rx="1.5"/><rect x="11" y="6" width="5" height="5" rx="1.5"/><rect x="18" y="6" width="5" height="5" rx="1.5"/><rect x="4" y="14" width="5" height="5" rx="1.5"/><rect x="11" y="14" width="5" height="5" rx="1.5"/><rect x="4" y="22" width="5" height="5" rx="1.5" opacity=".5"/>',
@@ -315,13 +263,35 @@ const KINDS = Object.keys(TILE);
 
 // у каждого вида: разметка, голос, сброс. Слова — только там, где они и есть суть (облако)
 const V = {
-  bars(el){
-    const L = [52, 34, 44, 26];
-    el.innerHTML = `<div class="pl-rbs">${L.map((w, i) => rbar(ln(w), i)).join('')}</div>`;
-    const rows = [...el.querySelectorAll('.pl-rb')], n = L.map(() => 0), wt = [5, 3, 2.2, 1];
-    const draw = () => { const s = n.reduce((a, b) => a + b, 0) || 1;
-      rows.forEach((r, i) => { const p = Math.round(n[i] / s * 100); r.style.setProperty('--w', p / 100); r.querySelector('em').textContent = p + '%'; }); };
-    return { vote(){ n[pickW(wt)]++; draw(); }, reset(){ n.fill(0); draw(); } };
+  grow(el){
+    // рост ответов: линия и заливка тянутся вправо, число рядом догоняет его как счетчик, у конца линии всплывает прибавка
+    el.innerHTML = `<div class="pv-grow"><div class="ch"><svg viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="plArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8B7BFF" stop-opacity=".5"/><stop offset="1" stop-color="#5B4BFF" stop-opacity="0"/></linearGradient></defs>
+      <path class="ar" fill="url(#plArea)"/><path class="li"/></svg><i class="hd"></i><em class="dl"></em></div><b class="big">0</b></div>`;
+    const ar = el.querySelector('.ar'), li = el.querySelector('.li'), hd = el.querySelector('.hd'), dl = el.querySelector('.dl'), big = el.querySelector('.big');
+    const S = 36;
+    let pts = [0], total = 0, shown = 0, raf = 0;
+    const draw = () => {
+      const ymax = Math.max(12, total * 1.18), n = pts.length;
+      const X = i => i / (S - 1) * 600, Y = v => 236 - v / ymax * 216;
+      const d = pts.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join('');
+      li.setAttribute('d', d);
+      ar.setAttribute('d', `${d}L${X(n - 1).toFixed(1)} 240L0 240Z`);
+      hd.style.left = dl.style.left = X(n - 1) / 6 + '%';
+      hd.style.top = dl.style.top = Y(pts[n - 1]) / 2.4 + '%';
+    };
+    const count = () => {
+      cancelAnimationFrame(raf);
+      const step = () => { shown = Math.min(total, shown + Math.max(1, Math.ceil((total - shown) / 5)));
+        big.textContent = shown; if (shown < total) raf = requestAnimationFrame(step); };
+      raf = requestAnimationFrame(step);
+    };
+    return {
+      vote(){ const add = 1 + rnd(5); total += add; pts.push(total); if (pts.length > S) pts.shift();
+        draw(); count();
+        dl.textContent = '+' + add; dl.classList.remove('up'); void dl.offsetWidth; dl.classList.add('up'); },
+      reset(){ total = shown = 0; pts = [0]; big.textContent = '0'; draw(); },
+    };
   },
   dots(el){
     el.innerHTML = `<div class="pv-dots">${[0, 1, 2, 3].map(i => `<div class="col"><div class="pile"></div><b>0</b>${ln([70, 50, 64, 40][i])}</div>`).join('')}</div>`;
@@ -647,7 +617,7 @@ const tryHTML = t => t ? `<div class="pl-try">
 /* ---------- запуск ---------- */
 // split — иллюстрация слева, текст справа; иначе заголовок сверху и сцена во всю ширину
 const CHAPTERS = [
-  { k: 'hands', html: hallHTML, live: liveHands, split: c => switchHTML(c.toggle) },
+  { k: 'hands', html: hallHTML, live: liveHands, inner: true },   // текст главы — на самом экране
   { k: 'join', html: joinHTML, live: liveJoin },
   { k: 'results', html: resHTML, live: liveRes },
   { k: 'deck', html: deckHTML, live: liveDeck, split: () => '' },
@@ -673,7 +643,9 @@ export async function mountPoll(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   const a = p.poll;
   const list = CHAPTERS.filter(ch => a[ch.k]);
-  mount.innerHTML = list.map(({ k, html, split }) => split
+  mount.innerHTML = list.map(({ k, html, split, inner }) => inner
+    ? `<section class="pl-ch wrap pl-${k}-ch"><div class="pl-viz">${html(a[k])}</div></section>`
+    : split
     ? `<section class="pl-ch wrap pl-${k}-ch pl-split"><div class="pl-viz">${html(a[k])}</div>${side(a[k], split(a[k], a))}</section>`
     : `<section class="pl-ch wrap pl-${k}-ch">${head(a[k])}<div class="pl-viz">${html(a[k])}</div></section>`).join('');
   mount.querySelectorAll('.pl-title').forEach(splitWords);

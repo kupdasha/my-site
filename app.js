@@ -2432,6 +2432,8 @@ function renderCase(k, keepScroll){
   // office — «русский офис»: три редактора в одном окне, рядом, шаблоны, QR, мини-лендинг, закрытый контур, сменный набор; рисует office.js
   if (p.office) body += `<div class="ro ro-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
+  // heroEnd — ролик из шапки уходит в самый конец кейса, после живых глав (см. интерактивные презентации)
+  if (p.heroEnd) body += `<div class="wrap case-hero-end"><div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2452,9 +2454,9 @@ function renderCase(k, keepScroll){
       ${p.short ? `<p class="case-sub" data-reveal>${T(p.short)}</p>` : ''}
       ${p.note ? `<p class="case-note" data-reveal>${T(p.note)}</p>` : ''}
     </div>
-    ${p.noHero ? '' : `<div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto${p.heroPhone ? `;--hp:${p.heroPhone}` : ''}"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>`}
+    ${p.noHero || p.heroEnd ? '' : `<div class="case-hero"${p.heroRatio ? ` style="aspect-ratio:${p.heroRatio};max-width:min(100%,calc(92vh * ${p.heroRatio}));margin:0 auto${p.heroPhone ? `;--hp:${p.heroPhone}` : ''}"` : p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div>`}
     ${p.heroNote ? `<div class="wrap"><p class="case-note hero-note">${T(p.heroNote)}</p></div>` : ''}
-    <div class="case-body${p.noHero ? ' no-hero' : ''}">${body}</div>
+    <div class="case-body${p.noHero || p.heroEnd ? ' no-hero' : ''}">${body}</div>
     <div class="wrap case-end">
       <button class="btn btn-line case-to-list"><span class="arr">←</span><span class="spell">${T(isNdaPage ? SITE.ndaPage.back : W.back)}</span></button>
     </div>

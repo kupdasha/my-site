@@ -314,6 +314,9 @@ img,video{display:block;max-width:100%}
 .case-hero iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .case-hero .hero-frame{opacity:0;transition:opacity .8s}
 .case-hero .hero-frame.ready{opacity:1}
+/* heroEnd — ролик в конце кейса, в колонке текста, со скругленными углами */
+.case-hero-end{margin-bottom:clamp(56px,7vw,104px)}
+.case-hero-end .case-hero{border-radius:var(--r-img)}
 .hero-play{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;transition:transform .4s var(--ease)}
 .hero-play:hover{transform:scale(1.08)}
 .case-body{padding:clamp(64px,8vw,120px) 0 0}
