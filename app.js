@@ -2988,12 +2988,24 @@ function sendGameContact(contact, data = {}){
   // чтобы Тильда не отказала (например, если в форме обязательный Email, а оставили ник в Telegram)
   f.querySelectorAll('[data-tilda-req]').forEach(el => el.removeAttribute('data-tilda-req'));
   f.querySelectorAll('[data-tilda-rule]').forEach(el => el.removeAttribute('data-tilda-rule'));
+  // ограничения длины тоже снимаем: поле телефона Тильды ждет строго «+7 (000) 000-00-00» (minlength 18)
+  f.querySelectorAll('[data-tilda-rule-minlength], [data-tilda-rule-maxlength]').forEach(el => { el.removeAttribute('data-tilda-rule-minlength'); el.removeAttribute('data-tilda-rule-maxlength'); });
   set(field.name, data.name || (f.querySelector('[name="kd_source"]') ? contact : `${contact} (${src})`));
   set('kd_source', src);
   // телефон — в поле телефона Тильды (видимая часть и скрытое итоговое значение), Telegram и источник — отдельными полями:
   // Tilda CRM сама заведет для них колонки
   if (data.phone) {
-    f.querySelectorAll('input[type="tel"], [name="Phone"], [name="phone"], [name="Телефон"]').forEach(el => { el.value = data.phone; el.dispatchEvent(new Event('input', { bubbles: true })); });
+    // российский номер (11 цифр с 7 или 8, или 10 цифр) приводим к виду маски Тильды: +7 (000) 000-00-00;
+    // в видимую часть поля — без кода страны, в скрытое итоговое поле — целиком
+    let d = data.phone.replace(/\D/g, '');
+    if (d.length === 10) d = '7' + d;
+    if (d.length === 11 && /^[78]/.test(d)) d = '7' + d.slice(1);
+    const ru = d.length === 11 && d[0] === '7';
+    const local = ru ? `(${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7, 9)}-${d.slice(9, 11)}` : data.phone;
+    const full = ru ? `+7 ${local}` : data.phone;
+    f.querySelectorAll('input[type="tel"]').forEach(el => { el.value = local; });
+    f.querySelectorAll('.js-phonemask-result, [name="Phone"], [name="phone"], [name="Телефон"]').forEach(el => { el.value = full; });
+    data.phone = full;
   }
   const extra = (name, v) => { let el = f.querySelector(`input[name="${name}"]`); if (!el) { el = document.createElement('input'); el.type = 'hidden'; el.name = name; f.appendChild(el); } el.value = v; };
   if (data.tg) extra('Telegram', data.tg);
