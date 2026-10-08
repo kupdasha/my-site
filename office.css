@@ -43,55 +43,37 @@
 .ro-app{position:relative;background:var(--bg);border-radius:10px;box-shadow:0 18px 40px -26px rgba(20,24,32,.3);overflow:hidden}
 .ro-bar{display:flex;align-items:center;gap:6px;height:clamp(18px,2vw,26px);padding:0 10px;border-bottom:3px solid var(--m,var(--line))}
 .ro-bar > b{display:block;width:34%;height:7px;border-radius:4px;background:var(--m)}
-.ro-pane{position:relative;padding:9% 10%}
-.g{display:flex;flex-direction:column;gap:9px}
-.g i{display:block;height:7px;border-radius:4px;background:var(--line)}
-.g i.h{height:11px;width:58%;background:var(--ink)}
-.g i.s{width:66%}
-.g-sheet{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:4px}
-.g-sheet u{display:block;height:10px;border-radius:2px;background:var(--line)}
-.g-sheet u.th{background:var(--m)}
-.g-slide .bars{display:flex;align-items:flex-end;gap:10%;height:52px;padding-top:4px}
-.g-slide .bars b{flex:1;border-radius:3px 3px 0 0;background:var(--m)}
-.g-html .gh{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:5px;background:var(--ro-mark)}
-.g-html .gh i{background:#1D222A;opacity:.85;width:70%}
-.g-html .gh i.s{width:45%;opacity:.4}
-.g-html .cards{display:flex;gap:6px}
-.g-html .cards b{flex:1;height:22px;border-radius:4px;background:var(--line)}
-.g-html .gb{display:block;width:40%;height:12px;border-radius:99px;background:var(--ink)}
+/* ---------- one: ярлыки Word, Excel, PowerPoint и HTML сходятся в программу ---------- */
+.ro-one{padding:clamp(20px,3vw,44px) clamp(14px,2.6vw,40px)}
+.ro-hub{display:block;width:100%;height:auto;overflow:visible}
+.ro-hub .sh .tile{fill:var(--m)}
+.ro-hub .sh-doc{--m:var(--ro-doc)}.ro-hub .sh-sheet{--m:var(--ro-sheet)}.ro-hub .sh-slide{--m:var(--ro-slide)}.ro-hub .sh-html{--m:var(--ro-html)}
+.ro-hub .gl{fill:#fff;font-family:var(--font);font-size:34px;font-weight:600}
+.ro-hub .gl.sm{fill:#1D222A;font-size:24px}
+/* стрелка ярлыка в углу, как на рабочем столе */
+.ro-hub .arr rect{fill:var(--bg);stroke:var(--ink);stroke-width:1.5}
+.ro-hub .arr path{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ro-hub .sep{stroke:var(--line);stroke-width:2;stroke-linecap:round}
+/* линии прорисовываются по очереди от ярлыков к программе */
+.ro-hub .ln{fill:none;stroke:color-mix(in srgb,var(--ink) 28%,var(--soft));stroke-width:2.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .4s var(--ease)}
+.ro-one.go .ro-hub .ln{stroke-dashoffset:0;transition:stroke-dashoffset 1s var(--ease-io) calc(var(--i) * 160ms)}
+.ro-hub .dot{stroke:var(--bg);stroke-width:2}
+.ro-hub .f-doc{fill:var(--ro-doc)}.ro-hub .f-sheet{fill:var(--ro-sheet)}.ro-hub .f-slide{fill:var(--ro-slide)}.ro-hub .f-html{fill:var(--ro-html)}
+/* программа: темный значок с четырьмя вкладками; вкладки загораются, когда линии дошли, и вздрагивает от каждой точки */
+.ro-hub .app > .tile{fill:var(--ink)}
+.ro-hub .app .tl{fill:color-mix(in srgb,var(--bg) 30%,var(--ink))}
+.ro-hub .app .tb{opacity:.25;transition:opacity .4s}
+.ro-one.go .ro-hub .app .tb{opacity:1;transition-delay:1.1s}
+.ro-hub .app{transform-box:fill-box;transform-origin:center}
+.ro-hub .app > .tile{transform-box:fill-box;transform-origin:center}
+.ro-hub.hit .app > .tile{animation:roBeat .35s var(--ease)}
+@keyframes roBeat{50%{transform:scale(1.04)}}
+/* ярлыки выезжают слева при первом показе */
+.ro-hub .sh{opacity:0;transition:opacity .5s var(--ease) calc(var(--i) * 90ms)}
+.ro-ch.in .ro-hub .sh{opacity:1}
 
-/* ---------- one: три редактора с ключами → одно окно ---------- */
-.ro-one{display:grid;place-items:center;min-height:clamp(320px,34vw,480px);padding:clamp(28px,4vw,56px) clamp(12px,3vw,48px)}
-.ro-one > *{grid-area:1 / 1}
-.ro-many{--gap:clamp(14px,3vw,48px);display:flex;gap:var(--gap)}
-.ro-many .ro-app{width:clamp(96px,18vw,250px);aspect-ratio:4/3.2;overflow:visible;
-  transition:transform .9s var(--ease-io),opacity .6s var(--ease)}
-.ro-many .ro-app .ro-bar{border-radius:10px 10px 0 0}
-/* ключ-лицензия на углу каждого окна */
-.ro-key{position:absolute;right:-12px;top:-14px;display:grid;place-items:center;width:clamp(30px,3vw,42px);aspect-ratio:1;border-radius:50%;background:var(--ink);
-  transition:transform .7s var(--ease),opacity .5s var(--ease)}
-.ro-key svg{width:62%;fill:none;stroke:var(--bg);stroke-width:2;stroke-linecap:round}
-.ro-one[data-step="1"] .ro-key,.ro-one[data-step="2"] .ro-key{transform:translateY(-60px) rotate(-30deg);opacity:0}
-/* окна съезжаются в середину и тают, на их месте растет одно */
-.ro-one[data-step="2"] .ro-many .ro-app{transform:translateX(calc((1 - var(--i)) * (100% + var(--gap)))) scale(.7);opacity:0}
-.ro-one[data-step="3"] .ro-many .ro-app,.ro-one[data-step="3"] .ro-key{transition:none;opacity:0}
-.ro-single{opacity:0;transform:scale(.6);transition:opacity .5s var(--ease),transform .9s var(--ease)}
-.ro-one[data-step="2"] .ro-single{opacity:1;transform:none;transition-delay:.35s}
-.ro-big{width:clamp(240px,40vw,520px);aspect-ratio:16/10}
-.ro-tabs{gap:clamp(4px,.6vw,8px);border-bottom-color:var(--m);transition:border-color .4s}
-.ro-tabs .ro-t{display:block;flex:0 1 52px;height:9px;border-radius:5px;background:var(--line);transition:background .4s}
-.ro-big[data-mode="doc"]{--m:var(--ro-doc)}.ro-big[data-mode="sheet"]{--m:var(--ro-sheet)}.ro-big[data-mode="slide"]{--m:var(--ro-slide)}.ro-big[data-mode="html"]{--m:var(--ro-html)}
-.ro-big[data-mode="doc"] .ro-t.ro-m-doc,.ro-big[data-mode="sheet"] .ro-t.ro-m-sheet,
-.ro-big[data-mode="slide"] .ro-t.ro-m-slide,.ro-big[data-mode="html"] .ro-t.ro-m-html{background:var(--m)}
-.ro-modes{display:grid;padding:6% 8%}
-.ro-mode{grid-area:1 / 1;opacity:0;transform:translateY(10px);transition:opacity .35s,transform .5s var(--ease)}
-.ro-big[data-mode="doc"] .ro-mode.ro-m-doc,.ro-big[data-mode="sheet"] .ro-mode.ro-m-sheet,
-.ro-big[data-mode="slide"] .ro-mode.ro-m-slide,.ro-big[data-mode="html"] .ro-mode.ro-m-html{opacity:1;transform:none}
-.ro-big .g-slide .bars{height:clamp(60px,9vw,120px)}
-.ro-big .g{gap:clamp(8px,1vw,14px)}
-.ro-big .g i{height:clamp(7px,.8vw,10px)}
-.ro-big .g-sheet u{height:clamp(12px,1.6vw,22px)}
-.ro-big .g-html .cards b{height:clamp(24px,3.4vw,44px)}
+.ro-tabs{gap:clamp(4px,.6vw,8px)}
+.ro-tabs .ro-t{display:block;flex:0 1 52px;height:9px;border-radius:5px;background:var(--line)}
 
 /* ---------- side: три вкладки рядом в одном окне ---------- */
 .ro-sidest{padding:clamp(20px,4vw,56px)}

@@ -1,8 +1,8 @@
 /* ================================================================
    КЕЙС «РУССКИЙ ОФИС» (поле office у проекта)
    Главы почти без слов — иконки и короткие анимации:
-   one — три отдельных редактора, у каждого ключ-лицензия; ключи
-   улетают, окна складываются в одно с четырьмя вкладками;
+   one — ярлыки Word, Excel, PowerPoint и отдельно HTML; от каждого
+   линия прорисовывается в значок программы, по линиям бегут точки;
    side — одно окно, внутри рядом готовые шаблоны: заявление в Word,
    смета со значками счетчиков и итогом по формуле, презентация;
    курсор переносит итог сметы в график и в заявление;
@@ -36,7 +36,6 @@ const at = (el, stage, fx = .5, fy = .5) => {
 };
 
 /* ---------- значки ---------- */
-const KEY = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="4.2"/><path d="M12.2 12H21M17.5 12v3.4M20.2 12v2.4"/></svg>`;
 const CURSOR = `<svg class="ro-cur" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8.2-6.1 1.3L10 18.6z"/></svg>`;
 // счетчики: капля и молния; искры — у кнопки «причесать»; почта, мессенджер и «нет сети» — у HTML
 const METER = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 5c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12z"/><path d="M23 4l-5 10h5l-3 9 8-12h-5l3-7z"/></svg>`;
@@ -45,14 +44,7 @@ const PLANE = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M28 5L4 14.5
 const NONET = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 12.5a17 17 0 0 1 24 0M8.5 17a11 11 0 0 1 15 0M13 21.5a5 5 0 0 1 6 0"/><circle cx="16" cy="25.5" r="1.4"/><path d="M5 5l22 22"/></svg>`;
 const SPARK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3l1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8zM18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/></svg>`;
 
-/* ---------- содержимое вкладок: рисунки из простых форм ---------- */
 const MODES = ['doc', 'sheet', 'slide', 'html'];
-const G = {
-  doc:   () => `<div class="g g-doc"><i class="h"></i><i></i><i></i><i class="s"></i><i></i><i class="s"></i></div>`,
-  sheet: () => `<div class="g g-sheet">${Array.from({ length: 20 }, (_, k) => `<u${k < 4 ? ' class="th"' : ''}></u>`).join('')}</div>`,
-  slide: () => `<div class="g g-slide"><i class="h"></i><div class="bars">${[38, 62, 48, 86].map(h => `<b style="height:${h}%"></b>`).join('')}</div></div>`,
-  html:  () => `<div class="g g-html"><div class="gh"><i></i><i class="s"></i></div><div class="cards"><b></b><b></b><b></b></div><span class="gb"></span></div>`,
-};
 
 const head = ch => `<div class="ro-head">
   <span class="case-label ro-label">${H.T(ch.label)}</span>
@@ -100,30 +92,63 @@ function cycle(el, steps, threshold = .3){
 /* ================================================================
    one — три редактора с ключами складываются в одно окно
    ================================================================ */
+// ярлыки: цветной квадрат с буквой и стрелкой ярлыка в углу; HTML — отдельно, ниже черты
+const SHORT = [
+  { k: 'doc', y: 52, g: 'W' }, { k: 'sheet', y: 140, g: 'X' }, { k: 'slide', y: 228, g: 'P' }, { k: 'html', y: 340, g: '</>' },
+];
+const APP = { x: 410, y: 196 };
 function oneHTML(){
-  return `<div class="ro-stage ro-one" data-step="0">
-    <div class="ro-many">${['doc', 'sheet', 'slide'].map((m, i) =>
-      `<div class="ro-app ro-m-${m}" style="--i:${i}"><div class="ro-bar"><b></b></div><div class="ro-pane">${G[m]()}</div><span class="ro-key">${KEY}</span></div>`).join('')}
-    </div>
-    <div class="ro-single"><div class="ro-app ro-big" data-mode="doc">
-      <div class="ro-bar ro-tabs">${MODES.map(m => `<b class="ro-t ro-m-${m}"></b>`).join('')}</div>
-      <div class="ro-pane ro-modes">${MODES.map(m => `<div class="ro-mode ro-m-${m}">${G[m]()}</div>`).join('')}</div>
-    </div></div>
+  const icon = (c, i) => `<g class="sh sh-${c.k}" style="--i:${i}" transform="translate(64 ${c.y})">
+    <rect class="tile" x="-32" y="-32" width="64" height="64" rx="14"/>
+    <text class="gl${c.g.length > 1 ? ' sm' : ''}" y="1" text-anchor="middle" dominant-baseline="central">${esc(c.g)}</text>
+    <g class="arr" transform="translate(-32 12)"><rect width="22" height="22" rx="5"/><path d="M7 16v-4a4 4 0 0 1 4-4h5M13 5l3 3-3 3"/></g></g>`;
+  const line = (c, i) => `<path class="ln ln-${c.k}" style="--i:${i}" pathLength="1" d="M104 ${c.y}C${230} ${c.y} ${250} ${APP.y} ${APP.x - 64} ${APP.y}"/>`;
+  return `<div class="ro-stage ro-one">
+    <svg class="ro-hub" viewBox="0 0 520 392" aria-hidden="true">
+      <path class="sep" d="M30 284H98"/>
+      ${SHORT.map(line).join('')}
+      <g class="dots"></g>
+      ${SHORT.map(icon).join('')}
+      <g class="app" transform="translate(${APP.x} ${APP.y})">
+        <rect class="tile" x="-62" y="-62" width="124" height="124" rx="26"/>
+        ${['doc', 'sheet', 'slide', 'html'].map((m, i) => `<rect class="tb f-${m}" x="${-44 + i * 23}" y="-40" width="19" height="9" rx="4.5"/>`).join('')}
+        <rect class="tl" x="-44" y="-14" width="70" height="7" rx="3.5"/><rect class="tl" x="-44" y="2" width="88" height="7" rx="3.5"/>
+        <rect class="tl" x="-44" y="18" width="52" height="7" rx="3.5"/>
+      </g>
+    </svg>
   </div>`;
 }
 function liveOne(box){
   const st = box.querySelector('.ro-one');
-  const big = box.querySelector('.ro-big');
-  if (still()) { st.dataset.step = 2; return; }
-  const live = cycle(st, [
-    async () => { st.dataset.step = 0; await wait(1600); },
-    async () => { st.dataset.step = 1; await wait(900); },          // ключи-лицензии улетают
-    async () => { st.dataset.step = 2; await wait(900);              // окна складываются в одно
-      // вкладки переключаются по очереди: документ, таблица, презентация, HTML
-      for (const m of [...MODES.slice(1), 'doc']) { if (!live()) return; big.dataset.mode = m; await wait(1000); }
-      await wait(600); },
-    async () => { st.dataset.step = 3; await wait(700); big.dataset.mode = 'doc'; },
-  ]);
+  const svg = st.querySelector('.ro-hub');
+  const dotsG = svg.querySelector('.dots');
+  const paths = [...svg.querySelectorAll('.ln')];
+  if (still()) { st.classList.add('go'); return; }
+  // точки бегут от ярлыков в программу, пока линии прорисованы
+  const NS = 'http://www.w3.org/2000/svg';
+  let dots = [], raf = 0, last = 0, next = 0, flow = false;
+  const frame = now => {
+    const dt = Math.min(50, now - (last || now)); last = now;
+    next -= dt;
+    if (flow && next <= 0) {
+      const k = Math.floor(Math.random() * paths.length), p = paths[k];
+      const el = document.createElementNS(NS, 'circle'); el.setAttribute('r', 6); el.setAttribute('class', 'dot f-' + SHORT[k].k);
+      dotsG.appendChild(el); dots.push({ el, p, len: p.getTotalLength(), t: 0 }); next = rnd(160, 320);
+    }
+    dots = dots.filter(d => {
+      d.t += dt / 1100;
+      if (d.t >= 1) { d.el.remove(); svg.classList.remove('hit'); void svg.getBoundingClientRect(); svg.classList.add('hit'); return false; }
+      const pt = d.p.getPointAtLength(d.len * d.t);
+      d.el.setAttribute('cx', pt.x); d.el.setAttribute('cy', pt.y);
+      return true;
+    });
+    if (flow || dots.length) raf = requestAnimationFrame(frame); else raf = 0;
+  };
+  const start = () => { flow = true; if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
+  cycle(st, [
+    async () => { st.classList.add('go'); await wait(1500); start(); await wait(4200); },   // линии прорисовываются, точки бегут
+    async () => { flow = false; await wait(1300); st.classList.remove('go'); await wait(900); },
+  ], .35);
 }
 
 /* ================================================================
@@ -399,7 +424,7 @@ const tryHTML = t => t ? `<div class="ro-try">
 // [ключ, рисунок, оживление, раскладка]: wide — заголовок сверху и сцена во всю ширину;
 // left / right — сцена слева или справа, текст рядом
 const CHAPTERS = [
-  ['one', oneHTML, liveOne, 'wide'],
+  ['one', oneHTML, liveOne, 'left'],
   ['side', sideHTML, liveSide, 'wide'],
   ['comb', combHTML, liveComb, 'left'],
   ['closed', closedHTML, liveClosed, 'wide'],
