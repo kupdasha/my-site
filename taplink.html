@@ -64,7 +64,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
 :root[data-mode="fun"] .btn{width:auto;min-width:150px;padding:0 26px 3px;z-index:3;will-change:translate}
 
 /* ножки — как на сайте (fun.js) */
-.legs{display:none;position:absolute;left:0;right:0;bottom:3px;height:0;z-index:-1;pointer-events:none}
+.legs{display:none;position:absolute;left:0;right:0;bottom:3px;height:0;z-index:-2;pointer-events:none}
 :root[data-mode="fun"] .legs{display:block}
 .legs i{position:absolute;top:-6px;width:4px;height:var(--leg,20px);margin-left:-2px;border-radius:2px;background:var(--legc,var(--btn));transform-origin:50% 0;transform:rotate(var(--a,0deg));transition:background .35s}
 .legs i::after{content:"";position:absolute;left:-2px;bottom:-3px;width:9px;height:5px;border-radius:3px 4px 2px 2px;background:inherit}
@@ -94,6 +94,13 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
 :root[data-mode="fun"] .soc a:hover{filter:brightness(1.15)}
 :root[data-mode="fun"] .soc a[href*="tiktok"],:root[data-mode="fun"] .soc a[href*="unsplash"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
 :root[data-mode="fun"] .soc a[href*="tiktok"]:hover,:root[data-mode="fun"] .soc a[href*="unsplash"]:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+/* веселая версия: заливка кнопки — отдельным слоем над ножками, чтобы ножки уходили под кнопку, а не рисовались поверх ее низа */
+:root[data-mode="fun"] :is(.actions .btn,.soc a){background:none;box-shadow:none}
+:root[data-mode="fun"] :is(.actions .btn,.soc a)::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;transition:background .35s}
+:root[data-mode="fun"] .actions .btn::before{background:var(--btn)}
+:root[data-mode="fun"] .actions .btn:hover::before{background:var(--btn-hover)}
+:root[data-mode="fun"] .soc a::before{background:var(--brand)}
+:root[data-mode="fun"] .soc a:is([href*="tiktok"],[href*="unsplash"])::before{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
 
 .legal{position:relative;z-index:1;max-width:330px;margin:calc(14px*var(--k)) auto 0;font-size:11px;line-height:1.3;color:var(--muted);text-align:center;text-wrap:balance}
 
@@ -471,8 +478,10 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
       r.el.style.translate = `${r.x.toFixed(1)}px ${(r.y + hop + lift).toFixed(1)}px`;
       r.el.style.rotate = `${r.rot.toFixed(2)}deg`;
     });
+    // кто ниже на экране — тот ближе: ножки верхней кнопки уходят за нижнюю, а не ложатся на нее
+    runners.map(r => [r, r.home.y + r.y + r.home.h]).sort((a, b) => a[1] - b[1]).forEach(([r], i) => { r.el.style.zIndex = 3 + i; });
   }
-  function resetRunners() { runners.forEach(r => { r.x = r.y = r.tx = r.ty = 0; r.rot = 0; r.state = 'rest'; r.el.style.translate = ''; r.el.style.rotate = ''; }); }
+  function resetRunners() { runners.forEach(r => { r.x = r.y = r.tx = r.ty = 0; r.rot = 0; r.state = 'rest'; r.el.style.translate = ''; r.el.style.rotate = ''; r.el.style.zIndex = ''; }); }
 
   /* ---------- ввод ---------- */
   addEventListener('pointermove', e => {
