@@ -197,14 +197,63 @@ def once_block(html, note):
     return (f'<!-- {note} -->\n'
             f"<script>(function(){{if(document.getElementById('case'))return;document.write({js})}})()</script>")
 
+# Настройки таплинка, которые Даша может менять прямо в блоке Тильды, без GitHub (просьба 08.10).
+# Блок их применяет поверх taplink.html: тексты и ссылки из блока главнее, оформление и анимация — с GitHub.
+TAPLINK_SETTINGS = """<script>
+/* ===================== НАСТРОЙКИ ТАПЛИНКА =====================
+   Здесь можно самой поменять имя, описание, кнопки и ссылки.
+   Как править:
+   - меняйте только то, что внутри кавычек '...';
+   - кавычки, запятые и квадратные скобки не трогайте;
+   - если внутри текста нужен апостроф, поставьте перед ним \\ (например: 'It\\'s');
+   - убрать кнопку — удалите ее строку целиком; добавить — скопируйте строку и поменяйте;
+   - после правки нажмите «Сохранить» в блоке и «Опубликовать» страницу.
+   Оформление, цвета и анимация приходят с GitHub, здесь их нет.
+   ============================================================== */
+window.TAPLINK = {
+
+  // имя крупно наверху
+  name: 'Даша Купцова',
+
+  // описание под именем; слова «Одна кавычка» сами станут ссылкой на подкаст
+  about: 'Делаю дизайн для брендов, спикерствую и организовываю мероприятия. Ex-лид дизайн-команды VK, в портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст «Одна кавычка»',
+  podcast: 'https://onekavychka.mave.digital/',
+
+  // главные кнопки сверху вниз:
+  //  [ 'надпись в серьезной версии',   'надпись в веселой',  'куда ведет' ],
+  buttons: [
+    [ 'заказать дизайн-проект',         'что умею?',          'https://kupdasha.ru/full' ],
+    [ 'позвать выступать',              'позвать',            'https://kupdasha.ru/profile' ],
+    [ 'ИИ-воркшоп для вашей команды',   'ИИшнуться',          'https://kupdasha.ru/ai' ],
+  ],
+
+  // соцсети слева направо, сверху вниз (по три в ряд):
+  //  [ 'надпись',     'ссылка' ],
+  // цвет кнопки берется по адресу ссылки (linkedin, vk.com, max.ru, t.me, tiktok, youtube, instagram, unsplash, behance)
+  socials: [
+    [ 'LinkedIn',    'https://www.linkedin.com/in/kup-daria/' ],
+    [ 'VK',          'https://vk.com/odnakavychka' ],
+    [ 'MAX',         'https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4' ],
+    [ 'Telegram',    'https://t.me/kupdasha' ],
+    [ 'TikTok',      'https://www.tiktok.com/@odnakav' ],
+    [ 'YouTube',     'https://www.youtube.com/@kupyasha26' ],
+    [ 'Instagram*',  'https://www.instagram.com/kupyasha/' ],
+    [ 'Unsplash',    'https://unsplash.com/@kupdasha' ],
+    [ 'Behance',     'https://www.behance.net/kupdaria' ],
+  ],
+};
+</script>"""
+
 def taplink_block():
-    # таплинк — отдельная страница Тильды из одного блока; вся страница (разметка, тексты, стили, код)
-    # лежит на GitHub в taplink.html, блок только подтягивает ее, поэтому перевставлять его не нужно.
+    # таплинк — отдельная страница Тильды из одного блока. Сверху — настройки (тексты и ссылки), их можно
+    # править прямо в Тильде; ниже — загрузчик: оформление, анимация и код лежат на GitHub в taplink.html.
     # Под медленную связь: номер свежей версии спрашиваем у воркера kup-version (40 байт); если в телефоне
     # уже лежит копия этой версии — показываем сразу, без загрузки. Иначе берем taplink.html по номеру
     # с jsDelivr (быстрый CDN, файл ~12 КБ), запасной путь — прямо с GitHub. Соединения со шрифтами и CDN
     # открываются заранее, пока ждем ответ.
-    return ('<!-- ТАПЛИНК. Весь таплинк лежит на GitHub в taplink.html и подключается отсюда. Блок не менять. -->\n'
+    return ('<!-- ТАПЛИНК. Сверху — настройки: тексты и ссылки можно менять прямо здесь. Ниже — загрузчик, его не трогать. -->\n'
+            + TAPLINK_SETTINGS + '\n\n'
+            '<!-- ЗАГРУЗЧИК: дальше ничего не менять. Оформление и анимация лежат на GitHub в taplink.html. -->\n'
             '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>\n'
             "<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',\n"
             "G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
@@ -213,9 +262,21 @@ def taplink_block():
             "try{c=JSON.parse(localStorage.getItem(K))}catch(e){}\n"
             "function get(u,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);x.timeout=ms;x.onload=function(){cb(x.status==200?x.responseText:null)};x.onerror=x.ontimeout=function(){cb(null)};x.send()}\n"
             "function save(s,h){try{localStorage.setItem(K,JSON.stringify({s:s,h:h}))}catch(e){}}\n"
+            # настройки из блока: тексты и ссылки поверх того, что пришло с GitHub
+            "function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}\n"
+            "function nb(t){return t.replace(/(^|[\\s(«])([А-Яа-яЁёA-Za-z]{1,2})\\s/g,'$1$2\\u00a0').replace(/\\s—/g,'\\u00a0—')}\n"
+            "function apply(r){var T=window.TAPLINK;if(!T)return;try{\n"
+            "var h=r.querySelector('h1');if(h&&T.name)h.textContent=T.name;\n"
+            "var b=r.querySelector('.bio'),w='«Одна кавычка»';if(b&&T.about){var t=esc(nb(T.about));b.innerHTML=T.podcast&&t.indexOf(w)>=0?t.replace(w,'<a href=\"'+esc(T.podcast)+'\" target=\"_blank\" rel=\"noopener\">«Одна\\u00a0кавычка»</a>'):t}\n"
+            "function list(sel,items,fill){var box=r.querySelector(sel);if(!box||!items||!items.length)return;var tpl=box.children[0];if(!tpl)return;tpl=tpl.cloneNode(true);box.innerHTML='';\n"
+            "items.forEach(function(it){var a=tpl.cloneNode(true);fill(a,it);box.appendChild(a)})}\n"
+            "list('.actions',T.buttons,function(a,it){a.dataset.serious=it[0];a.dataset.fun=it[1]||it[0];a.href=it[2];var s=a.querySelector('.t');if(s)s.textContent=it[0]});\n"
+            "list('.soc',T.socials,function(a,it){a.textContent=it[0];a.href=it[1]})\n"
+            "}catch(e){}}\n"
             "function show(h){if(shown||!h)return;shown=1;var doc=new DOMParser().parseFromString(h,'text/html');\n"
             "[].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});\n"
             "[].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});\n"
+            "apply(root);\n"
             # вставленные так скрипты сами не запускаются — пересоздаем их
             "[].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});\n"
             "root.style.minHeight='';root.style.background=''}\n"
@@ -223,7 +284,6 @@ def taplink_block():
             "get(W,2500,function(s){s=(s||'').trim();if(!/^[0-9a-f]{40}$/.test(s))s='';\n"
             "if(s&&c&&c.s===s&&c.h)return show(c.h);\n"
             "if(s)return get(R+s+'/taplink.html',20000,function(h){if(h){save(s,h);show(h)}else github(s)});\n"
-            # номер не узнали — показываем копию из телефона (если есть) и обновляем ее с GitHub на следующий раз
             "if(c&&c.h)show(c.h);github('')})})()</script>")
 
 BLOCKS = {
