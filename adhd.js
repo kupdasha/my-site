@@ -418,7 +418,25 @@ function liveCarousel(box){
   }, { threshold: .6 }).observe(view);
 }
 
+/* ---------- первые эскизы: коллаж, кадры проявляются шторкой по очереди ---------- */
+// { img, big: true } — ячейка 2 × 2, { img, wide: true } — 2 × 1; остальные — по одной клетке
+function firstHTML(c){
+  return `<div class="ad-first">${c.items.map((x, i) => {
+    const it = typeof x === 'string' ? { img: x } : x;
+    return `<button class="ad-fs${it.big ? ' big' : it.wide ? ' wide' : ''}" style="--i:${i}" aria-label="Увеличить эскиз"><img src="${it.img}" alt="" loading="lazy" draggable="false"></button>`;
+  }).join('')}</div>${cap(c.hint)}`;
+}
+function liveFirst(box){
+  const tiles = [...box.querySelectorAll('.ad-fs')];
+  box.addEventListener('click', e => {
+    const b = e.target.closest('.ad-fs'); if (!b) return;
+    const imgs = tiles.map(t => t.querySelector('img'));
+    H.openViewer(imgs.map(i => i.currentSrc || i.src), tiles.indexOf(b), imgs);
+  });
+}
+
 const KINDS = {
+  first:    [firstHTML, liveFirst, '.ad-first'],
   thoughts: [thoughtsHTML, liveThoughts, '.ad-thoughts'],
   board:    [boardHTML, liveBoard, '.ad-board'],
   type:     [typeHTML, liveType, '.ad-types'],

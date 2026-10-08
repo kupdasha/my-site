@@ -40,7 +40,7 @@
 .ad-types{display:grid;grid-template-columns:1fr;gap:clamp(16px,2vw,28px)}
 .ad-types figure{background:var(--soft);border-radius:clamp(20px,3vw,40px);padding:clamp(12px,2vw,28px);display:flex;flex-direction:column;gap:12px}
 .ad-types figcaption{font-size:16px;opacity:.6;text-align:center;text-wrap:balance}
-.ad-type{width:100%;height:auto;display:block;overflow:visible}
+.ad-type{width:100%;height:auto;aspect-ratio:1 / 1;flex:none;display:block;overflow:visible}   /* пропорции явно: в Safari svg без них в колонке схлопывается до нуля */
 .ad-type text{fill:var(--ink);font:500 22px var(--font)}
 .ad-ring text{font-size:27px}
 .ad-ring .ad-core{font-size:36px}
@@ -90,6 +90,18 @@
 /* на телефоне в центре только подпись к детали: заголовок не помещается между кружками */
 @container (max-width:460px){.ad-orb-ring{--R:39cqw;--s:20cqw}.ad-orb-core{width:40cqw}.ad-orb-title{display:none}.ad-orb-note{font-size:16px}.ad-ch.in .ad-orb.on .ad-orb-in{transform:scale(1.1)}}
 
+/* ---------- первые эскизы: коллаж 3 × 4, шторка снизу вверх по очереди ---------- */
+.ad-first{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:auto;grid-auto-flow:dense;gap:clamp(10px,1.4vw,20px)}
+.ad-fs{position:relative;aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in;padding:0;
+  clip-path:inset(100% 0 0 0 round var(--r-img));transition:clip-path 1s var(--ease) calc(.15s + var(--i) * .09s)}
+.ad-fs.big{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+.ad-fs.wide{grid-column:span 2;aspect-ratio:auto}
+.ad-fs img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.12);transition:transform 1.4s var(--ease) calc(.15s + var(--i) * .09s)}
+.ad-ch.in .ad-fs{clip-path:inset(0 0 0 0 round var(--r-img))}
+.ad-ch.in .ad-fs img{transform:none}
+.ad-ch.in .ad-fs:hover img{transform:scale(1.04);transition-delay:0s}
+@media (max-width:760px){.ad-first{grid-template-columns:repeat(2,minmax(0,1fr))}.ad-fs.big{grid-row:span 1;aspect-ratio:3/2}}
+
 /* ---------- что вышло ---------- */
 .ad-finals{display:grid;gap:clamp(32px,4vw,56px)}
 .ad-fin-name{font-weight:500;font-size:clamp(20px,1.8vw,26px);margin-bottom:14px}
@@ -136,5 +148,6 @@ button.ad-fin:hover img{transform:scale(1.04)}
 @media (max-width:640px){.ad-press-a{flex-direction:column;gap:6px}.ad-press-a span{text-align:left}}
 
 @media (prefers-reduced-motion: reduce){
+  .ad-fs,.ad-fs img{clip-path:none;transform:none;transition:none}
   .ad-viz,.ad-fin-group,.ad-press li,.ad-orb-in{opacity:1;transform:none;transition:none}
 }
