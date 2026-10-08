@@ -480,6 +480,7 @@ function liveFly(stage){
     const e = ease(k - Math.floor(k)), turn = i === n - 1 ? 2 * Math.PI * Math.ceil((a[0] - b[0]) / (2 * Math.PI)) : 0;
     keys.forEach((key, j) => { cam[key] = j === 2 ? Math.exp(lerp(Math.log(a[j]), Math.log(b[j]), e)) : lerp(a[j], b[j] + (j ? 0 : turn), e); });
     const [g, W, Hh] = sizeCanvas(cv);
+    if (W < 640) cam.dist *= .72;   // на телефоне кадр уже — камера ближе, чтобы кампус не терялся
     draw3d(g, W, Hh, cam, { pal: dark() ? PAL.dark : PAL.light, status: FLY_STATUS, labels: cam.dist > 120 && cam.dist < 700 });
   }
   function tick(){
@@ -827,6 +828,7 @@ function liveCampus(box, c){
     ];
     return `<div class="nv-spec"><span class="nv-mini-label">${H.T(L.title)}</span><dl>${rows.map(([k, v]) => `<dt>${H.T(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`;
   };
+  const narrow = () => innerWidth < 640;   // на телефоне табличка в панели меньше — до поля замечания листать недолго
   const head = (b) => `<div class="nv-side-head"><span class="nv-type-ic" title="${esc(TYPES[b.type].name)}">${ICON[b.type]}</span><b>№${b.n}</b><span>${H.T(b.zone)}</span></div>`;
   function renderPanel(){
     const b = board(), notes = st.notes[b.id] || [], live = open(b.id);
@@ -854,7 +856,7 @@ function liveCampus(box, c){
     } else {
       const done = BOARDS.filter(x => st.status[x.id] === 'ok').length, ok = st.status[b.id] === 'ok';
       panel.innerHTML = `${head(b)}
-        <div class="nv-client-plate">${plateWithPins(b, 190, 280, true)}</div>
+        <div class="nv-client-plate">${narrow() ? plateWithPins(b, 120, 180, true) : plateWithPins(b, 190, 280, true)}</div>
         <div class="nv-bubble"><textarea class="nv-input" rows="2" placeholder="${esc(H.pick(c.note))}" aria-label="${esc(H.pick(c.note))}"></textarea><button class="nv-round nv-send" aria-label="${esc(H.pick(c.send))}">${CI.send}</button></div>
         ${live.length ? `<div class="nv-notes">${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p></div>`).join('')}</div>` : ''}
         <div class="nv-approve"><button class="btn nv-ok${ok ? ' on' : ''}">${CI.check}<span class="spell">${H.T(ok ? c.done : c.ok)}</span></button><span class="nv-count">${done}/${BOARDS.length}</span></div>`;

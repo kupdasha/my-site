@@ -28,6 +28,7 @@
 
 /* ---------- шапка: пролеты над 3D-кампусом ---------- */
 .case-hero.nv-hero .nv-fly{position:absolute;inset:0;width:100%;height:100%;display:block}
+@media (max-width:640px){.case-hero.nv-hero{aspect-ratio:4/3}}   /* на телефоне кадр выше: 16:9 слишком низкий для пролета */
 
 /* ---------- заголовок главы с кнопкой демо ---------- */
 .nv-title-row{grid-column:5 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:20px 32px}
