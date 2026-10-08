@@ -70,7 +70,6 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
 .legs i::after{content:"";position:absolute;left:-2px;bottom:-3px;width:9px;height:5px;border-radius:3px 4px 2px 2px;background:inherit}
 .btn:hover .legs i{background:var(--btn-hover)}
 /* соцсети в веселой версии тоже на ножках: ножки светло-серые, плитки разбегаются кто куда */
-.soc a{--legc:#9AA1AD}
 :root[data-mode="fun"] .soc{row-gap:calc(26px*var(--k))}
 :root[data-mode="fun"] .soc a{position:relative;isolation:isolate;z-index:3;will-change:translate}
 .legs i:nth-child(1){left:16%}.legs i:nth-child(2){left:34%}.legs i:nth-child(3){left:66%}.legs i:nth-child(4){left:84%}
@@ -80,15 +79,19 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
 .soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 6px 2px;border-radius:14px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
 /* при наведении — цвет самой соцсети, текст контрастный */
 .soc a:hover{background:var(--brand);color:var(--brand-text,#fff)}
-.soc a[href*="linkedin"]{--brand:#0A66C2}
-.soc a[href*="vk.com"]{--brand:#0077FF}
-.soc a[href*="max.ru"]{--brand:linear-gradient(135deg,#2D7BFF,#8A3FFC)}
-.soc a[href*="t.me"]{--brand:#2AABEE;--brand-text:#0E1A24}
-.soc a[href*="tiktok"]{--brand:#000000}
-.soc a[href*="youtube"]{--brand:#FF0000}
-.soc a[href*="instagram"]{--brand:linear-gradient(45deg,#5B51D8,#833AB4,#C13584,#E1306C)}
-.soc a[href*="unsplash"]{--brand:#111111}
-.soc a[href*="behance"]{--brand:#1769FF}
+.soc a[href*="linkedin"]{--brand:#0A66C2;--legc:#0A66C2}
+.soc a[href*="vk.com"]{--brand:#0077FF;--legc:#0077FF}
+.soc a[href*="max.ru"]{--brand:linear-gradient(135deg,#2D7BFF,#8A3FFC);--legc:#5B5CFF}
+.soc a[href*="t.me"]{--brand:#2AABEE;--brand-text:#0E1A24;--legc:#2AABEE}
+.soc a[href*="tiktok"]{--brand:#000000;--legc:#25F4EE}
+.soc a[href*="youtube"]{--brand:#FF0000;--legc:#FF0000}
+.soc a[href*="instagram"]{--brand:linear-gradient(45deg,#5B51D8,#833AB4,#C13584,#E1306C);--legc:#A2348F}
+.soc a[href*="unsplash"]{--brand:#111111;--legc:#F4F4F6}
+.soc a[href*="behance"]{--brand:#1769FF;--legc:#1769FF}
+/* веселая версия: плитки сразу в цвете своей соцсети, ножки того же цвета (у черных TikTok и Unsplash — фирменные бирюзовый и белый, иначе на темном не видно) */
+:root[data-mode="fun"] .soc a{background:var(--brand);color:var(--brand-text,#fff)}
+:root[data-mode="fun"] .soc a:hover{filter:brightness(1.15)}
+:root[data-mode="fun"] .soc a[href*="tiktok"],:root[data-mode="fun"] .soc a[href*="unsplash"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
 :root[data-mode="fun"] .soc a[href*="tiktok"]:hover,:root[data-mode="fun"] .soc a[href*="unsplash"]:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 
 .legal{position:relative;z-index:1;max-width:330px;margin:calc(14px*var(--k)) auto 0;font-size:11px;line-height:1.3;color:var(--muted);text-align:center;text-wrap:balance}
