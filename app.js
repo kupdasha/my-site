@@ -2992,14 +2992,25 @@ function sendGameContact(contact){
   const mail = f.querySelector('[name="Email"], [name="email"], input[type="email"]');
   if (mail && mail !== field && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) set(mail.name, contact);
   f.querySelectorAll('input[type="checkbox"]').forEach(c => { if (!c.checked) c.click(); });   // галочки посетитель уже отметил в игре
-  const ok = () => f.classList.contains('js-send-form-success') || [...f.querySelectorAll('.js-successbox, .t-form__successbox')].some(b => b.offsetParent || getComputedStyle(b).display !== 'none');
+  // успех Тильда показывает по-разному: класс у формы, блок «спасибо» в форме или всплывающее окно (data-success-popup);
+  // плюс событие tildaform:aftersuccess. Ошибку — блоком ошибок в форме
+  let done = false;
+  // видимость считаем по display: окно «спасибо» Тильды на время отправки только невидимо (visibility, см. style.css)
+  const vis = el => el && getComputedStyle(el).display !== 'none';
+  const ok = () => done || f.classList.contains('js-send-form-success')
+    || [...f.querySelectorAll('.js-successbox, .t-form__successbox')].some(vis)
+    || [...document.querySelectorAll('.t-form-success-popup')].some(vis);
+  root.classList.add('kd-sending');
+  const bad = () => [...f.querySelectorAll('.js-errorbox-all, .t-form__errorbox-wrapper')].some(vis);
+  f.addEventListener('tildaform:aftersuccess', () => { done = true; }, { once: true });
+  window.jQuery?.(f).one?.('tildaform:aftersuccess', () => { done = true; });
   return new Promise((resolve, reject) => {
     const t0 = Date.now();
     (f.querySelector('[type="submit"], .t-submit') || {}).click?.();
     const iv = setInterval(() => {
-      if (ok()) { clearInterval(iv); resolve(); }
-      else if (Date.now() - t0 > 9000) { clearInterval(iv); reject(new Error('форма Тильды не ответила')); }
-    }, 250);
+      if (ok()) { clearInterval(iv); document.querySelectorAll('.t-form-success-popup').forEach(p => { p.style.display = 'none'; }); document.body.classList.remove('t-body_success-popup-showed'); setTimeout(() => root.classList.remove('kd-sending'), 300); resolve(); }
+      else if (bad() || Date.now() - t0 > 12000) { clearInterval(iv); root.classList.remove('kd-sending'); reject(new Error('форма Тильды не приняла заявку')); }
+    }, 200);
   });
 }
 $('#ttt').addEventListener('submit', e => {
@@ -3012,10 +3023,10 @@ $('#ttt').addEventListener('submit', e => {
     status.innerHTML = T(G.sent);
     form.remove();
   }).catch(() => {
-    // запасной путь: контакт уходит в Telegram готовым сообщением — посетителю остается нажать «отправить»
+    // не получилось (на странице нет формы Тильды или она не приняла заявку) — сами никуда не уводим,
+    // показываем ссылку: готовое сообщение в Telegram с контактом
     btn.disabled = false;
-    if (!tildaGameForm()) { location.href = `${SITE.telegram}?text=${encodeURIComponent(G.message + contact)}`; status.innerHTML = T(G.sent); }
-    else status.innerHTML = `${T(G.failed)} <a href="${SITE.telegram}?text=${encodeURIComponent(G.message + contact)}">Telegram</a>`;
+    status.innerHTML = `${T(G.failed)} <a href="${SITE.telegram}?text=${encodeURIComponent(G.message + contact)}" target="_blank" rel="noopener">Telegram</a>`;
   });
 });
 

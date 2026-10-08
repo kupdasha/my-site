@@ -2170,3 +2170,6 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .article-title .work-wip{position:static;display:inline-block;vertical-align:middle;margin-left:12px;border:1px solid currentColor;background:none;box-shadow:none;opacity:.6}
 /* на телефоне низ подвала не прячется под кнопкой «связаться» и плашкой cookie */
 @media (max-width:760px){.foot{padding-bottom:88px}:root.cookie-on .foot{padding-bottom:calc(88px + var(--cookie-h,0px))}}
+
+/* окно «спасибо» от спрятанной формы Тильды не показываем — ответ посетителю пишет сама игра */
+.kd-sending .t-form-success-popup{visibility:hidden!important}
