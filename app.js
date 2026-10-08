@@ -2925,7 +2925,9 @@ function renderGame(status){
       <label><input type="checkbox" name="agree" required><span>${T(G.agree[0])}<a href="${G.agreeLink}" target="_blank" rel="noopener">${T(G.agree[1])}</a></span></label>
       <label><input type="checkbox" name="policy" required><span>${T(G.policy[0])}<a href="${G.policyLink}" target="_blank" rel="noopener">${T(G.policy[1])}</a></span></label>
     </div>` : '';
-  if (w && w.who === 'x') after = `<form class="ttt-form" id="tttForm"><input class="ttt-input" name="contact" required placeholder="${G.field}" aria-label="${G.field}"><button class="btn btn-accent"><span class="spell">${T(G.send)}</span><span class="arr">→</span></button>${agree}</form>`;
+  // три обязательных поля: имя, телефон, ник в Telegram
+  const inp = (name, ph, type, extra = '') => `<input class="ttt-input" name="${name}" type="${type}" required placeholder="${ph}" aria-label="${ph}"${extra}>`;
+  if (w && w.who === 'x') after = `<form class="ttt-form" id="tttForm"><div class="ttt-fields">${inp('name', G.fName, 'text', ' autocomplete="name"')}${inp('phone', G.fPhone, 'tel', ' autocomplete="tel" pattern="[+0-9()\\s-]{7,}"')}${inp('tg', G.fTg, 'text', ' pattern="@?[A-Za-z0-9_]{4,}|https?://t\\.me/.+"')}</div><button class="btn btn-accent"><span class="spell">${T(G.send)}</span><span class="arr">→</span></button>${agree}</form>`;
   if (w && w.who !== 'x') after = `<a class="btn btn-accent" href="${SITE.telegram}"><span class="spell">${T(G.write)}</span><span class="arr">→</span></a>`;
   box.innerHTML = `
     <h3 class="ttt-title"><span class="iris" data-t="${G.title}">${T(G.title)}</span></h3>
@@ -2976,7 +2978,7 @@ function contactField(f){
     || f.querySelector('input[type="text"]:not([type="hidden"])') || f.querySelector('[name="Email"], [name="email"], input[type="email"]')
     || f.querySelector('[name="Phone"], [name="phone"], input[type="tel"]');
 }
-function sendGameContact(contact){
+function sendGameContact(contact, data = {}){
   const f = tildaGameForm();
   if (!f) return Promise.reject(new Error('нет формы Тильды'));
   const set = (name, v) => { const el = f.querySelector(`[name="${name}"]`); if (el) { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } };
@@ -2986,8 +2988,16 @@ function sendGameContact(contact){
   // чтобы Тильда не отказала (например, если в форме обязательный Email, а оставили ник в Telegram)
   f.querySelectorAll('[data-tilda-req]').forEach(el => el.removeAttribute('data-tilda-req'));
   f.querySelectorAll('[data-tilda-rule]').forEach(el => el.removeAttribute('data-tilda-rule'));
-  set(field.name, f.querySelector('[name="kd_source"]') ? contact : `${contact} (${src})`);
+  set(field.name, data.name || (f.querySelector('[name="kd_source"]') ? contact : `${contact} (${src})`));
   set('kd_source', src);
+  // телефон — в поле телефона Тильды (видимая часть и скрытое итоговое значение), Telegram и источник — отдельными полями:
+  // Tilda CRM сама заведет для них колонки
+  if (data.phone) {
+    f.querySelectorAll('input[type="tel"], [name="Phone"], [name="phone"], [name="Телефон"]').forEach(el => { el.value = data.phone; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  }
+  const extra = (name, v) => { let el = f.querySelector(`input[name="${name}"]`); if (!el) { el = document.createElement('input'); el.type = 'hidden'; el.name = name; f.appendChild(el); } el.value = v; };
+  if (data.tg) extra('Telegram', data.tg);
+  if (data.name) extra('Источник', src);
   // если оставили почту — она идет и в поле Email
   const mail = f.querySelector('[name="Email"], [name="email"], input[type="email"]');
   if (mail && mail !== field && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) set(mail.name, contact);
@@ -3015,11 +3025,15 @@ function sendGameContact(contact){
 }
 $('#ttt').addEventListener('submit', e => {
   e.preventDefault();
-  const G = SITE.game, form = e.target, contact = form.contact.value.trim();
+  const G = SITE.game, form = e.target;
+  const el = n => form.elements.namedItem(n);   // form.name — это имя самой формы, поэтому поля берем так
+  const data = { name: el('name')?.value.trim(), phone: el('phone')?.value.trim(), tg: el('tg')?.value.trim() };
+  if (data.tg && !data.tg.startsWith('@') && !/^https?:/.test(data.tg)) data.tg = '@' + data.tg;
+  const contact = el('contact') ? el('contact').value.trim() : [data.name, data.phone, data.tg].filter(Boolean).join(', ');
   if (!contact) return;
   const status = $('.ttt-status'), btn = form.querySelector('.btn');
   btn.disabled = true; status.innerHTML = T(G.sending || '');
-  sendGameContact(contact).then(() => {
+  sendGameContact(contact, data).then(() => {
     status.innerHTML = T(G.sent);
     form.remove();
   }).catch(() => {
