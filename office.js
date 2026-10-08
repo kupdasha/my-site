@@ -7,9 +7,9 @@
    side — одно окно, внутри рядом готовые шаблоны: заявление в Word,
    смета со значками счетчиков и итогом по формуле, презентация;
    курсор переносит итог сметы в график и в заявление;
-   comb — кнопка «причесать»: страшная таблица (жирные рамки, пестрые
-   ячейки, вкривь) после нажатия становится аккуратной и понятной —
-   пастельная шапка, ровные строки; без фона, минимум объектов;
+   comb — кнопка «причесать»: сначала страшная таблица (жирные рамки,
+   пестрые ячейки, вкривь), потом страшная схема (кривые блоки, толстые
+   косые связи); после нажатия обе становятся аккуратными, в пастели;
    html — вкладка HTML: презентация с анимацией становится лендингом
    и сама подстраивается под ноутбук, планшет и телефон; файл легкий,
    уходит по почте и в мессенджеры, открывается без интернета;
@@ -295,22 +295,40 @@ function liveClosed(box){
 // в страшной таблице текст скачет (слева, по центру, справа), в причесанной — названия слева, числа справа
 const COMB_W = [[54, 40, 46, 38], [70, 34, 52, 44], [48, 58, 30, 50], [62, 44, 40, 56], [44, 50, 60, 36]];
 const COMB_AL = ['c', 'r', 'l', 'c', 'r', 'l', 'l', 'c', 'r', 'r', 'c', 'l', 'l', 'r', 'c', 'c', 'r', 'l', 'c', 'l'];
+// схема: пять блоков — страшно (u: x, y, ширина, высота в % поля и поворот) и ровно (n); связи — две линии поверх
+const COMB_BOX = [
+  { u: [1, 4, 30, 24, -6], n: [2, 10, 26, 30] },
+  { u: [12, 62, 22, 32, 5], n: [2, 60, 26, 30] },
+  { u: [40, 26, 22, 36, -4], n: [37, 32, 26, 36] },
+  { u: [68, 2, 30, 22, 7], n: [72, 10, 26, 30] },
+  { u: [72, 60, 24, 34, -8], n: [72, 60, 26, 30] },
+];
 function combHTML(c){
   const cells = COMB_W.flatMap((row, r) => row.map((w, k) =>
     `<span class="c a-${COMB_AL[r * 4 + k]}${k ? ' n' : ''}"><i style="--w:${w}%"></i></span>`)).join('');
-  return `<div class="ro-stage ro-combst">
-    <div class="ro-tbl">${cells}</div>
+  const boxes = COMB_BOX.map(({ u, n }, k) => `<div class="bx" style="--ux:${u[0]}%;--uy:${u[1]}%;--uw:${u[2]}%;--uh:${u[3]}%;--ur:${u[4]}deg;` +
+    `--nx:${n[0]}%;--ny:${n[1]}%;--nw:${n[2]}%;--nh:${n[3]}%;--k:${k}"><i></i><i class="s"></i></div>`).join('');
+  return `<div class="ro-stage ro-combst" data-v="tbl">
+    <div class="ro-field">
+      <div class="ro-tbl">${cells}</div>
+      <div class="ro-sch">
+        <svg class="lk ugly" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M16 16L51 44M23 78L49 48M52 40L83 13M56 52L84 77"/></svg>
+        <svg class="lk neat" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M28 25H32.5V44H37M28 75H32.5V56H37M63 44H67.5V25H72M63 56H67.5V75H72"/></svg>
+        ${boxes}
+      </div>
+    </div>
     <span class="ro-comb">${SPARK}<span>${H.T(c.btn)}</span></span>
   </div>`;
 }
 function liveComb(box){
   const st = box.querySelector('.ro-combst'), btn = st.querySelector('.ro-comb');
   if (still()) { st.classList.add('neat'); return; }
-  cycle(st, [
-    async () => { st.classList.remove('neat'); await wait(2000); },                                   // страшная таблица
-    async () => { btn.classList.add('hit'); await wait(220); btn.classList.remove('hit');              // нажали «причесать»
-      st.classList.add('neat'); await wait(3400); },                                                  // аккуратная и понятная
-  ], .35);
+  // сначала таблица, потом схема: страшно — нажали «причесать» — понятно
+  const round = v => [
+    async () => { st.classList.add('swap'); await wait(350); st.classList.remove('neat'); st.dataset.v = v; await wait(60); st.classList.remove('swap'); await wait(1900); },
+    async () => { btn.classList.add('hit'); await wait(240); btn.classList.remove('hit'); st.classList.add('neat'); await wait(3000); },
+  ];
+  cycle(st, [...round('tbl'), ...round('sch')], .35);
 }
 
 /* ================================================================
@@ -353,13 +371,19 @@ const tryHTML = t => t ? `<div class="ro-try">
 
 /* ---------- скриншоты программы: карусель ---------- */
 // легкая копия (900 px) для телефона, полная (1680 px) — для экранов шире; грузятся лениво, место под картинку занято заранее
-function shotsHTML(list){
-  return `<section class="ro-shots-ch wrap">
+const ARROW = d => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d > 0 ? 'M5 12h13M13 6l6 6-6 6' : 'M19 12H6M11 6l-6 6 6 6'}"/></svg>`;
+function shotsHTML(list, label){
+  return `<section class="ro-ch ro-shots-ch wrap">
+    ${label ? `<span class="case-label ro-label ro-shots-label">${H.T(label)}</span>` : ''}
     <div class="ro-shots" tabindex="0" role="region" aria-label="Скриншоты программы">${list.map(x =>
       `<figure class="ro-shot"><img src="${esc(x.small)}" srcset="${esc(x.small)} 900w, ${esc(x.src)} ${x.w}w"
         sizes="(max-width: 640px) 86vw, (max-width: 1100px) 74vw, 62vw" width="${x.w}" height="${x.h}" loading="lazy" decoding="async" alt=""></figure>`).join('')}
     </div>
-    <div class="ro-shots-bar" aria-hidden="true"><i></i></div>
+    <div class="ro-shots-nav">
+      <div class="ro-shots-bar" aria-hidden="true"><i></i></div>
+      <button class="ro-arr" type="button" data-d="-1" aria-label="назад">${ARROW(-1)}</button>
+      <button class="ro-arr" type="button" data-d="1" aria-label="дальше">${ARROW(1)}</button>
+    </div>
   </section>`;
 }
 function liveShots(box, list){
@@ -370,7 +394,12 @@ function liveShots(box, list){
     const max = row.scrollWidth - row.clientWidth;
     bar.style.width = (row.clientWidth / row.scrollWidth * 100) + '%';
     bar.style.transform = `translateX(${max > 0 ? row.scrollLeft / max * (row.scrollWidth / row.clientWidth - 1) * 100 : 0}%)`;
+    // стрелки под лентой: в начале «назад» бледная, в конце — «дальше»
+    arrows[0].disabled = row.scrollLeft < 4; arrows[1].disabled = row.scrollLeft > max - 4;
   };
+  const arrows = [...box.querySelectorAll('.ro-arr')];
+  arrows.forEach(a => a.addEventListener('click', () =>
+    row.scrollBy({ left: +a.dataset.d * (imgs[0].clientWidth + 20), behavior: 'smooth' })));
   row.addEventListener('scroll', sync, { passive: true });
   addEventListener('resize', sync, { passive: true });
   imgs.forEach(i => i.addEventListener('load', sync, { once: true }));
@@ -440,7 +469,7 @@ export async function mountOffice(mount, p, helpers){
     ? `<section class="ro-ch wrap ro-${k}-ch">${head(o[k])}<div class="ro-viz">${html(o[k])}</div></section>`
     : `<section class="ro-ch wrap ro-${k}-ch ro-split${lay === 'right' ? ' rev' : ''}"><div class="ro-viz">${html(o[k])}</div>${
         side(o[k], lastSplit && lastSplit[0] === k ? tryHTML(o.try) : '')}</section>`).join('');
-  if (o.shots && o.shots.length) mount.insertAdjacentHTML('beforeend', shotsHTML(o.shots));
+  if (o.shots && o.shots.length) mount.insertAdjacentHTML('beforeend', shotsHTML(o.shots, o.shotsLabel));
   mount.querySelectorAll('.ro-title').forEach(splitWords);
   mount.querySelectorAll('.ro-ch').forEach(s => reveal.observe(s));
   list.forEach(([k, , live]) => live(mount.querySelector(`.ro-${k}-ch`), o[k]));

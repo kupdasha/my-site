@@ -1733,6 +1733,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             btn:   ['открыть демо', 'открыть демо'],
             link:  'https://rus-office.kupdaria26.workers.dev/',
           },
+          shotsLabel: ['интерфейс программы', 'как это выглядит'],   // подпись над каруселью скриншотов
           // скриншоты программы — каруселью в самом конце кейса; small — легкая копия для телефона (900 px), src — 1680 px
           shots: [
             { src: 'img/russkiy-ofis/shot-1.webp', small: 'img/russkiy-ofis/shot-1-s.webp', w: 1680, h: 995 },
