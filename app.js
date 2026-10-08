@@ -380,6 +380,7 @@ function rotateEvents(strip){
   const E = SITE.photos.events, slots = [...strip.querySelectorAll('.ev')];
   if (!slots.length || reduced) return;
   const ev = i => pick(E.items[i].caption), tall = i => (E.items[i].ratio || 1.5) < 1;
+  const OFTEN = (E.often || []).map(pick), often = i => OFTEN.includes(ev(i));
   let used = new Set(slots.map(s => +s.dataset.i));
   evTimer = setInterval(() => {
     const r = strip.getBoundingClientRect();
@@ -389,11 +390,13 @@ function rotateEvents(strip){
       const cur = +slot.dataset.i;
       const ok = i => tall(i) === tall(cur) && !now.includes(i) && !picked.includes(i)
         && ev(i) !== ev(cur) && !picked.some(j => ev(j) === ev(i));
-      let pool = E.items.map((x, i) => i).filter(i => ok(i) && !used.has(i));
-      if (!pool.length) {   // все кадры этого формата показаны — начинаем круг заново
+      // события из often показываются чаще: им можно повторяться и у них четыре шанса вместо одного
+      let pool = E.items.map((x, i) => i).filter(i => ok(i) && (!used.has(i) || often(i)));
+      if (!pool.some(i => !often(i))) {   // все обычные кадры этого формата показаны — начинаем круг заново
         E.items.forEach((x, i) => { if (tall(i) === tall(cur)) used.delete(i); });
         pool = E.items.map((x, i) => i).filter(ok);
       }
+      pool = pool.flatMap(i => often(i) ? [i, i, i, i] : [i]);
       const next = pool.length ? pool[Math.floor(Math.random() * pool.length)] : cur;
       picked.push(next); used.add(next);
     }
