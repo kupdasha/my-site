@@ -66,9 +66,13 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
 /* ножки — как на сайте (fun.js) */
 .legs{display:none;position:absolute;left:0;right:0;bottom:3px;height:0;z-index:-1;pointer-events:none}
 :root[data-mode="fun"] .legs{display:block}
-.legs i{position:absolute;top:-6px;width:4px;height:var(--leg,20px);margin-left:-2px;border-radius:2px;background:var(--btn);transform-origin:50% 0;transform:rotate(var(--a,0deg));transition:background .35s}
+.legs i{position:absolute;top:-6px;width:4px;height:var(--leg,20px);margin-left:-2px;border-radius:2px;background:var(--legc,var(--btn));transform-origin:50% 0;transform:rotate(var(--a,0deg));transition:background .35s}
 .legs i::after{content:"";position:absolute;left:-2px;bottom:-3px;width:9px;height:5px;border-radius:3px 4px 2px 2px;background:inherit}
 .btn:hover .legs i{background:var(--btn-hover)}
+/* соцсети в веселой версии тоже на ножках: ножки светло-серые, плитки разбегаются кто куда */
+.soc a{--legc:#9AA1AD}
+:root[data-mode="fun"] .soc{row-gap:calc(26px*var(--k))}
+:root[data-mode="fun"] .soc a{position:relative;isolation:isolate;z-index:3;will-change:translate}
 .legs i:nth-child(1){left:16%}.legs i:nth-child(2){left:34%}.legs i:nth-child(3){left:66%}.legs i:nth-child(4){left:84%}
 
 /* соцсети — сетка 3×3, как в исходном таплинке */
@@ -134,7 +138,6 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
     <nav class="actions" aria-label="Главное">
       <a class="btn" href="https://kupdasha.ru/" target="_blank" rel="noopener" data-serious="заказать дизайн-проект" data-fun="что умею?"><span class="t">заказать дизайн-проект</span></a>
       <a class="btn" href="https://kupdasha.ru/profile" target="_blank" rel="noopener" data-serious="позвать выступать" data-fun="позвать"><span class="t">позвать выступать</span></a>
-      <a class="btn" href="https://kupdasha.ru/merch" target="_blank" rel="noopener" data-serious="задизайнить себе мерч" data-fun="приодеться"><span class="t">задизайнить себе мерч</span></a>
       <a class="btn" href="https://kupdasha.ru/ai" target="_blank" rel="noopener" data-serious="ИИ-воркшоп для вашей команды" data-fun="ИИшнуться"><span class="t">ИИ-воркшоп для вашей команды</span></a>
     </nav>
 
@@ -374,7 +377,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
      в жидкости покачиваются на волнах. Друг на друга не налезают.
      ================================================================ */
   const RUN = { speed: 170, fleeSpeed: 300, rest: [600, 2200], margin: 6 };
-  const runners = [...document.querySelectorAll('.actions .btn')].map(el => {
+  const runners = [...document.querySelectorAll('.actions .btn, .soc a')].map(el => {
     const legs = document.createElement('span');
     legs.className = 'legs'; legs.setAttribute('aria-hidden', 'true');
     legs.innerHTML = '<i></i><i></i><i></i><i></i>';
@@ -387,7 +390,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
   });
   const setLegs = (r, a, len) => r.legs.forEach((l, i) => { l.style.setProperty('--a', a[i].toFixed(1) + 'deg'); l.style.setProperty('--leg', len.toFixed(1) + 'px'); });
   // переименовать кнопки под версию
-  function labels() { runners.forEach(r => { r.label.textContent = fun ? r.el.dataset.fun : r.el.dataset.serious; }); }
+  function labels() { runners.forEach(r => { if (r.label) r.label.textContent = fun ? r.el.dataset.fun : r.el.dataset.serious; }); }
   // где кнопка стоит без сдвига (ее «дом» в раскладке)
   function measureRunners() {
     runners.forEach(r => {
