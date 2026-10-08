@@ -831,11 +831,24 @@ function makeFog(media){
   f.onLeave = () => { f.last = null; };
   media.addEventListener('pointermove', f.onMove);
   media.addEventListener('pointerleave', f.onLeave);
+  guardWipe(f, media, 'fogged');
   return f;
+}
+/* Пока иней или серебро не стерты: палец не прокручивает страницу (touch-action: none у поля),
+   а протирание не считается нажатием — кейс или ссылка открываются только от короткого касания без движения */
+function guardWipe(f, el, cls){
+  el.classList.add(cls);
+  f.moved = 0;
+  f.onDown = e => { f.moved = 0; f.last = null; if (e.pointerType !== 'mouse') el.setPointerCapture?.(e.pointerId); };
+  f.onClick = e => { if (f.moved > 12) { e.preventDefault(); e.stopPropagation(); } };
+  el.addEventListener('pointerdown', f.onDown);
+  el.addEventListener('click', f.onClick, true);
+  f.unguard = () => { el.classList.remove(cls); el.removeEventListener('pointerdown', f.onDown); el.removeEventListener('click', f.onClick, true); };
 }
 function wipe(f, e){
   if (f.done) return;
   const r = f.media.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  if (f.last) f.moved += Math.hypot(x - f.last[0], y - f.last[1]);
   const g = f.g;
   g.save(); g.globalCompositeOperation = 'destination-out';
   const steps = f.last ? Math.max(1, Math.ceil(Math.hypot(x - f.last[0], y - f.last[1]) / 10)) : 1;
@@ -854,10 +867,10 @@ function wipe(f, e){
   }
   g.restore();
   f.last = [x, y];
-  if (f.cleared / f.grid.length > FOG.clearAt) { f.done = true; f.c.classList.add('gone'); setTimeout(() => f.c.remove(), 1000); }
+  if (f.cleared / f.grid.length > FOG.clearAt) { f.done = true; f.c.classList.add('gone'); setTimeout(() => { f.c.remove(); f.unguard?.(); }, 1000); }
 }
 function setupFog(){
-  fogs.forEach(f => { f.c.remove(); f.media.removeEventListener('pointermove', f.onMove); f.media.removeEventListener('pointerleave', f.onLeave); });
+  fogs.forEach(f => { f.c.remove(); f.unguard?.(); f.media.removeEventListener('pointermove', f.onMove); f.media.removeEventListener('pointerleave', f.onLeave); });
   fogs = [];
   if (!on) return;
   // иней: на кейсах с frost: true и еще на стольких, чтобы в выбранной категории
@@ -907,11 +920,15 @@ function makeSecret(media, k){
   f.onLeave = () => { f.last = null; };
   c.addEventListener('pointermove', f.onMove);
   c.addEventListener('pointerleave', f.onLeave);
+  guardWipe(f, c, 'scratching');
+  // ссылка карточки (запросить пароль) не срабатывает, если по серебру водили монеткой
+  media.addEventListener('click', e => { if (f.moved > 12 && e.target === c) { e.preventDefault(); e.stopPropagation(); } }, true);
   return f;
 }
 function scratch(f, e){
   if (f.done) return;
   const r = f.c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, g = f.g;
+  if (f.last) f.moved += Math.hypot(x - f.last[0], y - f.last[1]);
   g.save(); g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
   const steps = f.last ? Math.max(1, Math.ceil(Math.hypot(x - f.last[0], y - f.last[1]) / 4)) : 1;
   for (let i = 1; i <= steps; i++) {
@@ -926,7 +943,7 @@ function scratch(f, e){
   }
   g.restore();
   f.last = [x, y];
-  if (f.cleared / f.grid.length > SECRET.clearAt) { f.done = true; f.c.classList.add('gone'); }
+  if (f.cleared / f.grid.length > SECRET.clearAt) { f.done = true; f.c.classList.add('gone'); f.unguard?.(); }
 }
 function setupSecrets(){
   secrets.forEach(f => f.d.remove());

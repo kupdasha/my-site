@@ -1914,3 +1914,14 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .case-wait span{display:block;margin-top:2px;font-size:16px;line-height:1.35;opacity:.65}
 .case-wait i{position:absolute;left:0;bottom:0;height:4px;width:100%;background:#E2FB5A;transform-origin:left;transform:scaleX(var(--p,.06));transition:transform .5s var(--ease)}
 @media (max-width:760px){.case-wait{bottom:88px}}
+
+/* дружеская версия на телефоне: пока иней или серебро не стерты, палец стирает, а не листает страницу */
+.media.fogged,.silver.scratching{touch-action:none}
+/* шутка под серебром — ровно в поле, которое стирается: в две строки по центру, за край не выходит */
+.prank{left:18%;top:46%;width:64%;height:24%;translate:none;display:grid;place-items:center;padding:0 10px;text-align:center;white-space:normal;line-height:1.15;text-wrap:balance}
+@media (max-width:760px){
+  .silver,.prank{left:8%;width:84%;top:42%;height:32%}
+}
+/* в дружеской версии нет ряда размытых закрытых карточек перед кнопками про пароль — там досье */
+:root[data-theme="dark"] .nda-more{display:none}
+:root[data-theme="dark"] .nda-more+.nda-cta{margin-top:clamp(40px,5vw,64px)}
