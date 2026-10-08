@@ -254,6 +254,8 @@ def taplink_block():
     return ('<!-- ТАПЛИНК. Сверху — настройки: тексты и ссылки можно менять прямо здесь. Ниже — загрузчик, его не трогать. -->\n'
             + TAPLINK_SETTINGS + '\n\n'
             '<!-- ЗАГРУЗЧИК: дальше ничего не менять. Оформление и анимация лежат на GitHub в taplink.html. -->\n'
+            # Тильда на компьютере прячет страницу и проявляет ее через 0,4 с после загрузки — таплинку это не нужно
+            '<style>#allrecords.t-records{opacity:1!important;transition:none!important}</style>\n'
             '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>\n'
             "<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',\n"
             "G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
@@ -284,7 +286,7 @@ def taplink_block():
             # (в России *.workers.dev бывает закрыт), служебная ветка version на GitHub и GitHub API
             "var V=['https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t='+Date.now(),'https://api.github.com/repos/kupdasha/my-site/commits/main'],got=0,left=3;\n"
             "function sha(t){t=(t||'').trim();return /^[0-9a-f]{40}$/.test(t)?t:''}\n"
-            "function ask(u,h){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=3500;\n"
+            "function ask(u,h){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=2500;\n"
             "x.onload=function(){done(x.status==200?sha(x.responseText):'')};x.onerror=x.ontimeout=function(){done('')};x.send()}\n"
             # страница: по номеру с jsDelivr, иначе последняя копия jsDelivr, иначе прямо с GitHub, иначе копия из телефона
             "function page(s){var u=[];if(s)u.push(R+s+'/taplink.html');u.push(R+'main/taplink.html?v='+Math.floor(Date.now()/36e5),G+'?t='+Date.now());\n"
@@ -292,7 +294,7 @@ def taplink_block():
             "function done(s){left--;if(got)return;if(s){got=1;if(c&&c.s===s&&c.h)show(c.h);else page(s)}else if(!left){got=1;page('')}}\n"
             "ask(W);ask(V[0]);ask(V[1],'application/vnd.github.sha');\n"
             # медленная связь: если за 1,5 с номер не пришел, а копия в телефоне есть — показываем ее, не дожидаясь
-            "setTimeout(function(){if(!got&&c&&c.h)show(c.h)},1500)})()</script>")
+            "setTimeout(function(){if(!got&&c&&c.h)show(c.h)},1200)})()</script>")
 
 BLOCKS = {
     '1 шапка': [
