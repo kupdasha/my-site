@@ -1,0 +1,314 @@
+/* ================================================================
+   КЕЙС «РУССКИЙ ОФИС» (office.js, поле office у проекта)
+   Цвета — сайта: текст --ink, подложки --soft, линии --line.
+   Цвета вкладок — как в приложении: документ синий, таблица
+   зеленая, HTML лаймовый, презентация малиновая (без оранжевого).
+   ================================================================ */
+.ro{overflow-x:clip;--ro-gap:clamp(72px,9vw,144px);
+  --ro-doc:#185ABD;--ro-sheet:#1E7145;--ro-slide:#C2304A;--ro-html:#ADE900;--ro-mark:#E2FB5A;--ro-paper:#FFFFFF;--ro-paper-line:#E3E4E8}
+.ro-m-doc{--m:var(--ro-doc)}.ro-m-sheet{--m:var(--ro-sheet)}.ro-m-slide{--m:var(--ro-slide)}.ro-m-html{--m:var(--ro-html)}
+.ro-ch{margin-bottom:var(--ro-gap)}
+.ro-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
+.ro-head .ro-label{grid-column:1 / span 3;grid-row:1}
+.ro-title{font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.ro-head .ro-title,.ro-head .ro-text{grid-column:5 / -1}
+.ro-text{font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
+@media (max-width:760px){.ro-head .ro-label,.ro-head .ro-title,.ro-head .ro-text{grid-column:1 / -1}.ro-head .ro-label{grid-row:auto}}
+
+/* заголовок: слова поднимаются из-под строки одно за другим */
+.ro-w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.ro-w > span{display:inline-block;transform:translateY(105%);transition:transform .9s var(--ease) calc(var(--i) * 55ms)}
+.ro-ch.in .ro-w > span{transform:none}
+.ro-text,.ro-label,.ro-try{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease) .25s,transform .9s var(--ease) .25s}
+.ro-ch.in .ro-text,.ro-ch.in .ro-label,.ro-ch.in .ro-try{opacity:1;transform:none}
+.ro-try{transition-delay:.45s}
+.ro-viz{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .3s,transform 1.1s var(--ease) .3s}
+.ro-ch.in .ro-viz{opacity:1;transform:none}
+
+/* сцена в половину ширины: рисунок с одной стороны, текст с другой */
+.ro-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
+.ro-split > .ro-viz{grid-column:1 / span 7}
+.ro-side{grid-column:9 / -1;display:flex;flex-direction:column;gap:20px}
+.ro-split.rev > .ro-viz{grid-column:6 / -1;order:2}
+.ro-split.rev > .ro-side{grid-column:1 / span 4}
+.ro-side .ro-title{font-size:clamp(30px,3.2vw,48px);max-width:none}
+.ro-side .ro-text{font-size:clamp(19px,1.5vw,22px)}
+@media (max-width:900px){.ro-split > .ro-viz,.ro-split > .ro-side,.ro-split.rev > .ro-viz,.ro-split.rev > .ro-side{grid-column:1 / -1}.ro-split > .ro-side{order:-1}}
+@media (max-width:480px){.ro-title,.ro-side .ro-title{font-size:min(7.4vw,32px)}}
+
+/* общая подложка живых блоков */
+.ro-stage{position:relative;border-radius:var(--r-img);background:var(--soft);overflow:hidden}
+
+/* ---------- окно приложения и рисунки вкладок ---------- */
+.ro-app{position:relative;background:var(--bg);border-radius:10px;box-shadow:0 18px 40px -26px rgba(20,24,32,.3);overflow:hidden}
+.ro-bar{display:flex;align-items:center;gap:6px;height:clamp(18px,2vw,26px);padding:0 10px;border-bottom:3px solid var(--m,var(--line))}
+.ro-bar > b{display:block;width:34%;height:7px;border-radius:4px;background:var(--m)}
+.ro-pane{position:relative;padding:9% 10%}
+.g{display:flex;flex-direction:column;gap:9px}
+.g i{display:block;height:7px;border-radius:4px;background:var(--line)}
+.g i.h{height:11px;width:58%;background:var(--ink)}
+.g i.s{width:66%}
+.g-sheet{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:4px}
+.g-sheet u{display:block;height:10px;border-radius:2px;background:var(--line)}
+.g-sheet u.th{background:var(--m)}
+.g-slide .bars{display:flex;align-items:flex-end;gap:10%;height:52px;padding-top:4px}
+.g-slide .bars b{flex:1;border-radius:3px 3px 0 0;background:var(--m)}
+.g-html .gh{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:5px;background:var(--ro-mark)}
+.g-html .gh i{background:#1D222A;opacity:.85;width:70%}
+.g-html .gh i.s{width:45%;opacity:.4}
+.g-html .cards{display:flex;gap:6px}
+.g-html .cards b{flex:1;height:22px;border-radius:4px;background:var(--line)}
+.g-html .gb{display:block;width:40%;height:12px;border-radius:99px;background:var(--ink)}
+
+/* ---------- one: три редактора с ключами → одно окно ---------- */
+.ro-one{display:grid;place-items:center;min-height:clamp(320px,34vw,480px);padding:clamp(28px,4vw,56px) clamp(12px,3vw,48px)}
+.ro-one > *{grid-area:1 / 1}
+.ro-many{--gap:clamp(14px,3vw,48px);display:flex;gap:var(--gap)}
+.ro-many .ro-app{width:clamp(96px,18vw,250px);aspect-ratio:4/3.2;overflow:visible;
+  transition:transform .9s var(--ease-io),opacity .6s var(--ease)}
+.ro-many .ro-app .ro-bar{border-radius:10px 10px 0 0}
+/* ключ-лицензия на углу каждого окна */
+.ro-key{position:absolute;right:-12px;top:-14px;display:grid;place-items:center;width:clamp(30px,3vw,42px);aspect-ratio:1;border-radius:50%;background:var(--ink);
+  transition:transform .7s var(--ease),opacity .5s var(--ease)}
+.ro-key svg{width:62%;fill:none;stroke:var(--bg);stroke-width:2;stroke-linecap:round}
+.ro-one[data-step="1"] .ro-key,.ro-one[data-step="2"] .ro-key{transform:translateY(-60px) rotate(-30deg);opacity:0}
+/* окна съезжаются в середину и тают, на их месте растет одно */
+.ro-one[data-step="2"] .ro-many .ro-app{transform:translateX(calc((1 - var(--i)) * (100% + var(--gap)))) scale(.7);opacity:0}
+.ro-one[data-step="3"] .ro-many .ro-app,.ro-one[data-step="3"] .ro-key{transition:none;opacity:0}
+.ro-single{opacity:0;transform:scale(.6);transition:opacity .5s var(--ease),transform .9s var(--ease)}
+.ro-one[data-step="2"] .ro-single{opacity:1;transform:none;transition-delay:.35s}
+.ro-big{width:clamp(240px,40vw,520px);aspect-ratio:16/10}
+.ro-tabs{gap:clamp(4px,.6vw,8px);border-bottom-color:var(--m);transition:border-color .4s}
+.ro-tabs .ro-t{display:block;flex:0 1 52px;height:9px;border-radius:5px;background:var(--line);transition:background .4s}
+.ro-big[data-mode="doc"]{--m:var(--ro-doc)}.ro-big[data-mode="sheet"]{--m:var(--ro-sheet)}.ro-big[data-mode="slide"]{--m:var(--ro-slide)}.ro-big[data-mode="html"]{--m:var(--ro-html)}
+.ro-big[data-mode="doc"] .ro-t.ro-m-doc,.ro-big[data-mode="sheet"] .ro-t.ro-m-sheet,
+.ro-big[data-mode="slide"] .ro-t.ro-m-slide,.ro-big[data-mode="html"] .ro-t.ro-m-html{background:var(--m)}
+.ro-modes{display:grid;padding:6% 8%}
+.ro-mode{grid-area:1 / 1;opacity:0;transform:translateY(10px);transition:opacity .35s,transform .5s var(--ease)}
+.ro-big[data-mode="doc"] .ro-mode.ro-m-doc,.ro-big[data-mode="sheet"] .ro-mode.ro-m-sheet,
+.ro-big[data-mode="slide"] .ro-mode.ro-m-slide,.ro-big[data-mode="html"] .ro-mode.ro-m-html{opacity:1;transform:none}
+.ro-big .g-slide .bars{height:clamp(60px,9vw,120px)}
+.ro-big .g{gap:clamp(8px,1vw,14px)}
+.ro-big .g i{height:clamp(7px,.8vw,10px)}
+.ro-big .g-sheet u{height:clamp(12px,1.6vw,22px)}
+.ro-big .g-html .cards b{height:clamp(24px,3.4vw,44px)}
+
+/* ---------- side: три вкладки рядом в одном окне ---------- */
+.ro-sidest{padding:clamp(20px,4vw,56px)}
+.ro-wide{max-width:1040px;margin:0 auto}
+.ro-wide .ro-tabs{border-bottom-color:var(--line)}
+.ro-wide .ro-tabs .ro-t{background:var(--m)}
+.ro-panes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.ro-p{position:relative;padding:clamp(14px,2.4vw,32px);border-top:3px solid var(--m)}
+.ro-p + .ro-p{border-left:1.5px solid var(--line)}
+@media (max-width:640px){.ro-panes{grid-template-columns:1fr}.ro-p + .ro-p{border-left:0}}
+/* заявление: кому и от кого — справа, заголовок по центру, внизу дата и подпись */
+.ro-letter{display:flex;flex-direction:column;gap:9px}
+.ro-letter i{display:block;height:7px;border-radius:4px;background:var(--line);position:relative;overflow:hidden}
+.ro-letter .to{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-bottom:8px}
+.ro-letter .to i{width:46%}.ro-letter .to i.s{width:32%}
+.ro-letter .tt{width:36%;height:10px;margin:2px auto 6px;background:var(--ink)}
+.ro-letter i.s{width:62%}
+.ro-letter .mark::after{content:"";position:absolute;inset:0;background:var(--ro-mark);transform:scaleX(0);transform-origin:0 50%;transition:transform .6s var(--ease)}
+.ro-sidest.mark-on .ro-letter .mark::after{transform:none}
+:root:not([data-theme="dark"]) .ro-sidest.mark-on .ro-letter .mark::after{box-shadow:inset 0 -2px 0 rgba(29,34,42,.25)}
+.ro-letter .ft{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.ro-letter .ft i{width:26%}
+.ro-letter svg,.ro-card .ft svg{width:30%;fill:none;stroke:var(--ro-doc);stroke-width:2;stroke-linecap:round}
+/* смета: строки с суммами разной длины, внизу итог */
+.ro-smeta .rows{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px}
+.ro-smeta i,.ro-smeta u{display:block;height:14px;border-radius:3px;background:var(--line)}
+.ro-smeta u{--w:70%;width:var(--w);justify-self:end;background:color-mix(in srgb,var(--ro-sheet) 30%,var(--bg));transition:width .6s var(--ease)}
+.ro-smeta .sum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;padding-top:10px;border-top:2px solid var(--ink)}
+.ro-smeta .sum i{background:var(--ink);width:60%}
+.ro-smeta .total{width:100%;background:var(--ro-sheet);outline:3px solid transparent;outline-offset:2px;transition:outline-color .3s}
+.ro-sidest.sum-on .total{outline-color:var(--ro-mark)}
+/* презентация: заголовок и столбики, последний вырастает до итога сметы */
+.ro-deck .h{display:block;width:60%;height:10px;border-radius:5px;background:var(--ink);margin-bottom:14px}
+.ro-deck .bars{display:flex;align-items:flex-end;gap:12%;height:clamp(80px,9vw,120px);border-bottom:1.5px solid var(--line)}
+.ro-deck .bars b{flex:1;height:var(--h);border-radius:3px 3px 0 0;background:color-mix(in srgb,var(--ro-slide) 35%,var(--bg));transition:height .7s var(--ease)}
+.ro-deck .bars b:last-child{background:var(--ro-slide)}
+/* курсор и «цифра» в руке */
+.ro-hand{position:absolute;left:0;top:0;width:0;height:0;z-index:3;pointer-events:none}
+.ro-cur{position:absolute;left:-3px;top:-2px;width:26px;height:26px;fill:var(--ink);stroke:var(--bg);stroke-width:1.5;stroke-linejoin:round;transition:transform .18s var(--ease)}
+.ro-hand.press .ro-cur{transform:scale(.82)}
+.ro-chip{position:absolute;left:14px;top:18px;width:40px;height:14px;border-radius:4px;background:var(--ro-sheet);box-shadow:0 0 0 2px var(--ro-mark);
+  opacity:0;transform:scale(.4);transition:opacity .25s,transform .35s var(--ease)}
+.ro-sidest.carry .ro-chip{opacity:1;transform:none}
+
+/* ---------- templates: заявление, Гант и формулы заполняются сами ---------- */
+.ro-tpls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.6vw,22px);padding:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,40px);align-items:center}
+.ro-tpl{margin:0}
+.ro-card{position:relative;aspect-ratio:3/4;background:var(--bg);border-radius:8px;border-top:4px solid var(--m);padding:14% 12%;display:flex;flex-direction:column;gap:7%;
+  box-shadow:0 18px 40px -26px rgba(20,24,32,.3);overflow:hidden}
+.ro-card i{display:block;flex:none;height:6px;border-radius:3px;background:var(--line);transform-origin:0 50%}
+/* строки печатаются по очереди: ширина от нуля */
+.ro-tpl.ro-m-doc .ro-card i{transform:scaleX(0);transition:transform .45s var(--ease) var(--d,0ms)}
+.ro-tpls.go .ro-tpl.ro-m-doc .ro-card i{transform:none}
+.ro-tpl .to{display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-bottom:4%}
+.ro-tpl .to i{width:52%;transform-origin:100% 50%}.ro-tpl .to i.s{width:36%}
+.ro-tpl .tt{width:42%;height:8px;margin:0 auto;background:var(--ink);transform-origin:50% 50%}
+.ro-tpl i.s{width:64%}
+.ro-card .ft{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+.ro-card .ft i{width:30%}
+.ro-card .ft svg{width:42%}
+.ro-card .ft path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s var(--ease) 1.1s}
+.ro-tpls.go .ro-card .ft path{stroke-dashoffset:0}
+/* Гант: строки задач, полосы растут по очереди, вертикаль «сегодня» */
+.ro-gantt .ro-card{justify-content:center;gap:9%}
+.ro-gantt .row{display:grid;grid-template-columns:28% 1fr;gap:8%;align-items:center}
+.ro-gantt .row span{position:relative;height:12px}
+.ro-gantt .row b{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--m);transform:scaleX(0);transform-origin:0 50%;transition:transform .6s var(--ease) var(--d)}
+.ro-tpls.go .ro-gantt .row b{transform:none}
+.ro-gantt .now{position:absolute;top:10%;bottom:10%;left:56%;width:2px;background:var(--ro-slide);text-decoration:none;opacity:0;transition:opacity .4s 1.6s}
+.ro-tpls.go .ro-gantt .now{opacity:1}
+/* формулы: значения подсвечиваются по очереди, итог растет */
+.ro-sums .ro-card{gap:6%}
+.ro-sums .sigma{width:26%;align-self:flex-end;fill:none;stroke:var(--m);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2%}
+.ro-sums .row{display:grid;grid-template-columns:40% 1fr;gap:8%;align-items:center}
+.ro-sums .row u{display:block;justify-self:end;height:10px;border-radius:3px;background:var(--line);outline:2px solid transparent;outline-offset:1px;transition:outline-color .3s var(--d)}
+.ro-tpls.go .ro-sums .row:not(.res) u{outline-color:var(--m);animation:roOff .3s linear calc(var(--d) + 300ms) forwards}
+@keyframes roOff{to{outline-color:transparent}}
+.ro-sums .res{margin-top:auto;padding-top:8%;border-top:2px solid var(--ink)}
+.ro-sums .res i{background:var(--ink)}
+.ro-sums .res u{width:100%;height:14px;background:var(--m);transform:scaleX(0);transform-origin:100% 50%;transition:transform .7s var(--ease) 1.5s}
+.ro-tpls.go .ro-sums .res u{transform:none}
+.ro-tpls.out .ro-card{opacity:0;transition:opacity .4s}
+.ro-tpls.out .ro-card *{transition:none !important}
+
+/* ---------- qr: код собирается на листе ---------- */
+.ro-qrst{display:grid;place-items:center;padding:clamp(20px,3.4vw,48px)}
+.ro-sheet{width:min(100%,460px);aspect-ratio:1/1.06;background:var(--ro-paper);border-radius:4px;padding:9% 9%;display:flex;flex-direction:column;gap:3.4%;
+  box-shadow:0 1px 2px rgba(20,24,32,.06),0 24px 60px -30px rgba(20,24,32,.25)}
+.ro-sheet i{display:block;height:8px;border-radius:4px;background:var(--ro-paper-line)}
+.ro-sheet i.h{height:12px;width:56%;background:#1D222A;margin-bottom:2%}
+.ro-sheet i.s{width:64%}
+.ro-qrrow{display:grid;grid-template-columns:1fr 40%;gap:8%;align-items:end;margin-top:auto}
+.ro-qrrow .lines{display:flex;flex-direction:column;gap:12px;padding-bottom:4px}
+.ro-qr{position:relative;aspect-ratio:1;overflow:hidden}
+.ro-qr-svg{display:block;width:100%;height:100%}
+.ro-qr-svg rect{fill:#1D222A;opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.2)}
+.ro-qrst.go .ro-qr-svg rect{opacity:1;transform:none;transition:opacity .2s var(--d),transform .35s var(--ease) var(--d)}
+.ro-qrst.fade .ro-qr-svg{opacity:0;transition:opacity .45s}
+/* сканер: лаймовая полоса проходит сверху вниз */
+.ro-qr .scan{position:absolute;left:-4%;right:-4%;top:0;height:3px;background:var(--ro-mark);box-shadow:0 0 0 1px rgba(29,34,42,.15);text-decoration:none;opacity:0}
+.ro-qrst.scan .ro-qr .scan{animation:roScan 1.4s var(--ease-io) both}
+@keyframes roScan{0%{top:0;opacity:0}12%{opacity:1}50%{top:calc(100% - 3px)}88%{opacity:1}100%{top:0;opacity:0}}
+
+/* ---------- page: мини-лендинг из блоков открывается как сайт ---------- */
+.ro-pagest{padding:clamp(20px,3.4vw,48px)}
+.ro-browser{--m:var(--ro-html)}
+.ro-pbar{gap:10px;height:clamp(30px,3vw,40px);border-bottom:1.5px solid var(--line)}
+.ro-pbar .dots{display:flex;gap:5px}.ro-pbar .dots b{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.ro-pbar .tab{display:block;width:clamp(40px,6vw,72px);height:10px;border-radius:5px;background:var(--ro-html);transition:opacity .4s,width .5s var(--ease)}
+/* в браузере вместо вкладки редактора — адресная строка */
+.ro-pbar .addr{display:block;height:16px;width:0;border-radius:99px;background:var(--soft);transition:width .7s var(--ease) .2s}
+.ro-pagest[data-step="2"] .ro-pbar .tab{opacity:0;width:0}
+.ro-pagest[data-step="2"] .ro-pbar .addr{width:52%}
+.ro-ed{display:grid;grid-template-columns:var(--pal,22%) 1fr;transition:grid-template-columns .8s var(--ease-io)}
+.ro-pagest[data-step="2"] .ro-ed{--pal:0%}
+.ro-pal{display:flex;flex-direction:column;gap:12px;padding:16px 12% 16px;border-right:1.5px solid var(--line);overflow:hidden;transition:opacity .4s,padding .8s var(--ease-io)}
+.ro-pagest[data-step="2"] .ro-pal{opacity:0;padding-inline:0;border-right-color:transparent}
+.ro-pal span{display:block;height:22px;border-radius:5px;background:var(--line)}
+.ro-pal .p-hero{background:var(--ro-mark)}.ro-pal .p-btn{width:60%;height:14px;border-radius:99px;background:var(--ink)}
+.ro-site{display:flex;flex-direction:column;gap:clamp(8px,1vw,14px);padding:clamp(14px,2.2vw,28px);min-height:clamp(240px,26vw,360px)}
+.ro-site .b{opacity:0;transform:translateX(-30px) scale(.96);transition:opacity .45s var(--ease) calc(var(--k) * 380ms),transform .6s var(--ease) calc(var(--k) * 380ms)}
+.ro-pagest:not([data-step="0"]) .ro-site .b{opacity:1;transform:none}
+.ro-pagest[data-step="0"] .ro-site .b{transition:none}
+.b-hero{display:flex;flex-direction:column;gap:8px;padding:clamp(14px,2vw,26px);border-radius:8px;background:var(--ro-mark)}
+.b-hero i{display:block;height:12px;width:62%;border-radius:6px;background:#1D222A}
+.b-hero i.s{width:40%;height:8px;opacity:.35}
+.b-pic svg{display:block;width:100%;height:clamp(50px,6vw,80px);border-radius:8px;background:var(--line);fill:color-mix(in srgb,var(--ink) 22%,var(--line))}
+.b-cards{display:flex;gap:clamp(6px,1vw,12px)}
+.b-cards b{flex:1;height:clamp(28px,3.4vw,44px);border-radius:6px;background:var(--soft);border:1.5px solid var(--line)}
+.b-btn span{display:block;width:clamp(70px,9vw,120px);height:clamp(20px,2.4vw,30px);border-radius:99px;background:var(--ink);transition:transform .25s var(--ease),background .3s}
+.b-btn span.hit{transform:scale(.92);background:color-mix(in srgb,var(--ink) 75%,var(--ro-html))}
+.ro-pagest .ro-hand{opacity:0;transition:opacity .3s}
+.ro-pagest.hand .ro-hand{opacity:1}
+
+/* ---------- closed: закрытый контур ---------- */
+.ro-closedst{padding:clamp(12px,2.6vw,40px)}
+.ro-net{display:block;width:100%;height:auto;max-width:1040px;margin:0 auto;overflow:visible}
+.ro-net .wall{fill:var(--bg);stroke:var(--ink);stroke-width:3;transition:stroke .3s}
+.ro-net.hit .wall{animation:roWall .6s var(--ease)}
+@keyframes roWall{0%{stroke-width:6}100%{stroke-width:3}}
+.ro-net .paths path{stroke:var(--line);stroke-width:2;fill:none;stroke-dasharray:2 6;stroke-linecap:round}
+.ro-net .out{fill:none;stroke:color-mix(in srgb,var(--ink) 35%,var(--soft));stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.ro-net .out circle[r="2"]{fill:currentColor}
+.ro-net .cut{stroke:color-mix(in srgb,var(--ink) 25%,var(--soft));stroke-width:2;stroke-dasharray:4 7;stroke-linecap:round;fill:none}
+.ro-net .app{fill:var(--bg);stroke:var(--ink);stroke-width:2.4}
+.ro-net .page{fill:var(--bg);stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round}
+.ro-net .ln{fill:var(--line)}
+.ro-net .f-doc{fill:var(--ro-doc)}.ro-net .f-sheet{fill:var(--ro-sheet)}.ro-net .f-slide{fill:var(--ro-slide)}.ro-net .f-html{fill:var(--ro-html)}
+.ro-net .pk{stroke:var(--bg);stroke-width:2}
+.ro-net .pk-doc{fill:var(--ro-doc)}.ro-net .pk-sheet{fill:var(--ro-sheet)}.ro-net .pk-slide{fill:var(--ro-slide)}.ro-net .pk-html{fill:var(--ro-html)}
+.ro-net .pk-out{fill:var(--ink)}
+.ro-net .ring{fill:none;stroke:var(--ink);stroke-width:2.4}
+
+/* ---------- kits: сменный набор шаблонов ---------- */
+.ro-kitst{padding:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,40px)}
+.ro-sets{display:flex;justify-content:center;gap:clamp(10px,1.4vw,16px);margin-bottom:clamp(20px,2.8vw,36px)}
+.ro-set{position:relative;display:grid;place-items:center;width:clamp(52px,5vw,64px);aspect-ratio:1;border-radius:50%;border:0;background:var(--bg);color:var(--ink);cursor:pointer;overflow:hidden;
+  transition:background .35s,color .35s,transform .3s var(--ease)}
+.ro-set:hover{transform:translateY(-2px)}
+.ro-set.on{background:var(--ink);color:var(--bg)}
+.ro-set svg{width:52%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* полоса таймера: набор сменится сам, пока кнопки не трогали */
+.ro-set s{position:absolute;left:24%;right:24%;bottom:12%;height:2px;border-radius:2px;background:var(--ro-mark);transform:scaleX(0);transform-origin:0 50%;text-decoration:none}
+.ro-set.run s{animation:roTimer var(--ms) linear both}
+@keyframes roTimer{to{transform:none}}
+.ro-set:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.ro-kit{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.4vw,18px);perspective:900px}
+.ro-k{aspect-ratio:4/3;border-radius:8px;background:var(--bg);border-top:4px solid var(--m);box-shadow:0 14px 30px -22px rgba(20,24,32,.3);
+  transition:transform .35s var(--ease-io) calc(var(--i) * 50ms),opacity .3s calc(var(--i) * 50ms)}
+.ro-k.flip{transform:rotateY(90deg);opacity:.2}
+.ro-kin{height:100%;padding:11% 12%;display:flex;flex-direction:column;gap:8%;overflow:hidden}
+.ro-kin i{display:block;flex:none;height:6px;border-radius:3px;background:var(--line)}
+.ro-kin i.s{width:60%}.ro-kin i.r{width:40%;align-self:flex-end;background:var(--m)}
+.ro-kin .tt{width:44%;height:8px;margin:0 auto;background:var(--ink)}
+.ro-kin .tt.l{margin:0}
+.ro-kin .to{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.ro-kin .to i{width:46%}.ro-kin .to i.s{width:32%}
+.ro-kin .emb{display:block;flex:none;width:16%;aspect-ratio:1;margin:0 auto;border-radius:50%;border:2px solid var(--m)}
+.ro-kin .tb{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;flex:1}
+.ro-kin .tb.sm{flex:none}
+.ro-kin .tb u{display:block;border-radius:2px;background:var(--line);min-height:7px}
+.ro-kin .tb u.th{background:var(--m)}
+.ro-kin .gt{display:flex;flex-direction:column;justify-content:center;gap:12%;flex:1}
+.ro-kin .gt span{position:relative;height:8px}
+.ro-kin .gt b{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--m)}
+.ro-kin .cht{display:flex;align-items:flex-end;gap:8%;flex:1;border-bottom:1.5px solid var(--line)}
+.ro-kin .cht b{flex:1;border-radius:2px 2px 0 0;background:var(--m)}
+.ro-kin .sl{display:grid;grid-template-columns:1fr 1fr;gap:8%;flex:1}
+.ro-kin .sl b{border-radius:4px;background:color-mix(in srgb,var(--m) 30%,var(--bg))}
+.ro-kin .sl b:first-child{background:var(--m)}
+.ro-kin .gh{display:block;flex:1;border-radius:4px;background:var(--ro-mark)}
+.ro-kin .cd{display:flex;gap:6%}.ro-kin .cd b{flex:1;height:10px;border-radius:3px;background:var(--line)}
+.ro-kin .pill{display:block;width:34%;height:8px;border-radius:99px;background:var(--ink)}
+.ro-kin .sg{display:flex;justify-content:space-between;margin-top:auto}.ro-kin .sg i{width:34%;background:var(--ink)}
+.ro-kin .qr{display:block;width:28%;aspect-ratio:1;margin-top:auto;align-self:flex-end;border-radius:2px;
+  background:repeating-conic-gradient(#1D222A 0 25%,transparent 0 50%) 0 0 / 33.3% 33.3%;outline:2px solid #1D222A;outline-offset:1px}
+@media (max-width:480px){.ro-kit{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- демо под текстом последней главы ---------- */
+.ro-try{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:clamp(16px,2.4vw,32px);padding-top:clamp(20px,2.4vw,32px);border-top:1.5px solid var(--line)}
+.ro-try-title{font-size:clamp(22px,1.8vw,28px);font-weight:500;line-height:1.15}
+.ro-try-text{font-family:var(--font-read);font-size:19px;line-height:1.4;max-width:30ch}
+.ro-try-btn{margin-top:8px}
+/* на телефоне и планшете: текст главы, набор, и уже потом демо */
+@media (max-width:900px){
+  .ro-kits-ch{row-gap:20px}
+  .ro-kits-ch .ro-side{display:contents}
+  .ro-kits-ch .ro-label,.ro-kits-ch .ro-title,.ro-kits-ch .ro-text{order:-1;grid-column:1 / -1}
+  .ro-kits-ch > .ro-viz{margin-top:12px}
+  .ro-kits-ch .ro-try{order:1;grid-column:1 / -1;border-top:0;padding-top:0}
+}
+
+/* ---------- текст в начале кейса: на планшете задача и решение рядом, результат ниже ---------- */
+@media (min-width:761px) and (max-width:1100px){
+  .case-body:has(.ro-mount) .scheme-cols>.camp-col{grid-column:span 6 !important}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .ro-w > span,.ro-text,.ro-label,.ro-viz,.ro-try{transition:none;transform:none;opacity:1}
+}

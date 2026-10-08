@@ -2428,6 +2428,8 @@ function renderCase(k, keepScroll){
   if (p.anon) body += `<div class="an an-mount"></div>`;
   // poll — интерактивные презентации: лес рук и телефоны, вход по QR и коду, облако / график / рейтинг, свой PDF, без интернета; рисует poll.js
   if (p.poll) body += `<div class="pl pl-mount"></div>`;
+  // office — «русский офис»: три редактора в одном окне, рядом, шаблоны, QR, мини-лендинг, закрытый контур, сменный набор; рисует office.js
+  if (p.office) body += `<div class="ro ro-mount"></div>`;
   // презентация — в самом конце, перед ссылками
   // deck: 'drive:ID' — PDF листается во встроенном окне; список картинок — слайды крупно, один под другим,
   // по нажатию увеличиваются и листаются стрелками
@@ -2544,6 +2546,10 @@ function renderCase(k, keepScroll){
   if (pl) import(SCRIPT_BASE + 'poll.js?v=' + VER)
     .then(m => m.mountPoll(pl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс интерактивных презентаций не загрузился', err));
+  const ro = caseContent.querySelector('.ro-mount');
+  if (ro) import(SCRIPT_BASE + 'office.js?v=' + VER)
+    .then(m => m.mountOffice(ro, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс «русский офис» не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
   if (vp) import(SCRIPT_BASE + 'vkplay.js?v=' + VER)
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))
