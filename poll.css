@@ -127,9 +127,29 @@
 .pl-finger.on{opacity:1}
 .pl-finger.tap{scale:.75}
 @media (max-width:640px){
-  .pl-join{grid-template-columns:1fr;justify-items:center;row-gap:24px;padding:20px 16px}
-  .pl-tel{width:min(62vw,220px)}
+  /* телефон: экран зала сверху, телефон под ним — вся сцена помещается в один экран */
+  .pl-join{grid-template-columns:1fr;justify-items:center;row-gap:20px;padding:16px 16px 20px}
+  .pl-tel{width:min(46vw,176px);border-radius:24px;padding:6px}
+  .pl-tel-in{border-radius:19px}
+  .pl-pp{padding:16% 8% 8%;gap:6px}
+  .pl-pq{margin-bottom:2px}
+  .pl-opt{min-height:36px;padding:6px 10px;border-radius:12px;gap:8px}
+  .pl-opt i{width:14px;height:14px}
+  .pl-send{height:38px}
   .pl-jscr{width:100%}
+  .pl-jscr .pl-slide{padding:5cqw 6cqw}
+  .pl-jscr .pl-st{margin-bottom:2.4cqw}
+  .pl-jscr .pl-rbs{gap:1.6cqw}
+}
+/* телефон: в экране результатов мелочь крупнее — точки, клетки, облако */
+@media (max-width:640px){
+  .pv-cloud span{font-size:max(16px,calc(var(--f,0) * 1cqw / 6))}
+  .pv-dots .pile i{width:3.6cqw}
+  .pv-grid .cells i{width:4cqw;border-radius:1cqw}
+  .pv-mx .pt{width:3cqw;margin:-1.5cqw 0 0 -1.5cqw}
+  .pv-grow .hd{width:3cqw;margin:-1.5cqw 0 0 -1.5cqw}
+  .pv-pie .leg{width:46cqw}
+  .pl-tile{border-radius:14px}
 }
 
 /* ---------- results: экран зала и плитки видов, как в меню «Добавить слайд» ---------- */
@@ -193,7 +213,7 @@
 .pv-grid .cells i{width:2.6cqw;aspect-ratio:1;border-radius:.6cqw;animation:plPop .45s cubic-bezier(.34,1.56,.64,1) both}
 /* облако слов: частое — крупнее и плотнее */
 .pv-cloud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.6cqw 2.6cqw;flex:1;align-content:center}
-.pv-cloud span{font-size:calc(var(--f,0) * 1cqw / 9.6);font-weight:600;line-height:1.05;letter-spacing:-.02em;white-space:nowrap;transition:font-size .5s var(--ease),opacity .5s}
+.pv-cloud span{font-size:max(16px,calc(var(--f,0) * 1cqw / 9.6));font-weight:600;line-height:1.05;letter-spacing:-.02em;white-space:nowrap;transition:font-size .5s var(--ease),opacity .5s}
 /* число: гистограмма и крупное среднее */
 .pv-num{display:flex;align-items:flex-end;gap:5cqw;flex:1}
 .pv-num .hist{flex:1;height:100%;display:flex;align-items:flex-end;gap:.6cqw}
@@ -302,11 +322,20 @@
 :root .pl-try .pl-try-btn{background:var(--accent);color:var(--accent-text)}
 :root .pl-try .pl-try-btn::after{display:block}
 :root .pl-try .pl-try-btn:hover{background:var(--ink);color:var(--bg)}
+/* планшет и телефон: главы в две колонки выстраиваются как остальные — подпись слева, заголовок и текст справа, сцена ниже во всю ширину, демо под ней */
 @media (max-width:900px){
-  .pl-local-ch{row-gap:20px}
-  .pl-local-ch .pl-side{display:contents}
-  .pl-local-ch .pl-label,.pl-local-ch .pl-title,.pl-local-ch .pl-text{order:-1;grid-column:1 / -1}
-  .pl-local-ch .pl-try{order:1;grid-column:1 / -1;border-top:0;padding-top:0}
+  .pl-split{row-gap:20px}
+  .pl-split .pl-side{display:contents}
+  .pl-split .pl-label{grid-column:1 / span 3;grid-row:1}
+  .pl-split .pl-title{grid-column:5 / -1;grid-row:1;font-size:clamp(32px,4.2vw,60px);max-width:18ch}
+  .pl-split .pl-text{grid-column:5 / -1;grid-row:2;font-size:clamp(20px,1.8vw,26px)}
+  .pl-split > .pl-viz{grid-row:3;margin-top:clamp(12px,2vw,36px)}
+  .pl-split .pl-try{grid-column:5 / -1;grid-row:4;border-top:0;padding-top:0;margin-top:8px}
+}
+@media (max-width:760px){
+  .pl-split .pl-label,.pl-split .pl-title,.pl-split .pl-text,.pl-split .pl-try{grid-column:1 / -1}
+  .pl-split .pl-label{grid-row:1}.pl-split .pl-title{grid-row:2}.pl-split .pl-text{grid-row:3}
+  .pl-split > .pl-viz{grid-row:4}.pl-split .pl-try{grid-row:5}
 }
 
 /* на телефоне заголовки чуть мельче: строки, склеенные неразрывными пробелами, не вылезают за край */

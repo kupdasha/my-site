@@ -121,7 +121,7 @@ function hallHTML(c){
   }
   return `<div class="pl-stage pl-hall">
     <div class="pl-wall">${head(c)}</div>
-    <svg class="pl-crowd" viewBox="0 0 ${W} 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${ppl}</svg>
+    <svg class="pl-crowd" viewBox="0 0 ${W} 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${ppl}</svg>
   </div>`;
 }
 function liveHands(box){
