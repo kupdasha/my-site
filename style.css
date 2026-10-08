@@ -442,9 +442,11 @@ img,video{display:block;max-width:100%}
 @media (max-width:760px){
   .ph-row{grid-template-columns:minmax(0,1fr);gap:24px;margin-top:56px}
   .ph-set{justify-content:center}
-  .phone{width:min(60vw,230px);padding:8px;border-radius:32px}
+  .phone{width:min(52vw,200px);padding:8px;border-radius:30px}   /* ролик и начало текста помещаются на один экран */
   .phone video{border-radius:24px}
-  .ph-many .phone{width:calc((100vw - 32px - 12px) / 2 - 16px);max-width:200px}
+  .ph-many .phone{width:calc((100vw - 32px - 12px) / 2 - 16px);max-width:190px}
+  .ph-play{width:52px;height:52px}
+  .ph-play svg{width:22px;height:22px}
   .ph-text h3{font-size:24px;margin-bottom:12px}
   .ph-row:last-child{margin-bottom:56px}
 }
@@ -2176,3 +2178,8 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 
 /* значок Telegram в кнопке «связаться» */
 .fab .fab-tg{flex:none;width:22px;height:22px;margin:2px 10px 0 -6px}
+
+/* игра: три поля контакта — в ряд на компьютере, столбиком на телефоне */
+.ttt-fields{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;flex-basis:100%}
+.ttt-fields .ttt-input{flex:1 1 200px;min-width:0}
+@media (max-width:760px){.ttt-fields .ttt-input{flex-basis:100%}.ttt-form .btn{width:100%;justify-content:center}}
