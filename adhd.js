@@ -150,11 +150,15 @@ function slowSVG(t){
 function waveSVG(t){
   return `<svg class="sd-type sd-wave" viewBox="0 0 400 400" aria-hidden="true" data-s="${H.pick(t.wave)}"></svg>`;
 }
+// подписей под схемами нет: у кольца — живая подсказка-курсор, она подъезжает к кольцу и «нажимает»,
+// пока на кольцо не навели в первый раз
+const HINT_CURSOR = `<span class="sd-hint" aria-hidden="true"><i class="sd-hint-ripple"></i>
+  <svg viewBox="0 0 24 24" width="34" height="34"><path d="M5 3l14 7.5-6.2 1.6L10 18.5z" fill="#1D222A" stroke="#FFFFFF" stroke-width="1.6" stroke-linejoin="round"/></svg></span>`;
 function typeHTML(c){
   return `<div class="sd-types">
-    <figure><div class="sd-sq">${ringSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[0])}</figcaption>` : ''}</figure>
-    <figure><div class="sd-sq">${slowSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[1])}</figcaption>` : ''}</figure>
-    <figure><div class="sd-sq">${waveSVG(c)}</div>${c.notes ? `<figcaption>${H.T(c.notes[2])}</figcaption>` : ''}</figure>
+    <figure class="sd-ring-fig"><div class="sd-sq">${ringSVG(c)}${HINT_CURSOR}</div></figure>
+    <figure><div class="sd-sq">${slowSVG(c)}</div></figure>
+    <figure><div class="sd-sq">${waveSVG(c)}</div></figure>
   </div>${cap(c.hint)}`;
 }
 function liveSlow(svg){
@@ -205,7 +209,7 @@ function liveType(box){
   let raf = 0, seen = false, t0 = performance.now(), ang = 0, speed = .05, goal = .05, last = t0;
   slow(0); fall(0);
   if (still()) return;
-  ring.closest('figure').addEventListener('pointerenter', () => { goal = .6; });
+  ring.closest('figure').addEventListener('pointerenter', e => { goal = .6; e.currentTarget.classList.add('used'); });   // подсказка-курсор больше не нужна
   ring.closest('figure').addEventListener('pointerleave', () => { goal = .05; });
   const draw = t => {
     const s = (t - t0) / 1000, dt = Math.min(64, t - last); last = t;
