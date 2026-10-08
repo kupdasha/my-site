@@ -48,8 +48,8 @@ a{color:inherit}
 @keyframes track{to{background-position:300% 0}}
 
 .intro{text-align:center}
-h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line-height:1;letter-spacing:-.015em}
-.bio{margin:calc(12px*var(--k)) 0 0;font-family:var(--font-read);font-weight:400;font-size:17px;line-height:1.34;text-wrap:pretty}
+h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(--k)));line-height:1;letter-spacing:-.015em}
+.bio{margin:calc(12px*var(--k)) 0 0;font-family:var(--font-read);font-weight:400;font-size:max(16px,calc(17px*var(--k)));line-height:1.34;text-wrap:pretty}
 .bio a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .bio a:hover{background:var(--accent);color:var(--accent-text);text-decoration:none}
 
@@ -129,6 +129,19 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
   .actions{grid-column:2}
   .soc{grid-column:2}
   .legal{max-width:600px}
+}
+/* большой планшет стоя (iPad и крупнее): все еще крупнее, чтобы не терялось на экране */
+@media (min-width:700px) and (min-height:900px){
+  .col{max-width:620px;gap:calc(40px*var(--k))}
+  h1{font-size:calc(68px*var(--k))}
+  .bio{font-size:23px;margin-top:calc(18px*var(--k))}
+  .btn{height:calc(70px*var(--k));font-size:23px}
+  :root[data-mode="fun"] .btn{min-width:250px;padding:0 40px 3px}
+  :root[data-mode="fun"] .actions{gap:calc(32px*var(--k))}
+  .soc a{height:calc(64px*var(--k));font-size:20px;border-radius:18px}
+  :root[data-mode="fun"] .soc{row-gap:calc(30px*var(--k))}
+  .switch{font-size:18px}
+  .legal{max-width:480px;font-size:13px}
 }
 @media (prefers-reduced-motion:reduce){.switch>i{animation:none}}
 </style>
@@ -512,7 +525,7 @@ h1{margin:0;font-weight:600;font-size:calc(clamp(30px,8.6vw,40px)*var(--k));line
   sw.addEventListener('click', () => {
     setMode(!fun); paint(); splash(vw / 2, 700); labels();
     resetRunners();
-    requestAnimationFrame(relayout);
+    setTimeout(relayout, 30);   // не через кадр анимации: в фоновой вкладке он не приходит, и раскладка не пересчитывалась
   });
 
   /* ---------- один экран ---------- */
