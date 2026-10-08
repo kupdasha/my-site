@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Таплинк Купяши</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
 /* один экран: имя, четыре равные кнопки, сетка соцсетей 3×3; снизу экран наполнен «жидкостью» из искр, она переливается при наклоне */
 :root{
@@ -189,19 +187,12 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   const root = document.documentElement, sw = document.getElementById('switch');
   const page = document.getElementById('tl');
 
-  /* ШРИФТЫ — только те буквы, что есть на странице (в обеих версиях): Google отдает их одним
-     маленьким файлом вместо полного набора (~90 КБ) — на медленной связи текст встает быстрее.
-     Тексты меняются — список букв собирается сам. Пока шрифт грузится, текст виден системным. */
+  /* ШРИФТЫ — со своего сервера, не с Google (адрес посетителя не уходит за границу): fonts.css и папка fonts
+     в репозитории, ссылка — на зафиксированную версию, она не меняется. Пока шрифт грузится, текст виден системным */
   {
-    const uniq = t => [...new Set(t.replace(/\s+/g, ''))].sort().join('') + ' ';
-    const extra = [...document.querySelectorAll('[data-fun],[data-serious]')].map(e => e.dataset.fun + e.dataset.serious).join('');
-    const font = (fam, text) => {
-      const l = document.createElement('link'); l.rel = 'stylesheet';
-      l.href = 'https://fonts.googleapis.com/css2?family=' + fam + '&display=swap&text=' + encodeURIComponent(uniq(text));
-      document.head.appendChild(l);
-    };
-    font('Golos+Text:wght@400;500;600', page.textContent + extra + '«»—…');
-    font('Spectral:wght@400', document.querySelector('.bio').textContent);
+    const l = document.createElement('link'); l.rel = 'stylesheet';
+    l.href = 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@4be95bfd3aaf772c7036187b09018642beaffcad/fonts.css';
+    document.head.appendChild(l);
   }
 
   /* СЛАБЫЙ ТЕЛЕФОН ИЛИ МЕДЛЕННАЯ СВЯЗЬ: искр меньше и холст попроще, чтобы ничего не тормозило */
