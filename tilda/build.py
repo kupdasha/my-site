@@ -280,11 +280,19 @@ def taplink_block():
             # вставленные так скрипты сами не запускаются — пересоздаем их
             "[].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});\n"
             "root.style.minHeight='';root.style.background=''}\n"
-            "function github(s){get(G+'?t='+Date.now(),25000,function(h){if(h)save(s,h);show(h||(c&&c.h))})}\n"
-            "get(W,2500,function(s){s=(s||'').trim();if(!/^[0-9a-f]{40}$/.test(s))s='';\n"
-            "if(s&&c&&c.s===s&&c.h)return show(c.h);\n"
-            "if(s)return get(R+s+'/taplink.html',20000,function(h){if(h){save(s,h);show(h)}else github(s)});\n"
-            "if(c&&c.h)show(c.h);github('')})})()</script>")
+            # номер свежей версии спрашиваем сразу у трех источников, берем первый ответ: воркер kup-version
+            # (в России *.workers.dev бывает закрыт), служебная ветка version на GitHub и GitHub API
+            "var V=['https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t='+Date.now(),'https://api.github.com/repos/kupdasha/my-site/commits/main'],got=0,left=3;\n"
+            "function sha(t){t=(t||'').trim();return /^[0-9a-f]{40}$/.test(t)?t:''}\n"
+            "function ask(u,h){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=3500;\n"
+            "x.onload=function(){done(x.status==200?sha(x.responseText):'')};x.onerror=x.ontimeout=function(){done('')};x.send()}\n"
+            # страница: по номеру с jsDelivr, иначе последняя копия jsDelivr, иначе прямо с GitHub, иначе копия из телефона
+            "function page(s){var u=[];if(s)u.push(R+s+'/taplink.html');u.push(R+'main/taplink.html?v='+Math.floor(Date.now()/36e5),G+'?t='+Date.now());\n"
+            "(function next(){var x=u.shift();if(!x)return show(c&&c.h);get(x,20000,function(h){if(h&&h.indexOf('id=\"tl\"')>0){save(s,h);show(h)}else next()})})()}\n"
+            "function done(s){left--;if(got)return;if(s){got=1;if(c&&c.s===s&&c.h)show(c.h);else page(s)}else if(!left){got=1;page('')}}\n"
+            "ask(W);ask(V[0]);ask(V[1],'application/vnd.github.sha');\n"
+            # медленная связь: если за 1,5 с номер не пришел, а копия в телефоне есть — показываем ее, не дожидаясь
+            "setTimeout(function(){if(!got&&c&&c.h)show(c.h)},1500)})()</script>")
 
 BLOCKS = {
     '1 шапка': [
