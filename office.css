@@ -258,32 +258,22 @@
 .ro-htst.sent .t2{animation:roHit .5s var(--ease) 1.65s}
 @keyframes roHit{50%{transform:scale(1.18);background:var(--ro-mark);color:#1D222A}}
 
-/* ---------- скриншоты программы: карусель без кнопок ---------- */
-/* лента листается пальцем, колесом и перетаскиванием; следующий кадр выглядывает справа — видно, что дальше есть еще */
-.ro-shots-ch{margin-bottom:var(--ro-gap)}
-.ro-shots{display:flex;gap:clamp(12px,1.6vw,24px);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;
-  cursor:grab;-webkit-user-select:none;user-select:none;outline:none}
-.ro-shots::-webkit-scrollbar{display:none}
-.ro-shots.drag{cursor:grabbing;scroll-snap-type:none}
-.ro-shots.drag img{pointer-events:none}
-.ro-shot{flex:0 0 62%;margin:0;scroll-snap-align:start;border-radius:var(--r-img);overflow:hidden;background:var(--soft);box-shadow:inset 0 0 0 1px var(--line)}
-.ro-shot img{display:block;width:100%;height:auto;cursor:zoom-in;-webkit-user-drag:none}
-.ro-shots.drag .ro-shot img{cursor:grabbing}
-@media (max-width:1100px){.ro-shot{flex-basis:74%}}
-@media (max-width:640px){.ro-shot{flex-basis:86%}}
-/* полоска под лентой: какая часть видна; это не кнопка — просто показывает, где ты */
+/* ---------- скриншоты программы: один кадр на всю ширину, сменяются сами, под ними кружки ---------- */
 .ro-shots-label{display:block;margin-bottom:clamp(16px,2vw,24px)}
-/* под лентой: две круглые стрелки слева (справа внизу экрана — кнопка сайта «наверх») и полоска-положение; под картинками, не поверх */
-.ro-shots-nav{display:flex;align-items:center;gap:12px;margin-top:clamp(14px,1.6vw,20px)}
-.ro-shots-nav .ro-shots-bar{flex:1;margin:0 0 0 8px;order:1}
-.ro-arr{display:grid;place-items:center;flex:none;width:52px;height:52px;border:0;border-radius:50%;background:var(--ink);color:var(--bg);cursor:pointer;transition:opacity .3s,transform .3s var(--ease)}
-.ro-arr svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ro-arr:hover:not(:disabled){transform:scale(1.06)}
-.ro-arr:disabled{opacity:.18;cursor:default}
-.ro-arr:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-.ro-shots-bar{position:relative;height:3px;margin-top:clamp(14px,1.6vw,20px);border-radius:3px;background:var(--line);overflow:hidden}
-.ro-shots-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ink);transition:width .3s}
+.ro-shots{display:grid;outline:none;touch-action:pan-y;-webkit-user-select:none;user-select:none;cursor:zoom-in}
+.ro-shot{grid-area:1 / 1;margin:0;border-radius:var(--r-img);overflow:hidden;background:var(--soft);box-shadow:inset 0 0 0 1px var(--line);
+  opacity:0;transition:opacity .7s var(--ease)}
+.ro-shot.on{opacity:1}
+.ro-shot img{display:block;width:100%;height:auto;-webkit-user-drag:none;pointer-events:none}
 .ro-shots:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+/* кружки: сколько кадров — столько кружков; текущий — темный */
+.ro-dots{display:flex;justify-content:center;gap:4px;margin-top:clamp(16px,2vw,24px)}
+.ro-dot{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:none;cursor:pointer}
+.ro-dot i{display:block;width:12px;height:12px;border-radius:50%;background:var(--line);transition:background .4s,transform .4s var(--ease)}
+.ro-dot.on i{background:var(--ink);transform:scale(1.15)}
+.ro-dot:hover:not(.on) i{background:color-mix(in srgb,var(--ink) 30%,var(--line))}
+.ro-dot:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:50%}
+@media (prefers-reduced-motion:reduce){.ro-shot{transition:none}}
 
 /* ---------- демо под текстом последней главы ---------- */
 .ro-try{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:clamp(16px,2.4vw,32px);padding-top:clamp(20px,2.4vw,32px);border-top:1.5px solid var(--line)}

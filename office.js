@@ -16,8 +16,9 @@
    closed — закрытый контур: данные ходят внутри, наружу не выходят —
    отскакивают от границы, облако и интернет снаружи без связи;
    справа под текстом последней главы с рисунком сбоку — кнопка демо;
-   в самом конце — скриншоты программы каруселью: листаются пальцем,
-   колесом или перетаскиванием, кнопок поверх нет, по нажатию — крупно.
+   в самом конце — скриншоты программы: один кадр на всю ширину, кадры
+   сменяются сами, под ними столько кружков, сколько кадров; смахнуть —
+   следующий, нажать на кадр — крупно; кнопок поверх нет.
    Цвета вкладок — как в самом приложении: документ синий, таблица
    зеленая, HTML лаймовый; презентация — малиновая (оранжевого
    на сайте нет). Тексты — в content.js, оформление — office.css.
@@ -372,66 +373,50 @@ const tryHTML = t => t ? `<div class="ro-try">
 
 /* ---------- скриншоты программы: карусель ---------- */
 // легкая копия (900 px) для телефона, полная (1680 px) — для экранов шире; грузятся лениво, место под картинку занято заранее
-const ARROW = d => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d > 0 ? 'M5 12h13M13 6l6 6-6 6' : 'M19 12H6M11 6l-6 6 6 6'}"/></svg>`;
 function shotsHTML(list, label){
   return `<section class="ro-ch ro-shots-ch wrap">
     ${label ? `<span class="case-label ro-label ro-shots-label">${H.T(label)}</span>` : ''}
-    <div class="ro-shots" tabindex="0" role="region" aria-label="Скриншоты программы">${list.map(x =>
-      `<figure class="ro-shot"><img src="${esc(x.small)}" srcset="${esc(x.small)} 900w, ${esc(x.src)} ${x.w}w"
-        sizes="(max-width: 640px) 86vw, (max-width: 1100px) 74vw, 62vw" width="${x.w}" height="${x.h}" loading="lazy" decoding="async" alt=""></figure>`).join('')}
+    <div class="ro-shots" tabindex="0" role="region" aria-roledescription="слайды" aria-label="Скриншоты программы">${list.map((x, k) =>
+      `<figure class="ro-shot${k ? '' : ' on'}"><img src="${esc(x.small)}" srcset="${esc(x.small)} 900w, ${esc(x.src)} ${x.w}w"
+        sizes="(max-width: 640px) 92vw, 80vw" width="${x.w}" height="${x.h}" loading="lazy" decoding="async" alt=""></figure>`).join('')}
     </div>
-    <div class="ro-shots-nav">
-      <div class="ro-shots-bar" aria-hidden="true"><i></i></div>
-      <button class="ro-arr" type="button" data-d="-1" aria-label="назад">${ARROW(-1)}</button>
-      <button class="ro-arr" type="button" data-d="1" aria-label="дальше">${ARROW(1)}</button>
-    </div>
+    <div class="ro-dots">${list.map((_, k) =>
+      `<button class="ro-dot${k ? '' : ' on'}" type="button" aria-label="${k + 1} из ${list.length}"><i></i></button>`).join('')}</div>
   </section>`;
 }
+// один кадр на всю ширину, кадры сменяются сами; под ними — столько кружков, сколько кадров: видно, сколько их и какой сейчас
 function liveShots(box, list){
-  const row = box.querySelector('.ro-shots'), bar = box.querySelector('.ro-shots-bar i');
-  const imgs = [...row.querySelectorAll('img')];
-  // полоска под лентой: какая часть видна и где она
-  const sync = () => {
-    const max = row.scrollWidth - row.clientWidth;
-    bar.style.width = (row.clientWidth / row.scrollWidth * 100) + '%';
-    bar.style.transform = `translateX(${max > 0 ? row.scrollLeft / max * (row.scrollWidth / row.clientWidth - 1) * 100 : 0}%)`;
-    // стрелки под лентой: в начале «назад» бледная, в конце — «дальше»
-    arrows[0].disabled = row.scrollLeft < 4; arrows[1].disabled = row.scrollLeft > max - 4;
+  const row = box.querySelector('.ro-shots');
+  const shots = [...row.querySelectorAll('.ro-shot')], imgs = shots.map(f => f.querySelector('img'));
+  const dots = [...box.querySelectorAll('.ro-dot')];
+  const MS = 4000;
+  let cur = 0, on = false, timer = 0;
+  const go = k => {
+    cur = (k + shots.length) % shots.length;
+    shots.forEach((f, n) => f.classList.toggle('on', n === cur));
+    dots.forEach((d, n) => d.classList.toggle('on', n === cur));
+    run();
   };
-  const arrows = [...box.querySelectorAll('.ro-arr')];
-  arrows.forEach(a => a.addEventListener('click', () =>
-    row.scrollBy({ left: +a.dataset.d * (imgs[0].clientWidth + 20), behavior: 'smooth' })));
-  row.addEventListener('scroll', sync, { passive: true });
-  addEventListener('resize', sync, { passive: true });
-  imgs.forEach(i => i.addEventListener('load', sync, { once: true }));
-  sync();
-  // мышью — тянуть ленту; короткое нажатие без сдвига открывает картинку крупно
-  let down = null, moved = false;
-  row.addEventListener('pointerdown', e => {
-    if (e.pointerType !== 'mouse') return;
-    down = { x: e.clientX, left: row.scrollLeft }; moved = false;
+  // кадры сменяются сами, пока лента на экране
+  const run = () => {
+    clearTimeout(timer);
+    if (!on || still()) return;
+    timer = setTimeout(() => go(cur + 1), MS);
+  };
+  dots.forEach((d, n) => d.addEventListener('click', () => go(n)));
+  onScreen(row, v => { on = v; run(); }, .4);
+  // пальцем и мышью: смахнуть влево-вправо — следующий / предыдущий, короткое нажатие — кадр крупно
+  let x0 = null;
+  row.addEventListener('pointerdown', e => { x0 = e.clientX; });
+  row.addEventListener('pointerup', e => {
+    if (x0 == null) return;
+    const dx = e.clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+    else H.openViewer(list.map(x => x.src), cur, imgs);
   });
-  addEventListener('pointermove', e => {
-    if (!down) return;
-    const dx = e.clientX - down.x;
-    if (Math.abs(dx) > 5 && !moved) { moved = true; row.classList.add('drag'); }
-    if (moved) row.scrollLeft = down.left - dx;
-  });
-  addEventListener('pointerup', () => {
-    if (!down) return;
-    down = null;
-    if (moved) { row.classList.remove('drag'); setTimeout(() => { moved = false; }, 0); }
-  });
-  row.addEventListener('click', e => {
-    const img = e.target.closest('img');
-    if (!img || moved) return;
-    H.openViewer(list.map(x => x.src), imgs.indexOf(img), imgs);
-  });
-  // стрелки клавиатуры, когда лента в фокусе
   row.addEventListener('keydown', e => {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    e.preventDefault();
-    row.scrollBy({ left: (e.key === 'ArrowRight' ? 1 : -1) * imgs[0].clientWidth, behavior: 'smooth' });
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
   });
 }
 
