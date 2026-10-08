@@ -203,11 +203,12 @@
 .neat .ro-sch .lk.ugly{opacity:0}
 .ro-sch .lk.neat path{stroke:#B7C8EE;stroke-width:2;stroke-dasharray:1;stroke-dashoffset:1}
 .neat .ro-sch .lk.neat path{stroke-dashoffset:0;transition:stroke-dashoffset .9s var(--ease) .6s}
-/* кнопка «причесать» — крупная, светло-лаймовая, нажимается сама */
-.ro-comb{display:inline-flex;align-items:center;gap:10px;padding:14px 28px 15px 22px;border-radius:99px;background:#EDF7C9;color:#5E7417;font-size:clamp(20px,1.6vw,24px);font-weight:500;line-height:1;
-  transition:transform .2s var(--ease),background .3s}
-.ro-comb svg{width:24px;height:24px;fill:currentColor}
-.ro-comb.hit{transform:scale(.9);background:#DDEFA0}
+/* кнопка «причесать» — как в самой программе: бледная заливка цвета вкладки, текст и значок-ползунки цветом вкладки;
+   у программы вкладка презентации оранжевая — здесь малиновая (оранжевого на сайте нет); нажимается сама */
+.ro-comb{display:inline-flex;align-items:center;gap:10px;padding:13px 26px 14px 22px;border-radius:99px;background:#FBEDEF;color:var(--ro-slide);
+  font-family:Manrope,'Golos Text',var(--font);font-size:clamp(20px,1.6vw,24px);font-weight:500;line-height:1;letter-spacing:-.005em;transition:transform .2s var(--ease),background .3s}
+.ro-comb svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ro-comb.hit{transform:scale(.92);background:#F6D9DF}
 :root[data-theme="dark"] .ro-tbl .c,:root[data-theme="dark"] .neat .ro-tbl .c{background:#fff}
 :root[data-theme="dark"] .neat .ro-tbl .c:nth-child(-n+4){background:#E4ECFB}
 

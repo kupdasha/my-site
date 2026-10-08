@@ -40,12 +40,13 @@ const at = (el, stage, fx = .5, fy = .5) => {
 
 /* ---------- значки ---------- */
 const CURSOR = `<svg class="ro-cur" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8.2-6.1 1.3L10 18.6z"/></svg>`;
-// счетчики: капля и молния; искры — у кнопки «причесать»; почта, мессенджер и «нет сети» — у HTML
+// счетчики: капля и молния; почта, мессенджер и «нет сети» — у HTML
 const METER = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 5c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12z"/><path d="M23 4l-5 10h5l-3 9 8-12h-5l3-7z"/></svg>`;
 const MAIL = `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="3"/><path d="M5 9l11 8 11-8"/></svg>`;
 const PLANE = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M28 5L4 14.5l9 3.5 2.5 9 4.5-6 6.5 4.5z"/><path d="M13 18l15-13"/></svg>`;
 const NONET = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 12.5a17 17 0 0 1 24 0M8.5 17a11 11 0 0 1 15 0M13 21.5a5 5 0 0 1 6 0"/><circle cx="16" cy="25.5" r="1.4"/><path d="M5 5l22 22"/></svg>`;
-const SPARK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3l1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8zM18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/></svg>`;
+// значок кнопки «причесать» — тот же, что в самой программе: три линии с ползунками
+const TUNE = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.6 4.4h10.8M2.6 8h10.8M2.6 11.6h10.8M6 2.9v3M10.6 6.5v3M4.6 10.1v3"/></svg>`;
 
 const MODES = ['doc', 'sheet', 'slide', 'html'];
 
@@ -317,7 +318,7 @@ function combHTML(c){
         ${boxes}
       </div>
     </div>
-    <span class="ro-comb">${SPARK}<span>${H.T(c.btn)}</span></span>
+    <span class="ro-comb">${TUNE}<span>${H.T(c.btn)}</span></span>
   </div>`;
 }
 function liveComb(box){
