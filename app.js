@@ -2299,16 +2299,14 @@ function sheetHTML(rows, bg, cls){
   return `<div class="wrap camp-rowbox"><div class="case-sheet${cls ? ' ' + cls : ''}" style="--sheet:${bg || '#E9E9E7'}">${
     rows.map(r => `<div class="camp-row">${(Array.isArray(r) ? r : [r]).map(campCell).join('')}</div>`).join('')}</div></div>`;
 }
-const markWatcher = new IntersectionObserver(es => es.forEach(e => {
-  if (!e.isIntersecting) return;
-  markWatcher.unobserve(e.target);
-  import(SCRIPT_BASE + 'mark3d.js?v=' + VER)
-    .then(m => m.mountMark(e.target)).catch(err => console.warn('3D-знак не загрузился', err));
-}), { rootMargin: '400px 0px' });
+// знак грузится сразу при открытии кейса: модуль маленький (свой WebGL, без three.js), модель ~100 КБ,
+// а рисовать он начинает, только когда блок на экране
+const markMount = el => import(SCRIPT_BASE + 'mark3d.js?v=' + VER)
+  .then(m => m.mountMark(el)).catch(err => console.warn('3D-знак не загрузился', err));
 // список направлений: подсвечивается по очереди, пока блок на экране; при наведении на направление
 // перебор останавливается, а знак плавно загорается лаймовыми бликами (класс hot читает mark3d.js)
 function watchMark(el){
-  markWatcher.observe(el);
+  markMount(el);
   const li = [...el.querySelectorAll('.m3d-dirs li')]; if (!li.length) return;
   let k = 0, t = 0, seen = false, held = false;
   const show = i => li.forEach((x, j) => x.classList.toggle('on', i === j));
@@ -2931,15 +2929,28 @@ $('#ttt').addEventListener('click', e => {
    Тильда сама отправит ее туда, куда подключены формы, — в Tilda CRM, на почту, в Telegram.
    Если такой формы на странице нет (прототип) или она не ответила, — как раньше: готовое сообщение в Telegram */
 function tildaGameForm(){
+  // своя форма с полем kd_contact или — если имена полей не меняли — первая обычная форма Тильды на странице
   const inp = document.querySelector('form input[name="kd_contact"]');
-  return inp ? inp.closest('form') : null;
+  const f = inp ? inp.closest('form') : document.querySelector('#allrecords form.t-form, form.t-form');
+  if (f) f.closest('.t-rec')?.classList.add('kd-hidden-form');   // на странице ее не видно
+  return f;
+}
+// поле формы Тильды для контакта: kd_contact, иначе Имя / Email / Телефон / первое текстовое
+function contactField(f){
+  return f.querySelector('[name="kd_contact"]') || f.querySelector('[name="Name"], [name="name"]')
+    || f.querySelector('input[type="text"]:not([type="hidden"])') || f.querySelector('[name="Email"], [name="email"], input[type="email"]')
+    || f.querySelector('[name="Phone"], [name="phone"], input[type="tel"]');
 }
 function sendGameContact(contact){
   const f = tildaGameForm();
   if (!f) return Promise.reject(new Error('нет формы Тильды'));
   const set = (name, v) => { const el = f.querySelector(`[name="${name}"]`); if (el) { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } };
-  set('kd_contact', contact);
-  set('kd_source', 'крестики-нолики на сайте: победа посетителя');
+  const field = contactField(f), src = 'крестики-нолики на сайте: победа посетителя';
+  if (!field) return Promise.reject(new Error('в форме нет поля для контакта'));
+  // телефонное или почтовое поле Тильда проверяет по формату — туда пишем только подходящий контакт
+  field.removeAttribute('data-tilda-rule');
+  set(field.name, f.querySelector('[name="kd_source"]') ? contact : `${contact} (${src})`);
+  set('kd_source', src);
   f.querySelectorAll('input[type="checkbox"]').forEach(c => { if (!c.checked) c.click(); });   // галочки посетитель уже отметил в игре
   const ok = () => f.classList.contains('js-send-form-success') || [...f.querySelectorAll('.js-successbox, .t-form__successbox')].some(b => b.offsetParent || getComputedStyle(b).display !== 'none');
   return new Promise((resolve, reject) => {
