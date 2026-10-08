@@ -43,34 +43,43 @@
 .ro-app{position:relative;background:var(--bg);border-radius:10px;box-shadow:0 18px 40px -26px rgba(20,24,32,.3);overflow:hidden}
 .ro-bar{display:flex;align-items:center;gap:6px;height:clamp(18px,2vw,26px);padding:0 10px;border-bottom:3px solid var(--m,var(--line))}
 .ro-bar > b{display:block;width:34%;height:7px;border-radius:4px;background:var(--m)}
-/* ---------- one: ярлыки Word, Excel, PowerPoint и HTML сходятся в программу ---------- */
-.ro-one{padding:clamp(20px,3vw,44px) clamp(14px,2.6vw,40px)}
-.ro-hub{display:block;width:100%;height:auto;overflow:visible}
-.ro-hub .sh .tile{fill:var(--m)}
-.ro-hub .sh-doc{--m:var(--ro-doc)}.ro-hub .sh-sheet{--m:var(--ro-sheet)}.ro-hub .sh-slide{--m:var(--ro-slide)}.ro-hub .sh-html{--m:var(--ro-html)}
-.ro-hub .gl{fill:#fff;font-family:var(--font);font-size:34px;font-weight:600}
-.ro-hub .gl.sm{fill:#1D222A;font-size:24px}
-/* стрелка ярлыка в углу, как на рабочем столе */
-.ro-hub .arr rect{fill:var(--bg);stroke:var(--ink);stroke-width:1.5}
-.ro-hub .arr path{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ro-hub .sep{stroke:var(--line);stroke-width:2;stroke-linecap:round}
-/* линии прорисовываются по очереди от ярлыков к программе */
-.ro-hub .ln{fill:none;stroke:color-mix(in srgb,var(--ink) 28%,var(--soft));stroke-width:2.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .4s var(--ease)}
-.ro-one.go .ro-hub .ln{stroke-dashoffset:0;transition:stroke-dashoffset 1s var(--ease-io) calc(var(--i) * 160ms)}
-.ro-hub .dot{stroke:var(--bg);stroke-width:2}
-.ro-hub .f-doc{fill:var(--ro-doc)}.ro-hub .f-sheet{fill:var(--ro-sheet)}.ro-hub .f-slide{fill:var(--ro-slide)}.ro-hub .f-html{fill:var(--ro-html)}
-/* программа: темный значок с четырьмя вкладками; вкладки загораются, когда линии дошли, и вздрагивает от каждой точки */
-.ro-hub .app > .tile{fill:var(--ink)}
-.ro-hub .app .tl{fill:color-mix(in srgb,var(--bg) 30%,var(--ink))}
-.ro-hub .app .tb{opacity:.25;transition:opacity .4s}
-.ro-one.go .ro-hub .app .tb{opacity:1;transition-delay:1.1s}
-.ro-hub .app{transform-box:fill-box;transform-origin:center}
-.ro-hub .app > .tile{transform-box:fill-box;transform-origin:center}
-.ro-hub.hit .app > .tile{animation:roBeat .35s var(--ease)}
-@keyframes roBeat{50%{transform:scale(1.04)}}
-/* ярлыки выезжают слева при первом показе */
-.ro-hub .sh{opacity:0;transition:opacity .5s var(--ease) calc(var(--i) * 90ms)}
-.ro-ch.in .ro-hub .sh{opacity:1}
+/* ---------- one: четыре пастельные иконки складываются в одну ---------- */
+/* размеры — в процентах ширины сцены: иконка 17 %, в общей иконке — 13,3 % по четвертям */
+.ro-one{position:relative;aspect-ratio:16/9;container-type:inline-size}
+.ro-ic{--sz:17cqw;--sc:1;position:absolute;left:var(--x);top:50%;width:var(--sz);aspect-ratio:1;border-radius:22%;background:var(--c1);
+  transform:translate(-50%,-50%) scale(var(--sc));container-type:inline-size;
+  transition:left .9s var(--ease-io) calc(var(--i) * 70ms),top .9s var(--ease-io) calc(var(--i) * 70ms),transform .9s var(--ease-io) calc(var(--i) * 70ms),border-radius .9s var(--ease-io)}
+/* пастель без черного: фон, рисунок, плашка с белой буквой */
+.ic-w{--c1:#DCE7FB;--c2:#B4CBF3;--c3:#7FA2E4;--x:15%}
+.ic-x{--c1:#D9F0E2;--c2:#AEDDBF;--c3:#6FBF8F;--x:36%}
+.ic-p{--c1:#FBE0E7;--c2:#F3B6C5;--c3:#DE8AA1;--x:57%}
+.ic-h{--c1:#EDF7C9;--c2:#D3EA88;--c3:#9DBF2E;--x:85%}
+.ro-ic .art{position:absolute;right:12%;top:14%;bottom:14%;width:50%;display:flex;flex-direction:column;justify-content:center;gap:9%}
+.ro-ic .art i{display:block;height:8%;border-radius:99px;background:var(--c2)}
+.ro-ic .art i.s{width:64%}
+.ic-x .art{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:7%}
+.ic-x .art u{border-radius:12%;background:var(--c2)}
+.ic-p .art{align-items:center}
+.ic-p .pie{display:block;width:92%;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--c3) 0 28%,var(--c2) 0)}
+.ic-h .art .blk{display:block;height:34%;border-radius:10%;background:var(--c2)}
+.ro-ic b{position:absolute;left:9%;top:50%;width:46%;aspect-ratio:1;transform:translateY(-50%);display:grid;place-items:center;border-radius:20%;background:var(--c3);
+  color:#fff;font-family:var(--font);font-size:26cqw;font-weight:600;line-height:1}
+.ic-h b{font-size:17cqw;letter-spacing:-.04em}
+/* HTML стоит чуть поодаль, за тонкой чертой */
+.ro-sep{position:absolute;left:71%;top:36%;bottom:36%;width:2px;border-radius:2px;background:color-mix(in srgb,var(--ink) 12%,var(--soft));transition:opacity .5s}
+/* общая иконка: светлый скругленный квадрат, в нем четыре иконки по четвертям */
+.ro-frame{position:absolute;left:50%;top:50%;width:31.5cqw;aspect-ratio:1;border-radius:24%;background:#FFFFFF;box-shadow:0 20px 50px -28px rgba(60,70,110,.35);
+  transform:translate(-50%,-50%) scale(.6);opacity:0;transition:opacity .5s var(--ease),transform .9s var(--ease-io)}
+.ro-one[data-step="1"] .ro-frame{opacity:1;transform:translate(-50%,-50%);transition-delay:.25s}
+.ro-one[data-step="1"] .ro-sep{opacity:0}
+.ro-one[data-step="1"] .ro-ic{--sc:.78;border-radius:26%}
+.ro-one[data-step="1"] .ic-w{left:calc(50% - 7.4cqw);top:calc(50% - 7.4cqw)}
+.ro-one[data-step="1"] .ic-x{left:calc(50% + 7.4cqw);top:calc(50% - 7.4cqw)}
+.ro-one[data-step="1"] .ic-p{left:calc(50% - 7.4cqw);top:calc(50% + 7.4cqw)}
+.ro-one[data-step="1"] .ic-h{left:calc(50% + 7.4cqw);top:calc(50% + 7.4cqw)}
+/* иконки проявляются по очереди при первом показе */
+.ro-ic{opacity:0}
+.ro-ch.in .ro-ic{opacity:1;transition:opacity .5s var(--ease) calc(var(--i) * 100ms),left .9s var(--ease-io) calc(var(--i) * 70ms),top .9s var(--ease-io) calc(var(--i) * 70ms),transform .9s var(--ease-io) calc(var(--i) * 70ms),border-radius .9s var(--ease-io)}
 
 .ro-tabs{gap:clamp(4px,.6vw,8px)}
 .ro-tabs .ro-t{display:block;flex:0 1 52px;height:9px;border-radius:5px;background:var(--line)}

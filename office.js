@@ -1,8 +1,9 @@
 /* ================================================================
    КЕЙС «РУССКИЙ ОФИС» (поле office у проекта)
    Главы почти без слов — иконки и короткие анимации:
-   one — ярлыки Word, Excel, PowerPoint и отдельно HTML; от каждого
-   линия прорисовывается в значок программы, по линиям бегут точки;
+   one — четыре пастельные иконки в стиле значков приложений: Word,
+   Excel, PowerPoint и чуть поодаль HTML; съезжаются и складываются
+   в одну иконку — программу, потом снова расходятся;
    side — одно окно, внутри рядом готовые шаблоны: заявление в Word,
    смета со значками счетчиков и итогом по формуле, презентация;
    курсор переносит итог сметы в график и в заявление;
@@ -92,62 +93,27 @@ function cycle(el, steps, threshold = .3){
 /* ================================================================
    one — три редактора с ключами складываются в одно окно
    ================================================================ */
-// ярлыки: цветной квадрат с буквой и стрелкой ярлыка в углу; HTML — отдельно, ниже черты
-const SHORT = [
-  { k: 'doc', y: 52, g: 'W' }, { k: 'sheet', y: 140, g: 'X' }, { k: 'slide', y: 228, g: 'P' }, { k: 'html', y: 340, g: '</>' },
+// иконки в духе значков приложений: пастельный квадрат, справа рисунок «содержимого», слева плашка с буквой;
+// сначала стоят в ряд (HTML — чуть поодаль), потом каждая уменьшается и встает в свою четверть общей иконки
+const ICONS = [
+  { k: 'w', g: 'W', art: '<i></i><i></i><i></i><i class="s"></i>' },
+  { k: 'x', g: 'X', art: '<u></u><u></u><u></u><u></u><u></u><u></u>' },
+  { k: 'p', g: 'P', art: '<span class="pie"></span>' },
+  { k: 'h', g: '</>', art: '<i></i><i class="s"></i><span class="blk"></span>' },
 ];
-const APP = { x: 410, y: 196 };
 function oneHTML(){
-  const icon = (c, i) => `<g class="sh sh-${c.k}" style="--i:${i}" transform="translate(64 ${c.y})">
-    <rect class="tile" x="-32" y="-32" width="64" height="64" rx="14"/>
-    <text class="gl${c.g.length > 1 ? ' sm' : ''}" y="1" text-anchor="middle" dominant-baseline="central">${esc(c.g)}</text>
-    <g class="arr" transform="translate(-32 12)"><rect width="22" height="22" rx="5"/><path d="M7 16v-4a4 4 0 0 1 4-4h5M13 5l3 3-3 3"/></g></g>`;
-  const line = (c, i) => `<path class="ln ln-${c.k}" style="--i:${i}" pathLength="1" d="M104 ${c.y}C${230} ${c.y} ${250} ${APP.y} ${APP.x - 64} ${APP.y}"/>`;
-  return `<div class="ro-stage ro-one">
-    <svg class="ro-hub" viewBox="0 0 520 392" aria-hidden="true">
-      <path class="sep" d="M30 284H98"/>
-      ${SHORT.map(line).join('')}
-      <g class="dots"></g>
-      ${SHORT.map(icon).join('')}
-      <g class="app" transform="translate(${APP.x} ${APP.y})">
-        <rect class="tile" x="-62" y="-62" width="124" height="124" rx="26"/>
-        ${['doc', 'sheet', 'slide', 'html'].map((m, i) => `<rect class="tb f-${m}" x="${-44 + i * 23}" y="-40" width="19" height="9" rx="4.5"/>`).join('')}
-        <rect class="tl" x="-44" y="-14" width="70" height="7" rx="3.5"/><rect class="tl" x="-44" y="2" width="88" height="7" rx="3.5"/>
-        <rect class="tl" x="-44" y="18" width="52" height="7" rx="3.5"/>
-      </g>
-    </svg>
+  return `<div class="ro-stage ro-one" data-step="0">
+    <span class="ro-sep"></span>
+    <span class="ro-frame"></span>
+    ${ICONS.map((c, i) => `<div class="ro-ic ic-${c.k}" style="--i:${i}"><div class="art">${c.art}</div><b>${esc(c.g)}</b></div>`).join('')}
   </div>`;
 }
 function liveOne(box){
   const st = box.querySelector('.ro-one');
-  const svg = st.querySelector('.ro-hub');
-  const dotsG = svg.querySelector('.dots');
-  const paths = [...svg.querySelectorAll('.ln')];
-  if (still()) { st.classList.add('go'); return; }
-  // точки бегут от ярлыков в программу, пока линии прорисованы
-  const NS = 'http://www.w3.org/2000/svg';
-  let dots = [], raf = 0, last = 0, next = 0, flow = false;
-  const frame = now => {
-    const dt = Math.min(50, now - (last || now)); last = now;
-    next -= dt;
-    if (flow && next <= 0) {
-      const k = Math.floor(Math.random() * paths.length), p = paths[k];
-      const el = document.createElementNS(NS, 'circle'); el.setAttribute('r', 6); el.setAttribute('class', 'dot f-' + SHORT[k].k);
-      dotsG.appendChild(el); dots.push({ el, p, len: p.getTotalLength(), t: 0 }); next = rnd(160, 320);
-    }
-    dots = dots.filter(d => {
-      d.t += dt / 1100;
-      if (d.t >= 1) { d.el.remove(); svg.classList.remove('hit'); void svg.getBoundingClientRect(); svg.classList.add('hit'); return false; }
-      const pt = d.p.getPointAtLength(d.len * d.t);
-      d.el.setAttribute('cx', pt.x); d.el.setAttribute('cy', pt.y);
-      return true;
-    });
-    if (flow || dots.length) raf = requestAnimationFrame(frame); else raf = 0;
-  };
-  const start = () => { flow = true; if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
+  if (still()) { st.dataset.step = 1; return; }
   cycle(st, [
-    async () => { st.classList.add('go'); await wait(1500); start(); await wait(4200); },   // линии прорисовываются, точки бегут
-    async () => { flow = false; await wait(1300); st.classList.remove('go'); await wait(900); },
+    async () => { st.dataset.step = 0; await wait(2400); },   // четыре отдельные иконки
+    async () => { st.dataset.step = 1; await wait(3200); },   // сложились в одну
   ], .35);
 }
 
