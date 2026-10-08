@@ -78,6 +78,19 @@
 .ro-one[data-step="1"] .ic-x{left:calc(50% + 7.4cqw);top:calc(50% - 7.4cqw)}
 .ro-one[data-step="1"] .ic-p{left:calc(50% - 7.4cqw);top:calc(50% + 7.4cqw)}
 .ro-one[data-step="1"] .ic-h{left:calc(50% + 7.4cqw);top:calc(50% + 7.4cqw)}
+/* телефон: иконки крупнее, сцена ниже — меньше пустоты; собранная иконка тоже крупнее */
+@media (max-width:640px){
+  .ro-one{aspect-ratio:16/10}
+  .ro-ic{--sz:20.5cqw}
+  .ic-w{--x:12%}.ic-x{--x:35.5%}.ic-p{--x:59%}.ic-h{--x:88%}
+  .ro-sep{left:73.5%}
+  .ro-frame{width:39cqw;border-radius:5.8cqw}
+  .ro-one[data-step="1"] .ro-ic{--sc:.88}
+  .ro-one[data-step="1"] .ic-w{left:calc(50% - 9.4cqw);top:calc(50% - 9.4cqw)}
+  .ro-one[data-step="1"] .ic-x{left:calc(50% + 9.4cqw);top:calc(50% - 9.4cqw)}
+  .ro-one[data-step="1"] .ic-p{left:calc(50% - 9.4cqw);top:calc(50% + 9.4cqw)}
+  .ro-one[data-step="1"] .ic-h{left:calc(50% + 9.4cqw);top:calc(50% + 9.4cqw)}
+}
 /* иконки проявляются по очереди при первом показе */
 .ro-ic{opacity:0}
 .ro-ch.in .ro-ic{opacity:1;transition:opacity .5s var(--ease) calc(var(--i) * 100ms),left .9s var(--ease-io) calc(var(--i) * 70ms),top .9s var(--ease-io) calc(var(--i) * 70ms),transform .9s var(--ease-io) calc(var(--i) * 70ms),border-radius .9s var(--ease-io)}
@@ -137,6 +150,8 @@
 /* ---------- closed: закрытый контур ---------- */
 .ro-closedst{padding:clamp(12px,2.6vw,40px)}
 .ro-net{display:block;width:100%;height:auto;max-width:1040px;margin:0 auto;overflow:visible}
+/* телефон: схема шире экрана на 12 % (по краям — только пустые поля), без внутренних отступов — значки крупнее */
+@media (max-width:640px){.ro-closedst{padding:10px 0}.ro-net{width:112%;max-width:none;margin-left:-6%}}
 .ro-net .wall{fill:var(--bg);stroke:var(--ink);stroke-width:3;transition:stroke .3s}
 .ro-net.hit .wall{animation:roWall .6s var(--ease)}
 @keyframes roWall{0%{stroke-width:6}100%{stroke-width:3}}
@@ -291,6 +306,15 @@
   .ro-split:has(.ro-try) :is(.ro-label,.ro-title,.ro-text){order:-1;grid-column:1 / -1}
   .ro-split:has(.ro-try) > .ro-viz{margin-top:12px}
   .ro-split:has(.ro-try) .ro-try{order:1;grid-column:1 / -1;border-top:0;padding-top:0}
+}
+
+/* ---------- планшет: у глав с картинкой сбоку текст по той же сетке, что у остальных — подпись слева, заголовок и текст справа ---------- */
+@media (min-width:641px) and (max-width:900px){
+  .ro-split > .ro-side{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px}
+  .ro-split > .ro-side > .ro-label{grid-column:1 / span 3;grid-row:1}
+  .ro-split > .ro-side > :not(.ro-label){grid-column:5 / -1}
+  .ro-split:has(.ro-try) .ro-side .ro-label{grid-column:1 / span 3;align-self:start}
+  .ro-split:has(.ro-try) .ro-side :is(.ro-title,.ro-text),.ro-split:has(.ro-try) .ro-side .ro-try{grid-column:5 / -1}
 }
 
 /* ---------- текст в начале кейса: на планшете задача и решение рядом, результат ниже ---------- */
