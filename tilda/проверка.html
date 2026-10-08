@@ -190,16 +190,23 @@
 <div class="r t-rec" data-record-type="131"><!-- 5 таплинк / 1 таплинк целиком -->
 <!-- ТАПЛИНК. Весь таплинк лежит на GitHub в taplink.html и подключается отсюда. Блок не менять. -->
 <div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>
-<script>(function(){var B='../',v=Math.floor(Date.now()/36e5),root=document.getElementById('taplink-root');
+<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',
+G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;
+['https://cdn.jsdelivr.net','https://fonts.googleapis.com','https://fonts.gstatic.com'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});
 try{if(localStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}
-var G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html';
-function get(u,ms){return new Promise(function(ok,no){var t=setTimeout(no,ms);fetch(u).then(function(r){clearTimeout(t);r.ok?r.text().then(ok,no):no()},no)})}
-get(G+'?v='+Math.floor(Date.now()/6e4),4000).catch(function(){return get(B+'taplink.html?v='+v,15000)}).then(function(html){
-var doc=new DOMParser().parseFromString(html,'text/html');
+try{c=JSON.parse(localStorage.getItem(K))}catch(e){}
+function get(u,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);x.timeout=ms;x.onload=function(){cb(x.status==200?x.responseText:null)};x.onerror=x.ontimeout=function(){cb(null)};x.send()}
+function save(s,h){try{localStorage.setItem(K,JSON.stringify({s:s,h:h}))}catch(e){}}
+function show(h){if(shown||!h)return;shown=1;var doc=new DOMParser().parseFromString(h,'text/html');
 [].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});
 [].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});
 [].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});
-root.style.minHeight='';root.style.background=''})})()</script>
+root.style.minHeight='';root.style.background=''}
+function github(s){get(G+'?t='+Date.now(),25000,function(h){if(h)save(s,h);show(h||(c&&c.h))})}
+get(W,2500,function(s){s=(s||'').trim();if(!/^[0-9a-f]{40}$/.test(s))s='';
+if(s&&c&&c.s===s&&c.h)return show(c.h);
+if(s)return get(R+s+'/taplink.html',20000,function(h){if(h){save(s,h);show(h)}else github(s)});
+if(c&&c.h)show(c.h);github('')})})()</script>
 </div>
 <div class="r t-rec" data-record-type="131"><!-- 6 страница Обо мне / 1 страница Обо мне целиком -->
 <!-- ОФОРМЛЕНИЕ САЙТА: шрифты, стили и загрузчик файлов с GitHub. Это код, тексты здесь не правятся. -->

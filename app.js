@@ -41,7 +41,7 @@ const SCRIPT_BASE = (document.currentScript?.src || [...document.scripts].map(s 
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -2446,6 +2446,8 @@ function renderCase(k, keepScroll){
   if (p.poll) body += `<div class="pl pl-mount"></div>`;
   // office — «русский офис»: три редактора в одном окне, рядом, шаблоны, QR, мини-лендинг, закрытый контур, сменный набор; рисует office.js
   if (p.office) body += `<div class="ro ro-mount"></div>`;
+  // fix — исправлятор: фотограф снимает толпу, оплата не прошла, до и после, сила нейросети и края, где работает; рисует fix.js
+  if (p.fix) body += `<div class="fx fx-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // heroEnd — ролик из шапки уходит в самый конец кейса, после живых глав (см. интерактивные презентации)
   if (p.heroEnd) body += `<div class="wrap case-hero-end"><div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div></div>`;
@@ -2569,6 +2571,10 @@ function renderCase(k, keepScroll){
   if (ro) caseImport('office')
     .then(m => m.mountOffice(ro, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс «русский офис» не загрузился', err));
+  const fx = caseContent.querySelector('.fx-mount');
+  if (fx) caseImport('fix')
+    .then(m => m.mountFix(fx, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс исправлятора не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
   if (vp) caseImport('vkplay')
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))
