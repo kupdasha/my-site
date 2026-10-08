@@ -836,7 +836,8 @@ function mediaHTML(p){
   // preview — отдельный легкий ролик для сетки (mp4), если основное видео на площадке, которая не умеет тихий повтор
   const m = parseMedia(p.preview || legacyVideo(p));
   // thumb — легкая копия обложки для карточек (сетка, «следующий проект»); в шапке кейса остается полная image
-  const cover = p.thumb || p.image;
+  // listPreview-картинка (не ролик) — главная обложка проекта и для «следующего проекта», если она задана
+  const cover = (p.listPreview && !/\.mp4(\?|$)/.test(p.listPreview) ? p.listPreview : '') || p.thumb || p.image;
   const img = cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async"${p.pos ? ` style="object-position:${p.pos}"` : ''}>` : '';
   // ролик подгружается, только когда до карточки остается экран; до этого видна обложка
   // hover: true — ролик стоит на обложке и играет, только пока курсор над карточкой
