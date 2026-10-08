@@ -644,12 +644,16 @@ function liveBuild(box, c){
    ГЛАВА campus: одна карта, две роли — разница видна без слов.
    Студия (карандаш): рабочий проект — текст плиты правится в полях,
    иконки ТЗ, замечания заказчика с кнопкой-галочкой «учтено».
-   Заказчик (глаз, «по ссылке»): ничего не правит — на табличке
-   пульсирует мишень, нажатие ставит точку и открывает замечание;
-   кнопка «согласовать». Отправленное замечание улетает точкой
-   к кнопке «студия», на ней растет счетчик.
-   На карте: рука-подсказка «тяните», пока не потянули; круглые
-   кнопки — ближе, дальше, подойти к табличке, весь кампус.
+   Заказчик (глаз): ничего не правит — на табличке пульсирует
+   мишень, нажатие ставит точку и открывает замечание; кнопка
+   «согласовать». Отправленное замечание улетает точкой к кнопке
+   «студия», на ней растет счетчик.
+   Роль видно по окну вокруг карты и панели: у студии — окно
+   программы с инструментами, у заказчика — браузер с адресом.
+   Нажатие на метку — подлет вплотную, на плите настоящий макет;
+   вблизи тянуть — обойти вокруг, стрелка назад — к карте.
+   Подсказки: рука «нажимает» на метку, пока не нажали; вблизи —
+   рука тянет, пока не потянули.
    ================================================================ */
 const CI = {
   studio: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>',
@@ -663,20 +667,30 @@ const CI = {
   home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6M5 9v11h14V9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   hand: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.5 15a1.5 1.5 0 0 1 2.4-1.8L9 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   en: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
+  back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  layers: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 5-9 5-9-5zM3 14l9 5 9-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+  ruler: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16L16 4l4 4L8 20zM8 12l2 2M11 9l2 2M14 6l2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+  export: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5M5 14v5h14v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
 };
 function campusHTML(c){
   const rb = (cls, icon, label) => `<button class="nv-round ${cls}" aria-label="${esc(H.pick(label))}" title="${esc(H.pick(label))}">${icon}</button>`;
   return `<div class="nv-campus">
     <div class="nv-roles" role="tablist">${['studio', 'client'].map((m, i) =>
       `<button class="nv-role-btn${i ? '' : ' on'}" data-m="${m}" role="tab" aria-selected="${!i}">${CI[m]}<span>${H.T(c.modes[i])}</span>${i ? '' : '<b class="nv-badge" hidden>0</b>'}</button>`).join('')}</div>
-    <div class="nv-scene">
-      <canvas class="nv-cv"></canvas>
-      <div class="nv-face" aria-hidden="true"></div>
-      <span class="nv-chrome"></span>
-      <span class="nv-hand" aria-hidden="true">${CI.hand}</span>
-      <div class="nv-zoom">${rb('nv-near', ICON.add, c.near)}${rb('nv-far', CI.minus, c.far)}${rb('nv-go', CI.walk, c.go)}${rb('nv-all', CI.home, c.all)}</div>
+    <div class="nv-device">
+      <div class="nv-titlebar" aria-hidden="true"><span class="nv-lights"><i></i><i></i><i></i></span><span class="nv-chrome"></span></div>
+      <div class="nv-device-body">
+        <div class="nv-scene">
+          <canvas class="nv-cv"></canvas>
+          <div class="nv-face" aria-hidden="true"></div>
+          <span class="nv-hand" aria-hidden="true">${CI.hand}</span>
+          ${rb('nv-back', CI.back, c.back)}
+          <div class="nv-zoom">${rb('nv-near', ICON.add, c.near)}${rb('nv-far', CI.minus, c.far)}${rb('nv-all', CI.home, c.all)}</div>
+        </div>
+        <aside class="nv-panel"></aside>
+      </div>
     </div>
-    <aside class="nv-panel"></aside>
   </div>`;
 }
 function liveCampus(box, c){
@@ -714,6 +728,7 @@ function liveCampus(box, c){
     const [g, W, Hh] = sizeCanvas(cv), status = {};
     BOARDS.forEach(b => { status[b.id] = open(b.id).length ? 'fix' : st.mode === 'client' && st.status[b.id] === 'ok' ? 'ok' : ''; });
     hits = draw3d(g, W, Hh, cam, { pal: dark() ? PAL.dark : PAL.light, status, sel: st.sel, labels: cam.dist > 120 });
+    placeHand();
   }
   const redraw = () => { if (!raf) raf = requestAnimationFrame(draw); };
   function fly(target, ms = 1100){
@@ -731,7 +746,16 @@ function liveCampus(box, c){
     };
     anim = requestAnimationFrame(step);
   }
-  const setClose = v => { st.close = v; box.querySelector('.nv-go').classList.toggle('on', v); };
+  const hand = box.querySelector('.nv-hand');
+  // рука-подсказка: на карте «нажимает» на метку выбранной таблички, вблизи — тянет, чтобы обойти вокруг
+  let tapped = false, walked = false;
+  function placeHand(){
+    if (st.close) { hand.className = 'nv-hand drag' + (walked ? ' gone' : ''); hand.style.left = hand.style.top = ''; return; }
+    const h = hits.find(x => x.id === st.sel);
+    hand.className = 'nv-hand tap' + (tapped || !h ? ' gone' : '');
+    if (h) { hand.style.left = h.x + 'px'; hand.style.top = h.y + 'px'; }
+  }
+  const setClose = v => { st.close = v; scene.classList.toggle('close', v); placeHand(); };
   // замечания ТЗ — иконкой и двумя словами
   function issuesOf(b){
     const p = prepEdited(b), out = [];
@@ -748,7 +772,9 @@ function liveCampus(box, c){
   const head = (b) => `<div class="nv-side-head"><span class="nv-type-ic" title="${esc(TYPES[b.type].name)}">${ICON[b.type]}</span><b>№${b.n}</b><span>${H.T(b.zone)}</span></div>`;
   function renderPanel(){
     const b = board(), notes = st.notes[b.id] || [], live = open(b.id);
-    chrome.innerHTML = st.mode === 'studio' ? `${CI.studio}<span>${H.T(c.studioTag)}</span>` : `${CI.link}<span>${H.T(c.clientTag)}</span>`;
+    chrome.innerHTML = st.mode === 'studio'
+      ? `<span class="nv-tools">${[CI.studio, CI.layers, CI.ruler, CI.export].map((ic, i) => `<i${i ? '' : ' class="on"'}>${ic}</i>`).join('')}</span>`
+      : `<span class="nv-url">${CI.lock}<span>${esc(H.pick(c.url))}</span></span>`;
     if (st.mode === 'studio') {
       const p = prepEdited(b);
       panel.innerHTML = `${head(b)}
@@ -808,10 +834,11 @@ function liveCampus(box, c){
     requestAnimationFrame(() => { dot.style.transform = `translate(${to.right - 14 - from.left - from.width / 2}px,${to.top + 6 - from.top - from.height / 2}px) scale(.6)`; });
     setTimeout(() => { dot.remove(); updBadge(true); }, 750);
   }
+  // нажатие на метку — подлет вплотную к табличке; оттуда можно тянуть и обойти вокруг или вернуться к карте
   function select(id){
-    st.sel = id; st.pin = null;
+    st.sel = id; st.pin = null; tapped = true;
     renderPanel();
-    if (st.close) fly(faceCam(board(), 2.3), 900); else redraw();
+    setClose(true); fly(faceCam(board(), 1.7), 1300);
   }
   box.querySelectorAll('.nv-role-btn').forEach(b => b.addEventListener('click', () => {
     st.mode = b.dataset.m; st.pin = null;
@@ -819,10 +846,9 @@ function liveCampus(box, c){
     root.classList.toggle('client', st.mode === 'client');
     renderPanel(); redraw();
   }));
-  box.querySelector('.nv-go').addEventListener('click', () => {
-    if (st.close) { setClose(false); fly(HOME); } else { setClose(true); fly(faceCam(board(), 2.3)); }
-  });
-  box.querySelector('.nv-all').addEventListener('click', () => { setClose(false); fly(HOME); });
+  const toMap = () => { setClose(false); fly(HOME, 1300); };
+  box.querySelector('.nv-back').addEventListener('click', toMap);
+  box.querySelector('.nv-all').addEventListener('click', toMap);
   const zoom = k => { cancelAnimationFrame(anim); hideFace(); cam.dist = clamp(cam.dist * k, 3, 1800); if (cam.dist > 60) setClose(false); redraw(); };
   box.querySelector('.nv-near').addEventListener('click', () => zoom(.72));
   box.querySelector('.nv-far').addEventListener('click', () => zoom(1.38));
@@ -838,7 +864,7 @@ function liveCampus(box, c){
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
     if (!drag.moved) return;
-    hideFace(); scene.classList.add('used');
+    hideFace(); if (st.close) { walked = true; placeHand(); }
     cam.yaw = drag.yaw - dx * .006; cam.pitch = clamp(drag.pitch + dy * .004, .06, 1.3);
     redraw();
   });
@@ -847,7 +873,7 @@ function liveCampus(box, c){
       const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
       let best = null, bd = 22;
       for (const h of hits) { const d = Math.hypot(h.x - x, h.y - y); if (d < bd) { bd = d; best = h; } }
-      if (best) { scene.classList.add('used'); select(best.id); }
+      if (best) select(best.id);
     }
     drag = null;
   });

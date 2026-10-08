@@ -120,41 +120,59 @@
 }
 
 /* ---------- 3D-кампус: две роли, разница без слов ---------- */
-.nv-campus{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);grid-template-rows:auto auto;gap:16px clamp(16px,2vw,24px);align-items:start}
+.nv-campus{display:flex;flex-direction:column;gap:16px}
+/* окно вокруг карты и панели: у студии — программа на компьютере (панель инструментов), у заказчика — браузер (адресная строка) */
+.nv-device{border-radius:14px;background:var(--soft);box-shadow:0 0 0 1px var(--line);overflow:hidden;transition:background .4s,box-shadow .4s}
+.nv-campus.client .nv-device{box-shadow:0 0 0 3px var(--nv-fix)}
+.nv-titlebar{display:flex;align-items:center;gap:16px;height:52px;padding:0 16px;background:var(--ink);color:var(--bg);transition:background .4s,color .4s}
+.nv-campus.client .nv-titlebar{background:var(--bg);color:var(--ink)}
+.nv-lights{display:flex;gap:7px;flex:none}
+.nv-lights i{width:12px;height:12px;border-radius:50%;background:currentColor;opacity:.3}
+.nv-chrome{flex:1;min-width:0;display:flex;align-items:center}
+.nv-tools{display:flex;gap:6px}
+.nv-tools i{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;opacity:.55}
+.nv-tools i.on{opacity:1;background:rgba(127,127,127,.25)}
+.nv-tools svg{width:20px;height:20px}
+.nv-url{flex:1;max-width:460px;margin:0 auto;display:flex;align-items:center;gap:8px;height:36px;padding:0 14px 2px;border-radius:99px;background:var(--soft);font-size:16px;white-space:nowrap;overflow:hidden;animation:nvIn .35s var(--ease) both}
+.nv-url svg{flex:none;width:16px;height:16px;opacity:.6}
+.nv-url span{overflow:hidden;text-overflow:ellipsis}
+.nv-device-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);align-items:stretch}
 /* роли: карандаш — студия, глаз — заказчик; у студии счетчик замечаний */
 .nv-roles{grid-column:1 / -1;display:flex;gap:8px}
 .nv-role-btn{position:relative;display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 22px 2px 16px;border-radius:99px;background:var(--soft);font-size:18px;transition:background .3s,color .3s}
 .nv-role-btn svg{width:22px;height:22px}
 .nv-role-btn.on{background:var(--ink);color:var(--bg)}
-.nv-role-btn:not(.on):hover{background:var(--ink);color:var(--bg)}
+.nv-role-btn:not(.on):hover{background:var(--line)}
+.nv-role-btn:focus{outline:none}
+.nv-role-btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .nv-badge{position:absolute;top:-6px;right:-6px;min-width:26px;height:26px;padding:0 7px;border-radius:99px;background:var(--nv-fix);color:#fff;font-size:16px;font-weight:600;line-height:26px;text-align:center;box-shadow:0 0 0 3px var(--bg)}
 .nv-badge.pop{animation:nvBounce .5s var(--ease)}
 .nv-flydot{position:fixed;z-index:50;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--nv-fix);pointer-events:none;transition:transform .7s cubic-bezier(.5,0,.2,1)}
-.nv-scene{position:relative;aspect-ratio:4/3;border-radius:var(--r-img);overflow:hidden;background:var(--soft);user-select:none;-webkit-user-select:none;box-shadow:inset 0 0 0 0 var(--ink);transition:box-shadow .4s}
-/* заказчик видит карту «со стороны»: рамка вокруг, как у страницы по ссылке */
-.nv-scene::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 0 var(--nv-fix);pointer-events:none;transition:box-shadow .4s}
-.nv-campus.client .nv-scene::after{box-shadow:inset 0 0 0 3px var(--nv-fix)}
+.nv-scene{position:relative;width:100%;min-width:0;aspect-ratio:4/3;overflow:hidden;background:var(--soft);user-select:none;-webkit-user-select:none}
 .nv-scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
 .nv-scene canvas:active{cursor:grabbing}
 .nv-face{position:absolute;left:0;top:0;transform:translate(-50%,-50%);opacity:0;pointer-events:none;transition:opacity .45s}
 .nv-face.on{opacity:1}
 .nv-face .nv-plate{box-shadow:none}
-.nv-chrome{position:absolute;left:14px;top:14px;display:inline-flex;align-items:center;gap:8px;padding:7px 14px 9px 10px;border-radius:99px;background:var(--ink);color:var(--bg);font-size:16px;pointer-events:none}
-.nv-chrome svg{width:20px;height:20px}
-.nv-campus.client .nv-chrome{background:var(--nv-fix);color:#fff}
-/* рука-подсказка: тянет карту туда-сюда, пока ее не потянули сами */
-.nv-hand{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--bg);color:var(--ink);display:flex;align-items:center;justify-content:center;pointer-events:none;animation:nvDrag 2.4s var(--ease) infinite;transition:opacity .4s}
+/* рука-подсказка: на карте нажимает на метку (с волной), вблизи тянет туда-сюда — пока посетитель не сделал это сам */
+.nv-hand{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-6px 0 0 -14px;border-radius:50%;background:var(--bg);color:var(--ink);display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 6px 18px -6px rgba(0,0,0,.35);transition:opacity .4s,left .5s var(--ease),top .5s var(--ease)}
 .nv-hand svg{width:26px;height:26px}
-.nv-scene.used .nv-hand{opacity:0;animation:none}
+.nv-hand.tap{animation:nvTap 1.6s var(--ease) infinite}
+.nv-hand.tap::before{content:"";position:absolute;left:14px;top:6px;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2px solid var(--ink);animation:nvTapRing 1.6s var(--ease) infinite}
+.nv-hand.drag{margin:-23px 0 0 -23px;animation:nvDrag 2.4s var(--ease) infinite}
+.nv-hand.gone{opacity:0;animation:none}
+@keyframes nvTap{0%,100%{transform:translate(8px,10px)}40%{transform:translate(0,0) scale(.9)}55%{transform:translate(0,0) scale(.9)}}
+@keyframes nvTapRing{0%,35%{transform:scale(.3);opacity:0}45%{opacity:.8}100%{transform:scale(1.8);opacity:0}}
 @keyframes nvDrag{0%,100%{transform:translateX(-36px)}50%{transform:translateX(36px)}}
 .nv-zoom{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px}
 .nv-round{width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;flex:none;transition:transform .3s var(--ease),background .3s}
 .nv-round:hover{transform:scale(1.07)}
 .nv-round svg{width:22px;height:22px}
-.nv-go.on{background:var(--nv-fix);color:#fff}
+.nv-back{position:absolute;left:14px;top:14px;opacity:0;transform:scale(.6);pointer-events:none;transition:opacity .35s,transform .35s var(--ease)}
+.nv-scene.close .nv-back{opacity:1;transform:none;pointer-events:auto}
 /* панель */
-.nv-panel{display:flex;flex-direction:column;gap:16px;background:var(--nv-panel);border-radius:var(--r-img);padding:20px;min-height:100%;transition:background .4s}
-.nv-campus.client .nv-panel{background:transparent;box-shadow:inset 0 0 0 3px var(--nv-fix)}
+.nv-panel{display:flex;flex-direction:column;gap:16px;background:var(--nv-panel);padding:20px;border-left:1px solid var(--line);transition:background .4s}
+.nv-campus.client .nv-panel{background:var(--bg)}
 .nv-side-head{display:flex;align-items:center;gap:10px}
 .nv-side-head b{font-weight:500;font-size:22px}
 .nv-side-head > span:last-child{font-size:16px;opacity:.55;margin-left:auto}
@@ -197,8 +215,8 @@
 .nv-approve .btn svg{width:20px;height:20px}
 .nv-approve .btn.on{background:var(--nv-ok);color:#fff}
 .nv-count{font-size:16px;opacity:.55;font-variant-numeric:tabular-nums}
-@media (prefers-reduced-motion:reduce){.nv-hand,.nv-target,.nv-pen.nudge::after{animation:none}}
-@media (max-width:960px){.nv-campus{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.nv-hand,.nv-hand::before,.nv-target,.nv-pen.nudge::after{animation:none}}
+@media (max-width:960px){.nv-device-body{grid-template-columns:1fr}.nv-panel{border-left:0;border-top:1px solid var(--line)}}
 @media (max-width:560px){
   .nv-scene{aspect-ratio:1/1}
   .nv-role-btn{height:48px;padding:0 18px 2px 14px}
