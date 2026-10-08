@@ -7,10 +7,9 @@
    иконками напротив строк, справа строки (стрелка поворачивается,
    текст любой, убрать, «+»), тип носителя и цвет плиты — иконками;
    подсказки — микроанимацией, а не текстом;
-   campus — 3D-кампус: тянуть — поворот, метка — табличка в панели,
-   «подойти к табличке»; «студия» — рабочий проект, таблички правятся,
-   «заказчик» — только точки-замечания на табличке и «согласовать»,
-   замечания сразу видны в студии;
+   campus — 3D-кампус, две роли без слов: студия (карандаш) правит
+   текст плиты, заказчик (глаз, по ссылке) только ставит точки
+   с замечаниями и согласует; замечание улетает к кнопке «студия»;
    rec — запись экрана настоящей студии (Kinescope), у заголовка —
    зеленая кнопка демо (поле demo у главы).
    Данные кампуса, графа дорожек и правила типов носителей —
@@ -642,42 +641,55 @@ function liveBuild(box, c){
 }
 
 /* ================================================================
-   ГЛАВА campus: одна карта, две роли.
-   Студия — рабочий проект: таблички правятся прямо на карте, видны
-   требования ТЗ и замечания заказчика. Заказчик — только смотрит:
-   ставит точку на табличке и пишет замечание, может согласовать.
+   ГЛАВА campus: одна карта, две роли — разница видна без слов.
+   Студия (карандаш): рабочий проект — текст плиты правится в полях,
+   иконки ТЗ, замечания заказчика с кнопкой-галочкой «учтено».
+   Заказчик (глаз, «по ссылке»): ничего не правит — на табличке
+   пульсирует мишень, нажатие ставит точку и открывает замечание;
+   кнопка «согласовать». Отправленное замечание улетает точкой
+   к кнопке «студия», на ней растет счетчик.
+   На карте: рука-подсказка «тяните», пока не потянули; круглые
+   кнопки — ближе, дальше, подойти к табличке, весь кампус.
    ================================================================ */
+const CI = {
+  studio: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+  client: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>',
+  link: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.5 6-11a6 6 0 0 0-12 0c0 5.5 6 11 6 11z" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="10" r="2.2" fill="currentColor"/></svg>',
+  check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  send: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  minus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  walk: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4.5" r="2" fill="currentColor"/><path d="M10 21l2-6-2-3 1-4 4 3 3 1M12 15l3 2v4M11 8l-4 3v3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6M5 9v11h14V9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  hand: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.5 15a1.5 1.5 0 0 1 2.4-1.8L9 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  en: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
+};
 function campusHTML(c){
+  const rb = (cls, icon, label) => `<button class="nv-round ${cls}" aria-label="${esc(H.pick(label))}" title="${esc(H.pick(label))}">${icon}</button>`;
   return `<div class="nv-campus">
+    <div class="nv-roles" role="tablist">${['studio', 'client'].map((m, i) =>
+      `<button class="nv-role-btn${i ? '' : ' on'}" data-m="${m}" role="tab" aria-selected="${!i}">${CI[m]}<span>${H.T(c.modes[i])}</span>${i ? '' : '<b class="nv-badge" hidden>0</b>'}</button>`).join('')}</div>
     <div class="nv-scene">
       <canvas class="nv-cv"></canvas>
       <div class="nv-face" aria-hidden="true"></div>
-      <p class="nv-scene-hint"></p>
-      <div class="nv-zoom">
-        <button class="nv-round nv-near" aria-label="${esc(H.pick(c.near))}">${ICON.add}</button>
-        <button class="nv-round nv-far" aria-label="${esc(H.pick(c.far))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-      </div>
+      <span class="nv-chrome"></span>
+      <span class="nv-hand" aria-hidden="true">${CI.hand}</span>
+      <div class="nv-zoom">${rb('nv-near', ICON.add, c.near)}${rb('nv-far', CI.minus, c.far)}${rb('nv-go', CI.walk, c.go)}${rb('nv-all', CI.home, c.all)}</div>
     </div>
-    <aside class="nv-side">
-      <div class="nv-bar-btns nv-modes">${c.modes.map((m, i) => `<button class="btn btn-line nv-mode${i ? '' : ' on'}" data-m="${i ? 'client' : 'studio'}"><span class="spell">${H.T(m)}</span></button>`).join('')}</div>
-      <div class="nv-panel"></div>
-    </aside>
-  </div>
-  <div class="nv-bar-btns nv-campus-btns">
-    <button class="btn btn-line nv-go"><span class="spell">${H.T(c.go)}</span></button>
-    <button class="btn btn-line nv-all"><span class="spell">${H.T(c.all)}</span></button>
+    <aside class="nv-panel"></aside>
   </div>`;
 }
 function liveCampus(box, c){
-  const cv = box.querySelector('.nv-cv'), panel = box.querySelector('.nv-panel'), go = box.querySelector('.nv-go'), hint = box.querySelector('.nv-scene-hint');
+  const cv = box.querySelector('.nv-cv'), panel = box.querySelector('.nv-panel'), chrome = box.querySelector('.nv-chrome'), root = box.querySelector('.nv-campus');
+  const badge = box.querySelector('.nv-badge'), scene = box.querySelector('.nv-scene');
   const HOME = { yaw: .46, pitch: .7, dist: 680, tx: 0, ty: -20, tz: 0 };
   const cam = { ...HOME };
-  // texts — правки студии (строки таблички), notes — замечания заказчика [{x, y, t, done}], status — ok у согласованных
-  const st = { mode: 'studio', sel: D2().id, texts: {}, notes: {}, status: {}, close: false, pin: null };
+  // texts — правки студии, notes — замечания заказчика [{x, y, t, done}], status — ok у согласованных
+  const st = { mode: 'studio', sel: D2().id, texts: {}, notes: {}, status: {}, close: false, pin: null, pinned: false, edited: false };
   let hits = [], anim = 0, raf = 0;
   const board = () => BOARDS.find(b => b.id === st.sel);
   const open = id => (st.notes[id] || []).filter(n => !n.done);
-  // макет с правками студии
+  const openAll = () => BOARDS.reduce((s, b) => s + open(b.id).length, 0);
   function prepEdited(b){
     const tx = st.texts[b.id];
     if (!tx) return prepBoard(b);
@@ -686,7 +698,6 @@ function liveCampus(box, c){
     return prep(b.type, [{ ru: tx[0] ?? o.ru, en: o.en, no: o.no }]);
   }
   const face = box.querySelector('.nv-face');
-  // вплотную — поверх плиты встает настоящий макет, в размер плиты на экране
   function showFace(){
     const f = hits.face;
     if (!st.close || !f) return hideFace();
@@ -701,7 +712,6 @@ function liveCampus(box, c){
     raf = 0;
     if (!box.isConnected) return;
     const [g, W, Hh] = sizeCanvas(cv), status = {};
-    // студия: фиолетовая метка — есть открытые замечания; заказчик: зеленая — согласовал, фиолетовая — просил правки
     BOARDS.forEach(b => { status[b.id] = open(b.id).length ? 'fix' : st.mode === 'client' && st.status[b.id] === 'ok' ? 'ok' : ''; });
     hits = draw3d(g, W, Hh, cam, { pal: dark() ? PAL.dark : PAL.light, status, sel: st.sel, labels: cam.dist > 120 });
   }
@@ -721,82 +731,96 @@ function liveCampus(box, c){
     };
     anim = requestAnimationFrame(step);
   }
-  function setClose(v){ st.close = v; go.querySelector('.spell').innerHTML = H.T(v ? c.back : c.go); }
-  function checksOf(b){
-    const p = prepEdited(b), t = TYPES[b.type], out = [];
-    if (b.type === 'D2' && b.msgs.length > t.maxMsg) out.push(`${b.msgs.length} направлений при лимите ${t.maxMsg}`);
-    p.ms.filter(m => m.fr.over).forEach(m => out.push(`«${m.ru}» не помещается`));
-    p.ms.filter(m => !m.ru.trim()).forEach(() => out.push('Пустая строка на плите'));
-    if (b.type !== 'T1') p.ms.filter(m => !m.en).forEach(m => out.push(`Нет английского названия у «${m.ru}»`));
+  const setClose = v => { st.close = v; box.querySelector('.nv-go').classList.toggle('on', v); };
+  // замечания ТЗ — иконкой и двумя словами
+  function issuesOf(b){
+    const p = prepEdited(b), out = [];
+    p.ms.forEach(m => { if (m.fr.over) out.push(['fit', `«${m.ru}» ${H.pick(c.fit)}`]); });
+    if (b.type !== 'T1') p.ms.forEach(m => { if (!m.en) out.push(['en', H.pick(c.noEn)]); });
     return out;
   }
-  // макет таблички в панели с точками замечаний поверх
-  const plateWithPins = (b, live) => `<div class="nv-pinbox${live ? ' live' : ''}">${art(prepEdited(b), 150, 230)}${
+  const issueHTML = b => { const is = issuesOf(b); return `<ul class="nv-chips">${(is.length ? is : [['ok', H.pick(c.clean)]]).map(([k, t]) =>
+    `<li class="${k === 'ok' ? 'ok' : 'bad'}"><span class="nv-ic">${k === 'ok' ? CI.check : k === 'en' ? CI.en : ICON.fit}</span>${H.T(t)}</li>`).join('')}</ul>`; };
+  const plateWithPins = (b, w, h, target) => `<div class="nv-pinbox${target ? ' live' : ''}">${art(prepEdited(b), w, h)}${
     (st.notes[b.id] || []).map((n, i) => n.done ? '' : `<span class="nv-dot" style="left:${n.x}%;top:${n.y}%">${i + 1}</span>`).join('')}${
-    st.pin ? `<span class="nv-dot new" style="left:${st.pin.x}%;top:${st.pin.y}%">${(st.notes[b.id] || []).length + 1}</span>` : ''}</div>`;
+    st.pin ? `<span class="nv-dot new" style="left:${st.pin.x}%;top:${st.pin.y}%">${(st.notes[b.id] || []).length + 1}</span>` : ''}${
+    target && !st.pinned && !st.pin ? '<span class="nv-target" aria-hidden="true"></span>' : ''}</div>`;
+  const head = (b) => `<div class="nv-side-head"><span class="nv-type-ic" title="${esc(TYPES[b.type].name)}">${ICON[b.type]}</span><b>№${b.n}</b><span>${H.T(b.zone)}</span></div>`;
   function renderPanel(){
-    const b = board(), t = TYPES[b.type], notes = st.notes[b.id] || [], live = open(b.id);
-    const head = `<div class="nv-side-head"><span class="nv-role">${H.T(st.mode === 'studio' ? c.studioTag : c.clientTag)}</span><b>${H.T(`${t.name} №${b.n}`)}</b><span>${H.T(b.zone)}</span></div>`;
-    hint.innerHTML = H.T(st.mode === 'studio' ? c.studioHint : c.clientHint);
+    const b = board(), notes = st.notes[b.id] || [], live = open(b.id);
+    chrome.innerHTML = st.mode === 'studio' ? `${CI.studio}<span>${H.T(c.studioTag)}</span>` : `${CI.link}<span>${H.T(c.clientTag)}</span>`;
     if (st.mode === 'studio') {
-      const p = prepEdited(b), issues = checksOf(b);
-      panel.innerHTML = `${head}
-        <div class="nv-side-body">${plateWithPins(b)}
-          <div class="nv-edit"><span class="nv-mini-label">${H.T(c.edit)}</span>${p.ms.map((m, i) => `<input class="nv-line" data-i="${i}" value="${esc(m.ru)}" aria-label="${esc(H.pick(c.edit))}">`).join('')}</div></div>
-        <ul class="nv-list">${(issues.length ? issues.map(x => `<li class="bad"><span class="nv-ic">${okIcon(false)}</span><span>${H.T(x)}</span></li>`)
-          : [`<li class="ok"><span class="nv-ic">${okIcon(true)}</span><span>${H.T(c.clean)}</span></li>`]).join('')}</ul>
-        ${live.length ? `<div class="nv-notes"><span class="nv-mini-label">${H.T(c.from)}</span>${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p><button class="btn btn-line nv-resolve" data-i="${i}"><span class="spell">${H.T(c.resolve)}</span></button></div>`).join('')}</div>`
-          : `<p class="nv-quiet">${H.T(st.status[b.id] === 'ok' ? c.done : c.noNotes)}</p>`}`;
+      const p = prepEdited(b);
+      panel.innerHTML = `${head(b)}
+        <div class="nv-side-body">${plateWithPins(b, 140, 220)}
+          <div class="nv-edit">${p.ms.map((m, i) => `<label class="nv-pen${!i && !st.edited ? ' nudge' : ''}">${CI.studio}<input class="nv-line" data-i="${i}" value="${esc(m.ru)}" aria-label="${esc(H.pick(c.edit))}"></label>`).join('')}</div></div>
+        <div class="nv-issues">${issueHTML(b)}</div>
+        ${live.length ? `<div class="nv-notes">${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p><button class="nv-round nv-resolve" data-i="${i}" aria-label="${esc(H.pick(c.resolve))}" title="${esc(H.pick(c.resolve))}">${CI.check}</button></div>`).join('')}</div>` : ''}`;
       panel.querySelectorAll('.nv-edit .nv-line').forEach(inp => inp.addEventListener('input', () => {
+        st.edited = true; panel.querySelector('.nudge')?.classList.remove('nudge');
         const tx = st.texts[b.id] || (st.texts[b.id] = prepBoard(b).ms.map(m => m.ru));
         tx[+inp.dataset.i] = inp.value;
-        panel.querySelector('.nv-pinbox').outerHTML = plateWithPins(b);
-        panel.querySelector('.nv-list').innerHTML = (checksOf(b).map(x => `<li class="bad"><span class="nv-ic">${okIcon(false)}</span><span>${H.T(x)}</span></li>`).join(''))
-          || `<li class="ok"><span class="nv-ic">${okIcon(true)}</span><span>${H.T(c.clean)}</span></li>`;
+        panel.querySelector('.nv-pinbox').outerHTML = plateWithPins(b, 140, 220);
+        panel.querySelector('.nv-issues').innerHTML = issueHTML(b);
         if (st.close) showFace();
       }));
-      panel.querySelectorAll('.nv-resolve').forEach(btn => btn.addEventListener('click', () => { notes[+btn.dataset.i].done = true; renderPanel(); redraw(); }));
+      panel.querySelectorAll('.nv-resolve').forEach(btn => btn.addEventListener('click', () => {
+        notes[+btn.dataset.i].done = true; renderPanel(); redraw(); updBadge();
+      }));
     } else {
-      const done = BOARDS.filter(x => st.status[x.id] === 'ok').length;
-      panel.innerHTML = `${head}
-        <div class="nv-side-body">${plateWithPins(b, true)}
-          <div class="nv-client">
-            <p class="nv-state ${st.status[b.id] === 'ok' ? 'ok' : live.length ? 'fix' : 'none'}">${H.T(st.status[b.id] === 'ok' ? c.done : live.length ? c.wait : c.none)}</p>
-            <p class="nv-quiet">${H.T(c.pinHint)}</p>
-          </div></div>
-        ${st.pin ? `<div class="nv-write"><textarea class="nv-input" rows="2" placeholder="${esc(H.pick(c.note))}"></textarea>
-          <button class="btn btn-line nv-send"><span class="spell">${H.T(c.send)}</span></button></div>` : ''}
+      const done = BOARDS.filter(x => st.status[x.id] === 'ok').length, ok = st.status[b.id] === 'ok';
+      panel.innerHTML = `${head(b)}
+        <div class="nv-client-plate">${plateWithPins(b, 190, 280, true)}</div>
+        ${st.pin ? `<div class="nv-bubble"><input class="nv-line" placeholder="${esc(H.pick(c.note))}" aria-label="${esc(H.pick(c.note))}"><button class="nv-round nv-send" aria-label="${esc(H.pick(c.send))}">${CI.send}</button></div>` : ''}
         ${live.length ? `<div class="nv-notes">${notes.map((n, i) => n.done ? '' : `<div class="nv-note"><span class="nv-dot">${i + 1}</span><p>${esc(n.t)}</p></div>`).join('')}</div>` : ''}
-        <div class="nv-bar-btns"><button class="btn btn-line nv-ok${st.status[b.id] === 'ok' ? ' on' : ''}"><span class="spell">${H.T(c.ok)}</span></button></div>
-        <p class="nv-count">${H.T(c.count)}: ${done} из ${BOARDS.length}</p>`;
-      // нажатие на табличку ставит точку замечания
+        <div class="nv-approve"><button class="btn nv-ok${ok ? ' on' : ''}">${CI.check}<span class="spell">${H.T(ok ? c.done : c.ok)}</span></button><span class="nv-count">${done}/${BOARDS.length}</span></div>`;
       panel.querySelector('.nv-pinbox').addEventListener('click', e => {
         const r = e.currentTarget.getBoundingClientRect();
         st.pin = { x: clamp((e.clientX - r.left) / r.width * 100, 4, 96), y: clamp((e.clientY - r.top) / r.height * 100, 4, 96) };
-        renderPanel(); panel.querySelector('textarea').focus();
+        st.pinned = true; renderPanel(); panel.querySelector('.nv-bubble input').focus();
       });
-      panel.querySelector('.nv-send')?.addEventListener('click', () => {
-        const v = panel.querySelector('textarea').value.trim();
-        if (v) { (st.notes[b.id] || (st.notes[b.id] = [])).push({ ...st.pin, t: v }); delete st.status[b.id]; }
+      const send = () => {
+        const inp = panel.querySelector('.nv-bubble input'), v = inp.value.trim();
+        if (!v) return inp.focus();
+        const from = panel.querySelector('.nv-dot.new')?.getBoundingClientRect();
+        (st.notes[b.id] || (st.notes[b.id] = [])).push({ ...st.pin, t: v }); delete st.status[b.id];
         st.pin = null; renderPanel(); redraw();
-      });
-      panel.querySelector('.nv-ok').addEventListener('click', () => { st.status[b.id] = 'ok'; st.pin = null; renderPanel(); redraw(); });
+        flyToStudio(from);
+      };
+      panel.querySelector('.nv-send')?.addEventListener('click', send);
+      panel.querySelector('.nv-bubble input')?.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+      panel.querySelector('.nv-ok').addEventListener('click', () => { st.status[b.id] = ok ? '' : 'ok'; st.pin = null; renderPanel(); redraw(); });
     }
+  }
+  // замечание улетает точкой к кнопке «студия», счетчик подпрыгивает
+  function updBadge(pop){
+    const n = openAll();
+    badge.hidden = !n; badge.textContent = n;
+    if (pop) { badge.classList.remove('pop'); void badge.offsetWidth; badge.classList.add('pop'); }
+  }
+  function flyToStudio(from){
+    const to = badge.parentElement.getBoundingClientRect();
+    if (!from || still()) return updBadge(true);
+    const dot = document.createElement('span');
+    dot.className = 'nv-flydot';
+    dot.style.cssText = `left:${from.left + from.width / 2}px;top:${from.top + from.height / 2}px`;
+    document.body.appendChild(dot);
+    requestAnimationFrame(() => { dot.style.transform = `translate(${to.right - 14 - from.left - from.width / 2}px,${to.top + 6 - from.top - from.height / 2}px) scale(.6)`; });
+    setTimeout(() => { dot.remove(); updBadge(true); }, 750);
   }
   function select(id){
     st.sel = id; st.pin = null;
     renderPanel();
     if (st.close) fly(faceCam(board(), 2.3), 900); else redraw();
   }
-  box.querySelectorAll('.nv-mode').forEach(b => b.addEventListener('click', () => {
+  box.querySelectorAll('.nv-role-btn').forEach(b => b.addEventListener('click', () => {
     st.mode = b.dataset.m; st.pin = null;
-    box.querySelectorAll('.nv-mode').forEach(x => x.classList.toggle('on', x === b));
-    box.querySelector('.nv-campus').classList.toggle('client', st.mode === 'client');
+    box.querySelectorAll('.nv-role-btn').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
+    root.classList.toggle('client', st.mode === 'client');
     renderPanel(); redraw();
   }));
-  go.addEventListener('click', () => {
-    if (st.close) { setClose(false); fly(HOME); }
-    else { setClose(true); fly(faceCam(board(), 2.3)); }
+  box.querySelector('.nv-go').addEventListener('click', () => {
+    if (st.close) { setClose(false); fly(HOME); } else { setClose(true); fly(faceCam(board(), 2.3)); }
   });
   box.querySelector('.nv-all').addEventListener('click', () => { setClose(false); fly(HOME); });
   const zoom = k => { cancelAnimationFrame(anim); hideFace(); cam.dist = clamp(cam.dist * k, 3, 1800); if (cam.dist > 60) setClose(false); redraw(); };
@@ -814,7 +838,7 @@ function liveCampus(box, c){
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
     if (!drag.moved) return;
-    hideFace();
+    hideFace(); scene.classList.add('used');
     cam.yaw = drag.yaw - dx * .006; cam.pitch = clamp(drag.pitch + dy * .004, .06, 1.3);
     redraw();
   });
@@ -823,7 +847,7 @@ function liveCampus(box, c){
       const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
       let best = null, bd = 22;
       for (const h of hits) { const d = Math.hypot(h.x - x, h.y - y); if (d < bd) { bd = d; best = h; } }
-      if (best) select(best.id);
+      if (best) { scene.classList.add('used'); select(best.id); }
     }
     drag = null;
   });
