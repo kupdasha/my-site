@@ -207,6 +207,7 @@
 }
 
 /* ---------- запись экрана ---------- */
-.nv-rec{position:relative;aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:var(--soft)}
-.nv-rec iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.nv-rec{position:relative;aspect-ratio:var(--ar,16/9);width:min(100%,calc(86vh * (var(--ar,16/9))));margin:0 auto;border-radius:var(--r-img);overflow:hidden;background:var(--soft)}
+/* плеер шире окна на зашитые в запись поля (--fw, --fx) и на пиксель со всех сторон — без черных полос */
+.nv-rec iframe{position:absolute;left:calc(var(--fx,0%) - 1px);top:-1px;width:calc(var(--fw,100%) + 2px);height:calc(100% + 2px);border:0}
 

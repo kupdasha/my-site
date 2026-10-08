@@ -858,9 +858,12 @@ function liveCampus(box, c){
 }
 
 /* ---------- запись экрана ---------- */
+// rec: 'kinescope:ID' или { src, w, h, crop } — размер записи и черные поля по бокам, зашитые в нее (px):
+// окно плеера — по видео без полей, плеер чуть шире окна, поля уходят за края
 const recHTML = v => {
-  const id = String(v).replace(/^kinescope:/, '');
-  return `<div class="nv-rec"><iframe src="https://kinescope.io/embed/${esc(id)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen title="Запись экрана студии"></iframe></div>`;
+  const o = typeof v === 'string' ? { src: v } : v, w = o.w || 1920, h = o.h || 1080, crop = o.crop || 0, cw = w - crop * 2;
+  const id = String(o.src).replace(/^kinescope:/, '');
+  return `<div class="nv-rec" style="--ar:${cw} / ${h};--fw:${(w / cw * 100).toFixed(3)}%;--fx:${(-crop / cw * 100).toFixed(3)}%"><iframe src="https://kinescope.io/embed/${esc(id)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen title="Запись экрана студии"></iframe></div>`;
 };
 
 /* ---------- сборка кейса ---------- */

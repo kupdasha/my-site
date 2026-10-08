@@ -1591,7 +1591,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             { label: ['запись экрана', 'вживую'],
               title: ['так студия выглядит в браузере', 'так оно работает'],
               demo: { text: ['демо', 'демо'], link: 'https://navigation-studio.kupdaria26.workers.dev/' },   // ярко-зеленая кнопка рядом с заголовком
-              rec: 'kinescope:for2vJM7erLBrm68eiu6gD' },
+              rec: { src: 'kinescope:for2vJM7erLBrm68eiu6gD', w: 1912, h: 1080, crop: 40 } },   // запись 1912 × 1080, по бокам в ней черные поля по 40 px — окно плеера по видео без них
           ],
         },
       },
