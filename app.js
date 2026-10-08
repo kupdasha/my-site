@@ -38,6 +38,28 @@ if (window.__kdAppOK || typeof SITE === 'undefined') return; window.__kdAppOK = 
 // версия файлов для ?v=: на сайте меняется раз в час, на локальном превью — при каждой загрузке
 const VER = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? Date.now() : Math.floor(Date.now() / 36e5);
 const SCRIPT_BASE = (document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/app\.js(\?|$)/.test(s)) || '').replace(/app\.js(\?.*)?$/, '');
+
+/* СТРАХОВКА ДЛЯ КАРТИНОК: jsDelivr по новому номеру версии иногда отдает файл с ошибкой (403/503), пока не заберет его
+   у GitHub. Картинка или ролик не загрузились — пробуем еще раз: растровую картинку сразу с GitHub (raw, ветка main),
+   остальное — снова с jsDelivr через пару секунд; потом еще одна попытка с jsDelivr */
+addEventListener('error', e => {
+  const el = e.target;
+  if (!el || !/^(IMG|VIDEO|SOURCE)$/.test(el.tagName)) return;
+  const src = el.currentSrc || el.getAttribute('src') || '';
+  const m = /^https:\/\/cdn\.jsdelivr\.net\/gh\/kupdasha\/my-site@[^/]+\/(.+?)(\?.*)?$/.exec(src)
+         || /^https:\/\/raw\.githubusercontent\.com\/kupdasha\/my-site\/main\/(.+?)(\?.*)?$/.exec(src);
+  if (!m) return;
+  const n = +(el.dataset.retry || 0);
+  if (n >= 2) return;
+  el.dataset.retry = n + 1;
+  const path = m[1], raster = /\.(jpe?g|png|webp|gif|avif)$/i.test(path);
+  const next = n === 0 && raster ? 'https://raw.githubusercontent.com/kupdasha/my-site/main/' + path
+             : SCRIPT_BASE + path + '?r=' + (n + 1);
+  setTimeout(() => {
+    if (el.tagName === 'SOURCE') { el.src = next; el.parentElement?.load?.(); }
+    else { el.src = next; if (el.tagName === 'VIDEO') el.load(); }
+  }, n === 0 && raster ? 0 : 1500);
+}, true);
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
