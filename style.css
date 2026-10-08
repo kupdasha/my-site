@@ -1925,3 +1925,5 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 /* в дружеской версии нет ряда размытых закрытых карточек перед кнопками про пароль — там досье */
 :root[data-theme="dark"] .nda-more{display:none}
 :root[data-theme="dark"] .nda-more+.nda-cta{margin-top:clamp(40px,5vw,64px)}
+/* картинка-обложка под роликом: пока ролик играет, ее не видно */
+.media.vplay>img{visibility:hidden}

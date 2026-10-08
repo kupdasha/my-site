@@ -941,6 +941,10 @@ const framePreloader = new IntersectionObserver(es => es.forEach(e => {
   frame.src = frame.dataset.src;
 }), { rootMargin: '100% 0px' });
 function watchMedia(el){ mediaSizer.observe(el); mediaWatcher.observe(el); framePreloader.observe(el); }
+// ролик пошел — картинка-обложка под ним прячется (в светлой версии ролик умножается на фон, и она бы просвечивала);
+// ролик сброшен (у data-hover при уходе курсора) — обложка снова видна
+document.addEventListener('playing', e => { if (e.target.matches?.('.media video')) e.target.parentElement.classList.add('vplay'); }, true);
+document.addEventListener('emptied', e => { if (e.target.matches?.('.media video')) e.target.parentElement.classList.remove('vplay'); }, true);
 // ролики с data-hover: курсор над карточкой — играет с начала, ушел — снова обложка
 document.addEventListener('pointerover', e => {
   if (e.pointerType === 'touch') return;
