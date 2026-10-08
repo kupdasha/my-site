@@ -1870,23 +1870,37 @@ const clipPlayer = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
 }), { threshold: 0.2 });
 /* РОЛИКИ В ТЕЛЕФОНЕ (поле { phones: [{ src, poster }], title, text } в галерее кейса, см. AR мерч):
-   запись экрана стоит в рамке телефона, рядом заголовок и текст; phones: [] — только текст, тем же шрифтом. Ролик стоит на заставке и играет,
-   пока на него навели курсор; на тач-экранах — пока телефон на экране */
+   запись экрана стоит в рамке телефона, рядом заголовок и текст; phones: [] — только текст, тем же шрифтом.
+   Ролик подгружается заранее, когда телефон подъезжает к экрану, — к наведению он уже готов.
+   Играет, пока на него навели курсор; на тач-экранах — пока телефон на экране. Нажатие запускает и ставит на паузу
+   (на телефоне в режиме энергосбережения видео само не стартует). Пока стоит — на экране круглая кнопка */
+const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
 function phonesHTML(x){
   return `<div class="wrap ph-row${x.phones.length > 1 ? ' ph-many' : ''}${x.phones.length ? '' : ' ph-solo'}" data-reveal>${x.phones.length ? `<div class="ph-set">${
-    x.phones.map(f => `<div class="phone"><video src="${f.src}"${f.poster ? ` poster="${f.poster}"` : ''} muted loop playsinline preload="none" disablepictureinpicture></video></div>`).join('')
+    x.phones.map(f => `<div class="phone"><video src="${f.src}"${f.poster ? ` poster="${f.poster}"` : ''} muted loop playsinline preload="none" disablepictureinpicture></video><span class="film-play ph-play">${PLAY_ICON}</span></div>`).join('')
   }</div>` : ''}<div class="ph-text">${x.title ? `<h3>${T(x.title)}</h3>` : ''}${x.text ? `<p>${T(x.text)}</p>` : ''}</div></div>`;
 }
 const phoneTouch = matchMedia('(hover: none)').matches;
+const phonePlay = v => v.play().catch(() => {});
 const phonePlayer = new IntersectionObserver(es => es.forEach(e => {
   const v = e.target;
-  if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
+  if (e.isIntersecting) phonePlay(v); else v.pause();
 }), { threshold: 0.6 });
+// заранее грузим ролик, когда до телефона остается около экрана прокрутки
+const phonePreload = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  phonePreload.unobserve(e.target);
+  e.target.preload = 'auto'; e.target.load();
+}), { rootMargin: '100% 0px' });
 function phonesInit(root){
   root.querySelectorAll('.phone video').forEach(v => {
-    if (phoneTouch) return phonePlayer.observe(v);
     const box = v.parentNode;
-    box.addEventListener('mouseenter', () => v.play().catch(() => {}));
+    v.addEventListener('play', () => box.classList.add('playing'));
+    v.addEventListener('pause', () => box.classList.remove('playing'));
+    box.addEventListener('click', () => v.paused ? phonePlay(v) : v.pause());
+    phonePreload.observe(v);
+    if (phoneTouch) return phonePlayer.observe(v);
+    box.addEventListener('mouseenter', () => phonePlay(v));
     box.addEventListener('mouseleave', () => v.pause());
   });
 }
@@ -1896,7 +1910,7 @@ function filmCoverHTML(src, poster){
   const m = parseMedia(src);
   const url = embedURL(m, false).replace('muted=1&', '').replace('loop=1&', '');
   return `<div class="case-shot frame film-cover" data-reveal data-src="${url}"><img src="${poster}" alt="" loading="lazy">`
-    + `<button type="button" class="film-play" aria-label="смотреть видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button></div>`;
+    + `<button type="button" class="film-play" aria-label="смотреть видео">${PLAY_ICON}</button></div>`;
 }
 function filmInit(root){
   root.querySelectorAll('.film-cover').forEach(box => box.addEventListener('click', () => {
@@ -2954,6 +2968,8 @@ function tildaGameForm(){
   if (f) f.closest('.t-rec')?.classList.add('kd-hidden-form');   // на странице ее не видно
   return f;
 }
+tildaGameForm();   // сразу спрятать форму Тильды, если она есть на странице
+addEventListener('load', tildaGameForm);
 // поле формы Тильды для контакта: kd_contact, иначе Имя / Email / Телефон / первое текстовое
 function contactField(f){
   return f.querySelector('[name="kd_contact"]') || f.querySelector('[name="Name"], [name="name"]')
@@ -2966,10 +2982,15 @@ function sendGameContact(contact){
   const set = (name, v) => { const el = f.querySelector(`[name="${name}"]`); if (el) { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } };
   const field = contactField(f), src = 'крестики-нолики на сайте: победа посетителя';
   if (!field) return Promise.reject(new Error('в форме нет поля для контакта'));
-  // телефонное или почтовое поле Тильда проверяет по формату — туда пишем только подходящий контакт
-  field.removeAttribute('data-tilda-rule');
+  // контакт может быть ником, почтой или телефоном: снимаем у полей формы обязательность и проверку формата,
+  // чтобы Тильда не отказала (например, если в форме обязательный Email, а оставили ник в Telegram)
+  f.querySelectorAll('[data-tilda-req]').forEach(el => el.removeAttribute('data-tilda-req'));
+  f.querySelectorAll('[data-tilda-rule]').forEach(el => el.removeAttribute('data-tilda-rule'));
   set(field.name, f.querySelector('[name="kd_source"]') ? contact : `${contact} (${src})`);
   set('kd_source', src);
+  // если оставили почту — она идет и в поле Email
+  const mail = f.querySelector('[name="Email"], [name="email"], input[type="email"]');
+  if (mail && mail !== field && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) set(mail.name, contact);
   f.querySelectorAll('input[type="checkbox"]').forEach(c => { if (!c.checked) c.click(); });   // галочки посетитель уже отметил в игре
   const ok = () => f.classList.contains('js-send-form-success') || [...f.querySelectorAll('.js-successbox, .t-form__successbox')].some(b => b.offsetParent || getComputedStyle(b).display !== 'none');
   return new Promise((resolve, reject) => {
