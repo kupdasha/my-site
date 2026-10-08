@@ -35,8 +35,8 @@
 /* ---------- в две колонки: сцена слева, текст справа ---------- */
 .pl-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
 .pl-split > .pl-viz{grid-column:1 / span 7}
-.pl-side{grid-column:9 / -1;display:flex;flex-direction:column;gap:20px}
-.pl-side .pl-title{font-size:clamp(30px,3.2vw,48px);max-width:none}
+.pl-side{grid-column:9 / -1;min-width:0;display:flex;flex-direction:column;gap:20px}
+.pl-side .pl-title{font-size:clamp(28px,2.5vw,40px);max-width:none}
 .pl-side .pl-text{font-size:clamp(19px,1.5vw,22px)}
 @media (max-width:900px){.pl-split > .pl-viz,.pl-side{grid-column:1 / -1}.pl-side{order:-1}}
 
@@ -150,11 +150,12 @@
 
 /* ---------- results: экран зала и плитки видов, как в меню «Добавить слайд» ---------- */
 .pl-res{display:flex;flex-direction:column;align-items:center;gap:clamp(18px,2.4vw,28px);padding:clamp(20px,3.6vw,52px) clamp(16px,4vw,64px)}
-.pl-rscr{width:100%;max-width:960px}
+.pl-res{--rw:min(960px,calc((100svh - 300px) * 16 / 9))}
+.pl-rscr{width:100%;max-width:var(--rw)}
 .pl-sth{display:flex;flex-direction:column;gap:1.4cqw;margin-bottom:4cqw}
 .pl-sth .pl-ln0{height:max(8px,1.8cqw);background:#fff}
 .pl-vz{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
-.pl-tiles{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;width:100%;max-width:960px}
+.pl-tiles{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;width:100%;max-width:var(--rw)}
 .pl-tile{position:relative;display:grid;place-items:center;aspect-ratio:1;max-height:76px;border-radius:16px;background:var(--v-sunken);color:var(--v-muted);cursor:pointer;overflow:hidden;transition:background .25s,color .25s}
 :root[data-theme="dark"] .pl-tile{background:#24262D;color:#8A90A0}
 .pl-tile svg{width:56%;height:auto;fill:currentColor}
@@ -165,7 +166,7 @@
 .pl-tile-t{position:absolute;left:18%;right:18%;bottom:9%;height:3px;border-radius:2px;background:var(--v-acc);transform:scaleX(0);transform-origin:0 50%}
 .pl-tile.run .pl-tile-t{animation:plT 4.8s linear both}
 @keyframes plT{to{transform:none}}
-@media (max-width:640px){.pl-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}.pl-rscr{aspect-ratio:4/3.4}}
+@media (max-width:640px){.pl-res{--rw:100%}.pl-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}.pl-rscr{aspect-ratio:4/3.4}}
 
 /* опрос — полосы; порядок — те же полосы, строки переставляются */
 .pv-rank{position:relative;flex:1}
