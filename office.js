@@ -15,7 +15,9 @@
    уходит по почте и в мессенджеры, открывается без интернета;
    closed — закрытый контур: данные ходят внутри, наружу не выходят —
    отскакивают от границы, облако и интернет снаружи без связи;
-   справа под текстом последней главы с рисунком сбоку — кнопка демо.
+   справа под текстом последней главы с рисунком сбоку — кнопка демо;
+   в самом конце — скриншоты программы каруселью: листаются пальцем,
+   колесом или перетаскиванием, кнопок поверх нет, по нажатию — крупно.
    Цвета вкладок — как в самом приложении: документ синий, таблица
    зеленая, HTML лаймовый; презентация — малиновая (оранжевого
    на сайте нет). Тексты — в content.js, оформление — office.css.
@@ -386,6 +388,60 @@ const tryHTML = t => t ? `<div class="ro-try">
   <a class="btn btn-accent ro-try-btn" href="${esc(t.link)}" target="_blank" rel="noopener">${H.T(t.btn)}</a>
 </div>` : '';
 
+/* ---------- скриншоты программы: карусель ---------- */
+// легкая копия (900 px) для телефона, полная (1680 px) — для экранов шире; грузятся лениво, место под картинку занято заранее
+function shotsHTML(list){
+  return `<section class="ro-shots-ch wrap">
+    <div class="ro-shots" tabindex="0" role="region" aria-label="Скриншоты программы">${list.map(x =>
+      `<figure class="ro-shot"><img src="${esc(x.small)}" srcset="${esc(x.small)} 900w, ${esc(x.src)} ${x.w}w"
+        sizes="(max-width: 640px) 86vw, (max-width: 1100px) 74vw, 62vw" width="${x.w}" height="${x.h}" loading="lazy" decoding="async" alt=""></figure>`).join('')}
+    </div>
+    <div class="ro-shots-bar" aria-hidden="true"><i></i></div>
+  </section>`;
+}
+function liveShots(box, list){
+  const row = box.querySelector('.ro-shots'), bar = box.querySelector('.ro-shots-bar i');
+  const imgs = [...row.querySelectorAll('img')];
+  // полоска под лентой: какая часть видна и где она
+  const sync = () => {
+    const max = row.scrollWidth - row.clientWidth;
+    bar.style.width = (row.clientWidth / row.scrollWidth * 100) + '%';
+    bar.style.transform = `translateX(${max > 0 ? row.scrollLeft / max * (row.scrollWidth / row.clientWidth - 1) * 100 : 0}%)`;
+  };
+  row.addEventListener('scroll', sync, { passive: true });
+  addEventListener('resize', sync, { passive: true });
+  imgs.forEach(i => i.addEventListener('load', sync, { once: true }));
+  sync();
+  // мышью — тянуть ленту; короткое нажатие без сдвига открывает картинку крупно
+  let down = null, moved = false;
+  row.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse') return;
+    down = { x: e.clientX, left: row.scrollLeft }; moved = false;
+  });
+  addEventListener('pointermove', e => {
+    if (!down) return;
+    const dx = e.clientX - down.x;
+    if (Math.abs(dx) > 5 && !moved) { moved = true; row.classList.add('drag'); }
+    if (moved) row.scrollLeft = down.left - dx;
+  });
+  addEventListener('pointerup', () => {
+    if (!down) return;
+    down = null;
+    if (moved) { row.classList.remove('drag'); setTimeout(() => { moved = false; }, 0); }
+  });
+  row.addEventListener('click', e => {
+    const img = e.target.closest('img');
+    if (!img || moved) return;
+    H.openViewer(list.map(x => x.src), imgs.indexOf(img), imgs);
+  });
+  // стрелки клавиатуры, когда лента в фокусе
+  row.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    row.scrollBy({ left: (e.key === 'ArrowRight' ? 1 : -1) * imgs[0].clientWidth, behavior: 'smooth' });
+  });
+}
+
 /* ---------- запуск ---------- */
 // [ключ, рисунок, оживление, раскладка]: wide — заголовок сверху и сцена во всю ширину;
 // left / right — сцена слева или справа, текст рядом
@@ -421,7 +477,9 @@ export async function mountOffice(mount, p, helpers){
     ? `<section class="ro-ch wrap ro-${k}-ch">${head(o[k])}<div class="ro-viz">${html(o[k])}</div></section>`
     : `<section class="ro-ch wrap ro-${k}-ch ro-split${lay === 'right' ? ' rev' : ''}"><div class="ro-viz">${html(o[k])}</div>${
         side(o[k], lastSplit && lastSplit[0] === k ? tryHTML(o.try) : '')}</section>`).join('');
+  if (o.shots && o.shots.length) mount.insertAdjacentHTML('beforeend', shotsHTML(o.shots));
   mount.querySelectorAll('.ro-title').forEach(splitWords);
   mount.querySelectorAll('.ro-ch').forEach(s => reveal.observe(s));
   list.forEach(([k, , live]) => live(mount.querySelector(`.ro-${k}-ch`), o[k]));
+  if (o.shots && o.shots.length) liveShots(mount.querySelector('.ro-shots-ch'), o.shots);
 }

@@ -38,6 +38,19 @@ if (window.__kdAppOK || typeof SITE === 'undefined') return; window.__kdAppOK = 
 // версия файлов для ?v=: на сайте меняется раз в час, на локальном превью — при каждой загрузке
 const VER = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? Date.now() : Math.floor(Date.now() / 36e5);
 const SCRIPT_BASE = (document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/app\.js(\?|$)/.test(s)) || '').replace(/app\.js(\?.*)?$/, '');
+// живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
+// открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
+// его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay'];
+function caseImport(n){
+  if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    const href = SCRIPT_BASE + n + '.css?v=' + VER;
+    if (!document.querySelector(`link[href="${href}"]`)) {
+      const l = document.createElement('link'); l.rel = 'preload'; l.as = 'style'; l.href = href; document.head.appendChild(l);
+    }
+  }
+  return import(SCRIPT_BASE + n + '.js?v=' + VER);
+}
 
 const TUNE = {
   stringPull:     44,    // на сколько пикселей можно оттянуть струну
@@ -2496,68 +2509,68 @@ function renderCase(k, keepScroll){
   // листалка прямо в галерее кейса (без рядов макетов watchCampaigns ее не найдет)
   if (!caseContent.querySelector('.camp-row')) caseContent.querySelectorAll('.case-body .slides').forEach(watchSlides);
   const au = caseContent.querySelector('.au-mount');
-  if (au) import(SCRIPT_BASE + 'audit.js?v=' + VER)
+  if (au) caseImport('audit')
     .then(m => m.mountAudit(au, p, { T, pick, worldHTML, watchWorld, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('аудит не загрузился', err));
   const ad = caseContent.querySelector('.adhd-mount');
-  if (ad) import(SCRIPT_BASE + 'adhd.js?v=' + VER)
+  if (ad) caseImport('adhd')
     .then(m => m.mountADHD(ad, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс СДВГ не загрузился', err));
   const fl = caseContent.querySelector('.fleet-mount');
-  if (fl) import(SCRIPT_BASE + 'fleet.js?v=' + VER)
+  if (fl) caseImport('fleet')
     .then(m => m.mountFleet(fl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс Nέofleet не загрузился', err));
   const cl = caseContent.querySelector('.cl-mount');
-  if (cl) import(SCRIPT_BASE + 'clip.js?v=' + VER)
+  if (cl) caseImport('clip')
     .then(m => m.mountClip(cl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс клипа не загрузился', err));
   const ca = caseContent.querySelector('.casa-mount');
-  if (ca) import(SCRIPT_BASE + 'armani.js?v=' + VER)
+  if (ca) caseImport('armani')
     .then(m => m.mountCasa(ca, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс Armani/Casa не загрузился', err));
   const kv = caseContent.querySelector('.kv-mount');
-  if (kv) import(SCRIPT_BASE + 'kav.js?v=' + VER)
+  if (kv) caseImport('kav')
     .then(m => m.mountKav(kv, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс «Одна кавычка» не загрузился', err));
   const cts = (p.gallery || []).flat().filter(x => x && (x.ctPlayer || x.ctStories));
   const ctm = caseContent.querySelectorAll('.ct-mount');
-  if (ctm.length) import(SCRIPT_BASE + 'cartoon.js?v=' + VER)
+  if (ctm.length) caseImport('cartoon')
     .then(m => ctm.forEach((el, i) => m.mountCartoon(el, cts[i], { T, pick, openViewer, base: SCRIPT_BASE })))
     .catch(err => console.warn('кейс мультика не загрузился', err));
   const ab = caseContent.querySelector('.ab-mount');
-  if (ab) import(SCRIPT_BASE + 'akbars.js?v=' + VER)
+  if (ab) caseImport('akbars')
     .then(m => m.mountAkbars(ab, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс знаков отличия Ак Барс Банка не загрузился', err));
   const su = caseContent.querySelector('.su-mount');
-  if (su) import(SCRIPT_BASE + 'suit.js?v=' + VER)
+  if (su) caseImport('suit')
     .then(m => m.mountSuit(su, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс парашютного костюма не загрузился', err));
   const vn = caseContent.querySelector('.vn-mount');
-  if (vn) import(SCRIPT_BASE + 'ventures.js?v=' + VER)
+  if (vn) caseImport('ventures')
     .then(m => m.mountVentures(vn, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс The Ventures Japan не загрузился', err));
   const vc = caseContent.querySelector('.vc-mount');
-  if (vc) import(SCRIPT_BASE + 'vector.js?v=' + VER)
+  if (vc) caseImport('vector')
     .then(m => m.mountVector(vc, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс векторизатора не загрузился', err));
   const nv = caseContent.querySelector('.nv-mount');
-  if (nv) import(SCRIPT_BASE + 'navi.js?v=' + VER)
+  if (nv) caseImport('navi')
     .then(m => m.mountNavi(nv, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс студии навигации не загрузился', err));
   const an = caseContent.querySelector('.an-mount');
-  if (an) import(SCRIPT_BASE + 'anon.js?v=' + VER)
+  if (an) caseImport('anon')
     .then(m => m.mountAnon(an, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс анонимайзера не загрузился', err));
   const pl = caseContent.querySelector('.pl-mount');
-  if (pl) import(SCRIPT_BASE + 'poll.js?v=' + VER)
+  if (pl) caseImport('poll')
     .then(m => m.mountPoll(pl, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс интерактивных презентаций не загрузился', err));
   const ro = caseContent.querySelector('.ro-mount');
-  if (ro) import(SCRIPT_BASE + 'office.js?v=' + VER)
+  if (ro) caseImport('office')
     .then(m => m.mountOffice(ro, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс «русский офис» не загрузился', err));
   const vp = caseContent.querySelector('.vp-mount');
-  if (vp) import(SCRIPT_BASE + 'vkplay.js?v=' + VER)
+  if (vp) caseImport('vkplay')
     .then(m => m.mountStand(vp, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс стенда VK Play не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);

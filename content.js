@@ -1672,12 +1672,6 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         thumb: 'img/thumbs/w11.webp',   // легкая копия обложки для сетки (172 КБ → 38 КБ)
         pos:   'left center',   // картинка прижата к левому краю обложки
         noHero: true,   // обложка — только в сетке на главной, в кейсе сразу текст
-        galleryEnd: true,   // скриншоты программы — в самом конце, после живых глав
-        gallery: [
-          'https://static.tildacdn.com/tild6434-3739-4435-b561-643339356365/__2026-08-02_143136.png',
-          'https://static.tildacdn.com/tild3031-3061-4562-a337-326164303966/__2026-08-02_143159.png',
-          'https://static.tildacdn.com/tild6531-3864-4639-a239-343337623733/__2026-08-02_143227.png',
-        ],
         link:  'https://kupdasha.ru/vaib',
         links: [],   // демо — кнопкой в последней главе office.try
         schemeCols: 3,   // задача, решение и результат — колонками в одну строку
@@ -1732,6 +1726,12 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             btn:   ['открыть демо', 'открыть демо'],
             link:  'https://rus-office.kupdaria26.workers.dev/',
           },
+          // скриншоты программы — каруселью в самом конце кейса; small — легкая копия для телефона (900 px), src — 1680 px
+          shots: [
+            { src: 'img/russkiy-ofis/shot-1.webp', small: 'img/russkiy-ofis/shot-1-s.webp', w: 1680, h: 995 },
+            { src: 'img/russkiy-ofis/shot-2.webp', small: 'img/russkiy-ofis/shot-2-s.webp', w: 1680, h: 992 },
+            { src: 'img/russkiy-ofis/shot-3.webp', small: 'img/russkiy-ofis/shot-3-s.webp', w: 1680, h: 986 },
+          ],
         },
       },
       {
