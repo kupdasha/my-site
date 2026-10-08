@@ -3097,7 +3097,7 @@ function renderLegal(){
     setTimeout(() => bar.classList.add('show'), 600);
   }
   const C = L.cookie;
-  bar.innerHTML = `<p>${T(C.text)}<a href="${L.links[0].link}" target="_blank" rel="noopener">${T(C.policy)}</a></p><button class="btn btn-accent cookie-ok" type="button"><span>${T(C.accept)}</span></button>`;
+  bar.innerHTML = `<p>${T(C.text)} <a href="${L.links[0].link}" target="_blank" rel="noopener">${T(C.policy)}</a></p><button class="cookie-ok" type="button">${T(C.accept)}</button>`;
 }
 renderLegal();
 addEventListener('theme:apply', renderLegal);

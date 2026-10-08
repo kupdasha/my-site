@@ -92,7 +92,7 @@ def data(group, note):
             f'Object.assign(SITE, {{\n\n{tildify(body)}\n\n}});\n</script>')
 
 SHARED = ['name', 'pageTitle', 'telegram', 'switchLeft', 'switchRight', 'switchHint', 'contactButton', 'nav',
-          'contact', 'game', 'footer', 'secret', 'chat', 'jokes']
+          'contact', 'game', 'footer', 'legal', 'secret', 'chat', 'jokes']
 missing = [k for _, k in keys if k not in SHARED + ['hero', 'directions', 'works', 'nda', 'about', 'photos',
            'community', 'articles', 'clients', 'podcast', 'speaker', 'ndaPage']]
 assert not missing, f'новые разделы в content.js, их надо распределить по блокам: {missing}'
@@ -163,12 +163,9 @@ LOADER = ("<script>(function(){if(window.KUP)return;"
           "})()</script>")
 
 def css_block():
-    fonts = re.search(r'<link href="https://fonts.googleapis.com[^>]+>', index).group(0)
-    return ('<!-- ОФОРМЛЕНИЕ САЙТА: шрифты, стили и загрузчик файлов с GitHub. Это код, тексты здесь не правятся. -->\n'
-            '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+    # шрифты (Golos Text, Spectral) — со своего сервера: @font-face в style.css, файлы в папке fonts; Google не нужен
+    return ('<!-- ОФОРМЛЕНИЕ САЙТА: стили, шрифты и загрузчик файлов с GitHub. Это код, тексты здесь не правятся. -->\n'
             '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>\n'
-            f'{fonts}\n'
             '<!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->\n'
             "<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>\n"
             f"{LOADER}\n"
@@ -259,7 +256,7 @@ def taplink_block():
             '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>\n'
             "<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',\n"
             "G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
-            "['https://cdn.jsdelivr.net','https://fonts.googleapis.com','https://fonts.gstatic.com'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});\n"
+            "['https://cdn.jsdelivr.net'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});\n"
             "try{if(localStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}\n"
             "try{c=JSON.parse(localStorage.getItem(K))}catch(e){}\n"
             "function get(u,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);x.timeout=ms;x.onload=function(){cb(x.status==200?x.responseText:null)};x.onerror=x.ontimeout=function(){cb(null)};x.send()}\n"
