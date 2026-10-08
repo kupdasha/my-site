@@ -1904,3 +1904,13 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .case-body [class*="-mount"]:empty{min-height:60vh;border-radius:var(--r-img)}
 /* шапка кейса переливается, пока не показались обложка или ролик */
 .case-hero{background-color:var(--sk)}
+
+/* плашка загрузки внизу кейса: сколько осталось и полоска прогресса (тексты — works.loading) */
+.case-wait{position:fixed;left:50%;bottom:24px;z-index:90;width:min(440px,calc(100vw - 32px));padding:14px 20px 18px;border-radius:20px;
+  background:var(--ink);color:var(--bg);overflow:hidden;translate:-50% 16px;opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease),translate .45s var(--ease)}
+.case-wait.show{opacity:1;translate:-50% 0}
+.case-wait b{display:block;font-weight:500;font-size:17px;line-height:1.3}
+.case-wait span{display:block;margin-top:2px;font-size:16px;line-height:1.35;opacity:.65}
+.case-wait i{position:absolute;left:0;bottom:0;height:4px;width:100%;background:#E2FB5A;transform-origin:left;transform:scaleX(var(--p,.06));transition:transform .5s var(--ease)}
+@media (max-width:760px){.case-wait{bottom:88px}}

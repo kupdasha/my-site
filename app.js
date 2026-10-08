@@ -2591,9 +2591,68 @@ function skMark(img){
   img.dataset.sk = '1';
   img.classList.add('sk-wait');
   if (img.getBoundingClientRect().height < 2) img.classList.add('sk-box');
-  const done = () => img.classList.remove('sk-wait', 'sk-box');
+  // в плашку загрузки идут картинки первых двух экранов: остальные грузятся по прокрутке
+  const counted = caseLoad.on && (img.loading !== 'lazy' || img.getBoundingClientRect().top < innerHeight * 2);
+  if (counted) caseLoad.add();
+  const done = () => { img.classList.remove('sk-wait', 'sk-box'); if (counted) caseLoad.tick(); };
   img.addEventListener('load', done, { once: true });
   img.addEventListener('error', done, { once: true });
+}
+/* ПЛАШКА ЗАГРУЗКИ КЕЙСА: сколько примерно осталось ждать. Считает картинки первых экранов,
+   ролик в шапке и живые главы; время — по скорости, с которой они уже загрузились.
+   Появляется, только если загрузка дольше 0,7 с; тексты — works.loading в content.js */
+const caseLoad = {
+  on: false, total: 0, done: 0, t0: 0, shown: 0, eta: Infinity, timer: 0, el: null,
+  start(){
+    this.on = true; this.total = 0; this.done = 0; this.t0 = performance.now(); this.eta = Infinity; this.shown = 0;
+    clearInterval(this.timer); this.timer = setInterval(() => this.draw(), 250);
+  },
+  add(){ if (this.on) this.total++; },
+  tick(){ if (!this.on) return; this.done++; this.draw(); },
+  pill(){
+    if (this.el) return this.el;
+    let el = document.getElementById('caseWait');
+    if (!el) { el = document.createElement('div'); el.id = 'caseWait'; el.className = 'case-wait'; el.setAttribute('role', 'status'); el.innerHTML = '<b></b><span></span><i></i>'; caseEl.appendChild(el); }
+    return (this.el = el);
+  },
+  draw(){
+    if (!this.on) return;
+    const L = SITE.works.loading || {}, el = this.pill(), t = (performance.now() - this.t0) / 1000;
+    const frac = this.total ? this.done / this.total : 0;
+    if (this.total && this.done >= this.total) return this.stop();
+    if (t < 0.7 && !this.shown) return;
+    if (!el.querySelector('b')) el.innerHTML = '<b></b><span></span><i></i>';
+    this.shown = 1;
+    // оставшееся время: прошедшее × доля, которая еще не загрузилась; число только уменьшается
+    if (frac > 0.04) this.eta = Math.min(this.eta, Math.max(1, Math.ceil(t * (1 - frac) / frac)));
+    const left = isFinite(this.eta) ? (this.eta <= 1 || frac > 0.92 ? T(L.almost) : T(L.left).replace('{s}', this.eta)) : T(L.start);
+    el.querySelector('b').innerHTML = left;
+    el.querySelector('span').innerHTML = T(L.wait);
+    el.style.setProperty('--p', Math.max(0.06, frac).toFixed(3));
+    el.classList.add('show');
+    if (isFinite(this.eta) && this.eta > 1) this.eta = Math.max(1, this.eta - 0.25);   // отсчет идет и между загрузками
+  },
+  stop(){
+    this.on = false; clearInterval(this.timer);
+    const el = document.getElementById('caseWait');
+    if (el) { el.style.setProperty('--p', 1); setTimeout(() => el.classList.remove('show'), 350); }
+  },
+};
+// живые главы: пока их код грузится, контейнер пуст; первый ребенок — глава готова
+function trackMounts(){
+  caseContent.querySelectorAll('.case-body [class*="-mount"]').forEach(m => {
+    if (m.firstChild) return;
+    caseLoad.add();
+    const mo = new MutationObserver(() => { if (m.firstChild) { mo.disconnect(); caseLoad.tick(); } });
+    mo.observe(m, { childList: true });
+  });
+  // ролик в шапке кейса
+  caseContent.querySelectorAll('.case-hero video').forEach(v => {
+    if (v.readyState >= 2) return;
+    caseLoad.add();
+    const ok = () => caseLoad.tick();
+    v.addEventListener('loadeddata', ok, { once: true }); v.addEventListener('error', ok, { once: true });
+  });
 }
 const skScan = scope => scope.querySelectorAll && scope.querySelectorAll('img').forEach(skMark);
 new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
@@ -2606,14 +2665,18 @@ function unboot(){ caseEl.classList.remove('boot'); root.classList.remove('case-
 function openCase(k){
   caseIndex = k;
   unboot();
+  caseLoad.start();
   renderCase(k);
   skScan(caseContent);
+  trackMounts();
+  caseLoad.draw();
   caseEl.classList.add('open');
   placeFab(); setTimeout(placeToTop, 100);
   document.body.classList.add('locked');
   caseEl.focus?.();
 }
 function closeCase(){
+  caseLoad.stop();
   if (caseIndex == null) return;
   caseIndex = null;
   caseEl.classList.remove('open');
