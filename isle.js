@@ -6,7 +6,9 @@
    shutter — шторка 3D / AI на одном кадре, ходит сама, пока не тронули;
    more — тот же прием на других проектах: строка проектов, у каждого
      шторка 3D / AI, у нескольких вариантов — миниатюры под шторкой;
-     side — если ракурс у нейросети другой, вместо шторки две картинки рядом.
+     side — если ракурс у нейросети другой, вместо шторки две картинки рядом;
+     lights — смена освещения на месте: 3D и варианты нейросети сменяются
+     сами, миниатюры с подписями — переключатели.
    Тексты — в content.js, оформление — isle.css, картинки — img/isle.
    ================================================================ */
 let H;   // помощники из app.js: T (типограф), pick, openViewer, base
@@ -138,6 +140,29 @@ const sideHTML = (before, after, ratio, tags) => `<div class="ia-side" style="wi
     <span class="ia-tag l${k ? ' ai' : ''}">${H.T(tags[k])}</span>
   </div>`).join('')}
 </div>`;
+// смена света: кадры лежат друг на друге, сверху слева — подпись текущего
+const lightsHTML = s => `<div class="ia-lights" style="aspect-ratio:${s.ratio};width:min(100%,calc(70vh * ${s.ratio}))">
+  ${s.lights.map((l, k) => `<div class="ia-lt${k ? '' : ' on'}"><img src="${esc(src(l.img))}" alt="" loading="lazy" decoding="async" draggable="false"><span class="ia-tag l${k ? ' ai' : ''}">${H.T(l.name)}</span></div>`).join('')}
+</div>`;
+// листает свет по кругу, пока кадр на экране и его не трогали
+function liveLights(it, ctl){
+  const frames = [...it.querySelectorAll('.ia-lt')], vars = [...it.querySelectorAll('.ia-var')];
+  let cur = 0, timer = 0, seen = false, touched = false;
+  const show = i => {
+    cur = (i + frames.length) % frames.length;
+    frames.forEach((f, k) => f.classList.toggle('on', k === cur));
+    vars.forEach((v, k) => v.classList.toggle('on', k === cur));
+    run();
+  };
+  const run = () => {
+    clearTimeout(timer);
+    if (touched || !seen || still() || !it.classList.contains('on')) return;
+    timer = setTimeout(() => show(cur + 1), 2400);
+  };
+  vars.forEach((v, k) => v.addEventListener('click', () => { touched = true; ctl.stop(); show(k); }));
+  onScreen(it.querySelector('.ia-lights'), v => { seen = v; run(); }, .3);
+  new MutationObserver(run).observe(it, { attributes: true, attributeFilter: ['class'] });
+}
 function moreHTML(c, tagsFor){
   const tg = tagsFor(c.pair);
   return `<section class="ia-ch ia-more wrap">
@@ -145,10 +170,12 @@ function moreHTML(c, tagsFor){
     <div class="ia-box">
       ${tabs(c.items.map(s => H.T(s.name)))}
       <div class="ia-board">${c.items.map((s, i) => `<div class="ia-item${i ? '' : ' on'}" data-i="${i}">
-        ${s.side ? sideHTML(s.before, s.after[0], s.ratio, tg) : cmpHTML(s.before, s.after[0], s.ratio, tg)}
+        ${s.lights ? lightsHTML(s) : s.side ? sideHTML(s.before, s.after[0], s.ratio, tg) : cmpHTML(s.before, s.after[0], s.ratio, tg)}
         <div class="ia-under">
           <p class="ia-cap on">${H.T(s.text)}</p>
-          ${s.after.length > 1 ? `<div class="ia-vars">${s.after.map((a, k) =>
+          ${s.lights ? `<div class="ia-vars">${s.lights.map((l, k) =>
+            `<button class="ia-var${k ? '' : ' on'}" type="button" data-k="${k}"><img src="${esc(l.img.replace(/\.webp$/, '-s.webp'))}" alt="" loading="lazy" decoding="async"><span>${H.T(l.name)}</span></button>`).join('')}</div>` : ''}
+          ${s.after && s.after.length > 1 ? `<div class="ia-vars">${s.after.map((a, k) =>
             `<button class="ia-var${k ? '' : ' on'}" type="button" data-k="${k}" aria-label="Вариант нейросети"><img src="${esc(a.replace(/\.webp$/, '-s.webp'))}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>` : ''}
         </div>
       </div>`).join('')}</div>
@@ -157,8 +184,9 @@ function moreHTML(c, tagsFor){
 }
 function liveMore(sec, c){
   const items = [...sec.querySelectorAll('.ia-item')];
-  const ctl = cycle(sec.querySelector('.ia-box'), items.length, i => items.forEach((s, k) => s.classList.toggle('on', k === i)), 7000);
+  const ctl = cycle(sec.querySelector('.ia-box'), items.length, i => items.forEach((s, k) => s.classList.toggle("on", k === i)), 10000);
   items.forEach((it, i) => {
+    if (c.items[i].lights) { liveLights(it, ctl); return; }
     const cmp = it.querySelector('.ia-cmp');
     if (!cmp) return;   // две картинки рядом — двигать нечего
     const live = liveCmp(cmp);
