@@ -813,9 +813,27 @@ function feelStrings(x, y){
     s.prev = inside ? dy : null;
   }
 }
-addEventListener('pointermove', e => { pointerX = e.clientX; pointerY = e.clientY; feelStrings(pointerX, pointerY); }, { passive: true });
+addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; srcOf('mouse'); pointerX = e.clientX; pointerY = e.clientY; feelStrings(pointerX, pointerY); }, { passive: true });
 // при прокрутке струна сама проезжает под курсором — и тоже цепляется
-addEventListener('scroll', () => feelStrings(pointerX, pointerY), { passive: true });
+addEventListener('scroll', () => {
+  // на телефоне и планшете курсора нет: струна цепляется за середину экрана, когда проезжает ее при прокрутке
+  // (пока палец лежит на экране — за палец)
+  if (touchUI && performance.now() - lastTouch > 120) { srcOf('screen'); feelStrings(innerWidth / 2, innerHeight * 0.55); return; }
+  feelStrings(pointerX, pointerY);
+}, { passive: true });
+// пальцем: провел по строке — струна дернулась
+const touchUI = matchMedia('(pointer: coarse)').matches;
+let lastTouch = 0, feelSrc = '';
+// сменился источник (мышь, палец, середина экрана) — забываем прошлое положение, иначе струна «заденется» сама
+function srcOf(src){ if (feelSrc !== src) { feelSrc = src; strings.forEach(s => { s.prev = null; }); } }
+const onTouch = e => { const t = e.touches[0]; if (!t) return; lastTouch = performance.now(); srcOf('finger'); pointerX = t.clientX; pointerY = t.clientY; feelStrings(pointerX, pointerY); };
+addEventListener('touchstart', onTouch, { passive: true });
+addEventListener('touchmove', onTouch, { passive: true });
+// палец оторвали, пока струна натянута, — она срывается и звучит
+addEventListener('touchend', () => {
+  lastTouch = performance.now();
+  strings.forEach(s => { if (s.held) { s.held = false; s.el.classList.remove('live'); pluck(s, Math.abs(s.amp) / TUNE.stringPull); } s.prev = null; });
+}, { passive: true });
 document.addEventListener('pointerleave', () => { pointerX = pointerY = null; });
 (function tickStrings(){
   for (const s of strings) {
