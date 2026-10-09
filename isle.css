@@ -1,0 +1,94 @@
+/* ================================================================
+   КЕЙС «3D + AI. ИЛЛЮСТРАЦИИ» (isle.js, поле isle у проекта)
+   Цвета — сайта: текст --ink, подложки --soft, лаймовый --accent —
+   подпись «AI» на шторке и выбранный вариант.
+   ================================================================ */
+.ia{overflow-x:clip;--ia-gap:clamp(72px,9vw,144px)}
+.ia-ch{margin-bottom:var(--ia-gap)}
+
+/* заголовок главы: подпись слева, заголовок и абзац справа */
+.ia-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
+.ia-label{grid-column:1 / span 3;grid-row:1}
+.ia-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.ia-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
+@media (max-width:760px){.ia-label,.ia-title,.ia-text{grid-column:1 / -1}.ia-label{grid-row:auto}}
+
+/* появление */
+.ia-head > *{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.ia-head > :nth-child(2){transition-delay:.08s}.ia-head > :nth-child(3){transition-delay:.16s}
+.ia-box{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .15s,transform 1.1s var(--ease) .15s}
+.ia-ch.in .ia-head > *,.ia-ch.in .ia-box{opacity:1;transform:none}
+
+/* ---------- строка надписей сверху: текущая темная, под ней — полоска таймера ---------- */
+.ia-tabs{display:flex;flex-wrap:wrap;column-gap:clamp(20px,2.6vw,40px);row-gap:4px;border-bottom:1.5px solid var(--line);margin-bottom:clamp(20px,2.6vw,32px)}
+.ia-tab{position:relative;padding:0 0 14px;margin-bottom:-1.5px;font-size:clamp(20px,1.7vw,26px);font-weight:500;line-height:1.15;white-space:nowrap;color:inherit;
+  background:none;border:0;opacity:.38;cursor:pointer;transition:opacity .35s}
+.ia-tab em{font-style:normal;font-weight:400;opacity:.6}
+.ia-tab:hover{opacity:.75}
+.ia-tab[aria-selected="true"]{opacity:1}
+.ia-tab:focus{outline:none}
+.ia-tab:focus-visible{outline:2px solid currentColor;outline-offset:6px;border-radius:4px}
+.ia-tick{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;transition:opacity .3s}
+.ia-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%}
+.ia-tab[aria-selected="true"] .ia-tick{opacity:1}
+.ia-tab.run .ia-tick::after{animation:iaTick var(--ms) linear both}
+@keyframes iaTick{from{transform:scaleX(0)}to{transform:none}}
+@media (max-width:760px){
+  .ia-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad)}
+  .ia-tabs::-webkit-scrollbar{display:none}
+  .ia-tab{flex:none}
+}
+
+/* ---------- кадры лежат друг на друге, виден один ---------- */
+.ia-stage{position:relative;aspect-ratio:16 / 9;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in}
+.ia-stage.ia-still{cursor:default}
+/* кадр 16:9 целиком помещается на экран вместе со строкой этапов и подписью */
+.ia-stage{width:min(100%,calc(70vh * 16 / 9));margin-inline:auto}
+@media (min-width:761px){.ia-path .ia-tabs,.ia-light .ia-tabs,.ia-caps{width:min(100%,calc(70vh * 16 / 9));margin-inline:auto}}
+.ia-shot{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .9s var(--ease);user-select:none;-webkit-user-select:none}
+.ia-still .ia-shot{object-fit:cover}
+.ia-shot.on{opacity:1}
+/* у этапов картинки разных пропорций: подложка светлая, как бумага эскиза */
+.ia-path .ia-stage{background:#F1F1EF}
+.ia-stage:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+/* подписи под кадром: видна текущая */
+.ia-caps{display:grid;margin-top:16px}
+.ia-caps > .ia-cap{grid-area:1 / 1}
+.ia-cap{font-size:19px;line-height:1.35;max-width:52ch;text-wrap:balance;opacity:0;transform:translateY(6px);transition:opacity .5s var(--ease),transform .6s var(--ease)}
+.ia-cap.on{opacity:1;transform:none}
+
+/* ---------- шторка 3D / AI ---------- */
+.ia-cmp{position:relative;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:ew-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.ia-cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;transition:opacity .22s}
+.ia-cmp.swap .ia-cmp-b{opacity:0}
+.ia-cmp-a{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--x)) 0 0)}
+.ia-cmp-line{position:absolute;top:0;bottom:0;left:var(--x);width:3px;margin-left:-1.5px;background:#fff;pointer-events:none}
+.ia-cmp-knob{position:absolute;top:50%;left:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 2px 10px rgba(20,24,32,.25)}
+.ia-cmp-knob svg{width:24px;height:24px;fill:none;stroke:#1D222A;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ia-tag{position:absolute;top:16px;padding:6px 14px 8px;border-radius:99px;background:rgba(255,255,255,.92);color:#1D222A;font-size:17px;line-height:1;pointer-events:none;white-space:nowrap}
+.ia-tag.l{left:16px}
+.ia-tag.r{right:16px;background:var(--accent)}
+.ia-cmp:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+/* ---------- другие проекты: шторки лежат друг на друге, видна одна ---------- */
+.ia-board{display:grid;grid-template-columns:minmax(0,1fr)}
+.ia-item{grid-area:1 / 1;opacity:0;visibility:hidden;transition:opacity .6s var(--ease),visibility 0s .6s}
+.ia-item.on{opacity:1;visibility:visible;transition:opacity .6s var(--ease)}
+.ia-under{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px 32px;margin-top:16px}
+.ia-under .ia-cap{opacity:1;transform:none}
+.ia-vars{display:flex;gap:10px}
+.ia-var{position:relative;width:88px;aspect-ratio:16 / 10;padding:0;border:0;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:pointer;opacity:.5;transition:opacity .3s}
+.ia-var img{width:100%;height:100%;object-fit:cover;display:block}
+.ia-var.on,.ia-var:hover{opacity:1}
+.ia-var.on::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 3px var(--ink)}
+
+@media (max-width:640px){
+  .ia-tag{font-size:16px;top:10px;padding:5px 12px 7px}
+  .ia-tag.l{left:10px}.ia-tag.r{right:10px}
+  .ia-cmp-knob{width:44px;height:44px;margin:-22px 0 0 -22px}
+  .ia-var{width:72px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ia-head > *,.ia-box{transform:none;opacity:1;transition:none}
+}
