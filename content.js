@@ -3733,6 +3733,40 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         },
         links: [],
       },
+      {
+        other: true,   // показывается внизу, в «других работах»
+        promote: ['3D'],   // но в категории 3D — крупной карточкой в сетке
+        cat:   '3D',
+        title: 'Разное',
+        tag:   '3D',
+        image: 'https://static.tildacdn.com/tild3837-3762-4131-b332-306438306566/2.png',
+        thumb: 'img/thumbs/w37.webp',   // легкая копия обложки для сетки (1208 КБ → 80 КБ)
+        /* каждый проект — блок { screen }: название, подпись и картинки рядом, ряд не выше экрана.
+           Картинки — img/raznoe (-s — копия 900 px для телефона); склейки Darrow и L'Oréal разрезаны на кадры */
+        gallery: [
+          [
+            { screen: ['img/raznoe/lego-truck.webp'], title: 'LEGO в «Пятерочке»' },
+            { screen: [['img/raznoe/lego-kv-aero.webp', 'img/raznoe/lego-kv-dragon.webp']],
+              text: ['Плакаты: свою 3D-модель кассы, которую сама отрендерила, соединила с оригинальными рендерами наборов от LEGO.',
+                     'Кассу смоделировала и отрендерила сама, а наборы на ней — оригинальные рендеры от LEGO'] },
+            { screen: ['img/raznoe/starwars-1.webp', 'img/raznoe/starwars-2.webp'], title: 'LEGO Star Wars' },
+            { screen: ['img/raznoe/loreal-1.webp', 'img/raznoe/loreal-2.webp'], title: 'L’Oréal' },
+            { screen: ['img/raznoe/darrow-1.webp', 'img/raznoe/darrow-2.webp'], title: 'Darrow' },
+            { screen: ['img/raznoe/gancia.webp'], title: 'Gancia' },
+            { screen: ['img/raznoe/mosbirzha-1.webp', 'img/raznoe/mosbirzha-2.webp'], title: 'MatchMaking',
+              text: ['Одна конструкция в двух брендингах: «Москва Карьера» и Московская биржа.',
+                     'Один стенд, два наряда: «Москва Карьера» и Московская биржа'] },
+            { screen: ['img/raznoe/philips-1.webp', 'img/raznoe/philips-2.webp', 'img/raznoe/philips-3.webp'], title: 'Philips',
+              text: ['Круглый павильон: по краю — секции за цветными рейками, в центре — газон с креслами-мешками и очистителями воздуха Philips.',
+                     'Круглый павильон: по краю — цветные секции, в центре — газон, кресла-мешки и очистители воздуха Philips между ними'] },
+          ],
+        ],
+        link:  'https://kupdasha.ru/stands',
+        story: [
+          'Сборная солянка стендов за три года работы в ивент-агентстве. Все визуализации сделала сама в Blender, потом сама же подготовила их к печати, и стенды построили в реальности.',
+        ],
+      },
+
       /* ---------- дальше — проекты, которые еще не оформляли в отдельных чатах (только текст и картинки) ---------- */
       {
         cat:   'вайб-кодинг',
@@ -3830,29 +3864,6 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         ],
         link:  'https://kupdasha.ru/stands',
         story: [
-        ],
-      },
-      {
-        other: true,   // показывается внизу, в «других работах»
-        promote: ['3D'],   // но в категории 3D — крупной карточкой в сетке
-        cat:   '3D',
-        title: 'Разное',
-        wip:   true,   // кейс еще не оформлен — на обложке тег «в процессе оформления»
-        tag:   '3D',
-        image: 'https://static.tildacdn.com/tild3837-3762-4131-b332-306438306566/2.png',
-        thumb: 'img/thumbs/w37.webp',   // легкая копия обложки для сетки (1208 КБ → 80 КБ)
-        gallery: [
-          'https://static.tildacdn.com/tild3366-3634-4336-b539-323463626664/1_2.png',
-          'https://static.tildacdn.com/tild6466-3961-4465-b732-323332373461/kv_aero.png',
-          'https://static.tildacdn.com/tild6231-3932-4665-a335-333563626534/kv_dragon.png',
-          'https://static.tildacdn.com/tild3163-3636-4262-b434-623931363635/grtged.png',
-          'https://static.tildacdn.com/tild6633-3132-4137-a238-393339366535/gancia.png',
-          'https://static.tildacdn.com/tild3833-6366-4837-a239-376239636133/Darrow.jpg',
-          'https://static.tildacdn.com/tild3161-3537-4538-b261-333438323439/photo.png',
-        ],
-        link:  'https://kupdasha.ru/stands',
-        story: [
-          'Сборная солянка стендов за три года работы в ивент-агентстве. Все визуализации сделала сама в Blender, потом сама же подготовила их к печати, и стенды построили в реальности.',
         ],
       },
     ],

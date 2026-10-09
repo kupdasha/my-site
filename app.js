@@ -1647,6 +1647,9 @@ function watchCampaigns(root){
       const ar = img.naturalWidth / img.naturalHeight;
       img.parentNode.style.setProperty('--ar', ar);
       img.parentNode.classList.toggle('wide', ar > 1.3);   // широкий макет: на телефоне встает во всю ширину
+      // ряд «на один экран» (screen): сумма пропорций ограничивает его ширину, чтобы высота не вылезала за экран
+      const row = img.closest('.camp-row.fit');
+      if (row) row.style.setProperty('--sum', [...row.children].reduce((s, c) => s + (+c.style.getPropertyValue('--ar') || 1.5), 0));
     };
     img.complete ? set() : img.addEventListener('load', set, { once: true });
   });
@@ -2239,6 +2242,12 @@ function galleryItem(x){
   // { ctPlayer } — рабочий плеер со сценами, { ctStories } — сторис по очереди; оба рисует cartoon.js (см. «мультик созданный кодом»)
   if (x && (x.ctPlayer || x.ctStories)) return `<div class="ct-mount"></div>`;
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
+  // { screen: [ряды], title, text } — проект во весь экран: название и подпись, под ними ряды картинок; ряд — картинка
+  // или список картинок рядом (высокие плакаты — парой), ряд не выше экрана, широкий кадр — во всю ширину.
+  // У img/… с копией -s (900 px) телефон берет ее (см. «Разное» в 3D)
+  if (x && x.screen) return `<div class="wrap scr-proj">${x.title || x.text ? `<div class="scr-head">${x.title ? `<h3>${T(x.title)}</h3>` : ''}${x.text ? `<p>${T(x.text)}</p>` : ''}</div>` : ''}${
+    x.screen.map(r => [].concat(r)).map(r => `<div class="camp-row fit" style="--n:${r.length}">${
+      r.map(s => campCell(s).replace(/<img src="(img\/[^"]+)\.webp"/, '<img src="$1.webp" srcset="$1-s.webp 900w, $1.webp 2000w" sizes="(max-width:760px) 84vw, 60vw"')).join('')}</div>`).join('')}</div>`;
   if (x && x.collage) return campCollage(x);
   // { film: 'img/….mp4', poster, caption } — ролик для просмотра: со звуком и плеером, сам не запускается, грузится по нажатию;
   // film: 'kinescope:ID' и другие плееры — встраиваются окном, с теми же отступами

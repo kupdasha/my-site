@@ -1310,6 +1310,20 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 }
 /* после ряда картинок текстовый блок отступает, чтобы не прилипать к макетам */
 .camp-rowbox+.wrap>.case-text{margin-top:clamp(48px,6vw,96px)}
+/* проект на один экран (элемент { screen } в галерее, см. «Разное» в 3D): название и подпись, под ними ряд картинок,
+   ряд не выше экрана — ширина = высота экрана × сумма пропорций картинок (--sum считает app.js) */
+.scr-proj{margin-bottom:clamp(72px,9vw,136px)}
+.scr-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);margin-bottom:clamp(16px,2vw,28px);align-items:baseline}
+.scr-head h3{grid-column:1 / span 4;font-size:clamp(22px,2.3vw,34px);line-height:1.15;font-weight:500;text-wrap:balance}
+.scr-head p{grid-column:5 / -1;font-size:clamp(16px,1.3vw,19px);line-height:1.4;max-width:52ch;opacity:.65;text-wrap:pretty}
+.scr-head h3+p{margin-top:0}
+.scr-proj>.camp-row.fit{max-width:calc((100svh - 150px) * var(--sum, 1.6) + (var(--n) - 1) * clamp(8px,1vw,16px));margin-inline:auto}
+.scr-proj>.camp-row.fit+.camp-row.fit{margin-top:clamp(8px,1vw,16px)}
+@media (max-width:760px){
+  .scr-head{display:block}
+  .scr-head p{margin-top:8px}
+  .scr-proj>.camp-row.fit{max-width:none}
+}
 /* узкий ряд — по ширине текстовой колонки, для картинок низкого разрешения */
 .camp-rowbox.narrow>.camp-row{width:calc(66.67% + clamp(16px,2vw,28px) / 3);margin-left:auto}
 .camp-rowbox.narrow>.camp-cap{margin-left:calc(33.33% - clamp(16px,2vw,28px) / 3)}
