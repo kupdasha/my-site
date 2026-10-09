@@ -1,0 +1,98 @@
+/* ================================================================
+   КЕЙС «ПУШКИНСКИЙ БАЛ В МЕТАВСЕЛЕННОЙ» (ball.js, поле ball у проекта)
+   Цвета — сайта; во дворце: темно-синие стены --bl-wall, золото
+   рам и арок --bl-gold (желтое, без оранжевого).
+   ================================================================ */
+.bl-ch{--bl-gap:clamp(72px,9vw,144px);--bl-wall:#141933;--bl-gold:#D9C27C;margin-bottom:var(--bl-gap);overflow-x:clip}
+
+/* заголовок главы: подпись и заголовок слева, текст справа */
+.bl-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:18px;align-items:end;margin-bottom:clamp(28px,3.4vw,48px)}
+.bl-label{grid-column:1 / -1}
+.bl-title{grid-column:1 / span 6;font-weight:500;font-size:clamp(30px,3.2vw,48px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
+.bl-text{grid-column:8 / -1;font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;max-width:40ch}
+@media (max-width:900px){.bl-title,.bl-text{grid-column:1 / -1}}
+.bl-head > *{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.bl-head > :nth-child(2){transition-delay:.08s}.bl-head > :nth-child(3){transition-delay:.16s}
+.bl-ch.in .bl-head > *{opacity:1;transform:none}
+
+/* ---------- halls: анфилада, кадр закреплен, прокрутка ведет сквозь арки ---------- */
+.bl-halls{position:relative;height:calc(100svh + (var(--n) - 1) * 75svh)}
+.bl-pin{position:sticky;top:var(--case-bar,76px);height:calc(100svh - var(--case-bar,76px));display:flex;flex-direction:column;justify-content:center;gap:clamp(14px,1.6vw,22px);padding:clamp(8px,1.4vw,20px) 0 clamp(16px,2vw,28px)}
+.bl-stage{position:relative;flex:1 1 auto;min-height:0;max-height:calc((min(100vw,1600px) - 2 * var(--pad,40px)) / 1.9);border-radius:var(--r-img);overflow:hidden;background:var(--bl-wall);isolation:isolate}
+.bl-layer{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0;will-change:transform}
+.bl-layer img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-select:none}
+.bl-layer:not(:first-child){visibility:hidden}
+/* дальняя арка: золотая кромка, внутри — следующий зал */
+.bl-door{position:absolute;left:0;top:0;width:0;height:0;border-radius:999px 999px 0 0;overflow:hidden;box-shadow:0 0 0 2px var(--bl-gold);visibility:hidden;will-change:transform,width,height;z-index:1}
+.bl-door .bl-layer{will-change:transform,width,height}
+/* подпись под кадром: название зала и строка, справа — точки */
+.bl-cap{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.bl-cap-txt{display:grid;flex:1;min-width:0}
+.bl-cap-one{grid-area:1 / 1;display:flex;flex-wrap:wrap;column-gap:14px;row-gap:2px;align-items:baseline;font-size:clamp(17px,1.3vw,20px);line-height:1.35;opacity:0;transform:translateY(8px);transition:opacity .45s,transform .6s var(--ease)}
+.bl-cap-one.on{opacity:1;transform:none}
+.bl-cap-one b{font-weight:500}
+.bl-cap-one span{opacity:.6}
+.bl-dots{display:flex;gap:8px;padding-top:8px;flex:none}
+.bl-dots i{width:9px;height:9px;border-radius:50%;background:var(--line);transition:background .3s,transform .3s}
+.bl-dots i.on{background:var(--ink);transform:scale(1.15)}
+/* без движения — залы просто друг под другом */
+.bl-halls.flat{height:auto}
+.bl-halls.flat .bl-pin{position:static;height:auto}
+.bl-halls.flat .bl-stage{display:grid;gap:16px;max-height:none;overflow:visible;background:none;border-radius:0}
+.bl-halls.flat .bl-layer{position:static;visibility:visible;aspect-ratio:1.9;border-radius:var(--r-img);overflow:hidden}
+.bl-halls.flat .bl-door,.bl-halls.flat .bl-cap{display:none}
+@media (max-width:760px){
+  .bl-pin{justify-content:center}
+  .bl-stage{flex:none;aspect-ratio:4 / 5;max-height:calc(100% - 96px)}
+  .bl-cap{min-height:72px}
+  .bl-cap-one{flex-direction:column}
+}
+
+/* ---------- podium: ролик перематывается курсором ---------- */
+.bl-film-wrap{margin:0}
+.bl-film{position:relative;aspect-ratio:1280 / 666;border-radius:var(--r-img);overflow:hidden;background:var(--bl-wall);cursor:ew-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.bl-film video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.bl-film:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+/* дорожка вдоль подиума: пройденное — цветом текста, точка — где мы */
+.bl-track{position:relative;height:4px;margin-top:16px;border-radius:2px;background:var(--line)}
+.bl-track i{position:absolute;left:0;top:0;bottom:0;width:calc(var(--k,0) * 100%);border-radius:inherit;background:var(--ink)}
+.bl-track b{position:absolute;top:50%;left:calc(var(--k,0) * 100%);width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--ink)}
+.bl-note{margin-top:14px;font-size:16px;opacity:.6}
+
+/* ---------- wall: работы в золотых рамах на темной стене ---------- */
+.bl-wall{columns:4 220px;column-gap:clamp(14px,2vw,28px);padding:clamp(20px,3.2vw,48px);border-radius:var(--r-img);background:var(--bl-wall)}
+.bl-frame{display:block;width:100%;margin:0 0 clamp(14px,2vw,28px);padding:0;border:0;background:#fff;box-shadow:0 0 0 3px var(--bl-gold);border-radius:2px;break-inside:avoid;cursor:zoom-in;
+  transform-origin:50% -24px;opacity:0;transform:rotate(var(--r)) translateY(-12px);transition:opacity .6s var(--d),transform 1.3s cubic-bezier(.25,1.6,.4,1) var(--d)}
+.bl-frame img{display:block;width:100%;height:auto;border-radius:2px}
+.bl-wall.hung .bl-frame{opacity:1;transform:none}
+.bl-wall.hung .bl-frame:hover{transform:translateY(-4px);transition-delay:0s;transition-duration:.6s,.5s}
+.bl-frame:focus-visible{outline:3px solid #fff;outline-offset:6px}
+@media (max-width:560px){.bl-wall{columns:2;padding:14px}}
+
+/* ---------- zones: часовые пояса лентой неба ---------- */
+.bl-zones{display:flex;border-radius:var(--r-img);overflow:hidden;min-height:clamp(300px,30vw,400px)}
+.bl-zone{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:18px 12px 20px;
+  background:linear-gradient(90deg,var(--a,#111631),var(--b,#111631));color:#fff;transition:background 1s}
+.bl-zone.lt{color:#1D222A}
+.bl-city{font-size:16px;line-height:1.2}
+.bl-time{font-size:clamp(22px,2vw,30px);font-weight:500;line-height:1;font-variant-numeric:tabular-nums}
+.bl-open{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:16px;opacity:.8}
+.bl-open svg{width:16px;height:20px;flex:none;fill:#FFF0B8;stroke:currentColor;stroke-width:1.6}
+/* солнце или луна: высота — по местному часу */
+.bl-orb{position:absolute;left:50%;top:calc(18px + var(--y,.5) * 38%);width:22px;height:22px;margin-left:-11px;border-radius:50%;background:#FFF2B0}
+.bl-zone.night .bl-orb{width:18px;height:18px;margin-left:-9px;background:#E6EAF6;-webkit-mask:radial-gradient(circle at 70% 35%,transparent 6px,#000 6.5px);mask:radial-gradient(circle at 70% 35%,transparent 6px,#000 6.5px)}
+/* планшет и телефон: города строками сверху вниз; на узком — от «открыто» остается дверь */
+@media (max-width:1080px){
+  .bl-zones{flex-direction:column;min-height:0}
+  .bl-zone{flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;padding:14px 16px;background:linear-gradient(180deg,var(--a,#111631),var(--b,#111631))}
+  .bl-orb{position:static;margin:0;flex:none}
+  .bl-zone.night .bl-orb{margin:0 2px}
+  .bl-city{flex:1}
+  .bl-time{font-size:22px;order:3}
+  .bl-open{margin:0;order:2}
+}
+@media (max-width:480px){.bl-open{font-size:0;gap:0}}
+
+@media (prefers-reduced-motion:reduce){
+  .bl-head > *,.bl-frame{opacity:1;transform:none;transition:none}
+}
