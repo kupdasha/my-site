@@ -2220,3 +2220,6 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 :root[data-theme="dark"] :is(#facts,#courses) .string{display:block}
 /* лента выступлений: под подписью всегда место на две строки — при смене фото подпись в одну или две строки не двигает страницу */
 .ev figcaption{min-height:calc(2em * 1.3)}
+
+/* cardTint: полупрозрачная заливка поверх обложки карточки (например, черная 3% у белой картинки) */
+.media-tint{position:absolute;inset:0;z-index:1;pointer-events:none}
