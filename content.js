@@ -3792,6 +3792,16 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 { area: 'a', img: 'img/raznoe/philips-1.webp' },
                 { area: 'b', img: 'img/raznoe/philips-2.webp', half: true },
                 { area: 'c', img: 'img/raznoe/philips-3.webp', half: true } ] } },
+            { title: 'Crocs',
+              text: ['Летняя зона в торговом центре: от рендеров в 3D до фото с площадки.',
+                     'Сначала нарисовала в 3D, потом зону построили в торговом центре — кресла-мешки заняли сразу'],
+              screen: { areas: '"z p h" "z p c" "s p c" "s q c"', cols: '525fr 446fr 305fr', rows: '150fr 86fr 80fr 304fr', ratio: 2.13, cells: [
+                { area: 'h', head: true },
+                { area: 'z', img: 'img/raznoe/crocs-zone.webp' },
+                { area: 's', img: 'img/raznoe/crocs-stands.webp' },
+                { area: 'p', img: 'img/raznoe/crocs-photo-1.webp', half: true },
+                { area: 'q', img: 'img/raznoe/crocs-photo-2.webp', half: true },
+                { area: 'c', img: 'img/raznoe/crocs-photo-3.webp', pos: 'bottom' } ] } },
           ],
         ],
         links: [],   // ссылки на старую страницу kupdasha.ru/stands нет
