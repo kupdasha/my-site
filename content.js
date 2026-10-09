@@ -3552,7 +3552,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       },
       {
         other: true,   // показывается внизу, в «других работах»
-        promote: ['3D'],   // но в категории 3D — крупной карточкой в сетке
+        listOnly: true,   // и в категории 3D — строкой в «других работах», даже если она там одна (просьба 09.10)
         cat:   '3D',
         title: 'Пушкинский бал в метавселенной',
         year:  '2024',
@@ -3729,24 +3729,6 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           'https://static.tildacdn.com/tild3861-3465-4437-b331-396561303666/3.jpg',
           'https://static.tildacdn.com/tild6135-3738-4032-a135-376131346161/10.jpg',
           'https://static.tildacdn.com/tild3835-3732-4336-b930-386534633161/1.jpg',
-        ],
-        link:  'https://kupdasha.ru/stands',
-        story: [
-        ],
-      },
-      {
-        other: true,   // показывается внизу, в «других работах»
-        promote: ['3D'],   // но в категории 3D — крупной карточкой в сетке
-        cat:   '3D',
-        title: 'Столото',
-        wip:   true,   // кейс еще не оформлен — на обложке тег «в процессе оформления»
-        year:  '2020',
-        tag:   'стенд',
-        image: 'https://static.tildacdn.com/tild3266-3730-4264-b639-303236393537/_.png',
-        thumb: 'img/thumbs/w35.webp',   // легкая копия обложки для сетки (2920 КБ → 179 КБ)
-        gallery: [
-          'https://static.tildacdn.com/tild3831-6439-4430-b766-343235313938/photo.jpg',
-          'https://static.tildacdn.com/tild6532-3166-4062-b533-313834653932/__2.png',
         ],
         link:  'https://kupdasha.ru/stands',
         story: [
@@ -4079,7 +4061,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       { name: 'Heineken',           color: '',        project: '', what: 'стенд сидра Strongbow' },
       { name: 'Ростех',             color: '',        project: 'Ростех',                what: 'ролик' },
       { name: 'Merz',               color: '',        project: '',                      what: 'стенд эстетической косметологии' },
-      { name: 'Столото',            color: '',        project: 'Столото',                      what: 'стенд' },
+      { name: 'Столото',            color: '',        what: 'стенд' },   // кейс удален с сайта 09.10 — имя без ссылки
       { name: 'Crocs',              color: '',        project: '',                what: 'стенд' },
       { name: 'Сколково',           color: '',        project: 'Парашютный костюм Skolkovo', what: 'парашютный костюм для резидента' },
       { name: 'Евразийский банк развития', color: '', project: 'сайт Евразийского банка развития', what: 'сайт банка' },

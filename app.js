@@ -927,7 +927,7 @@ function renderWorks(){
   $('#workFiltersEnd').innerHTML = chips;
   // «другие работы» из одного проекта не показываем: такой проект встает в общую сетку
   let other = W.items.map((p, k) => [p, k]).filter(([p]) => isOther(p) && inCat(p));
-  const solo = other.length === 1 ? other[0][0] : null;
+  const solo = other.length === 1 && !other[0][0].listOnly ? other[0][0] : null;   // listOnly — всегда строкой в «других работах»
   if (solo) other = [];
   let n = 0;
   $('#workList').innerHTML = W.items.map((p, k) => {
