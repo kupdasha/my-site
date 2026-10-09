@@ -5,6 +5,11 @@
    ================================================================ */
 .bl-ch{--bl-gap:clamp(72px,9vw,144px);--bl-wall:#141933;--bl-gold:#D9C27C;margin-bottom:var(--bl-gap);overflow-x:clip}
 
+/* текст в начале кейса: на планшете 2 × 2 (на телефоне style.css ставит одну колонку) */
+@media (min-width:761px) and (max-width:1100px){
+  .case-body:has(.bl-mount) .scheme-cols>.camp-col{grid-column:span 6 !important}
+}
+
 /* заголовок главы: подпись и заголовок слева, текст справа */
 .bl-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:18px;align-items:end;margin-bottom:clamp(28px,3.4vw,48px)}
 .bl-label{grid-column:1 / -1}
@@ -41,6 +46,10 @@
 .bl-halls.flat .bl-stage{display:grid;gap:16px;max-height:none;overflow:visible;background:none;border-radius:0}
 .bl-halls.flat .bl-layer{position:static;visibility:visible;aspect-ratio:1.9;border-radius:var(--r-img);overflow:hidden}
 .bl-halls.flat .bl-door,.bl-halls.flat .bl-cap{display:none}
+/* планшет: кадр выше, 4 : 3 — по бокам рендер чуть срезан */
+@media (min-width:761px) and (max-width:1100px){
+  .bl-stage{flex:none;aspect-ratio:4 / 3;max-height:calc(100% - 64px)}
+}
 @media (max-width:760px){
   .bl-pin{justify-content:center}
   .bl-stage{flex:none;aspect-ratio:4 / 5;max-height:calc(100% - 96px)}
