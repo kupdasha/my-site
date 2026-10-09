@@ -1,13 +1,12 @@
 /* ================================================================
    КЕЙС «TELE2, КОНФЕРЕНЦИЯ «ВЫХОДИ ЗА РАМКИ»» (поле tele у проекта)
-   frame    — ключевой визуал: один шрифтовой блок за несколькими
-              носителями (экран, куб, стойка, награда, панно): слова
-              едут и выходят за край каждого, курсор сдвигает блок;
    illusion — фотозона с иллюзией: панели на разной глубине, TELE2
               собирается только с одной точки; камеры 30 и 40 мм,
               схема сверху, точка зрителя — посередине;
    pixels   — панно из поворотных плашек: рисовать курсором или
               пальцем, без касания рисует само;
+   wishes   — кубы с пожеланиями: гора кубов растет, нажатие ставит
+              свой куб, рядом — маленькое превью рендера;
    things   — сцена, стойки, фольга, куб, награды, кубы, дженга.
    Тексты — в content.js, оформление — tele.css, картинки — img/tele2.
    ================================================================ */
@@ -29,79 +28,6 @@ const head = c => `<div class="t2-head">
   <h2 class="t2-title">${H.T(c.title)}</h2>
   ${c.text ? `<p class="t2-text">${H.T(c.text)}</p>` : ''}
 </div>`;
-
-/* ================================================================
-   frame — носители как окна в один общий шрифтовой блок.
-   Блок лежит «за стеной» во всю ее ширину, у каждого носителя —
-   свой вырез; строки едут навстречу друг другу
-   ================================================================ */
-// место носителей на стене, % ширины и высоты: [left, top, width, height]
-const WALL = {
-  wide: [[0, 10, 47, 70], [50, 0, 20, 48], [73, 0, 10, 100], [86, 38, 14, 50], [50, 54, 20, 46]],
-  tall: [[0, 0, 100, 30], [0, 33, 48, 38.4], [52, 33, 48, 67], [0, 0, 0, 0], [0, 74.4, 48, 25.6]],   // на телефоне без награды: узкая подпись не помещается
-};
-const ROWS = 14;   // строк в блоке; на широкой стене видно 7, на высокой — все 14
-
-function frameHTML(c){
-  const w = c.words;
-  // строка — слова по кругу со своего места, каждое третье лаймовое; дважды, чтобы ехать без шва
-  const row = i => {
-    const one = w.map((_, k) => w[(k + i * 3) % w.length]).map((s, k) =>
-      `<span${(k + i) % 3 ? '' : ' class="hi"'}>${esc(s)}</span>`).join('');
-    return `<div class="t2-row" data-r="${i}" style="top:calc(var(--u) * ${i})"><div class="t2-run">${one}</div><div class="t2-run" aria-hidden="true">${one}</div></div>`;
-  };
-  const field = `<div class="t2-field">${Array.from({ length: ROWS }, (_, i) => row(i)).join('')}</div>`;
-  return `<div class="t2-wall">${c.carriers.map((n, i) =>
-    `<div class="t2-car" data-i="${i}">${field}${i ? '' : '<i class="t2-square" aria-hidden="true"></i>'}<span class="t2-car-name">${H.T(n)}</span></div>`).join('')}</div>`;
-}
-function liveFrame(box){
-  const wall = box.querySelector('.t2-wall'), cars = [...box.querySelectorAll('.t2-car')];
-  const runs = [...Array(ROWS)].map((_, r) => [...box.querySelectorAll(`.t2-row[data-r="${r}"]`)]);
-  let W = 0, Hh = 0, span = [], seen = false, raf = 0, last = 0, t = Math.random() * 40;
-  let mx = 0, my = 0, px = 0, py = 0;
-  const layout = () => {
-    const lay = narrow() ? WALL.tall : WALL.wide;
-    W = wall.clientWidth; Hh = wall.clientHeight;
-    wall.style.setProperty('--u', (Hh / (narrow() ? ROWS : ROWS / 2)).toFixed(1) + 'px');
-    cars.forEach((el, i) => {
-      const [l, tp, w, h] = lay[i] || [0, 0, 0, 0];
-      el.style.cssText = `left:${l}%;top:${tp}%;width:${w}%;height:${h}%;display:${w ? '' : 'none'}`;
-      const f = el.querySelector('.t2-field');
-      f.style.width = W + 'px'; f.style.height = Hh + 'px';
-      f.style.left = (-l / 100 * W) + 'px'; f.style.top = (-tp / 100 * Hh) + 'px';
-    });
-    span = runs.map(list => list[0].querySelector('.t2-run').offsetWidth || 1);
-    draw();
-  };
-  const draw = () => {
-    px += (mx - px) * .06; py += (my - py) * .06;
-    runs.forEach((list, r) => {
-      const dir = r % 2 ? 1 : -1, sp = 22 + (r * 7) % 15;
-      let x = (dir * t * sp + r * 173) % span[r];
-      if (x > 0) x -= span[r];
-      const tx = x + px * W * .06, ty = py * Hh * .05;
-      list.forEach(el => { el.style.transform = `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0)`; });
-    });
-  };
-  const loop = now => {
-    raf = 0;
-    if (!seen) return;
-    const dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now;
-    t += dt; draw();
-    raf = requestAnimationFrame(loop);
-  };
-  wall.addEventListener('pointermove', e => {
-    if (e.pointerType !== 'mouse') return;
-    const r = wall.getBoundingClientRect();
-    mx = (e.clientX - r.left) / r.width - .5; my = (e.clientY - r.top) / r.height - .5;
-  });
-  wall.addEventListener('pointerleave', () => { mx = my = 0; });
-  new ResizeObserver(layout).observe(wall);
-  document.fonts?.ready.then(layout);
-  layout();
-  if (still()) return;
-  onScreen(wall, v => { seen = v; last = 0; if (v && !raf) raf = requestAnimationFrame(loop); });
-}
 
 /* ================================================================
    illusion — фотозона-обманка. Зритель смотрит вдоль +z из точки E,
@@ -470,6 +396,159 @@ function livePixels(box, c){
 }
 
 /* ================================================================
+   wishes — кубы с пожеланиями. Изометрия на canvas: у куба три видимые
+   грани, на левой — значок и пожелание, на правой — значок. Гора
+   растет сама, нажатие ставит куб сразу; когда гора собрана —
+   кубы уходят, и всё сначала
+   ================================================================ */
+// высота горы в каждой клетке (i — вправо-вниз, j — влево-вниз)
+const MOUND = [
+  [1, 2, 2, 1, 0],
+  [2, 3, 3, 2, 1],
+  [2, 3, 4, 3, 1],
+  [1, 2, 3, 2, 1],
+  [0, 1, 1, 1, 0],
+];
+const SLOTS = (() => {
+  const out = [];
+  MOUND.forEach((row, i) => row.forEach((h, j) => { for (let k = 0; k < h; k++) out.push({ i, j, k }); }));
+  return out.sort((a, b) => a.k - b.k || (a.i + a.j) - (b.i + b.j) || a.i - b.i);   // снизу вверх, от дальних к ближним
+})();
+const DARK = '#1B1C1F';
+// значки в квадрате 100 × 100, центр — (50, 36)
+const ICONS = {
+  up: g => { g.moveTo(50, 58); g.lineTo(50, 16); g.moveTo(36, 30); g.lineTo(50, 16); g.lineTo(64, 30); },
+  sky: g => { g.moveTo(26, 52); g.lineTo(74, 52); g.moveTo(30, 52); g.lineTo(44, 34); g.lineTo(52, 44); g.lineTo(60, 36); g.lineTo(70, 52);
+    g.moveTo(60, 24); g.arc(52, 24, 8, 0, Math.PI * 2); },
+  bulb: g => { g.moveTo(62, 30); g.arc(50, 30, 12, 0, Math.PI * 2); g.moveTo(44, 46); g.lineTo(56, 46); g.moveTo(45, 52); g.lineTo(55, 52);
+    g.moveTo(50, 10); g.lineTo(50, 4); g.moveTo(30, 30); g.lineTo(24, 30); g.moveTo(70, 30); g.lineTo(76, 30); },
+  luck: g => { [[50, 22], [62, 34], [50, 46], [38, 34]].forEach(([x, y]) => { g.moveTo(x + 8, y); g.arc(x, y, 8, 0, Math.PI * 2); });
+    g.moveTo(50, 34); g.lineTo(58, 58); },
+  coins: g => { [52, 42, 32].forEach(y => { g.moveTo(66, y); g.ellipse(50, y, 16, 6, 0, 0, Math.PI * 2); }); g.moveTo(34, 32); g.lineTo(34, 52); g.moveTo(66, 32); g.lineTo(66, 52); },
+  lead: g => { g.moveTo(50, 8); g.lineTo(53, 15); g.lineTo(60, 15); g.lineTo(54, 20); g.lineTo(56, 27); g.lineTo(50, 23); g.lineTo(44, 27); g.lineTo(46, 20); g.lineTo(40, 15); g.lineTo(47, 15); g.closePath();
+    g.moveTo(57, 38); g.arc(50, 38, 7, 0, Math.PI * 2); g.moveTo(34, 60); g.quadraticCurveTo(50, 40, 66, 60); },
+};
+function wishesHTML(c){
+  return `<div class="t2-wish">
+    <div class="t2-pile"><canvas class="t2-wcv" aria-label="${esc(H.pick(c.alt))}"></canvas></div>
+    <div class="t2-wish-side">
+      <button class="btn btn-line t2-add"><span class="spell">${H.T(c.add)}</span></button>
+      <p class="t2-wish-now" aria-live="polite"></p>
+      <p class="t2-hint">${H.T(c.hint)}</p>
+      ${c.preview ? `<button class="t2-shot t2-wish-prev" aria-label="Увеличить"><img src="${esc(small(c.preview))}" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      ${c.previewCap ? `<p class="t2-cap">${H.T(c.previewCap)}</p>` : ''}` : ''}
+    </div>
+  </div>`;
+}
+function liveWishes(box, c){
+  const cv = box.querySelector('.t2-wcv'), g = cv.getContext('2d');
+  const words = c.wishes.map(w => ({ icon: w.icon, text: H.pick(w.text) }));
+  let cubes = [], seen = false, raf = 0, next = 0, leaving = 0, n = 0;
+  const FALL = 520;
+  let S = 40, OX = 0, OY = 0;
+  const size = () => {
+    const d = Math.min(2, devicePixelRatio || 1);
+    cv.width = Math.round(cv.clientWidth * d); cv.height = Math.round(cv.clientHeight * d);
+    // гора 5 × 5 клеток: по ширине 8,7 ребра, от вершины до низа — 7,4 ребра; плюс поля
+    const W = cv.width, Hh = cv.height;
+    S = Math.min(W / 9.4, Hh / 8.2);
+    OX = W / 2; OY = Hh / 2 + S * .7;
+    draw(performance.now());
+  };
+  const make = (slot, now, at) => {
+    const w = words[n % words.length];
+    // пожелания по кругу, цвета — вперемешку, лаймовых больше
+    const lime = (n * 7) % 5 < 3;
+    n++;
+    return { ...slot, w, lime, at: at ?? now };
+  };
+  const nowEl = box.querySelector('.t2-wish-now');
+  const add = now => {
+    if (cubes.length >= SLOTS.length || leaving) return false;
+    const q = make(SLOTS[cubes.length], now);
+    cubes.push(q);
+    nowEl.textContent = q.w.text;
+    return true;
+  };
+  const face = (ox, oy, ux, uy, vx, vy, fill, draw) => {
+    g.save(); g.setTransform(ux / 100, uy / 100, vx / 100, vy / 100, ox, oy);
+    g.beginPath(); g.rect(0, 0, 100, 100); g.fillStyle = fill; g.fill();
+    if (draw) draw();
+    g.restore();
+  };
+  const cube = (q, now) => {
+    const t = clamp((now - q.at) / FALL, 0, 1);
+    const drop = (1 - t) * (1 - t) * 6;   // падает с высоты 6 этажей, у земли замедляется
+    let alpha = 1, k = q.k + drop;
+    if (leaving) { const p = clamp((now - leaving - (q.i + q.j) * 40) / 500, 0, 1); alpha = 1 - p; k -= p * .6; }
+    if (alpha <= 0 || t <= 0) return;
+    const ex = [S * .866, S * .5], ey = [-S * .866, S * .5];
+    const O = [OX + (q.i - 2) * ex[0] + (q.j - 2) * ey[0], OY + (q.i - 2) * ex[1] + (q.j - 2) * ey[1] - k * S];
+    const body = q.lime ? LIME : DARK;
+    const ink = q.lime ? DARK : LIME;
+    const top = q.lime ? '#EEFC9A' : '#2E3035', right = q.lime ? '#C9E040' : '#141517';
+    g.globalAlpha = alpha;
+    // верх
+    g.beginPath();
+    g.moveTo(O[0], O[1] - S); g.lineTo(O[0] + ex[0], O[1] + ex[1] - S); g.lineTo(O[0] + ex[0] + ey[0], O[1] + ex[1] + ey[1] - S); g.lineTo(O[0] + ey[0], O[1] + ey[1] - S); g.closePath();
+    g.fillStyle = top; g.fill();
+    // на гранях только значки: подпись была бы мельче 16 px — пожелание пишется рядом
+    const mark = big => () => {
+      g.strokeStyle = ink; g.lineWidth = big ? 5 : 4.5; g.lineCap = 'round'; g.lineJoin = 'round';
+      g.save(); g.translate(50, 50); g.scale(big ? 1.15 : .9, big ? 1.15 : .9); g.translate(-50, -34);
+      g.beginPath(); ICONS[q.w.icon](g); g.stroke(); g.restore();
+    };
+    // левая грань (j = 1): вдоль ex, вниз; правая (i = 1): вдоль −ey, вниз
+    const L = [O[0] + ey[0], O[1] + ey[1] - S];
+    face(L[0], L[1], ex[0], ex[1], 0, S, body, mark(true));
+    const R = [O[0] + ex[0] + ey[0], O[1] + ex[1] + ey[1] - S];
+    face(R[0], R[1], -ey[0], -ey[1], 0, S, right, mark(false));
+    g.globalAlpha = 1;
+  };
+  const draw = now => {
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    // тень горы на полу
+    g.fillStyle = 'rgba(0,0,0,.07)';
+    g.beginPath(); g.ellipse(OX, OY + S * 2.1, S * 4.2, S * 1.1, 0, 0, Math.PI * 2); g.fill();
+    cubes.slice().sort((a, b) => (a.i + a.j + a.k) - (b.i + b.j + b.k) || a.k - b.k).forEach(q => cube(q, now));
+  };
+  const loop = now => {
+    raf = 0;
+    if (!seen) return;
+    if (leaving && now - leaving > 1400) { cubes = []; leaving = 0; next = now + 400; }
+    if (!leaving && now > next) {
+      if (cubes.length >= SLOTS.length) { leaving = now + 2600; next = Infinity; }
+      else { add(now); next = now + 900; }
+    }
+    if (leaving && leaving > now) { /* гора постояла — сейчас уйдет */ }
+    draw(now);
+    raf = requestAnimationFrame(loop);
+  };
+  // по нажатию — свой куб сразу; гора собрана — начинаем новую
+  const put = () => {
+    const now = performance.now();
+    if (leaving) return;
+    if (cubes.length >= SLOTS.length) { leaving = now; return; }
+    add(now); next = now + 2400;
+    if (!raf && seen) raf = requestAnimationFrame(loop);
+    if (still()) draw(now + FALL);
+  };
+  cv.addEventListener('click', put);
+  box.querySelector('.t2-add').addEventListener('click', put);
+  const pv = box.querySelector('.t2-wish-prev');
+  if (pv) pv.addEventListener('click', () => H.openViewer([c.preview], 0, [pv.querySelector('img')]));
+  // в начале гора уже наполовину собрана
+  const now0 = performance.now() - FALL;
+  for (let s = 0; s < 16; s++) cubes.push(make(SLOTS[s], now0, now0));
+  nowEl.textContent = cubes[cubes.length - 1].w.text;
+  new ResizeObserver(size).observe(cv);
+  document.fonts?.ready.then(() => draw(performance.now()));
+  size();
+  if (still()) { while (cubes.length < SLOTS.length) cubes.push(make(SLOTS[cubes.length], now0, now0)); draw(performance.now()); return; }
+  onScreen(cv, v => { seen = v; if (v && !raf) { next = performance.now() + 600; raf = requestAnimationFrame(loop); } });
+}
+
+/* ================================================================
    things — остальное оформление: заголовок и строка слева, кадры справа
    ================================================================ */
 function thingsHTML(c){
@@ -501,9 +580,9 @@ const reveal = new IntersectionObserver(es => es.forEach(e => {
 }), { rootMargin: '0px 0px -14% 0px' });
 
 const KINDS = {
-  frame:    [frameHTML, liveFrame],
   illusion: [illusionHTML, liveIllusion],
   pixels:   [pixelsHTML, livePixels],
+  wishes:   [wishesHTML, liveWishes],
   things:   [thingsHTML, liveThings],
 };
 export async function mountTele(mount, p, helpers){
