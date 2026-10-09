@@ -112,8 +112,9 @@
 .kz-zi svg rect[x="5"]{fill:currentColor}
 .kz-zones h3{font-size:clamp(20px,1.8vw,26px);font-weight:500;line-height:1.15;margin:0 0 6px}
 .kz-zones p{font-family:var(--font-read);font-size:18px;line-height:1.4}
-@media (max-width:860px){.kz-plan{grid-template-columns:1fr}.kz-plan-map{max-width:520px}}
-@media (max-width:560px){.kz-zones{grid-template-columns:1fr}.kz-zones li{display:grid;grid-template-columns:44px 1fr;column-gap:12px}.kz-zi{grid-row:span 2;margin:0}.kz-zones p{grid-column:2}}
+/* планшет: план и фото рядом, зоны под фото списком со значками слева */
+@media (max-width:1100px){.kz-zones{grid-template-columns:1fr;gap:14px}.kz-zones li{display:grid;grid-template-columns:44px 1fr;column-gap:12px}.kz-zi{grid-row:span 2;margin:0}.kz-zones p{grid-column:2}}
+@media (max-width:600px){.kz-plan{grid-template-columns:1fr}.kz-plan-map{max-width:420px}}
 
 /* ---------- магнитная стена ---------- */
 .kz-wall{background:#F7F3F6;container-type:inline-size}
@@ -266,7 +267,10 @@
 .kz-cmp-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
 .kz-cmp-pic:hover img{transform:scale(1.03)}
 .kz-cmp figcaption{margin-top:12px;font-size:18px;line-height:1.3;text-wrap:balance}
-@media (max-width:760px){.kz-cmp{grid-template-columns:repeat(2,minmax(0,1fr))}.kz-cmp[style*="--n:3"] .kz-cmp-it:first-child{grid-column:1 / -1}.kz-cmp[style*="--n:3"] .kz-cmp-it:first-child .kz-cmp-pic{aspect-ratio:4/3}}
+/* телефон: картинки целиком, лентой — смахиваются вбок */
+@media (max-width:760px){.kz-cmp:not(.zoom){display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 calc(-1 * var(--pad));padding:0 var(--pad);scroll-padding:0 var(--pad)}
+  .kz-cmp:not(.zoom)::-webkit-scrollbar{display:none}
+  .kz-cmp:not(.zoom) .kz-cmp-it{flex:0 0 72%;scroll-snap-align:start}}
 
 /* ---------- переключатель рендеров ---------- */
 .kz-views-pic{cursor:zoom-in}
@@ -277,8 +281,9 @@
 .kz-views.side{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.7fr);gap:clamp(20px,3vw,48px);align-items:center}
 .kz-views.side .kz-bar{flex-direction:column;align-items:flex-start;margin:0}
 .kz-views.side .kz-views-pic{aspect-ratio:auto!important;width:100%;height:min(calc(100svh - 220px),900px)}
-@media (max-width:760px){.kz-views.side .kz-views-pic{height:min(calc(100svh - 260px),115vw)}}
-@media (max-width:760px){.kz-views.side{grid-template-columns:1fr}.kz-views.side .kz-bar{flex-direction:row}}
+/* планшет и телефон: рендер на всю ширину в своих пропорциях, кнопки — строкой под ним */
+@media (max-width:1100px){.kz-views.side{grid-template-columns:1fr}.kz-views.side .kz-bar{flex-direction:row;margin-top:16px}
+  .kz-views.side .kz-views-pic{aspect-ratio:3548/4096!important;height:auto}}
 /* в высокой рамке пара картинок — одна над другой */
 .kz-views.side .kz-view:has(img+img){flex-direction:column}
 .kz-views.side .kz-view:has(img+img) img{width:100%;height:49%}
@@ -330,7 +335,8 @@
 .kz-bk-spread.out-r{transform:rotateY(80deg);opacity:0}
 .kz-bk-spread.in-r{transform:rotateY(80deg);opacity:0;transition:none}
 .kz-bk-spread.in-l{transform:rotateY(-80deg);opacity:0;transition:none}
-.kz-bk-spread .kz-bk-page{width:min(100cqw,340px);min-height:calc(min(100cqw,340px) * 2.128)}
+/* на телефоне страница целиком помещается в экран под меню локаций */
+.kz-bk-spread .kz-bk-page{--sw:min(100cqw,330px,calc((100svh - 190px) / 2.128));width:var(--sw);min-height:calc(var(--sw) * 2.128)}
 .kz-bk-page{position:relative;background:#0077FF;color:#fff;overflow:hidden;font-family:"PT Serif",var(--font-read);text-align:left}
 .kz-bk-k,.kz-bk-pat{position:absolute;inset:0;width:100%;height:100%}
 /* матовая бумага: мягкий свет сверху справа, книзу чуть темнее */

@@ -578,7 +578,8 @@ function menuHTML(c){
         <div hidden>${Object.entries(pages).map(([k, h]) => `<template data-k="${k}">${h}</template>`).join('')}</div>
       </div>
     </div>
-    ${c.render ? `<button class="kz-stage kz-bk-render" aria-label="Увеличить"><img src="${small(c.render)}" srcset="${small(c.render)} 900w, ${c.render} 2000w" sizes="(max-width:1100px) 100vw, 45vw" data-full="${c.render}" alt="" loading="lazy" draggable="false"></button>` : ''}
+    ${c.render ? `<button class="kz-stage kz-bk-render" aria-label="Увеличить"><picture>${c.renderWide
+      ? `<source media="(max-width:1100px)" srcset="${small(c.renderWide)} 900w, ${c.renderWide} 2000w" sizes="100vw">` : ''}<img src="${small(c.render)}" srcset="${small(c.render)} 900w, ${c.render} 2000w" sizes="45vw" data-full="${c.renderWide || c.render}" alt="" loading="lazy" draggable="false"></picture></button>` : ''}
   </div>`;
 }
 // Прототип листания: меню перелистывается само по кругу, пока оно на экране, без кнопок.
@@ -595,7 +596,7 @@ function liveMenu(box, c){
   const layout = () => {
     const w = stage.clientWidth >= 560;
     if (w === wide) return;
-    wide = w; cur = 0; k = 0;
+    wide = w; cur = 0; k = 0; fresh = true;
     stage.querySelectorAll('.kz-bk3d, .kz-bk-spread').forEach(x => x.remove());
     if (w) {
       stage.insertAdjacentHTML('beforeend', `<div class="kz-bk3d">
@@ -632,6 +633,8 @@ function liveMenu(box, c){
     }, 300);
     cur = to;
   };
+  // первый раз обложка открывается почти сразу — иначе меню успевают пролистать, не заметив, что оно живое
+  let fresh = true;
   const run = () => {
     clearTimeout(timer);
     if (!on) return;
@@ -641,7 +644,8 @@ function liveMenu(box, c){
       const to = plan[k][0];
       if (wide) book(to); else page(to);
       run();
-    }, plan[k][1]);
+    }, fresh && k === 0 ? 650 : plan[k][1]);
+    fresh = false;
   };
   const r = box.querySelector('.kz-bk-render');
   if (r) r.addEventListener('click', () => { const im = r.querySelector('img'); H.openViewer([im.dataset.full], 0, [im]); });
@@ -649,7 +653,8 @@ function liveMenu(box, c){
   addEventListener('resize', layout);
   // без анимаций — сразу разворот, и ничего не листается
   if (still()) { if (wide) book(1, true); else { stage.querySelector('.kz-bk-spread').remove(); stage.insertAdjacentHTML('beforeend', `<div class="kz-bk-spread">${tpl('col1')}</div>`); } return; }
-  onScreen(stage, v => { on = v; run(); });
+  // листает, когда меню видно хотя бы на треть
+  new IntersectionObserver(([e]) => { on = e.isIntersecting; run(); }, { threshold: .3 }).observe(stage);
 }
 
 /* ---------- коллаж: одна картинка крупно, остальные вокруг; по нажатию — крупно ---------- */
