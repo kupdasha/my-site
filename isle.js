@@ -4,10 +4,9 @@
    path — от эскиза до нейросети: строка этапов сверху с полоской таймера,
      кадры сменяются сами, нажатие на кадр — крупно;
    shutter — шторка 3D / AI на одном кадре, ходит сама, пока не тронули;
-   light — один остров в разном свете: 3D-рендер и варианты нейросети
-     сменяются на месте, остров не сдвигается ни на пиксель;
    more — тот же прием на других проектах: строка проектов, у каждого
-     шторка 3D / AI, у нескольких вариантов — миниатюры под шторкой.
+     шторка 3D / AI, у нескольких вариантов — миниатюры под шторкой;
+     side — если ракурс у нейросети другой, вместо шторки две картинки рядом.
    Тексты — в content.js, оформление — isle.css, картинки — img/isle.
    ================================================================ */
 let H;   // помощники из app.js: T (типограф), pick, openViewer, base
@@ -130,27 +129,15 @@ function liveCmp(cmp){
 }
 
 /* ================================================================
-   light — один остров, разный свет: кадры лежат друг на друге
+   more — склад и коридоры: шторка или две картинки рядом
    ================================================================ */
-function lightHTML(c){
-  return `<section class="ia-ch ia-light wrap">
-    ${head(c)}
-    <div class="ia-box">
-      ${tabs(c.items.map(s => H.T(s.name)))}
-      <div class="ia-stage ia-still" style="aspect-ratio:16 / 9">
-        ${c.items.map((s, i) => `<img class="ia-shot${i ? '' : ' on'}" src="${esc(src(s.img))}" alt="" loading="lazy" decoding="async" draggable="false">`).join('')}
-      </div>
-    </div>
-  </section>`;
-}
-function liveLight(sec){
-  const shots = [...sec.querySelectorAll('.ia-shot')];
-  cycle(sec.querySelector('.ia-box'), shots.length, i => shots.forEach((s, k) => s.classList.toggle('on', k === i)), 2600);
-}
-
-/* ================================================================
-   more — склад, коридоры, L'Oréal: у каждого своя шторка
-   ================================================================ */
+// две картинки рядом с подписями «3D» и «AI»: обе целиком на экране
+const sideHTML = (before, after, ratio, tags) => `<div class="ia-side" style="width:min(100%,calc(64vh * 2 * ${ratio}))">
+  ${[before, after].map((im, k) => `<div class="ia-half" style="aspect-ratio:${ratio}">
+    <img src="${esc(src(im))}" alt="" loading="lazy" decoding="async" draggable="false">
+    <span class="ia-tag l${k ? ' ai' : ''}">${H.T(tags[k])}</span>
+  </div>`).join('')}
+</div>`;
 function moreHTML(c, tagsFor){
   const tg = tagsFor(c.pair);
   return `<section class="ia-ch ia-more wrap">
@@ -158,7 +145,7 @@ function moreHTML(c, tagsFor){
     <div class="ia-box">
       ${tabs(c.items.map(s => H.T(s.name)))}
       <div class="ia-board">${c.items.map((s, i) => `<div class="ia-item${i ? '' : ' on'}" data-i="${i}">
-        ${cmpHTML(s.before, s.after[0], s.ratio, tg)}
+        ${s.side ? sideHTML(s.before, s.after[0], s.ratio, tg) : cmpHTML(s.before, s.after[0], s.ratio, tg)}
         <div class="ia-under">
           <p class="ia-cap on">${H.T(s.text)}</p>
           ${s.after.length > 1 ? `<div class="ia-vars">${s.after.map((a, k) =>
@@ -172,7 +159,9 @@ function liveMore(sec, c){
   const items = [...sec.querySelectorAll('.ia-item')];
   const ctl = cycle(sec.querySelector('.ia-box'), items.length, i => items.forEach((s, k) => s.classList.toggle('on', k === i)), 7000);
   items.forEach((it, i) => {
-    const cmp = it.querySelector('.ia-cmp'), live = liveCmp(cmp);
+    const cmp = it.querySelector('.ia-cmp');
+    if (!cmp) return;   // две картинки рядом — двигать нечего
+    const live = liveCmp(cmp);
     cmp.addEventListener('pointerdown', ctl.stop);
     const vars = [...it.querySelectorAll('.ia-var')];
     const after = c.items[i].after;
@@ -216,13 +205,11 @@ export async function mountIsle(mount, p, helpers){
     const s = f.shutter;
     html += `<section class="ia-ch ia-shutter wrap">${head(s)}<div class="ia-box">${cmpHTML(s.before, s.after, s.ratio, [`3D, ${f.from}`, `AI, ${f.to}`])}</div></section>`;
   }
-  if (f.light) html += lightHTML(f.light);
   if (f.more) html += moreHTML(f.more, tagsFor);
   mount.innerHTML = html;
   mount.querySelectorAll('.ia-ch').forEach(s => reveal.observe(s));
   const q = s => mount.querySelector(s);
   if (f.path) livePath(q('.ia-path'), f.path);
   if (f.shutter) liveCmp(q('.ia-shutter .ia-cmp'));
-  if (f.light) liveLight(q('.ia-light'));
   if (f.more) liveMore(q('.ia-more'), f.more);
 }
