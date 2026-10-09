@@ -490,7 +490,6 @@ function liveThings(box, c){
 let cssReady;
 function loadCSS(base){
   if (!cssReady) cssReady = new Promise(res => {
-    if (document.querySelector('link[href*="tele.css"]')) return res();
     const l = document.createElement('link');
     l.rel = 'stylesheet'; l.href = base + 'tele.css?v=' + VERS;
     l.onload = l.onerror = res; document.body.appendChild(l);   // в конец body: стили кейса идут после style.css
