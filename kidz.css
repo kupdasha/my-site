@@ -1,0 +1,309 @@
+/* ================================================================
+   КЕЙС «VK, ДЕТСКИЕ ЗОНЫ В КИДЗАНИИ» (kidz.js, поле kidz у проекта)
+   Цвета — сайта; свои — синий VK, праздничные розовый, голубой
+   и фиолетовый, розовый VK Клипов. Сцены рисуются своими цветами
+   и лежат на подложке --kz-stage.
+   ================================================================ */
+.kz{overflow-x:clip;--kz-gap:clamp(64px,8vw,128px);--kz-blue:#0077FF;--kz-pink:#FF2E8B;--kz-cyan:#4FD8EA;--kz-violet:#8A3FFC;--kz-mag:#E82AC4;
+  --kz-stage:#EEF0F4;--kz-nav:76px}
+:root[data-theme="dark"] .kz{--kz-stage:#1A1C22}
+.kz-ch{margin-bottom:var(--kz-gap)}
+.kz-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
+.kz-label{grid-column:1 / span 3;grid-row:1}
+.kz-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.kz-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:42ch}
+@media (max-width:760px){.kz-label,.kz-title,.kz-text{grid-column:1 / -1}.kz-label{grid-row:auto}}
+
+.kz-viz{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease) .15s,transform 1s var(--ease) .15s}
+.kz-ch.in .kz-viz{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.kz-viz{opacity:1;transform:none;transition:none}}
+
+.kz-stage{position:relative;display:block;width:100%;padding:0;border-radius:var(--r-img);overflow:hidden;background:var(--kz-stage);user-select:none;-webkit-user-select:none}
+.kz-stage>svg{display:block;width:100%;height:auto}
+.kz-bar{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.kz-chip:not(.on){background:var(--soft);color:var(--ink)}
+.kz-chip:not(.on):hover{background:var(--line)}
+.kz-chip.on{background:var(--ink);color:var(--bg)}
+.kz-arr{display:inline-block;margin-left:.35em;transition:transform .45s var(--ease)}
+
+/* ---------- домики ---------- */
+.kz-house{display:block;width:100%;height:auto;overflow:visible}
+.kz-bl{animation:kzRise 5.4s var(--ease-io) var(--d) infinite;transform-box:fill-box}
+@keyframes kzRise{0%{transform:translateY(24px);opacity:0}20%{opacity:1}70%{opacity:1}100%{transform:translateY(-70px);opacity:0}}
+.kz-float{animation:kzBob 3.6s ease-in-out var(--d) infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes kzBob{from{transform:translateY(-5px) rotate(-4deg)}to{transform:translateY(6px) rotate(4deg)}}
+@media (prefers-reduced-motion:reduce){.kz-bl,.kz-float{animation:none}}
+
+/* ---------- развилка: два домика ---------- */
+.kz-two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2vw,28px)}
+.kz-pick{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:0;text-align:left;color:var(--ink)}
+.kz-pick-pic{display:flex;align-items:flex-end;width:100%;aspect-ratio:5/4;border-radius:var(--r-img);padding:clamp(20px,4vw,56px) clamp(28px,6vw,96px) 0;overflow:hidden;transition:transform .6s var(--ease)}
+.kz-pick-party .kz-pick-pic{background:#DCEBFF}
+.kz-pick-blog .kz-pick-pic{background:#F6DDF0}
+:root[data-theme="dark"] .kz-pick-party .kz-pick-pic{background:#13243F}
+:root[data-theme="dark"] .kz-pick-blog .kz-pick-pic{background:#2F1630}
+.kz-pick .kz-house{transition:transform .6s var(--ease)}
+.kz-pick:hover .kz-house{transform:translateY(-10px) scale(1.03)}
+.kz-pick-name{display:block;margin-top:14px;font-weight:500;font-size:clamp(26px,2.6vw,40px);line-height:1.1}
+.kz-pick-text{display:block;font-size:18px;opacity:.6}
+.kz-pick:hover .kz-arr,.kz-next:hover .kz-arr{transform:translateY(5px)}
+@media (max-width:600px){.kz-two{gap:12px}.kz-pick-pic{aspect-ratio:4/5;padding:16px 10px 0}.kz-pick-name{font-size:20px;margin-top:8px}.kz-pick-text{font-size:16px}.kz-pick .kz-arr{display:none}}
+
+/* ---------- липкое меню: две половины, у каждой — полоска прогресса ---------- */
+.kz-nav{position:sticky;top:var(--kz-nav);z-index:3;background:var(--bg);padding:8px 0 0;transition:box-shadow .4s}
+.kz-nav.stuck{box-shadow:0 1px 0 var(--line)}
+.kz-nav-in{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,28px)}
+.kz-tab{position:relative;display:flex;align-items:center;gap:10px;padding:10px 0 16px;font-size:clamp(16px,1.6vw,20px);font-weight:500;line-height:1.1;color:var(--ink);opacity:.5;transition:opacity .4s}
+.kz-tab:hover,.kz-tab.on{opacity:1}
+.kz-tab-ic{flex:none;width:26px;height:26px}
+.kz-tab-ic svg{display:block;width:100%;height:100%;fill:currentColor;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.kz-tab-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kz-prog{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.kz-prog b{position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(var(--k,0))}
+.kz-tab[data-go="party"] .kz-prog b{background:var(--kz-blue)}
+.kz-tab[data-go="blog"] .kz-prog b{background:var(--kz-mag)}
+
+/* ---------- заставка локации ---------- */
+.kz-door{margin:clamp(24px,3vw,40px) 0 var(--kz-gap);color:#fff}
+.kz-place-party .kz-door-in{background:var(--kz-blue)}
+.kz-place-blog .kz-door-in{background:var(--kz-mag)}
+.kz-door-in{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:end;gap:clamp(24px,4vw,64px);border-radius:var(--r-img);padding:clamp(32px,5vw,72px) clamp(24px,4vw,64px) 0;overflow:hidden}
+.kz-door-txt{padding-bottom:clamp(32px,5vw,72px)}
+.kz-door-name{font-weight:500;font-size:clamp(44px,6vw,96px);line-height:.98;letter-spacing:-.02em}
+.kz-door-sub{font-size:clamp(18px,1.6vw,22px);margin-top:18px;opacity:.75}
+.kz-door-pic{max-width:440px;justify-self:end;width:100%;transform:translateY(40px);opacity:0;transition:transform 1.1s var(--ease) .1s,opacity .8s .1s}
+.kz-door.in .kz-door-pic{transform:none;opacity:1}
+@media (max-width:760px){.kz-door-in{grid-template-columns:1fr}.kz-door-txt{padding-bottom:0}.kz-door-pic{justify-self:center;max-width:300px}}
+.kz-next-row{margin:calc(var(--kz-gap) * -.4) auto var(--kz-gap)}
+
+/* ---------- VK Праздники: фасад в темноте ---------- */
+.kz-glow{cursor:pointer}
+.kz-dark{opacity:0}
+.kz-spill{opacity:0}
+.kz-in-dim{opacity:0}
+.kz-glow.run .kz-dark{animation:kzDusk 9s ease-in-out infinite}
+.kz-glow.run .kz-spill{animation:kzSpill 9s ease-in-out infinite}
+.kz-glow.run .kz-in-dim{animation:kzIn 9s ease-in-out infinite}
+@keyframes kzDusk{0%,12%{opacity:0}34%,82%{opacity:.84}100%{opacity:0}}
+@keyframes kzSpill{0%,12%{opacity:0}34%,82%{opacity:1}100%{opacity:0}}
+@keyframes kzIn{0%,12%{opacity:0}34%,82%{opacity:.45}100%{opacity:0}}
+.kz-glow.night .kz-dark{animation:none;opacity:.84;transition:opacity .8s}
+.kz-glow.night .kz-spill{animation:none;opacity:1}
+.kz-glow.night .kz-in-dim{animation:none;opacity:.45}
+
+/* ---------- план на три зоны ---------- */
+.kz-plan{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(28px,4vw,64px);align-items:start}
+.kz-plan-map{position:relative}
+.kz-area{display:flex;align-items:baseline;gap:8px;margin-bottom:12px;font-weight:500;line-height:1}
+.kz-area-n{font-size:clamp(56px,7vw,104px);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kz-area-u{font-size:clamp(22px,2.2vw,32px);opacity:.6}
+.kz-plan-svg{display:block;width:100%;height:auto;overflow:visible}
+.kz-floor{fill:var(--kz-stage)}
+.kz-grid{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.08}
+.kz-walls{fill:none;stroke:var(--ink);stroke-width:7;stroke-linejoin:round}
+.kz-glass{stroke:var(--kz-cyan);stroke-width:7;stroke-dasharray:24 10}
+.kz-furn{fill:none;stroke:var(--ink);stroke-width:2.4;opacity:.75}
+.kz-art{opacity:.32;transition:opacity .6s var(--ease)}
+.kz-z{fill:var(--ink);opacity:0;transition:opacity .6s var(--ease)}
+.kz-plan-map[data-on="photo"] .kz-z-photo,.kz-plan-map[data-on="wall"] .kz-z-wall,.kz-plan-map[data-on="table"] .kz-z-table{opacity:.07}
+.kz-plan-map[data-on="photo"] .kz-art[d^="M520"],.kz-plan-map[data-on="wall"] circle.kz-art,.kz-plan-map[data-on="wall"] rect.kz-art{opacity:1}
+.kz-plan-map[data-on="table"] .kz-furn{opacity:1;stroke-width:3.4}
+.kz-plan-photos{position:relative;aspect-ratio:3/2;border-radius:var(--r-img);overflow:hidden;background:var(--kz-stage);cursor:zoom-in}
+.kz-plan-photos img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.04);transition:opacity .8s var(--ease),transform 1.4s var(--ease)}
+.kz-plan-photos img.on{opacity:1;transform:none}
+.kz-zones{list-style:none;margin:clamp(20px,2.4vw,32px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,28px)}
+.kz-zones li{cursor:pointer;opacity:.4;transition:opacity .5s var(--ease)}
+.kz-zones li.on{opacity:1}
+.kz-zi{display:block;width:36px;height:36px;margin-bottom:10px}
+.kz-zi svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kz-zi svg rect[x="5"]{fill:currentColor}
+.kz-zones h3{font-size:clamp(20px,1.8vw,26px);font-weight:500;line-height:1.15;margin:0 0 6px}
+.kz-zones p{font-family:var(--font-read);font-size:18px;line-height:1.4}
+@media (max-width:860px){.kz-plan{grid-template-columns:1fr}.kz-plan-map{max-width:520px}}
+@media (max-width:560px){.kz-zones{grid-template-columns:1fr}.kz-zones li{display:grid;grid-template-columns:44px 1fr;column-gap:12px}.kz-zi{grid-row:span 2;margin:0}.kz-zones p{grid-column:2}}
+
+/* ---------- магнитная стена ---------- */
+.kz-wall{background:#F7F3F6;container-type:inline-size}
+:root[data-theme="dark"] .kz-wall{background:#221D24}
+.kz-wall-scene{position:relative;aspect-ratio:16/10}
+.kz-board{position:absolute;left:16%;right:16%;top:7%;height:52%;background:#fff;border:3px solid var(--kz-cyan);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.kz-board-in{text-align:center;color:#1D222A}
+.kz-mags{display:flex;justify-content:center;flex-wrap:wrap;font-weight:600;line-height:1;min-height:1em}
+.kz-mags-name{font-size:clamp(34px,9cqw,104px);margin-bottom:.12em}
+.kz-mags-line{font-size:clamp(18px,4cqw,46px)}
+.kz-mag{display:inline-block;color:var(--c);transform:translateY(120%) rotate(calc(var(--r) * 4));opacity:0;
+  transition:transform .7s cubic-bezier(.3,1.6,.5,1) var(--d),opacity .3s var(--d)}
+.kz-mag.on{transform:rotate(var(--r));opacity:1}
+.kz-mag.off{transform:translateY(160%) rotate(calc(var(--r) * -6));opacity:0;transition:transform .35s ease-in var(--d),opacity .3s var(--d)}
+.kz-sp{display:inline-block;width:.3em}
+.kz-balloon-set i{position:absolute;width:calc(var(--s) * .62cqw);aspect-ratio:1/1.08;border-radius:50%;background:var(--c);transform:translate(-50%,-50%)}
+.kz-balloon-set i::after{content:"";position:absolute;left:24%;top:18%;width:22%;height:16%;border-radius:50%;background:#fff;opacity:.45}
+.kz-wall.run .kz-balloon-set i{animation:kzSway 3.4s ease-in-out var(--d) infinite alternate}
+@keyframes kzSway{from{transform:translate(-50%,-50%) rotate(-3deg)}to{transform:translate(-50%,-56%) rotate(3deg)}}
+.kz-cubes{position:absolute;left:14%;right:14%;bottom:0;height:34%;display:flex;align-items:flex-end;gap:2%}
+.kz-cube{position:relative;flex:1;height:100%;background:var(--c);border-radius:6px 6px 0 0}
+.kz-cube>svg{position:absolute;left:50%;top:54%;width:60%;transform:translate(-50%,-50%)}
+.kz-cube-tech{height:80%}
+.kz-cube-seat{height:90%;transform-origin:bottom}
+.kz-gift{position:absolute;left:30%;bottom:100%;width:40%}
+.kz-gift svg{display:block;width:100%}
+.kz-wall.run .kz-gift{animation:kzGift 4.2s cubic-bezier(.3,1.4,.5,1) infinite}
+@keyframes kzGift{0%{transform:translateY(-160%);opacity:0}18%{transform:none;opacity:1}80%{transform:none;opacity:1}100%{transform:translateY(-20%);opacity:0}}
+.kz-tech{position:absolute;inset:8% 10%;background:#14161B;border-radius:4px}
+.kz-tech svg{display:block;width:100%;height:100%}
+.kz-cube-tech .kz-hatch{position:absolute;inset:8% 10%;background:var(--c);border-radius:4px;box-shadow:inset 0 0 0 3px rgba(0,0,0,.18);transform-origin:left;transform:perspective(600px) rotateY(0)}
+.kz-cube-tech .kz-hatch::after{content:"";position:absolute;right:10%;top:44%;width:6%;height:14%;border-radius:4px;background:rgba(255,255,255,.7)}
+.kz-wall.run .kz-cube-tech .kz-hatch{animation:kzDoor 4.2s var(--ease-io) 1.2s infinite}
+@keyframes kzDoor{0%,15%{transform:perspective(600px) rotateY(0)}35%,65%{transform:perspective(600px) rotateY(-110deg)}85%,100%{transform:perspective(600px) rotateY(0)}}
+.kz-wall.run .kz-cube-seat{animation:kzSeat 4.2s ease-in-out 2.4s infinite}
+@keyframes kzSeat{0%,20%,60%,100%{transform:none}30%,50%{transform:scaleY(.9) scaleX(1.03)}}
+.kz-speaker{position:absolute;left:30%;bottom:100%;width:40%}
+.kz-speaker svg{position:relative;display:block;width:100%}
+.kz-speaker i{position:absolute;left:50%;top:55%;width:100%;aspect-ratio:1;border:2px solid var(--kz-blue);border-radius:50%;transform:translate(-50%,-50%) scale(.6);opacity:0}
+.kz-wall.run .kz-speaker i{animation:kzRing 2.4s ease-out infinite}
+.kz-wall.run .kz-speaker i+i{animation-delay:1.2s}
+@keyframes kzRing{0%{transform:translate(-50%,-50%) scale(.6);opacity:.8}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}
+.kz-form{display:flex;gap:12px;padding:16px;background:var(--bg);border-top:1px solid var(--line)}
+.kz-form input{flex:1;min-width:0;height:56px;padding:0 22px 3px;border-radius:99px;border:0;background:var(--soft);color:var(--ink);font:inherit;font-size:18px;outline:none}
+.kz-form input:focus{box-shadow:inset 0 0 0 2px var(--ink)}
+@media (prefers-reduced-motion:reduce){.kz-mag,.kz-mag.off{transition:none}}
+
+/* ---------- фотозона: видоискатель ---------- */
+.kz-snap{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:clamp(16px,2vw,28px);align-items:start}
+.kz-snap-pic{aspect-ratio:3/2;cursor:pointer}
+.kz-snap-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.kz-vf{position:absolute;transition:left .6s var(--ease),top .6s var(--ease),width .6s var(--ease),height .6s var(--ease);pointer-events:none}
+.kz-vf i{position:absolute;width:clamp(16px,2.4vw,34px);height:clamp(16px,2.4vw,34px);border:3px solid #fff}
+.kz-vf i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}
+.kz-vf i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
+.kz-vf i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}
+.kz-vf i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+.kz-vf.click{animation:kzClick .35s var(--ease)}
+@keyframes kzClick{50%{transform:scale(.96)}}
+.kz-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.kz-flash.go{animation:kzFlash .55s ease-out}
+@keyframes kzFlash{0%{opacity:.9}100%{opacity:0}}
+.kz-strip{display:flex;flex-direction:column;gap:clamp(12px,1.4vw,18px)}
+.kz-shot{display:block;padding:8px 8px 28px;background:#fff;border-radius:3px;box-shadow:0 1px 0 var(--line),0 10px 24px rgba(20,22,28,.12);
+  transform:translateY(-30px) rotate(-4deg);opacity:0;transition:transform .7s cubic-bezier(.3,1.4,.5,1),opacity .4s}
+.kz-shot:nth-child(2n){--rr:2.5deg}.kz-shot:nth-child(2n+1){--rr:-2deg}
+.kz-shot.in{transform:rotate(var(--rr));opacity:1}
+.kz-shot.out{opacity:0;transform:translateY(30px) rotate(var(--rr))}
+.kz-shot>span{display:block;aspect-ratio:3/2;background-repeat:no-repeat;background-color:var(--kz-stage)}
+@media (max-width:760px){.kz-snap{grid-template-columns:1fr}.kz-strip{flex-direction:row}.kz-shot{flex:0 0 calc((100% - 12px) / 2);padding:6px 6px 20px}}
+
+/* ---------- Дом блогеров: фасад ---------- */
+.kz-front .kz-ghost{opacity:0;fill:rgba(255,255,255,.4);stroke:var(--kz-pink);stroke-width:6;stroke-dasharray:14 10;transition:opacity .5s var(--ease)}
+.kz-front .kz-g-lines{fill:none;stroke:#fff;stroke-dasharray:none;stroke-width:6}
+.kz-front .kz-ghost.show{opacity:1}
+.kz-front .kz-ghost.gone{opacity:0;transition:opacity .6s .5s}
+.kz-strike{fill:none;stroke:var(--kz-pink);stroke-width:9;stroke-dasharray:1;stroke-dashoffset:1;stroke-linecap:round}
+.kz-ghost.gone .kz-strike{stroke-dashoffset:0;transition:stroke-dashoffset .5s var(--ease)}
+.kz-front .kz-g-lines .kz-strike{stroke:var(--kz-pink)}
+.kz-scr-items{transition:opacity .4s}
+.kz-front.lines .kz-scr-items{opacity:0}
+.kz-pat{transform-box:fill-box;transform-origin:bottom}
+.kz-front.push .kz-pat{animation:kzPush 2.4s var(--ease-io)}
+@keyframes kzPush{0%{transform:none}40%{transform:scaleY(2.6)}55%{transform:scaleY(.96)}70%{transform:scaleY(1.04)}100%{transform:none}}
+.kz-limit{stroke:#fff;stroke-width:4;stroke-dasharray:16 12;opacity:.55}
+.kz-front.push .kz-limit{animation:kzLimit 2.4s var(--ease-io)}
+@keyframes kzLimit{0%,30%{stroke:#fff;opacity:.55}45%{stroke:var(--kz-pink);opacity:1;stroke-width:8}100%{stroke:#fff;opacity:.55}}
+.kz-ruler{fill:none;stroke:#fff;stroke-width:4}
+.kz-limit-tag{position:absolute;left:84.8%;top:84.7%;transform:translateY(-50%);color:#fff;font-size:clamp(16px,1.6vw,22px);font-weight:500;line-height:1;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.kz-front.push .kz-pat,.kz-front.push .kz-limit{animation:none}}
+
+/* ---------- точки на общем виде ---------- */
+.kz-spots-pic{aspect-ratio:3/2;overflow:visible}
+.kz-spots-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:var(--r-img)}
+.kz-spot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;padding:0;border-radius:50%;z-index:1}
+.kz-spot i{position:absolute;inset:11px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(29,34,42,.35);transition:transform .4s var(--ease),background .4s}
+.kz-spot::before{content:"";position:absolute;inset:6px;border-radius:50%;border:2px solid #fff;animation:kzPulse 2.4s ease-out infinite}
+.kz-spot.on i{background:var(--accent);transform:scale(1.25)}
+@keyframes kzPulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.7);opacity:0}}
+.kz-tip{position:absolute;z-index:2;width:max-content;max-width:min(320px,40vw);padding:14px 18px 16px;border-radius:12px;background:var(--bg);color:var(--ink);transform:translate(18px,-50%);opacity:0;pointer-events:none;transition:opacity .3s}
+.kz-tip.left{transform:translate(calc(-100% - 18px),-50%)}
+.kz-tip.show{opacity:1}
+.kz-tip b,.kz-spots-cap b{display:block;font-weight:500;font-size:20px;line-height:1.2;margin-bottom:4px}
+.kz-tip span,.kz-spots-cap span{display:block;font-family:var(--font-read);font-size:18px;line-height:1.4}
+.kz-spots-cap{display:none;margin-top:16px}
+@media (max-width:760px){.kz-tip{display:none}.kz-spots-cap{display:block}}
+@media (prefers-reduced-motion:reduce){.kz-spot::before{animation:none}}
+
+/* ---------- бьюти-зона: узор в кадре и лайтбокс ---------- */
+.kz-beauty{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2vw,28px)}
+.kz-scale,.kz-box{aspect-ratio:1/1}
+.kz-scale-wall{position:absolute;inset:0;background:#FBEEF3 var(--arcs) 0 0 / 44px 44px;transition:background-size 1.4s var(--ease-io)}
+.kz-scale.big .kz-scale-wall{background-size:300px 300px}
+.kz-phone{position:absolute;left:50%;top:50%;width:34%;aspect-ratio:9/18;transform:translate(-50%,-50%);border:clamp(6px,1vw,10px) solid #1D222A;border-radius:clamp(18px,2.6vw,30px);
+  box-shadow:0 0 0 999px rgba(251,238,243,.86);overflow:hidden}
+.kz-person{position:absolute;left:50%;bottom:-6%;width:70%;aspect-ratio:1/1.1;transform:translateX(-50%);
+  background:radial-gradient(circle at 50% 26%,#3A3F4B 0 22%,transparent 22.5%),radial-gradient(ellipse 60% 44% at 50% 100%,#3A3F4B 0 98%,transparent 100%)}
+.kz-mark{position:absolute;right:5%;top:5%;width:clamp(36px,4.4vw,52px);opacity:0;transform:scale(.6);transition:opacity .4s,transform .5s cubic-bezier(.3,1.6,.5,1)}
+.kz-mark svg{display:block;width:100%;stroke:#fff;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round}
+.kz-mark-ok circle{fill:#1F9D55;stroke:none}
+.kz-mark-no circle{fill:var(--kz-pink);stroke:none}
+.kz-scale:not(.big) .kz-mark-ok,.kz-scale.big .kz-mark-no{opacity:1;transform:none;transition-delay:.9s}
+/* лайтбокс: серебряная коробка поворачивается — спереди зал, сзади гардероб */
+.kz-box{background:#F3EEF2;perspective:1200px}
+:root[data-theme="dark"] .kz-box,:root[data-theme="dark"] .kz-scale{background:#2A2228}
+.kz-box-3d{position:absolute;left:18%;right:18%;top:30%;height:40%;transform-style:preserve-3d;transition:transform 1.1s var(--ease-io)}
+.kz-box[data-s~="back"] .kz-box-3d{transform:rotateY(180deg)}
+.kz-face{position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#E6E8EC 0%,#B8BDC6 45%,#EEF0F3 70%,#A9AFB9 100%);box-shadow:inset 0 0 0 4px rgba(255,255,255,.55)}
+.kz-face-back{transform:rotateY(180deg)}
+.kz-face svg{width:46%;height:auto}
+.kz-cut{fill:#FFE9F3;transition:opacity .5s}
+.kz-face-front .kz-cut{position:absolute;left:27%}
+.kz-plate{position:absolute;left:27%;width:46%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .5s}
+.kz-plate svg{width:100%;fill:#D9DDE3;filter:drop-shadow(1px 2px 0 rgba(60,66,78,.45)) drop-shadow(-1px -1px 0 rgba(255,255,255,.9))}
+.kz-box[data-s^="solid"] .kz-face-front .kz-cut,.kz-box[data-s^="solid"] .kz-cut-back{opacity:0}
+.kz-box[data-s^="solid"] .kz-plate{opacity:1}
+.kz-side{position:absolute;left:0;right:0;bottom:6%;display:flex;justify-content:center}
+.kz-box[data-s="cut back"] .kz-mark-no,.kz-box[data-s="solid back"] .kz-mark-ok{opacity:1;transform:none;transition-delay:.9s}
+@media (max-width:600px){.kz-beauty{grid-template-columns:1fr}.kz-scale,.kz-box{aspect-ratio:4/3}.kz-phone{width:24%}}
+
+/* ---------- форма поваров ---------- */
+.kz-apron{--ap:#D8C3A5}
+.kz-apron.blue{--ap:#2457E6}
+.kz-apron-st{background:#F4F2EF}
+:root[data-theme="dark"] .kz-apron-st{background:#24242A}
+.kz-ap path{transition:fill .8s var(--ease),stroke .8s var(--ease)}
+.kz-tiles{fill:none;stroke:#E1DED9;stroke-width:2}
+:root[data-theme="dark"] .kz-tiles{stroke:#30303A}
+.kz-cross{fill:#5B8BFF;opacity:0;transition:opacity .9s var(--ease)}
+.kz-apron.blue .kz-cross{opacity:.35}
+.kz-tint{fill:#2E6BFF;opacity:0;mix-blend-mode:multiply;transition:opacity .9s var(--ease)}
+.kz-apron.blue .kz-tint{opacity:.28}
+.kz-beam{fill:none;stroke:var(--ink);stroke-width:2;stroke-dasharray:8 10;opacity:.25}
+/* ---------- меню ---------- */
+.kz-menu{display:grid;grid-template-columns:1fr 1fr;gap:3%;padding:5% 7%;aspect-ratio:16/10;cursor:pointer;background:#E9ECF1}
+:root[data-theme="dark"] .kz-menu{background:#20232A}
+.kz-page{position:relative;display:block;border-radius:4px;overflow:hidden;background:#fff;transition:background .8s var(--ease)}
+.kz-cover-pat{position:absolute;left:0;right:0;bottom:0;height:46%;background:var(--arcs) 0 0 / 34px 34px;opacity:1;transition:opacity .8s}
+.kz-cover{background:var(--kz-blue)}
+.kz-cover-vk{position:absolute;left:12%;top:10%;width:16%;opacity:0;transition:opacity .6s .3s}
+.kz-cover-name{position:absolute;left:12%;right:10%;top:34%;color:#fff;font-family:var(--font-read);font-weight:600;font-size:clamp(20px,3.6vw,52px);line-height:1;transform:rotate(-90deg) translate(-40%,-40%);transform-origin:left top;white-space:nowrap;transition:transform 1s var(--ease-io)}
+.kz-menu.strict .kz-cover-pat{opacity:0}
+.kz-menu.strict .kz-cover-vk{opacity:1}
+.kz-menu.strict .kz-cover-name{transform:none;white-space:normal}
+.kz-ml{position:absolute;left:var(--ox);top:var(--oy);width:var(--ow);height:5px;border-radius:99px;background:var(--kz-blue);transform:rotate(var(--or));
+  transition:left .9s var(--ease-io) var(--d),top .9s var(--ease-io) var(--d),width .9s var(--ease-io) var(--d),transform .9s var(--ease-io) var(--d),height .6s,background .8s,border-radius .6s}
+.kz-mh{height:9px}
+.kz-menu.strict .kz-list{background:var(--kz-blue)}
+.kz-menu.strict .kz-ml{left:var(--nx);top:var(--ny);width:var(--nw);transform:none;height:3px;border-radius:1px;background:rgba(255,255,255,.75)}
+.kz-menu.strict .kz-mh{height:6px;background:#fff}
+.kz-cat{position:absolute;right:8%;bottom:6%;width:30%;fill:none;stroke:var(--kz-blue);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;transition:opacity .6s,transform .8s var(--ease)}
+.kz-menu.strict .kz-cat{opacity:0;transform:translateY(20%) rotate(10deg)}
+@media (prefers-reduced-motion:reduce){.kz-ml,.kz-cover-name{transition:none}}
+
+/* ---------- зал кухни ---------- */
+.kz-v{opacity:0;transition:opacity .8s var(--ease)}
+.kz-hall[data-v="art"] .kz-v-art,.kz-hall[data-v="wall"] .kz-v-wall,.kz-hall[data-v="hang"] .kz-v-hang{opacity:1}
+.kz-v-hang{transform-box:fill-box;transform-origin:top;transform:translateY(-20px);transition:opacity .8s var(--ease),transform 1s var(--ease)}
+.kz-hall[data-v="hang"] .kz-v-hang{transform:none}
+
+/* ---------- фото в конце локации ---------- */
+.kz-photos{columns:3 260px;column-gap:clamp(12px,1.4vw,20px)}
+.kz-ph{display:block;width:100%;padding:0;margin-bottom:clamp(12px,1.4vw,20px);border-radius:var(--r-img);overflow:hidden;break-inside:avoid;cursor:zoom-in;background:var(--kz-stage)}
+.kz-ph img{display:block;width:100%;height:auto;transition:transform .8s var(--ease)}
+.kz-ph:hover img{transform:scale(1.03)}
