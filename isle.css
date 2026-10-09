@@ -33,7 +33,8 @@
 .ia-tab[aria-selected="true"] .ia-tick{opacity:1}
 .ia-tab.run .ia-tick::after{animation:iaTick var(--ms) linear both}
 @keyframes iaTick{from{transform:scaleX(0)}to{transform:none}}
-@media (max-width:760px){
+/* на планшете и телефоне строка не переносится, а листается вбок */
+@media (max-width:1024px){
   .ia-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad)}
   .ia-tabs::-webkit-scrollbar{display:none}
   .ia-tab{flex:none}
@@ -43,7 +44,7 @@
 .ia-stage{position:relative;aspect-ratio:16 / 9;border-radius:var(--r-img);overflow:hidden;background:var(--soft);cursor:zoom-in}
 /* кадр 16:9 целиком помещается на экран вместе со строкой этапов и подписью */
 .ia-stage{width:min(100%,calc(70vh * 16 / 9));margin-inline:auto}
-@media (min-width:761px){.ia-path .ia-tabs,.ia-caps{width:min(100%,calc(70vh * 16 / 9));margin-inline:auto}}
+@media (min-width:1025px){.ia-path .ia-tabs,.ia-caps{width:min(100%,calc(70vh * 16 / 9));margin-inline:auto}}
 .ia-shot{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .9s var(--ease);user-select:none;-webkit-user-select:none}
 .ia-shot.on{opacity:1}
 /* у этапов картинки разных пропорций: подложка светлая, как бумага эскиза */
@@ -95,6 +96,20 @@
 /* миниатюры света с подписью под картинкой */
 .ia-var span{display:block;padding-top:6px;font-size:16px;line-height:1.2;text-align:left;color:var(--ink)}
 
+/* телефон: кадр этапов выше (у эскиза и календаря другие пропорции), проекты не лежат друг на друге —
+   видно только текущий, иначе под складом оставалась бы пустота высотой с коридоры; коридоры друг под другом */
+@media (max-width:760px){
+  .ia-path .ia-stage{aspect-ratio:4 / 3}
+  .ia-board{display:block}
+  .ia-item{display:none;opacity:1;visibility:visible}
+  .ia-item.on{display:block;animation:iaIn .6s var(--ease)}
+  .ia-side{grid-template-columns:minmax(0,1fr)}
+  .ia-under{margin-top:12px;flex-direction:column;align-items:stretch}
+  /* переключатели света — сразу под картинкой, на всю ширину */
+  .ia-under .ia-vars{order:-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+  .ia-under .ia-var{width:auto}
+}
+@keyframes iaIn{from{opacity:0}to{opacity:1}}
 @media (max-width:640px){
   .ia-tag{font-size:16px;top:10px;padding:5px 12px 7px}
   .ia-tag.l{left:10px}.ia-tag.r{right:10px}

@@ -73,7 +73,7 @@ function pathHTML(c, years){
     <div class="ia-box">
       ${tabs(steps.map(s => H.T(s.name) + (s.year ? ` <em>${years[s.year]}</em>` : '')))}
       <div class="ia-stage" role="button" tabindex="0" aria-label="Увеличить">
-        ${steps.map((s, i) => `<img class="ia-shot${i ? '' : ' on'}" src="${esc(src(s.img))}" alt="" ${i ? 'loading="lazy" ' : ''}decoding="async" draggable="false">`).join('')}
+        ${steps.map((s, i) => `<img class="ia-shot${i ? '' : ' on'}" src="${esc(src(s.img))}"${s.bg ? ` style="background:${esc(s.bg)}"` : ''} alt="" ${i ? 'loading="lazy" ' : ''}decoding="async" draggable="false">`).join('')}
       </div>
       <div class="ia-caps">${steps.map((s, i) => `<p class="ia-cap${i ? '' : ' on'}">${H.T(s.text)}</p>`).join('')}</div>
     </div>
