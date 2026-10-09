@@ -544,14 +544,24 @@ function liveCarousel(box, c){
 
 /* ---------- меню Café de Persik: буклет один в один с макетом, листается ---------- */
 // обложка, разворот из двух колонок и задняя сторона; на телефоне — по одной странице
-const BOOK_K = `<svg class="kz-bk-k" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true"><path d="M48.5 0V213M48.5 117C68 117 86 114 100 110M48.5 117C68 117 86 120 100 124M0 190C18 203 34 208 48.5 208"/></svg>`;
+// узоры напечатаны глянцем по матовой бумаге: поверх рисунка тот же рисунок бликом (градиент kzGloss), блик проезжает по нему
+const K_D = 'M48.5 0V213M48.5 117C68 117 86 114 100 110M48.5 117C68 117 86 120 100 124M0 190C18 203 34 208 48.5 208';
+const BOOK_K = `<svg class="kz-bk-k" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true"><path d="${K_D}"/><path class="kz-gl" d="${K_D}"/></svg>`;
+// градиент блика — один на кейс: страницы книжки собираются из копий шаблонов
+const GLOSS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="kzGloss" x1="-1" y1="0" x2="0" y2=".6">
+    <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/>
+    <stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset=".58" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    <animate attributeName="x1" values="-1;1.2;1.2" keyTimes="0;.6;1" dur="4.5s" repeatCount="indefinite"/>
+    <animate attributeName="x2" values="0;2.2;2.2" keyTimes="0;.6;1" dur="4.5s" repeatCount="indefinite"/>
+  </linearGradient></defs></svg>`;
 function bookPat(){
   let d = '';
   for (let r = 0; r < 3; r++) for (let k = 0; k < 3; k++) {
     const x = k * 34, y = 109 + r * 35;
     d += `M${x} ${y}h14C${x + 18} ${y + 14} ${x + 26} ${y + 28} ${x + 34} ${y + 35}h-14C${x + 13} ${y + 28} ${x + 4} ${y + 14} ${x} ${y}Z`;
   }
-  return `<svg class="kz-bk-pat" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
+  return `<svg class="kz-bk-pat" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/><path class="kz-gl" d="${d}"/></svg>`;
 }
 const BOOK_CAT = `<svg class="kz-bk-cat" viewBox="0 0 120 160" aria-hidden="true"><path d="M20 60L26 14 50 40M100 60L94 14 70 40M18 74C18 44 38 36 60 36S102 44 102 74 84 112 60 112 18 104 18 74ZM30 66h24v10c0 6-24 6-24 0zM66 66h24v10c0 6-24 6-24 0zM54 70h12M46 92c6-6 10-6 14 0 4-6 8-6 14 0M60 112v8M44 124l16-8 16 8-16 8zM30 112c-8 20-10 36-6 48M90 112c8 20 10 36 6 48"/></svg>`;
 function menuHTML(c){
@@ -563,117 +573,83 @@ function menuHTML(c){
     back: `<div class="kz-bk-page kz-bk-back">${bookPat()}</div>`,
   };
   return `<div class="kz-menu">
-    <div class="kz-book">
+    <div class="kz-book">${GLOSS}
       <div class="kz-book-stage" tabindex="0" role="region" aria-roledescription="меню" aria-label="${esc(c.title)}">
         <div hidden>${Object.entries(pages).map(([k, h]) => `<template data-k="${k}">${h}</template>`).join('')}</div>
-      </div>
-      <div class="kz-book-nav">
-        <button class="kz-bk-arr kz-bk-prev" aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <div class="kz-dots"></div>
-        <button class="kz-bk-arr kz-bk-next" aria-label="Дальше"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
     </div>
     ${c.render ? `<button class="kz-stage kz-bk-render" aria-label="Увеличить"><img src="${small(c.render)}" srcset="${small(c.render)} 900w, ${c.render} 2000w" sizes="(max-width:1100px) 100vw, 45vw" data-full="${c.render}" alt="" loading="lazy" draggable="false"></button>` : ''}
   </div>`;
 }
-// Прототип листания. Широкий экран — настоящая книжка: два листа на корешке посередине, лист переворачивается
-// вокруг корешка (обложка → разворот из двух колонок → задняя сторона; закрытая книжка сдвигается в центр).
+// Прототип листания: меню перелистывается само по кругу, пока оно на экране, без кнопок.
+// Широкий экран — настоящая книжка: два листа на корешке посередине, лист переворачивается вокруг корешка
+// (обложка → разворот → задняя сторона → разворот → обложка; закрытая книжка сдвигается в центр).
 // Узкий экран — по одной странице: страница уходит ребром, следующая выходит с другой стороны
 function liveMenu(box, c){
-  const stage = box.querySelector('.kz-book-stage'), dotsEl = box.querySelector('.kz-dots');
+  const stage = box.querySelector('.kz-book-stage');
   const tpl = k => box.querySelector(`template[data-k="${k}"]`).innerHTML;
-  const prev = box.querySelector('.kz-bk-prev'), next = box.querySelector('.kz-bk-next');
-  let wide = null, cur = 0, n = 0, touched = false, busy = false, leaves = [];
   const singles = ['front', 'col1', 'col2', 'back'];
-  const mark = () => {
-    [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === cur));
-    prev.disabled = cur === 0; next.disabled = cur === n - 1;
-  };
+  let wide = null, cur = 0, leaves = [], timer = 0, on = false, k = 0;
+  // сколько держать каждую страницу: разворот читают дольше
+  const PLAN = { wide: [[0, 2800], [1, 4600], [2, 2800], [1, 4600]], narrow: [[0, 2600], [1, 3800], [2, 3800], [3, 2600]] };
   const layout = () => {
     const w = stage.clientWidth >= 560;
     if (w === wide) return;
-    wide = w;
+    wide = w; cur = 0; k = 0;
     stage.querySelectorAll('.kz-bk3d, .kz-bk-spread').forEach(x => x.remove());
     if (w) {
-      n = 3; cur = Math.min(cur, 2);
       stage.insertAdjacentHTML('beforeend', `<div class="kz-bk3d">
         <div class="kz-bk-leaf"><div class="kz-bk-face">${tpl('front')}</div><div class="kz-bk-face kz-bk-rev">${tpl('col1')}</div></div>
         <div class="kz-bk-leaf"><div class="kz-bk-face">${tpl('col2')}</div><div class="kz-bk-face kz-bk-rev">${tpl('back')}</div></div>
       </div>`);
       leaves = [...stage.querySelectorAll('.kz-bk-leaf')];
-      book(true);
-    } else {
-      n = 4; cur = Math.min(cur, 3);
-      stage.insertAdjacentHTML('beforeend', `<div class="kz-bk-spread">${tpl(singles[cur])}</div>`);
-    }
-    dotsEl.innerHTML = Array.from({ length: n }, (_, k) => `<button class="kz-dot" type="button" aria-label="${k + 1} из ${n}"><i></i></button>`).join('');
-    [...dotsEl.children].forEach((d, k) => d.addEventListener('click', () => { touched = true; go(k); }));
-    mark();
+      book(0, true);
+    } else stage.insertAdjacentHTML('beforeend', `<div class="kz-bk-spread">${tpl(singles[0])}</div>`);
+    run();
   };
-  // листы слева от корешка — перевернутые; верхним лежит тот, что перевернули последним
-  const book = instant => {
+  // листы слева от корешка — перевернутые; переворачиваемый лист лежит поверх остальных
+  const book = (to, instant) => {
     const bk = stage.querySelector('.kz-bk3d');
     bk.classList.toggle('instant', !!instant);
-    bk.dataset.step = cur;
+    bk.dataset.step = to;
     leaves.forEach((l, i) => {
-      const turned = i < cur;
-      if (l.classList.contains('turned') !== turned) l.style.zIndex = 5;   // переворачиваемый лист — поверх остальных
+      const turned = i < to;
+      if (l.classList.contains('turned') !== turned) l.style.zIndex = 5;
       l.classList.toggle('turned', turned);
     });
-    setTimeout(() => leaves.forEach((l, i) => { l.style.zIndex = i < cur ? i + 1 : leaves.length - i; }), instant ? 0 : 900);
+    setTimeout(() => leaves.forEach((l, i) => { l.style.zIndex = i < to ? i + 1 : leaves.length - i; }), instant ? 0 : 900);
     if (instant) requestAnimationFrame(() => bk.classList.remove('instant'));
+    cur = to;
   };
-  const go = k => {
-    k = clamp(k, 0, n - 1);
-    if (k === cur || busy) return;
-    const dir = k > cur ? 1 : -1;
-    // в книжке листы переворачиваются по одному: через страницу — два переворота подряд
-    if (wide) {
-      busy = true;
-      const step = () => {
-        cur += dir; mark(); book(still());
-        if (cur !== k) setTimeout(step, 420); else setTimeout(() => { busy = false; }, still() ? 0 : 700);
-      };
-      step();
-      return;
-    }
-    busy = true;
-    const old = stage.querySelector('.kz-bk-spread');
-    cur = k; mark();
-    const done = () => {
-      old.remove();
-      stage.insertAdjacentHTML('beforeend', `<div class="kz-bk-spread">${tpl(singles[cur])}</div>`);
-      const nw = stage.querySelector('.kz-bk-spread');
-      if (!still()) { nw.classList.add(dir > 0 ? 'in-r' : 'in-l'); nw.getBoundingClientRect(); nw.classList.remove('in-r', 'in-l'); }
-      setTimeout(() => { busy = false; }, 320);
-    };
-    if (still()) { done(); return; }
+  const page = to => {
+    const dir = to > cur || (cur === 3 && to === 0) ? 1 : -1, old = stage.querySelector('.kz-bk-spread');
     old.classList.add(dir > 0 ? 'out-l' : 'out-r');
-    setTimeout(done, 300);
+    setTimeout(() => {
+      old.remove();
+      stage.insertAdjacentHTML('beforeend', `<div class="kz-bk-spread">${tpl(singles[to])}</div>`);
+      const nw = stage.querySelector('.kz-bk-spread');
+      nw.classList.add(dir > 0 ? 'in-r' : 'in-l'); nw.getBoundingClientRect(); nw.classList.remove('in-r', 'in-l');
+    }, 300);
+    cur = to;
   };
-  prev.addEventListener('click', () => { touched = true; go(cur - 1); });
-  next.addEventListener('click', () => { touched = true; go(cur + 1); });
-  // нажатие на правую половину — вперед, на левую — назад; смахнуть — так же
-  let x0 = null;
-  stage.addEventListener('pointerdown', e => { x0 = e.clientX; });
-  stage.addEventListener('pointerup', e => {
-    if (x0 == null) return;
-    const dx = e.clientX - x0; x0 = null; touched = true;
-    if (Math.abs(dx) > 40) { go(cur + (dx < 0 ? 1 : -1)); return; }
-    const r = stage.getBoundingClientRect();
-    if (wide && e.clientX < r.left + r.width / 2) go(cur - 1);
-    else go(cur === n - 1 ? 0 : cur + 1);
-  });
-  stage.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); touched = true; go(cur + 1); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); touched = true; go(cur - 1); }
-  });
-  layout();
-  addEventListener('resize', layout);
-  // подсказка без слов: если меню не трогали, через пару секунд обложка сама открывается
-  onScreen(stage, v => { if (v && !touched && !still()) setTimeout(() => { if (!touched && cur === 0) go(1); }, 1600); });
+  const run = () => {
+    clearTimeout(timer);
+    if (!on) return;
+    const plan = PLAN[wide ? 'wide' : 'narrow'];
+    timer = setTimeout(() => {
+      k = (k + 1) % plan.length;
+      const to = plan[k][0];
+      if (wide) book(to); else page(to);
+      run();
+    }, plan[k][1]);
+  };
   const r = box.querySelector('.kz-bk-render');
   if (r) r.addEventListener('click', () => { const im = r.querySelector('img'); H.openViewer([im.dataset.full], 0, [im]); });
+  layout();
+  addEventListener('resize', layout);
+  // без анимаций — сразу разворот, и ничего не листается
+  if (still()) { if (wide) book(1, true); else { stage.querySelector('.kz-bk-spread').remove(); stage.insertAdjacentHTML('beforeend', `<div class="kz-bk-spread">${tpl('col1')}</div>`); } return; }
+  onScreen(stage, v => { on = v; run(); });
 }
 
 /* ---------- коллаж: одна картинка крупно, остальные вокруг; по нажатию — крупно ---------- */

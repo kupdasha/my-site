@@ -309,13 +309,8 @@
 @media (max-width:1100px){.kz-menu{grid-template-columns:1fr}}
 .kz-book{display:flex;flex-direction:column;justify-content:center;background:#EEF0F4;border-radius:var(--r-img);padding:clamp(24px,3vw,44px) clamp(8px,1.4vw,20px) clamp(10px,1.4vw,16px)}
 :root[data-theme="dark"] .kz-book{background:#1A1C22}
-.kz-book-nav{display:flex;align-items:center;justify-content:center;gap:clamp(8px,1.4vw,16px);margin-top:clamp(14px,1.8vw,22px)}
-.kz-book-nav .kz-dots{margin:0}
-.kz-book-stage{flex:1;min-width:0;display:flex;justify-content:center;container-type:inline-size;perspective:2200px;outline:none;cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none;--pw:min(330px,49cqw)}
+.kz-book-stage{flex:1;min-width:0;display:flex;justify-content:center;container-type:inline-size;perspective:2200px;outline:none;touch-action:pan-y;user-select:none;-webkit-user-select:none;--pw:min(330px,49cqw)}
 .kz-book-stage:focus-visible{outline:3px solid var(--accent);outline-offset:6px}
-.kz-bk-arr{flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--ink);transition:opacity .3s}
-.kz-bk-arr:disabled{opacity:.15;cursor:default}
-.kz-bk-arr svg{width:22px;height:22px;fill:none;stroke:var(--bg);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 /* книжка: два листа на корешке посередине; закрытая — в центре */
 .kz-bk3d{position:relative;width:calc(var(--pw) * 2);height:calc(var(--pw) * 2.128);perspective:2200px;transition:transform .9s cubic-bezier(.6,.05,.3,1)}
 .kz-bk3d[data-step="0"]{transform:translateX(-25%)}
@@ -338,17 +333,25 @@
 .kz-bk-spread .kz-bk-page{width:min(100cqw,340px);min-height:calc(min(100cqw,340px) * 2.128)}
 .kz-bk-page{position:relative;background:#0077FF;color:#fff;overflow:hidden;font-family:"PT Serif",var(--font-read);text-align:left}
 .kz-bk-k,.kz-bk-pat{position:absolute;inset:0;width:100%;height:100%}
+/* матовая бумага: мягкий свет сверху справа, книзу чуть темнее */
+.kz-bk-page::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(200deg,rgba(255,255,255,.14),rgba(255,255,255,0) 42%,rgba(0,10,40,.14))}
+/* обложки в черной рамке, как на визуализации */
+.kz-bk-front::after,.kz-bk-back::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;box-shadow:inset 0 0 0 calc(var(--pw, 300px) * .032) #161A24}
+.kz-bk-spread .kz-bk-front::after,.kz-bk-spread .kz-bk-back::after{box-shadow:inset 0 0 0 10px #161A24}
+/* глянец: по узору проезжает блик */
+.kz-bk-pat .kz-gl{fill:url(#kzGloss)}
+.kz-bk-k .kz-gl{stroke:url(#kzGloss)}
 .kz-bk-k path{fill:none;stroke:#0066F5;stroke-width:3.2;vector-effect:non-scaling-stroke}
 .kz-bk-k path:first-child{stroke-width:10}
 .kz-bk-pat path{fill:#0066F5}
-.kz-bk-vk{position:absolute;left:10.5%;top:5%;width:16.5%}
+.kz-bk-vk{position:absolute;left:12%;top:6.5%;width:16.5%}
 .kz-bk-vk svg{display:block;width:100%}
-.kz-bk-front h3{position:absolute;left:10.5%;right:6%;top:21%;font-weight:700;font-size:calc(var(--pw) * .135);line-height:1.12;letter-spacing:.01em}
+.kz-bk-front h3{position:absolute;left:12%;right:6%;top:21%;font-weight:700;font-size:calc(var(--pw) * .135);line-height:1.12;letter-spacing:.01em}
 .kz-bk-spread .kz-bk-front h3{font-size:clamp(34px,13cqw,46px)}
 .kz-bk-col{padding:10% 6% 7% 10%}
 .kz-bk-col section+section{margin-top:9%}
 .kz-bk-col h4{font-weight:700;font-size:clamp(21px,1.6vw,24px);white-space:nowrap;line-height:1.1;margin:0 0 5.5%}
-.kz-bk-col p{font-size:16px;line-height:1.25;margin:0 0 3.4%}
+.kz-bk-col p{font-size:16px;line-height:1.25;margin:0 0 3.4%;color:rgba(255,255,255,.88)}
 .kz-bk-cat{position:absolute;right:0;bottom:2%;width:42%;fill:none;stroke:#2A8BFF;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
 .kz-bk-render{background:#EEF0F4;cursor:zoom-in;min-height:320px}
 .kz-bk-render img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
