@@ -70,6 +70,11 @@
 .ia-tag.r{right:16px;background:var(--accent)}
 .ia-cmp:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 
+/* крупные планы под шторкой острова: две квадратные шторки рядом, вместе не шире главной */
+.ia-duo{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,24px);margin:clamp(12px,1.6vw,24px) auto 0;width:min(100%,calc(70vh * 16 / 9))}
+.ia-duo .ia-cmp{width:100% !important}
+@media (max-width:760px){.ia-duo{grid-template-columns:minmax(0,1fr)}}
+
 /* ---------- другие проекты: шторки лежат друг на друге, видна одна ---------- */
 .ia-board{display:grid;grid-template-columns:minmax(0,1fr)}
 .ia-item{grid-area:1 / 1;opacity:0;visibility:hidden;transition:opacity .6s var(--ease),visibility 0s .6s}

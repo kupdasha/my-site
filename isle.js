@@ -4,6 +4,7 @@
    path — от эскиза до нейросети: строка этапов сверху с полоской таймера,
      кадры сменяются сами, нажатие на кадр — крупно;
    shutter — шторка 3D / AI на одном кадре, ходит сама, пока не тронули;
+     под ней крупные планы (details) — по шторке на каждый, рядом;
    more — тот же прием на других проектах: строка проектов, у каждого
      шторка 3D / AI, у нескольких вариантов — миниатюры под шторкой;
      side — если ракурс у нейросети другой, вместо шторки две картинки рядом;
@@ -231,13 +232,16 @@ export async function mountIsle(mount, p, helpers){
   if (f.path) html += pathHTML(f.path, years);
   if (f.shutter) {
     const s = f.shutter;
-    html += `<section class="ia-ch ia-shutter wrap">${head(s)}<div class="ia-box">${cmpHTML(s.before, s.after, s.ratio, [`3D, ${f.from}`, `AI, ${f.to}`])}</div></section>`;
+    const tg = [`3D, ${f.from}`, `AI, ${f.to}`];
+    html += `<section class="ia-ch ia-shutter wrap">${head(s)}<div class="ia-box">${cmpHTML(s.before, s.after, s.ratio, tg)}
+      ${s.details ? `<div class="ia-duo">${s.details.map(d => cmpHTML(d.before, d.after, '1 / 1', tg)).join('')}</div>` : ''}
+    </div></section>`;
   }
   if (f.more) html += moreHTML(f.more, tagsFor);
   mount.innerHTML = html;
   mount.querySelectorAll('.ia-ch').forEach(s => reveal.observe(s));
   const q = s => mount.querySelector(s);
   if (f.path) livePath(q('.ia-path'), f.path);
-  if (f.shutter) liveCmp(q('.ia-shutter .ia-cmp'));
+  if (f.shutter) mount.querySelectorAll('.ia-shutter .ia-cmp').forEach(liveCmp);
   if (f.more) liveMore(q('.ia-more'), f.more);
 }

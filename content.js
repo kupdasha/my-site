@@ -3868,6 +3868,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             before: 'img/isle/island-3d.webp',
             after:  'img/isle/island-ai.webp',
             ratio:  '16 / 9',
+            // крупные планы под шторкой: у каждого своя шторка 3D / AI, рядом (на телефоне друг под другом)
+            details: [
+              { before: 'img/isle/detail-1-3d.webp', after: 'img/isle/detail-1-ai.webp' },
+              { before: 'img/isle/detail-2-3d.webp', after: 'img/isle/detail-2-ai.webp' },
+            ],
           },
           more: {
             label: ['тот же прием', 'тот же прием'],
