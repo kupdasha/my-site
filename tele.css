@@ -1,0 +1,94 @@
+/* ================================================================
+   КЕЙС «TELE2, КОНФЕРЕНЦИЯ «ВЫХОДИ ЗА РАМКИ»» (tele.js, поле tele)
+   Цвета — сайта и самой конференции: черные носители --t2-black,
+   лайм — общий --accent, без свечения.
+   ================================================================ */
+.t2-ch{--t2-gap:clamp(72px,9vw,144px);--t2-black:#111214;margin-bottom:var(--t2-gap);overflow-x:clip}
+:root[data-theme="dark"] .t2-ch{--t2-black:#1B1D22}
+
+/* текст в начале кейса: на планшете 2 × 2 (на телефоне style.css ставит одну колонку) */
+@media (min-width:761px) and (max-width:1100px){
+  .case-body:has(.t2-mount) .scheme-cols>.camp-col{grid-column:span 6 !important}
+}
+
+/* заголовок главы: подпись и заголовок слева, текст справа */
+.t2-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:18px;align-items:end;margin-bottom:clamp(28px,3.4vw,48px)}
+.t2-label{grid-column:1 / -1}
+.t2-title{grid-column:1 / span 6;font-weight:500;font-size:clamp(30px,3.2vw,48px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
+.t2-text{grid-column:8 / -1;font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;max-width:40ch}
+@media (max-width:900px){.t2-title,.t2-text{grid-column:1 / -1}}
+.t2-head > *{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.t2-head > :nth-child(2){transition-delay:.08s}.t2-head > :nth-child(3){transition-delay:.16s}
+.t2-ch.in .t2-head > *{opacity:1;transform:none}
+
+.t2-cap{margin-top:14px;font-size:16px;line-height:1.4;opacity:.6;text-wrap:balance}
+.t2-shot{display:block;width:100%;padding:0;border:0;background:var(--soft);border-radius:var(--r-img);overflow:hidden;cursor:zoom-in}
+.t2-shot img{display:block;width:100%;height:auto;transition:transform .9s var(--ease)}
+.t2-shot:hover img{transform:scale(1.02)}
+
+/* ---------- frame: носители — окна в один шрифтовой блок ---------- */
+.t2-wall{position:relative;aspect-ratio:2.4;user-select:none;-webkit-user-select:none}
+.t2-car{position:absolute;overflow:hidden;background:var(--t2-black);border-radius:4px;contain:paint}
+.t2-field{position:absolute;pointer-events:none}
+.t2-row{position:absolute;left:0;display:flex;white-space:nowrap;height:var(--u);will-change:transform}
+.t2-run{display:flex;flex:none}
+.t2-run span{flex:none;padding-right:.42em;font-weight:600;font-size:calc(var(--u) * .86);line-height:var(--u);letter-spacing:-.025em;color:#F4F4F2}
+.t2-run span.hi{color:var(--accent)}
+/* рамка на экране сцены: слова проходят сквозь нее и уходят за край */
+.t2-square{position:absolute;left:50%;top:50%;width:52%;aspect-ratio:1;max-height:76%;transform:translate(-50%,-50%);border:max(3px,calc(var(--u) * .1)) solid var(--accent);pointer-events:none}
+@supports not (aspect-ratio:1){.t2-square{height:60%}}
+.t2-car-name{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);padding:3px 8px;border-radius:3px;background:var(--t2-black);color:#F4F4F2;font-size:16px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:760px){
+  .t2-wall{aspect-ratio:.8}
+  .t2-car-name{left:6px;bottom:6px;max-width:calc(100% - 12px);padding:2px 6px}
+}
+
+/* ---------- illusion: кадр слева, кнопки и схема справа ---------- */
+.t2-ill{display:grid;grid-template-columns:minmax(0,1fr) clamp(260px,26vw,360px);gap:clamp(20px,2.4vw,36px);align-items:start}
+.t2-view{position:relative;aspect-ratio:4 / 3;border-radius:var(--r-img);overflow:hidden;background:#0E0F11}
+.t2-cv{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:pan-y;cursor:crosshair}
+.t2-side{display:flex;flex-direction:column;gap:16px}
+.t2-cams{display:flex;flex-wrap:wrap;gap:10px}
+.t2-cams .btn:not(.on){background:var(--soft);color:var(--ink)}
+.t2-cams .btn:not(.on):hover{background:var(--ink);color:var(--bg)}
+.t2-map{position:relative;aspect-ratio:1 / 1.12;border-radius:var(--r-img);background:var(--soft)}
+.t2-top{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:pointer}
+.t2-state{font-weight:500;font-size:clamp(19px,1.5vw,22px);line-height:1.3;min-height:2.6em;text-wrap:balance}
+.t2-state.ok{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:.32em;text-underline-offset:-.12em;text-decoration-skip-ink:none}
+.t2-hint{font-size:16px;line-height:1.4;opacity:.6;text-wrap:balance}
+.t2-ill-photo{margin-top:clamp(20px,2.4vw,36px)}
+@media (max-width:900px){
+  .t2-ill{grid-template-columns:1fr}
+  .t2-side{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px 20px;align-items:start}
+  .t2-cams{grid-column:1 / -1}
+  .t2-map{grid-row:span 2}
+}
+@media (max-width:520px){
+  .t2-side{grid-template-columns:1fr}
+  .t2-cams{flex-wrap:nowrap}
+  .t2-cams .btn{flex:1 1 0;justify-content:center;padding-inline:12px;white-space:nowrap}
+  .t2-map{aspect-ratio:1.2;grid-row:auto}
+}
+
+/* ---------- pixels: панно из плашек ---------- */
+.t2-board{position:relative;padding:clamp(18px,2.6vw,40px) clamp(14px,2vw,32px);border-radius:var(--r-img);background:var(--t2-black)}
+.t2-led{position:absolute;left:clamp(14px,2vw,32px);right:clamp(14px,2vw,32px);top:clamp(8px,1.1vw,16px);height:3px;border-radius:2px;background:#E9E9E6}
+.t2-pcv{display:block;width:100%;touch-action:pan-y;cursor:pointer}
+.t2-pix-bar{display:flex;justify-content:flex-end;margin-top:16px}
+.t2-pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.4vw,20px);margin-top:clamp(28px,3.4vw,48px)}
+.t2-pair .t2-shot img{aspect-ratio:4 / 3;object-fit:cover}
+@media (max-width:760px){.t2-pair{grid-template-columns:1fr}}
+
+/* ---------- things: строки — текст слева, кадры справа ---------- */
+.t2-things{display:grid;gap:clamp(40px,5vw,80px)}
+.t2-thing{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:18px;align-items:start}
+.t2-thing-txt{grid-column:1 / span 3}
+.t2-thing-txt h3{font-weight:500;font-size:clamp(22px,1.8vw,28px);line-height:1.15;text-wrap:balance}
+.t2-thing-txt p{margin-top:10px;font-family:var(--font-read);font-size:clamp(18px,1.3vw,20px);line-height:1.4}
+.t2-thing-img{grid-column:4 / -1;display:grid;gap:clamp(12px,1.4vw,20px)}
+.t2-thing-img.two{grid-template-columns:1fr 1fr}
+@media (max-width:900px){
+  .t2-thing-txt,.t2-thing-img{grid-column:1 / -1}
+  .t2-thing-txt{max-width:46ch}
+}
+@media (max-width:760px){.t2-thing-img.two{grid-template-columns:1fr}}
