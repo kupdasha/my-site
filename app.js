@@ -2207,7 +2207,7 @@ function screenHTML(x){
     const inGrid = g.cells.some(c => c.head);
     return `<div class="wrap scr-proj">${!inGrid && head ? `<div class="scr-head">${head}</div>` : ''}<div class="collage camp-row scr-grid" style="grid-template-areas:${g.areas.replace(/"/g, '&quot;')};grid-template-columns:${g.cols};grid-template-rows:${g.rows || ''};--ratio:${g.ratio}">${
       g.cells.map(c => c.head ? `<div class="collage-cell scr-cell-head" style="grid-area:${c.area}">${head}</div>`
-        : `<div class="collage-cell" style="grid-area:${c.area}${c.pos ? `;--pos:${c.pos}` : ''}">${cell(c.img)}</div>`).join('')}</div></div>`;
+        : `<div class="collage-cell${c.half ? ' half' : ''}" style="grid-area:${c.area}${c.pos ? `;--pos:${c.pos}` : ''}">${cell(c.img)}</div>`).join('')}</div></div>`;
   }
   return `<div class="wrap scr-proj">${head ? `<div class="scr-head">${head}</div>` : ''}${
     g.map(r => [].concat(r)).map(r => `<div class="camp-row fit" style="--n:${r.length}">${r.map(cell).join('')}</div>`).join('')}</div>`;

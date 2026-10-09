@@ -1328,9 +1328,13 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .scr-head{display:block}
   .scr-head p{margin-top:8px}
   .scr-proj>.camp-row.fit{max-width:none}
-  .scr-grid.collage{display:flex;flex-direction:column;overflow:visible;scroll-snap-type:none;max-width:none;margin:0;padding:0}
-  .scr-grid .collage-cell{display:flex!important;width:100%}
+  /* коллаж на телефоне — две колонки: название и широкие кадры во всю ширину, half — парой (плакаты, высокие стойки) */
+  .scr-grid.collage{display:grid;grid-template-columns:1fr 1fr!important;grid-template-areas:none!important;grid-template-rows:none!important;
+    align-items:start;overflow:visible;scroll-snap-type:none;max-width:none;margin:0;padding:0}
+  .scr-grid .collage-cell{display:flex!important;grid-row:auto!important;grid-column:span 2!important;width:100%}
+  .scr-grid .collage-cell.half{grid-column:span 1!important}
   .scr-grid .camp-shot{flex:none!important;width:100%!important;aspect-ratio:var(--ar)}
+  .scr-cell-head p{max-width:none}
 }
 /* узкий ряд — по ширине текстовой колонки, для картинок низкого разрешения */
 .camp-rowbox.narrow>.camp-row{width:calc(66.67% + clamp(16px,2vw,28px) / 3);margin-left:auto}

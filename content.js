@@ -3646,7 +3646,6 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 'Слова, которым тесно в рамке, и фотозона, которая складывается только с одной точки'],
         image: 'img/t2.jpg',
         thumb: 'img/thumbs/w36.webp',   // легкая копия обложки для сетки (383 КБ → 110 КБ)
-        link:  'https://kupdasha.ru/stands',
         schemeCols: true,   // задача, роль, решение и результат — колонками в одну строку
         scheme: {
           task:     ['Коммерческая конференция Tele2 в сентябре 2020 года, проект агентства Papa Carlo. Конференция развивает у участников творческий подход и дает придумать новый нестандартный продукт, который компания будет развивать дальше. Оформить нужно было всё — от сцены до активностей.',
@@ -3751,18 +3750,18 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         image: 'https://static.tildacdn.com/tild3837-3762-4131-b332-306438306566/2.png',
         thumb: 'img/thumbs/w37.webp',   // легкая копия обложки для сетки (1208 КБ → 80 КБ)
         /* каждый проект — блок { screen }: коллаж не выше экрана, название и подпись в ячейке head или над коллажем,
-           картинки увеличиваются по нажатию. Картинки — img/raznoe (-s — копия 900 px для телефона; у грузовика и
+           картинки увеличиваются по нажатию; на телефоне всё в две колонки: half — картинка в половину ширины, остальные во всю. Картинки — img/raznoe (-s — копия 900 px для телефона; у грузовика и
            Star Wars фон прозрачный); склейки Darrow и L'Oréal разрезаны на кадры */
         gallery: [
           [
             { title: 'LEGO в «Пятерочке»',
-              text: ['Плакаты: свою 3D-модель кассы, которую сама отрендерила, соединила с оригинальными рендерами наборов от LEGO.',
+              text: ['Плакаты: кассу смоделировала и отрендерила сама, а наборы на ней — из оригинальных рендеров LEGO.',
                      'Кассу смоделировала и отрендерила сама, а наборы на ней — оригинальные рендеры от LEGO'],
               screen: { areas: '"h a b" "c a b"', cols: '412fr 438fr 438fr', rows: '373fr 231fr', ratio: 2.13, cells: [
                 { area: 'h', head: true },
                 { area: 'c', img: 'img/raznoe/lego-truck.webp', pos: 'bottom' },
-                { area: 'a', img: 'img/raznoe/lego-kv-aero.webp' },
-                { area: 'b', img: 'img/raznoe/lego-kv-dragon.webp' } ] } },
+                { area: 'a', img: 'img/raznoe/lego-kv-aero.webp', half: true },
+                { area: 'b', img: 'img/raznoe/lego-kv-dragon.webp', half: true } ] } },
             { title: 'LEGO Star Wars',
               screen: { areas: '"a h" "a b"', cols: '2fr 1fr', rows: '1fr 1fr', ratio: 2.67, cells: [
                 { area: 'h', head: true },
@@ -3774,12 +3773,12 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 { area: 'a', img: 'img/raznoe/loreal-1.webp' },
                 { area: 'b', img: 'img/raznoe/loreal-2.webp', pos: 'bottom' } ] } },
             { title: 'Darrow и Gancia',
-              text: ['Выкладка для магазинов: стойки для бутылок в торговом зале.',
+              text: ['Выкладка для магазинов: стойки и прилавки под бутылки.',
                      'Выкладка для магазинов: чтобы бутылку заметили в зале раньше соседних'],
               screen: { areas: '"a b h" "a b c"', cols: '430fr 463fr 395fr', rows: '284fr 220fr', ratio: 2.54, cells: [
                 { area: 'h', head: true },
-                { area: 'a', img: 'img/raznoe/darrow-1.webp' },
-                { area: 'b', img: 'img/raznoe/gancia.webp' },
+                { area: 'a', img: 'img/raznoe/darrow-1.webp', half: true },
+                { area: 'b', img: 'img/raznoe/gancia.webp', half: true },
                 { area: 'c', img: 'img/raznoe/darrow-2.webp', pos: 'bottom' } ] } },
             { title: 'MatchMaking',
               screen: { areas: '"a h" "a b"', cols: '2fr 1fr', rows: '1fr 1fr', ratio: 2.67, cells: [
@@ -3787,17 +3786,17 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 { area: 'a', img: 'img/raznoe/mosbirzha-1.webp' },
                 { area: 'b', img: 'img/raznoe/mosbirzha-2.webp', pos: 'bottom' } ] } },
             { title: 'Philips',
-              text: ['Круглый павильон: по краю — секции за цветными рейками, в центре — газон с креслами-мешками и очистителями воздуха Philips.',
-                     'Круглый павильон: по краю — цветные секции, в центре — газон, кресла-мешки и очистители воздуха Philips между ними'],
+              text: ['Круглый павильон: по краю — секции за цветными рейками, в центре — газон с креслами-мешками и очистителями воздуха.',
+                     'Круглый павильон: по краю — цветные секции, в центре — газон, кресла-мешки и очистители воздуха между ними'],
               screen: { areas: '"a b" "a c"', cols: '2fr 1fr', rows: '1fr 1fr', ratio: 2.67, cells: [
                 { area: 'a', img: 'img/raznoe/philips-1.webp' },
-                { area: 'b', img: 'img/raznoe/philips-2.webp' },
-                { area: 'c', img: 'img/raznoe/philips-3.webp' } ] } },
+                { area: 'b', img: 'img/raznoe/philips-2.webp', half: true },
+                { area: 'c', img: 'img/raznoe/philips-3.webp', half: true } ] } },
           ],
         ],
-        link:  'https://kupdasha.ru/stands',
+        links: [],   // ссылки на старую страницу kupdasha.ru/stands нет
         story: [
-          'Сборная солянка стендов за три года работы в ивент-агентстве. Все визуализации сделала сама в Blender, потом сама же подготовила их к печати, и стенды построили в реальности.',
+          'Сборная солянка за три года работы в ивент-агентстве: стенды, выкладка для магазинов, плакаты. Визуализации делала в Blender, макеты к печати готовила тоже я — и конструкции потом построили в реальности.',
         ],
       },
 
