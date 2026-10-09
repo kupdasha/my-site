@@ -407,23 +407,32 @@ function rotateEvents(strip){
   const ev = i => pick(E.items[i].caption), tall = i => (E.items[i].ratio || 1.5) < 1;
   const OFTEN = (E.often || []).map(pick), often = i => OFTEN.includes(ev(i));
   let used = new Set(slots.map(s => +s.dataset.i));
+  // когда кадр показывали последний раз (номер смены): любой кадр возвращается не раньше чем через 4 смены
+  // (вертикальных мало — им хотя бы 3), иначе одно и то же фото мелькает почти подряд, в соседних окошках
+  let tick = 0; const shownAt = {};
+  slots.forEach(s => { shownAt[+s.dataset.i] = 0; });
+  const rested = i => tick - (shownAt[i] ?? -99) >= 4;
   evTimer = setInterval(() => {
     const r = strip.getBoundingClientRect();
     if (document.hidden || !strip.isConnected || r.bottom < 0 || r.top > innerHeight) return;   // лента не на экране — стоим
+    tick++;
     const now = slots.map(s => +s.dataset.i), picked = [];
     for (const slot of slots) {
       const cur = +slot.dataset.i;
       const ok = i => tall(i) === tall(cur) && !now.includes(i) && !picked.includes(i)
         && ev(i) !== ev(cur) && !picked.some(j => ev(j) === ev(i));
       // события из often показываются чаще: им можно повторяться и у них четыре шанса вместо одного
-      let pool = E.items.map((x, i) => i).filter(i => ok(i) && (!used.has(i) || often(i)));
+      let pool = E.items.map((x, i) => i).filter(i => ok(i) && rested(i) && (!used.has(i) || often(i)));
       if (!pool.some(i => !often(i))) {   // все обычные кадры этого формата показаны — начинаем круг заново
         E.items.forEach((x, i) => { if (tall(i) === tall(cur)) used.delete(i); });
-        pool = E.items.map((x, i) => i).filter(ok);
+        pool = E.items.map((x, i) => i).filter(i => ok(i) && rested(i));
+        // вертикальных кадров мало — если отдохнувших нет, берем хотя бы те, что не показывались 3 смены
+        if (!pool.length) pool = E.items.map((x, i) => i).filter(i => ok(i) && tick - (shownAt[i] ?? -99) >= 3);
+        if (!pool.length) pool = E.items.map((x, i) => i).filter(ok);
       }
       pool = pool.flatMap(i => often(i) ? [i, i, i, i] : [i]);
       const next = pool.length ? pool[Math.floor(Math.random() * pool.length)] : cur;
-      picked.push(next); used.add(next);
+      picked.push(next); used.add(next); shownAt[next] = tick;
     }
     slots.forEach((slot, k) => swapEvent(slot, picked[k], k));
   }, EV_ROTATE);

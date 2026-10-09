@@ -2192,3 +2192,5 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 :root[data-theme="dark"] :is(#facts,#courses) .fact{border-bottom-color:transparent}
 :root[data-theme="dark"] :is(#facts,#courses) .fact::after{display:none}
 :root[data-theme="dark"] :is(#facts,#courses) .string{display:block}
+/* лента выступлений: под подписью всегда место на две строки — при смене фото подпись в одну или две строки не двигает страницу */
+.ev figcaption{min-height:calc(2em * 1.3)}
