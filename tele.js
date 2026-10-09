@@ -190,7 +190,7 @@ function liveIllusion(box, c){
     g.lineWidth = 1.5 * d; g.strokeStyle = col;
     spot.forEach((z, i) => {
       g.beginPath(); g.arc(X(0), Y(z), 4.5 * d, 0, 7); g.stroke();
-      g.fillStyle = col; g.globalAlpha = .65; g.fillText(H.pick(c.cams[i].mark), X(0) + 12 * d, Y(z)); g.globalAlpha = 1;
+      g.fillStyle = col; g.globalAlpha = .65; g.textAlign = 'right'; g.fillText(H.pick(c.cams[i].mark), X(0) - 12 * d, Y(z)); g.globalAlpha = 1; g.textAlign = 'left';   // слева — чтобы не наезжать на «точку зрителя»
     });
     // точка зрителя
     g.beginPath(); g.arc(X(E.x), Y(E.z), 7 * d, 0, 7); g.fillStyle = LIME; g.fill(); g.strokeStyle = col; g.stroke();
@@ -229,7 +229,7 @@ function liveIllusion(box, c){
   const status = () => {
     const d = Math.hypot(cam.x - E.x, cam.z - E.z);
     const s = d < .04 ? 'ok' : d < .3 ? 'near' : 'off';
-    if (s !== state) { state = s; stateEl.textContent = H.pick(c.state[s]); stateEl.classList.toggle('ok', s === 'ok'); }
+    if (s !== state) { state = s; stateEl.innerHTML = H.T(c.state[s]); stateEl.classList.toggle('ok', s === 'ok'); }
   };
   const loop = now => {
     raf = 0;
@@ -442,7 +442,7 @@ function wishesHTML(c){
 }
 function liveWishes(box, c){
   const cv = box.querySelector('.t2-wcv'), g = cv.getContext('2d');
-  const words = c.wishes.map(w => ({ icon: w.icon, text: H.pick(w.text) }));
+  const words = c.wishes.map(w => ({ icon: w.icon, text: w.text }));
   let cubes = [], seen = false, raf = 0, next = 0, leaving = 0, n = 0;
   const FALL = 520;
   let S = 40, OX = 0, OY = 0;
@@ -467,7 +467,7 @@ function liveWishes(box, c){
     if (cubes.length >= SLOTS.length || leaving) return false;
     const q = make(SLOTS[cubes.length], now);
     cubes.push(q);
-    nowEl.textContent = q.w.text;
+    nowEl.innerHTML = H.T(q.w.text);
     return true;
   };
   const face = (ox, oy, ux, uy, vx, vy, fill, draw) => {
@@ -540,7 +540,7 @@ function liveWishes(box, c){
   // в начале гора уже наполовину собрана
   const now0 = performance.now() - FALL;
   for (let s = 0; s < 16; s++) cubes.push(make(SLOTS[s], now0, now0));
-  nowEl.textContent = cubes[cubes.length - 1].w.text;
+  nowEl.innerHTML = H.T(cubes[cubes.length - 1].w.text);
   new ResizeObserver(size).observe(cv);
   document.fonts?.ready.then(() => draw(performance.now()));
   size();

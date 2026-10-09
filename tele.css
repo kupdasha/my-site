@@ -47,20 +47,25 @@
   .t2-map{grid-row:span 2}
 }
 @media (max-width:520px){
-  .t2-side{grid-template-columns:1fr}
+  /* телефон: сразу под кадром — собрались ли буквы, потом кнопки, схема и подсказка */
+  .t2-side{display:flex;flex-direction:column;align-items:stretch;gap:14px}
+  .t2-state{order:-1;min-height:2.6em}
   .t2-cams{flex-wrap:nowrap}
   .t2-cams .btn{flex:1 1 0;justify-content:center;padding-inline:12px;white-space:nowrap}
-  .t2-map{aspect-ratio:1.2;grid-row:auto}
+  .t2-map{width:100%;aspect-ratio:1.5}
 }
 
 /* ---------- pixels: панно из плашек ---------- */
 .t2-board{position:relative;padding:clamp(18px,2.6vw,40px) clamp(14px,2vw,32px);border-radius:var(--r-img);background:var(--t2-black)}
 .t2-led{position:absolute;left:clamp(14px,2vw,32px);right:clamp(14px,2vw,32px);top:clamp(8px,1.1vw,16px);height:3px;border-radius:2px;background:#E9E9E6}
-.t2-pcv{display:block;width:100%;touch-action:pan-y;cursor:pointer}
+.t2-pcv{display:block;width:100%;touch-action:none;cursor:pointer}   /* пальцем рисуют в любую сторону; листать — мимо панно */
 .t2-pix-bar{display:flex;justify-content:flex-end;margin-top:16px}
 .t2-pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.4vw,20px);margin-top:clamp(28px,3.4vw,48px)}
 .t2-pair .t2-shot img{aspect-ratio:4 / 3;object-fit:cover}
-@media (max-width:760px){.t2-pair{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .t2-pair{grid-template-columns:1fr}
+  .t2-pix-bar{justify-content:flex-start}   /* справа внизу — плавающие кнопки сайта */
+}
 
 /* ---------- wishes: гора кубов слева, кнопка и маленькое превью справа ---------- */
 .t2-wish{display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,24vw,340px);gap:clamp(20px,2.4vw,36px);align-items:start}
@@ -74,7 +79,13 @@
   .t2-wish-side{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:20px}
   .t2-wish-prev,.t2-wish-side .t2-cap,.t2-wish-side .t2-hint{grid-column:1 / -1;max-width:360px}
 }
-@media (max-width:520px){.t2-pile{aspect-ratio:1}}
+@media (max-width:520px){
+  /* гора ограничена шириной — кадр ниже, без пустого неба; пожелание крупно сразу под горой */
+  .t2-pile{aspect-ratio:1.15}
+  .t2-wish-side{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+  .t2-wish-now{order:-1}
+  .t2-wish-prev{width:min(100%,240px);margin-top:4px}   /* превью рендера — маленьким, крупно по нажатию */
+}
 
 /* ---------- things: строки — текст слева, кадры справа ---------- */
 .t2-things{display:grid;gap:clamp(40px,5vw,80px)}
