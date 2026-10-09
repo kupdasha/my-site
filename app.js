@@ -231,12 +231,14 @@ function renderLists(){
       : `<a class="link" href="${here ? '#' + n.link.split('#')[1] : n.link}">${T(n.text)}</a>`;
   }).join('');
 
-  $('#facts').innerHTML = SITE.about.facts.map((f, k) =>
-    `<div class="fact" data-reveal style="--d:${k * 0.06}s"><span>${T(f.name)}</span><span>${T(f.detail)}</span></div>`).join('');
+  // награды и курсы: между строками — струны (видны в дружеской версии, в серьезной — обычные линии)
+  if ($('#facts')) $('#facts').innerHTML = STRING_HTML + SITE.about.facts.map((f, k) =>
+    `<div class="fact" data-reveal style="--d:${k * 0.06}s"><span>${T(f.name)}</span><span>${T(f.detail)}</span></div>${STRING_HTML}`).join('');
 
   // курсы — таким же списком, как награды
-  if (SITE.about.courses) $('#courses').innerHTML = SITE.about.courses.map((f, k) =>
-    `<div class="fact" data-reveal style="--d:${k * 0.06}s"><span>${T(f.school)}</span><span>${T(f.title)}</span></div>`).join('');
+  if (SITE.about.courses && $('#courses')) $('#courses').innerHTML = STRING_HTML + SITE.about.courses.map((f, k) =>
+    `<div class="fact" data-reveal style="--d:${k * 0.06}s"><span>${T(f.school)}</span><span>${T(f.title)}</span></div>${STRING_HTML}`).join('');
+  if ($('#facts .string')) setTimeout(() => { collectStrings(); dispatchEvent(new CustomEvent('strings:rendered')); });
 
   $('#clients').innerHTML = SITE.clients.items.map((c, k) => {
     const i = c.project ? SITE.works.items.findIndex(w => w.title === c.project) : -1;
@@ -748,7 +750,7 @@ function renderDirections(){
 }
 /* струны — между строками направлений и между строками «других работ» (в веселой версии) */
 function collectStrings(){
-  strings = $$('#otherList .string, #dirList .string').map(el => ({
+  strings = $$('#otherList .string, #dirList .string, #facts .string, #courses .string').map(el => ({
     el, svg: el.querySelector('svg'), line: el.querySelector('.line'), ghosts: [...el.querySelectorAll('.ghost')], hist: [],
     amp: 0, vel: 0, at: 0.5, held: false, prev: null, w: 0,
   }));
