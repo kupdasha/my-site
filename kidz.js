@@ -42,11 +42,19 @@ const VK = 'M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.31
 const VK_GLYPH = 'M19.376 17.123' + VK.slice(VK.indexOf('zm3.692 17.123') + 14);
 const vk = (x, y, s, fill = '#fff', cls = '') => `<path class="${cls}" fill="${fill}" fill-rule="evenodd" transform="translate(${x} ${y}) scale(${s / 24})" d="${VK}"/>`;
 
-const head = ch => `<div class="kz-head">
+// aside — картинки коллажем справа от текста (по нажатию — крупно)
+const head = ch => `<div class="kz-head${ch.aside ? ' has-aside' : ''}">
   <span class="case-label kz-label">${H.T(ch.label)}</span>
   <h2 class="kz-title">${H.T(ch.title)}</h2>
   ${ch.text ? `<p class="kz-text">${H.T(ch.text)}</p>` : ''}
+  ${ch.aside ? `<div class="kz-aside">${ch.aside.map((src, i) =>
+    `<button class="kz-aside-pic" data-i="${i}" aria-label="Увеличить"><img src="${small(src)}" data-full="${src}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>` : ''}
 </div>`;
+function liveAside(sec){
+  const imgs = [...sec.querySelectorAll('.kz-aside img')];
+  sec.querySelectorAll('.kz-aside-pic').forEach(b => b.addEventListener('click', () =>
+    H.openViewer(imgs.map(x => x.dataset.full), +b.dataset.i, imgs)));
+}
 
 /* ================================================================
    ДОМИКИ: из них собрана развилка в начале и заставки локаций
@@ -534,10 +542,107 @@ function liveCarousel(box, c){
   });
 }
 
+/* ---------- меню Café de Persik: буклет один в один с макетом, листается ---------- */
+// обложка, разворот из двух колонок и задняя сторона; на телефоне — по одной странице
+const BOOK_K = `<svg class="kz-bk-k" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true"><path d="M48.5 0V213M48.5 117C68 117 86 114 100 110M48.5 117C68 117 86 120 100 124M0 190C18 203 34 208 48.5 208"/></svg>`;
+function bookPat(){
+  let d = '';
+  for (let r = 0; r < 3; r++) for (let k = 0; k < 3; k++) {
+    const x = k * 34, y = 109 + r * 35;
+    d += `M${x} ${y}h14C${x + 18} ${y + 14} ${x + 26} ${y + 28} ${x + 34} ${y + 35}h-14C${x + 13} ${y + 28} ${x + 4} ${y + 14} ${x} ${y}Z`;
+  }
+  return `<svg class="kz-bk-pat" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
+}
+const BOOK_CAT = `<svg class="kz-bk-cat" viewBox="0 0 120 160" aria-hidden="true"><path d="M20 60L26 14 50 40M100 60L94 14 70 40M18 74C18 44 38 36 60 36S102 44 102 74 84 112 60 112 18 104 18 74ZM30 66h24v10c0 6-24 6-24 0zM66 66h24v10c0 6-24 6-24 0zM54 70h12M46 92c6-6 10-6 14 0 4-6 8-6 14 0M60 112v8M44 124l16-8 16 8-16 8zM30 112c-8 20-10 36-6 48M90 112c8 20 10 36 6 48"/></svg>`;
+function menuHTML(c){
+  const col = list => list.map(([h, items]) => `<section><h4>${esc(h)}</h4>${items.map(t => `<p>${H.T(t)}</p>`).join('')}</section>`).join('');
+  const pages = {
+    front: `<div class="kz-bk-page kz-bk-front">${BOOK_K}<span class="kz-bk-vk"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="${VK}"/></svg></span><h3>${esc(c.title).replace(' de ', '<br>de ')}</h3></div>`,
+    col1: `<div class="kz-bk-page kz-bk-col">${col(c.cols[0])}</div>`,
+    col2: `<div class="kz-bk-page kz-bk-col">${BOOK_CAT}${col(c.cols[1])}</div>`,
+    back: `<div class="kz-bk-page kz-bk-back">${bookPat()}</div>`,
+  };
+  return `<div class="kz-book">
+    <div class="kz-book-row">
+      <button class="kz-bk-arr kz-bk-prev" aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="kz-book-stage" tabindex="0" role="region" aria-roledescription="меню" aria-label="${esc(c.title)}">
+        <div class="kz-bk-pages" hidden>${Object.entries(pages).map(([k, h]) => `<template data-k="${k}">${h}</template>`).join('')}</div>
+      </div>
+      <button class="kz-bk-arr kz-bk-next" aria-label="Дальше"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="kz-dots"></div>
+  </div>
+  ${c.render ? `<button class="kz-stage kz-bk-render" aria-label="Увеличить"><img src="${small(c.render)}" srcset="${small(c.render)} 900w, ${c.render} 2000w" sizes="100vw" data-full="${c.render}" alt="" loading="lazy" draggable="false"></button>` : ''}`;
+}
+function liveMenu(box, c){
+  const stage = box.querySelector('.kz-book-stage'), dotsEl = box.querySelector('.kz-dots');
+  const tpl = k => box.querySelector(`template[data-k="${k}"]`).innerHTML;
+  const prev = box.querySelector('.kz-bk-prev'), next = box.querySelector('.kz-bk-next');
+  let spreads = [], cur = 0, wide = null, touched = false, busy = false;
+  // на широком экране разворот из двух колонок, на узком — по одной странице
+  const layout = () => {
+    const w = stage.clientWidth >= 560;
+    if (w === wide) return;
+    wide = w;
+    spreads = w ? [['front'], ['col1', 'col2'], ['back']] : [['front'], ['col1'], ['col2'], ['back']];
+    if (cur >= spreads.length) cur = spreads.length - 1;
+    dotsEl.innerHTML = spreads.map((_, k) => `<button class="kz-dot" type="button" aria-label="${k + 1} из ${spreads.length}"><i></i></button>`).join('');
+    [...dotsEl.children].forEach((d, k) => d.addEventListener('click', () => { touched = true; go(k); }));
+    stage.querySelectorAll('.kz-bk-spread').forEach(x => x.remove());
+    stage.insertAdjacentHTML('beforeend', spreadHTML(cur));
+    mark();
+  };
+  const spreadHTML = k => `<div class="kz-bk-spread${spreads[k].length > 1 ? ' open' : ''}">${spreads[k].map(tpl).join('')}</div>`;
+  const mark = () => {
+    [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === cur));
+    prev.disabled = cur === 0; next.disabled = cur === spreads.length - 1;
+  };
+  // страница переворачивается: старый разворот уходит ребром, новый выходит с другой стороны
+  const go = k => {
+    k = clamp(k, 0, spreads.length - 1);
+    if (k === cur || busy) return;
+    busy = true;
+    const dir = k > cur ? 1 : -1, old = stage.querySelector('.kz-bk-spread');
+    cur = k; mark();
+    const done = () => {
+      old.remove();
+      stage.insertAdjacentHTML('beforeend', spreadHTML(cur));
+      const nw = stage.querySelector('.kz-bk-spread');
+      if (!still()) { nw.classList.add(dir > 0 ? 'in-r' : 'in-l'); nw.getBoundingClientRect(); nw.classList.remove('in-r', 'in-l'); }
+      setTimeout(() => { busy = false; }, 320);
+    };
+    if (still()) { done(); return; }
+    old.classList.add(dir > 0 ? 'out-l' : 'out-r');
+    setTimeout(done, 300);
+  };
+  prev.addEventListener('click', () => { touched = true; go(cur - 1); });
+  next.addEventListener('click', () => { touched = true; go(cur + 1); });
+  let x0 = null;
+  stage.addEventListener('pointerdown', e => { x0 = e.clientX; });
+  stage.addEventListener('pointerup', e => {
+    if (x0 == null) return;
+    const dx = e.clientX - x0; x0 = null; touched = true;
+    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+    else go(cur === spreads.length - 1 ? 0 : cur + 1);
+  });
+  stage.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); touched = true; go(cur + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); touched = true; go(cur - 1); }
+  });
+  layout();
+  addEventListener('resize', layout);
+  // подсказка без слов: если меню не трогали, через пару секунд оно само раскрывается на разворот
+  onScreen(stage, v => { if (v && !touched && !still()) setTimeout(() => { if (!touched && cur === 0) go(1); }, 1800); });
+  const r = box.querySelector('.kz-bk-render');
+  if (r) r.addEventListener('click', () => { const im = r.querySelector('img'); H.openViewer([im.dataset.full], 0, [im]); });
+}
+
 /* ---------- было и варианты: рендеры из презентации рядом, по нажатию — крупно ---------- */
+// zoom: { s, x, y } — все картинки ряда увеличены в одно место: варианты отличаются деталью, и ее должно быть видно
 function compareHTML(c){
-  return `<div class="kz-cmp" style="--n:${c.items.length}">${c.items.map((it, i) =>
-    `<figure class="kz-cmp-it"><button class="kz-stage kz-cmp-pic" data-i="${i}" aria-label="Увеличить"><img src="${small(it.img)}" data-full="${it.img}" alt="" loading="lazy" draggable="false"></button>${
+  const z = c.zoom ? ` style="--zs:${c.zoom.s};--zx:${c.zoom.x}%;--zy:${c.zoom.y}%"` : '';
+  return `<div class="kz-cmp${c.zoom ? ' zoom' : ''}" style="--n:${c.items.length}">${c.items.map((it, i) =>
+    `<figure class="kz-cmp-it"><button class="kz-stage kz-cmp-pic" data-i="${i}" aria-label="Увеличить"><img src="${c.zoom ? it.img : small(it.img)}" data-full="${it.img}" alt="" loading="lazy" draggable="false"${z}></button>${
       it.name ? `<figcaption>${H.T(it.name)}</figcaption>` : ''}</figure>`).join('')}</div>`;
 }
 function liveCompare(box){
@@ -577,6 +682,7 @@ const KINDS = {
   beauty: [beautyHTML, liveBeauty],
   apron:  [apronHTML, liveApron],
   views:  [viewsHTML, liveViews],
+  menu:   [menuHTML, liveMenu],
   carousel: [carouselHTML, liveCarousel],
   compare:  [compareHTML, liveCompare],   // идет после основной картинки главы, если она есть
 };
@@ -596,7 +702,9 @@ function placeHTML(pl){
   return `<div class="kz-place kz-place-${pl.key}" data-place="${pl.key}">
     <header class="kz-door"><div class="wrap"><div class="kz-door-in">
       <div class="kz-door-txt"><h2 class="kz-door-name">${H.T(pl.name)}</h2><p class="kz-door-sub">${H.T(pl.text)}</p></div>
-      <div class="kz-door-pic">${pl.key === 'party' ? partyHouse() : blogHouse()}</div>
+      ${pl.door ? `<div class="kz-door-pic kz-door-shots">${pl.door.map((src, i) =>
+        `<img class="${i ? '' : 'on'}" src="${small(src)}" srcset="${small(src)} 900w, ${src} 2000w" sizes="(max-width:760px) 100vw, 45vw" alt="" draggable="false"${i ? ' loading="lazy"' : ''}>`).join('')}</div>`
+        : `<div class="kz-door-pic">${pl.key === 'party' ? partyHouse() : blogHouse()}</div>`}
     </div></div></header>
     ${chs}
     ${pl.photos ? `<section class="kz-ch wrap" data-kind="photos">${head(pl.photos)}<div class="kz-viz">${carouselHTML(pl.photos)}</div></section>` : ''}
@@ -635,6 +743,14 @@ function liveNav(mount){
   upd();
 }
 
+// заставка локации: рендер и фото фасада сменяют друг друга, пока заставка на экране
+function liveDoor(box){
+  const imgs = [...box.querySelectorAll('img')];
+  if (imgs.length < 2) return;
+  onScreen(box, v => { if (v) imgs.forEach(i => { i.loading = 'eager'; }); });
+  autoTour(box, imgs.length, i => imgs.forEach((im, k) => im.classList.toggle('on', k === i)), 3400);
+}
+
 /* ---------- запуск ---------- */
 let cssReady;
 function loadCSS(base){
@@ -665,6 +781,8 @@ export async function mountKidz(mount, p, helpers){
       if (ch[k]) KINDS[k][1](sec[i].querySelector('.kz-viz-' + k), ch[k]);
     }));
     if (pl.photos) liveCarousel(sec[pl.chapters.length].querySelector('.kz-viz'), pl.photos);
+    pl.chapters.forEach((ch, i) => { if (ch.aside) liveAside(sec[i]); });
   });
+  mount.querySelectorAll('.kz-door-shots').forEach(liveDoor);
   liveNav(mount);
 }
