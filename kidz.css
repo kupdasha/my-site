@@ -168,30 +168,6 @@
 .kz-form input:focus{box-shadow:inset 0 0 0 2px var(--ink)}
 @media (prefers-reduced-motion:reduce){.kz-mag,.kz-mag.off{transition:none}}
 
-/* ---------- фотозона: видоискатель ---------- */
-.kz-snap{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:clamp(16px,2vw,28px);align-items:start}
-.kz-snap-pic{aspect-ratio:3/2;cursor:pointer}
-.kz-snap-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.kz-vf{position:absolute;transition:left .6s var(--ease),top .6s var(--ease),width .6s var(--ease),height .6s var(--ease);pointer-events:none}
-.kz-vf i{position:absolute;width:clamp(16px,2.4vw,34px);height:clamp(16px,2.4vw,34px);border:3px solid #fff}
-.kz-vf i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}
-.kz-vf i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
-.kz-vf i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}
-.kz-vf i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
-.kz-vf.click{animation:kzClick .35s var(--ease)}
-@keyframes kzClick{50%{transform:scale(.96)}}
-.kz-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
-.kz-flash.go{animation:kzFlash .55s ease-out}
-@keyframes kzFlash{0%{opacity:.9}100%{opacity:0}}
-.kz-strip{display:flex;flex-direction:column;gap:clamp(12px,1.4vw,18px)}
-.kz-shot{display:block;padding:8px 8px 28px;background:#fff;border-radius:3px;box-shadow:0 1px 0 var(--line),0 10px 24px rgba(20,22,28,.12);
-  transform:translateY(-30px) rotate(-4deg);opacity:0;transition:transform .7s cubic-bezier(.3,1.4,.5,1),opacity .4s}
-.kz-shot:nth-child(2n){--rr:2.5deg}.kz-shot:nth-child(2n+1){--rr:-2deg}
-.kz-shot.in{transform:rotate(var(--rr));opacity:1}
-.kz-shot.out{opacity:0;transform:translateY(30px) rotate(var(--rr))}
-.kz-shot>span{display:block;aspect-ratio:3/2;background-repeat:no-repeat;background-color:var(--kz-stage)}
-@media (max-width:760px){.kz-snap{grid-template-columns:1fr}.kz-strip{flex-direction:row}.kz-shot{flex:0 0 calc((100% - 12px) / 2);padding:6px 6px 20px}}
-
 /* ---------- Дом блогеров: фасад ---------- */
 .kz-front .kz-ghost{opacity:0;fill:rgba(255,255,255,.4);stroke:var(--kz-pink);stroke-width:6;stroke-dasharray:14 10;transition:opacity .5s var(--ease)}
 .kz-front .kz-g-lines{fill:none;stroke:#fff;stroke-dasharray:none;stroke-width:6}
@@ -275,35 +251,42 @@
 .kz-tint{fill:#2E6BFF;opacity:0;mix-blend-mode:multiply;transition:opacity .9s var(--ease)}
 .kz-apron.blue .kz-tint{opacity:.28}
 .kz-beam{fill:none;stroke:var(--ink);stroke-width:2;stroke-dasharray:8 10;opacity:.25}
-/* ---------- меню ---------- */
-.kz-menu{display:grid;grid-template-columns:1fr 1fr;gap:3%;padding:5% 7%;aspect-ratio:16/10;cursor:pointer;background:#E9ECF1}
-:root[data-theme="dark"] .kz-menu{background:#20232A}
-.kz-page{position:relative;display:block;border-radius:4px;overflow:hidden;background:#fff;transition:background .8s var(--ease)}
-.kz-cover-pat{position:absolute;left:0;right:0;bottom:0;height:46%;background:var(--arcs) 0 0 / 34px 34px;opacity:1;transition:opacity .8s}
-.kz-cover{background:var(--kz-blue)}
-.kz-cover-vk{position:absolute;left:12%;top:10%;width:16%;opacity:0;transition:opacity .6s .3s}
-.kz-cover-name{position:absolute;left:12%;right:10%;top:34%;color:#fff;font-family:var(--font-read);font-weight:600;font-size:clamp(20px,3.6vw,52px);line-height:1;transform:rotate(-90deg) translate(-40%,-40%);transform-origin:left top;white-space:nowrap;transition:transform 1s var(--ease-io)}
-.kz-menu.strict .kz-cover-pat{opacity:0}
-.kz-menu.strict .kz-cover-vk{opacity:1}
-.kz-menu.strict .kz-cover-name{transform:none;white-space:normal}
-.kz-ml{position:absolute;left:var(--ox);top:var(--oy);width:var(--ow);height:5px;border-radius:99px;background:var(--kz-blue);transform:rotate(var(--or));
-  transition:left .9s var(--ease-io) var(--d),top .9s var(--ease-io) var(--d),width .9s var(--ease-io) var(--d),transform .9s var(--ease-io) var(--d),height .6s,background .8s,border-radius .6s}
-.kz-mh{height:9px}
-.kz-menu.strict .kz-list{background:var(--kz-blue)}
-.kz-menu.strict .kz-ml{left:var(--nx);top:var(--ny);width:var(--nw);transform:none;height:3px;border-radius:1px;background:rgba(255,255,255,.75)}
-.kz-menu.strict .kz-mh{height:6px;background:#fff}
-.kz-cat{position:absolute;right:8%;bottom:6%;width:30%;fill:none;stroke:var(--kz-blue);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;transition:opacity .6s,transform .8s var(--ease)}
-.kz-menu.strict .kz-cat{opacity:0;transform:translateY(20%) rotate(10deg)}
-@media (prefers-reduced-motion:reduce){.kz-ml,.kz-cover-name{transition:none}}
+/* ---------- карусель: кадр целиком, кружки по числу кадров ---------- */
+.kz-viz+.kz-viz{margin-top:clamp(28px,3.4vw,48px)}
+.kz-car{outline:none}
+.kz-car:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.kz-car-row{display:grid;aspect-ratio:3/2;max-height:84vh;border-radius:var(--r-img);overflow:hidden;background:var(--kz-stage);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:zoom-in}
+.kz-car-shot{grid-area:1 / 1;margin:0;min-height:0;opacity:0;transition:opacity .7s var(--ease)}
+.kz-car-shot.on{opacity:1}
+.kz-car-shot img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.kz-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;margin-top:clamp(12px,1.6vw,20px)}
+.kz-dot{display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;background:none;cursor:pointer}
+.kz-dot i{display:block;width:11px;height:11px;border-radius:50%;background:var(--line);transition:background .4s,transform .4s var(--ease)}
+.kz-dot.on i{background:var(--ink);transform:scale(1.15)}
+.kz-dot:hover:not(.on) i{background:color-mix(in srgb,var(--ink) 30%,var(--line))}
+@media (prefers-reduced-motion:reduce){.kz-car-shot{transition:none}}
 
-/* ---------- зал кухни ---------- */
-.kz-v{opacity:0;transition:opacity .8s var(--ease)}
-.kz-hall[data-v="art"] .kz-v-art,.kz-hall[data-v="wall"] .kz-v-wall,.kz-hall[data-v="hang"] .kz-v-hang{opacity:1}
-.kz-v-hang{transform-box:fill-box;transform-origin:top;transform:translateY(-20px);transition:opacity .8s var(--ease),transform 1s var(--ease)}
-.kz-hall[data-v="hang"] .kz-v-hang{transform:none}
+/* ---------- было и варианты: рендеры рядом ---------- */
+.kz-cmp{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:clamp(12px,1.6vw,24px)}
+.kz-cmp-it{margin:0}
+.kz-cmp-pic{aspect-ratio:2/3;cursor:zoom-in}
+.kz-cmp-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.kz-cmp-pic:hover img{transform:scale(1.03)}
+.kz-cmp figcaption{margin-top:12px;font-size:18px;line-height:1.3;text-wrap:balance}
+.kz-cmp-it:first-child figcaption{opacity:.55}
+@media (max-width:760px){.kz-cmp{grid-template-columns:repeat(2,minmax(0,1fr))}.kz-cmp[style*="--n:3"] .kz-cmp-it:first-child{grid-column:1 / -1}.kz-cmp[style*="--n:3"] .kz-cmp-it:first-child .kz-cmp-pic{aspect-ratio:4/3}}
 
-/* ---------- фото в конце локации ---------- */
-.kz-photos{columns:3 260px;column-gap:clamp(12px,1.4vw,20px)}
-.kz-ph{display:block;width:100%;padding:0;margin-bottom:clamp(12px,1.4vw,20px);border-radius:var(--r-img);overflow:hidden;break-inside:avoid;cursor:zoom-in;background:var(--kz-stage)}
-.kz-ph img{display:block;width:100%;height:auto;transition:transform .8s var(--ease)}
-.kz-ph:hover img{transform:scale(1.03)}
+/* ---------- переключатель рендеров ---------- */
+.kz-views-pic{cursor:zoom-in}
+.kz-view{position:absolute;inset:0;display:flex;gap:2%;justify-content:center;align-items:center;opacity:0;transition:opacity .7s var(--ease)}
+.kz-view.on{opacity:1}
+.kz-view img{display:block;min-width:0;width:100%;height:100%;object-fit:contain}
+.kz-view:has(img+img) img{width:49%}
+.kz-views.side{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.7fr);gap:clamp(20px,3vw,48px);align-items:center}
+.kz-views.side .kz-bar{flex-direction:column;align-items:flex-start;margin:0}
+.kz-views.side .kz-views-pic{max-height:86vh}
+@media (max-width:760px){.kz-views.side{grid-template-columns:1fr}.kz-views.side .kz-bar{flex-direction:row}}
+/* в высокой рамке пара картинок — одна над другой */
+.kz-views.side .kz-view:has(img+img){flex-direction:column}
+.kz-views.side .kz-view:has(img+img) img{width:100%;height:49%}
+.kz-views:not(.side) .kz-views-pic{max-height:78vh}

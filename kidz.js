@@ -5,12 +5,13 @@
    половин с полоской прогресса: видно, в какой локации вы
    и сколько ее осталось. У каждой локации — заставка, живые главы
    и фото в конце.
-   VK Праздники: фасад в темноте (светятся только лайтбоксы),
-   план на три зоны, магнитная стена (впишите имя), фотозона-видоискатель.
+   VK Праздники: рендеры концепции каруселью, фасад в темноте (светятся
+   только лайтбоксы), план на три зоны, магнитная стена (впишите имя).
    Дом блогеров: фасад (лишнее появляется и стирается, узор упирается
-   в 70 см), точки на общем виде, узор в кадре телефона и лайтбокс,
-   фартук синий или бежевый, меню собирается в строгую верстку,
-   три варианта стены в зале кухни.
+   в 70 см) и рендеры «как было / варианты», точки на общем виде, узор
+   в кадре телефона и лайтбокс, фартук синий или бежевый с фото формы,
+   настоящее меню и рендеры зала кухни переключателем.
+   В конце каждой локации — фото с площадки каруселью с кружками.
    Тексты — в content.js, оформление — kidz.css, фото — img/kidzania.
    ================================================================ */
 let H;   // помощники из app.js: T (типограф), pick, openViewer, base
@@ -20,7 +21,6 @@ const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const small = src => src.replace(/\.webp$/, '-s.webp');   // легкая копия 900 px
-const photo = id => 'img/kidzania/' + id + '.webp';
 const onScreen = (el, cb, margin = '0px') =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: margin }).observe(el);
 // перебор по кругу, пока блок на экране и его не трогали; возвращает «стоп»
@@ -316,42 +316,6 @@ function liveWall(box, c){
   });
 }
 
-/* ---------- фотозона: видоискатель выбирает кадр, вспышка, снимок падает в ленту ---------- */
-function snapHTML(c){
-  return `<div class="kz-snap">
-    <button class="kz-stage kz-snap-pic" aria-label="Сделать снимок">
-      <img src="${small(c.img)}" srcset="${small(c.img)} 900w, ${c.img} 2000w" sizes="(max-width:760px) 100vw, 66vw" alt="" draggable="false" loading="lazy">
-      <span class="kz-vf"><i></i><i></i><i></i><i></i></span>
-      <span class="kz-flash"></span>
-    </button>
-    <div class="kz-strip" aria-hidden="true"></div>
-  </div>`;
-}
-function liveSnap(box, c){
-  const pic = box.querySelector('.kz-snap-pic'), vf = box.querySelector('.kz-vf'), strip = box.querySelector('.kz-strip');
-  const flash = box.querySelector('.kz-flash'), src = small(c.img);
-  let k = 0, busy = false;
-  const aim = s => { vf.style.left = s.x + '%'; vf.style.top = s.y + '%'; vf.style.width = s.s + '%'; vf.style.height = s.s + '%'; };
-  aim(c.shots[0]);
-  const shoot = () => {
-    if (busy) return; busy = true;
-    const s = c.shots[k];
-    flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
-    vf.classList.remove('click'); void vf.offsetWidth; vf.classList.add('click');
-    // снимок — тот же кадр из фото: фон увеличен под рамку видоискателя
-    const shot = document.createElement('span');
-    shot.className = 'kz-shot';
-    const f = s.s < 100 ? 100 / (100 - s.s) : 0;
-    shot.innerHTML = `<span style="background-image:url('${src}');background-size:${(1e4 / s.s).toFixed(1)}% auto;background-position:${(s.x * f).toFixed(1)}% ${(s.y * f).toFixed(1)}%"></span>`;
-    strip.prepend(shot);
-    requestAnimationFrame(() => requestAnimationFrame(() => shot.classList.add('in')));
-    [...strip.children].slice(2).forEach(o => { o.classList.add('out'); setTimeout(() => o.remove(), 600); });
-    setTimeout(() => { k = (k + 1) % c.shots.length; aim(c.shots[k]); busy = false; }, 700);
-  };
-  const stop = autoTour(pic, 1e9, shoot, 3200);
-  pic.addEventListener('click', () => { stop(); shoot(); });
-}
-
 /* ================================================================
    ДОМ БЛОГЕРОВ
    ================================================================ */
@@ -530,101 +494,77 @@ function liveApron(box){
   chips.forEach((b, i) => b.addEventListener('click', () => { stop(i); show(i); }));
 }
 
-/* ---------- меню: строки слетаются из прованса в строгую верстку ---------- */
-function menuHTML(c){
-  // [x, y, ширина] в процентах страницы: было — вразброс и с наклоном, стало — две колонки с заголовками
-  const rows = [];
-  const cols = [[8, [1, 1, 1, 0, 1, 1, 1, 1]], [54, [1, 1, 1, 1, 0, 1, 1, 1]]];
-  cols.forEach(([x, list], ci) => {
-    let y = 10, head = true;
-    list.forEach(v => {
-      if (!v) { y += 9; head = true; return; }
-      rows.push({ nx: x, ny: y, nw: head ? 20 : 26 + ((y * 7 + ci * 13) % 12), h: head });
-      y += head ? 9.5 : 7.5; head = false;
-    });
-  });
-  const html = rows.map((r, i) => {
-    const ox = 8 + (i * 29) % 46, oy = 8 + i * (58 / rows.length) + (i * 7) % 6, ow = r.h ? 30 : 18 + (i * 13) % 16, or = ((i * 17) % 13 - 6) * 1.6;
-    return `<i class="kz-ml${r.h ? ' kz-mh' : ''}" style="--ox:${ox}%;--oy:${oy}%;--ow:${ow}%;--or:${or}deg;--nx:${r.nx}%;--ny:${r.ny}%;--nw:${r.nw}%;--d:${i * 30}ms"></i>`;
-  }).join('');
-  return `<button class="kz-stage kz-menu" aria-label="Переключить меню">
-    <span class="kz-page kz-cover">
-      <span class="kz-cover-pat" style="--arcs:${ARCS('#fff')}"></span>
-      <svg class="kz-cover-vk" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="${VK}"/></svg>
-      <span class="kz-cover-name">${esc(c.title)}</span>
-    </span>
-    <span class="kz-page kz-list">${html}
-      <svg class="kz-cat" viewBox="0 0 120 120" aria-hidden="true"><path d="M30 60l-6-28 22 14M90 60l6-28-22 14M24 74c0-24 16-34 36-34s36 10 36 34-16 34-36 34-36-10-36-34zM46 70v4M74 70v4M54 86c4 4 8 4 12 0M30 40c0-20 60-20 60 0" fill="none"/></svg>
-    </span>
-  </button>`;
-}
-function liveMenu(box){
-  const m = box.querySelector('.kz-menu');
-  const stop = autoTour(m, 2, i => m.classList.toggle('strict', i === 1), 3400);
-  m.addEventListener('click', () => { stop(); m.classList.toggle('strict'); });
-}
-
-/* ---------- зал кухни: три варианта одной стены ---------- */
-function hallHTML(c){
-  // листья: детерминированный разброс эллипсов трех оттенков зеленого
-  const leaves = (x0, y0, w, h, n, seed) => {
-    let s = seed, out = '';
-    const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
-    const G = ['#2F8F4E', '#43A85E', '#6CC27A', '#1F6E3B'];
-    for (let i = 0; i < n; i++) {
-      const x = x0 + rnd() * w, y = y0 + rnd() * h, r = 12 + rnd() * 16;
-      out += `<ellipse cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" rx="${r.toFixed(0)}" ry="${(r * .55).toFixed(0)}" transform="rotate(${(rnd() * 180).toFixed(0)} ${x.toFixed(0)} ${y.toFixed(0)})" fill="${G[i % 4]}"/>`;
-    }
-    return out;
-  };
-  const chair = x => `<g transform="translate(${x} 0)"><path d="M0 412c0-30 6-44 34-44h10v44z" fill="#14161B"/><path d="M4 412h44M10 412l-8 104M40 412l8 104" stroke="#14161B" stroke-width="6" stroke-linecap="round"/></g>`;
-  const tiles = [];
-  for (let y = 40; y < 520; y += 28) tiles.push(`M0 ${y}H1200`);
-  for (let y = 40, r = 0; y < 520; y += 28, r++) for (let x = (r % 2) * 40; x < 1200; x += 80) tiles.push(`M${x} ${y}v28`);
-  const frames = [[600, 120, 90, 120], [704, 140, 60, 60], [704, 214, 60, 80], [778, 120, 100, 90], [778, 224, 70, 70], [862, 230, 40, 50]];
-  return `<div class="kz-hall">
-    <div class="kz-stage kz-hall-st"><svg viewBox="0 0 1200 620" aria-hidden="true">
-      <rect width="1200" height="520" fill="#F5F3F0"/><path d="${tiles.join('')}" stroke="#E2DED8" stroke-width="2"/>
-      <g class="kz-v kz-v-wall">${leaves(10, 50, 900, 460, 420, 7)}</g>
-      <g class="kz-v kz-v-art">
-        ${frames.map(([x, y, w, h], i) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="#1D5BFF" stroke-width="${i % 2 ? 6 : 9}"/>${
-          i === 0 ? `<rect x="${x + 22}" y="${y + 20}" width="${w - 44}" height="${h - 40}" fill="#C9CDD4"/>` : i === 3 ? vk(x + 34, y + 28, 32, C.blue) : `<circle cx="${x + w / 2}" cy="${y + h / 2}" r="${Math.min(w, h) / 4}" fill="#C9CDD4"/>`}`).join('')}
-        <path d="M150 160l-20-10M156 300l-30 14M330 150l20-16M344 300l26 10" stroke="#C9C4BC" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="250" cy="230" r="96" fill="#F7A6C3"/><path d="M250 136c-8 30-8 120 0 188" stroke="#E584A8" stroke-width="6" fill="none"/>
-        <path d="M252 138c20-40 70-40 80-20-30 16-56 20-80 20z" fill="#43A85E"/>
-        <circle cx="214" cy="214" r="9" fill="${C.ink}"/><circle cx="286" cy="214" r="9" fill="${C.ink}"/><path d="M230 250c12 12 28 12 40 0" stroke="${C.ink}" stroke-width="6" fill="none" stroke-linecap="round"/>
-      </g>
-      <rect x="0" y="0" width="1200" height="34" fill="#23262E"/>
-      <g class="kz-lamps">${[440, 580, 720].map(x => `<path d="M${x} 34v70" stroke="#23262E" stroke-width="3"/><rect x="${x - 12}" y="104" width="24" height="60" rx="3" fill="#14161B"/>`).join('')}</g>
-      <g class="kz-v kz-v-hang">${leaves(330, 30, 520, 120, 170, 3)}</g>
-      <rect x="0" y="520" width="1200" height="100" fill="#DCCBB2"/><path d="M0 548h1200M0 584h1200" stroke="#CDBA9E" stroke-width="2"/>
-      <g><rect x="950" y="190" width="170" height="330" fill="#fff" stroke="#D9D5CE" stroke-width="4"/><circle cx="1035" cy="290" r="42" fill="#3A3F4B" stroke="#C9CDD4" stroke-width="8"/><path d="M968 360h14" stroke="#B9BDC5" stroke-width="6" stroke-linecap="round"/></g>
-      ${chair(320)}${chair(420)}${chair(720)}${chair(820)}
-      <rect x="470" y="412" width="250" height="108" fill="#14161B"/>
-      <rect x="330" y="398" width="540" height="18" rx="9" fill="#fff" stroke="#E2E4E8" stroke-width="2"/>
-      ${[400, 470, 560, 640, 730, 800].map((x, i) => `<circle cx="${x}" cy="${390 - (i % 2) * 4}" r="${10 + (i % 3) * 3}" fill="${[C.pink, '#fff', C.cyan, '#F7A6C3', '#fff', C.pink][i]}"/>`).join('')}
-    </svg></div>
-    <div class="kz-bar">${c.variants.map((v, i) => `<button class="btn kz-chip" data-i="${i}">${H.T(v.name)}</button>`).join('')}</div>
+/* ---------- карусель: один кадр на всю ширину, сменяются сами, под ними кружки по числу кадров ---------- */
+// смахнуть — следующий кадр, короткое нажатие — крупно
+function carouselHTML(c){
+  const list = c.items;
+  return `<div class="kz-car" tabindex="0" role="region" aria-roledescription="слайды">
+    <div class="kz-car-row">${list.map((src, k) =>
+      `<figure class="kz-car-shot${k ? '' : ' on'}"><img src="${small(src)}" srcset="${small(src)} 900w, ${src} 2000w" sizes="(max-width:760px) 100vw, 80vw" alt="" loading="lazy" draggable="false"></figure>`).join('')}</div>
+    <div class="kz-dots">${list.map((_, k) =>
+      `<button class="kz-dot${k ? '' : ' on'}" type="button" aria-label="${k + 1} из ${list.length}"><i></i></button>`).join('')}</div>
   </div>`;
 }
-function liveHall(box, c){
-  const st = box.querySelector('.kz-hall'), chips = [...box.querySelectorAll('.kz-chip')];
-  const show = i => { st.dataset.v = c.variants[i].key; chips.forEach((b, k) => b.classList.toggle('on', k === i)); };
-  show(0);
-  const stop = autoTour(st, c.variants.length, show, 3000);
-  chips.forEach((b, i) => b.addEventListener('click', () => { stop(i); show(i); }));
+function liveCarousel(box, c){
+  const car = box.querySelector('.kz-car'), row = car.querySelector('.kz-car-row');
+  const shots = [...row.children], imgs = shots.map(f => f.querySelector('img')), dots = [...car.querySelectorAll('.kz-dot')];
+  let cur = 0, on = false, timer = 0;
+  const run = () => { clearTimeout(timer); if (on && !still()) timer = setTimeout(() => go(cur + 1), 4000); };
+  const go = k => {
+    cur = (k + shots.length) % shots.length;
+    shots.forEach((f, n) => f.classList.toggle('on', n === cur));
+    dots.forEach((d, n) => d.classList.toggle('on', n === cur));
+    // следующий кадр грузится заранее, чтобы смена не мигала пустым
+    const nx = imgs[(cur + 1) % imgs.length]; if (nx.loading === 'lazy') nx.loading = 'eager';
+    run();
+  };
+  dots.forEach((d, n) => d.addEventListener('click', () => go(n)));
+  onScreen(row, v => { on = v; if (v) imgs.slice(0, 2).forEach(i => { i.loading = 'eager'; }); run(); });
+  let x0 = null;
+  row.addEventListener('pointerdown', e => { x0 = e.clientX; });
+  row.addEventListener('pointerup', e => {
+    if (x0 == null) return;
+    const dx = e.clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+    else H.openViewer(c.items, cur, imgs);
+  });
+  car.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+  });
 }
 
-/* ---------- фото в конце локации: колонками, по нажатию — крупно ---------- */
-function photosHTML(c){
-  return `<div class="kz-photos">${c.items.map((id, i) =>
-    `<button class="kz-ph" data-i="${i}" aria-label="Увеличить фото"><img src="${small(photo(id))}" data-full="${photo(id)}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div>`;
+/* ---------- было и варианты: рендеры из презентации рядом, по нажатию — крупно ---------- */
+function compareHTML(c){
+  return `<div class="kz-cmp" style="--n:${c.items.length}">${c.items.map((it, i) =>
+    `<figure class="kz-cmp-it"><button class="kz-stage kz-cmp-pic" data-i="${i}" aria-label="Увеличить"><img src="${small(it.img)}" data-full="${it.img}" alt="" loading="lazy" draggable="false"></button>${
+      it.name ? `<figcaption>${H.T(it.name)}</figcaption>` : ''}</figure>`).join('')}</div>`;
 }
-function livePhotos(box){
-  const imgs = [...box.querySelectorAll('.kz-ph img')];
-  box.addEventListener('click', e => {
-    const b = e.target.closest('.kz-ph'); if (!b) return;
-    H.openViewer(imgs.map(x => x.dataset.full), +b.dataset.i, imgs);
+function liveCompare(box){
+  const imgs = [...box.querySelectorAll('.kz-cmp-pic img')];
+  box.querySelectorAll('.kz-cmp-pic').forEach(b => b.addEventListener('click', () =>
+    H.openViewer(imgs.map(x => x.dataset.full), +b.dataset.i, imgs)));
+}
+
+/* ---------- переключатель рендеров: кнопки — варианты, картинки сменяются сами, пока их не трогали ---------- */
+function viewsHTML(c){
+  return `<div class="kz-views${c.side ? ' side' : ''}">
+    <div class="kz-stage kz-views-pic" style="aspect-ratio:${c.ratio || '16/10'}">${c.items.map((it, i) =>
+      `<div class="kz-view${i ? '' : ' on'}" data-i="${i}">${(it.imgs || [it.img]).map(src =>
+        `<img src="${small(src)}" srcset="${small(src)} 900w, ${src} 2000w" sizes="${c.side ? '(max-width:760px) 100vw, 55vw' : '(max-width:760px) 100vw, 90vw'}" data-full="${src}" alt="" loading="lazy" draggable="false">`).join('')}</div>`).join('')}</div>
+    <div class="kz-bar">${c.items.map((it, i) => `<button class="btn kz-chip${i ? '' : ' on'}" data-i="${i}">${H.T(it.name)}</button>`).join('')}</div>
+  </div>`;
+}
+function liveViews(box, c){
+  const views = [...box.querySelectorAll('.kz-view')], chips = [...box.querySelectorAll('.kz-chip')];
+  const show = i => { views.forEach((v, k) => v.classList.toggle('on', k === i)); chips.forEach((b, k) => b.classList.toggle('on', k === i)); };
+  const stop = autoTour(box.querySelector('.kz-views-pic'), c.items.length, show, 3600);
+  chips.forEach((b, i) => b.addEventListener('click', () => { stop(i); show(i); }));
+  onScreen(box, v => { if (v) box.querySelectorAll('img[loading="lazy"]').forEach(i => { i.loading = 'eager'; }); }, '300px 0px');
+  box.querySelector('.kz-views-pic').addEventListener('click', e => {
+    const im = e.target.closest('img'); if (!im) return;
+    const all = [...box.querySelectorAll('.kz-view img')];
+    H.openViewer(all.map(x => x.dataset.full), all.indexOf(im), all);
   });
 }
 
@@ -632,13 +572,13 @@ const KINDS = {
   glow:   [glowHTML, liveGlow],
   plan:   [planHTML, livePlan],
   wall:   [wallHTML, liveWall],
-  snap:   [snapHTML, liveSnap],
   front:  [frontHTML, liveFront],
   spots:  [spotsHTML, liveSpots],
   beauty: [beautyHTML, liveBeauty],
   apron:  [apronHTML, liveApron],
-  menu:   [menuHTML, liveMenu],
-  hall:   [hallHTML, liveHall],
+  views:  [viewsHTML, liveViews],
+  carousel: [carouselHTML, liveCarousel],
+  compare:  [compareHTML, liveCompare],   // идет после основной картинки главы, если она есть
 };
 
 /* ================================================================
@@ -650,8 +590,8 @@ function navHTML(places){
 }
 function placeHTML(pl){
   const chs = pl.chapters.map(ch => {
-    const k = Object.keys(KINDS).find(x => ch[x]);
-    return `<section class="kz-ch wrap" data-kind="${k}">${head(ch)}<div class="kz-viz">${k ? KINDS[k][0](ch[k]) : ''}</div></section>`;
+    const ks = Object.keys(KINDS).filter(x => ch[x]);
+    return `<section class="kz-ch wrap" data-kind="${ks[0] || ''}">${head(ch)}${ks.map(k => `<div class="kz-viz kz-viz-${k}">${KINDS[k][0](ch[k])}</div>`).join('')}</section>`;
   }).join('');
   return `<div class="kz-place kz-place-${pl.key}" data-place="${pl.key}">
     <header class="kz-door"><div class="wrap"><div class="kz-door-in">
@@ -659,7 +599,7 @@ function placeHTML(pl){
       <div class="kz-door-pic">${pl.key === 'party' ? partyHouse() : blogHouse()}</div>
     </div></div></header>
     ${chs}
-    ${pl.photos ? `<section class="kz-ch wrap" data-kind="photos">${head(pl.photos)}<div class="kz-viz">${photosHTML(pl.photos)}</div></section>` : ''}
+    ${pl.photos ? `<section class="kz-ch wrap" data-kind="photos">${head(pl.photos)}<div class="kz-viz">${carouselHTML(pl.photos)}</div></section>` : ''}
     ${pl.next && pl.nextKey ? `<div class="wrap kz-next-row"><button class="btn btn-line kz-next" data-go="${pl.nextKey}"><span>${H.T(pl.next)}</span><span class="kz-arr" aria-hidden="true">↓</span></button></div>` : ''}
   </div>`;
 }
@@ -721,11 +661,10 @@ export async function mountKidz(mount, p, helpers){
   mount.querySelectorAll('.kz-ch, .kz-door').forEach(s => reveal.observe(s));
   places.forEach(pl => {
     const sec = [...mount.querySelectorAll(`.kz-place[data-place="${pl.key}"] .kz-ch`)];
-    pl.chapters.forEach((ch, i) => {
-      const k = Object.keys(KINDS).find(x => ch[x]);
-      if (k) KINDS[k][1](sec[i].querySelector('.kz-viz'), ch[k]);
-    });
-    if (pl.photos) livePhotos(sec[pl.chapters.length].querySelector('.kz-viz'));
+    pl.chapters.forEach((ch, i) => Object.keys(KINDS).forEach(k => {
+      if (ch[k]) KINDS[k][1](sec[i].querySelector('.kz-viz-' + k), ch[k]);
+    }));
+    if (pl.photos) liveCarousel(sec[pl.chapters.length].querySelector('.kz-viz'), pl.photos);
   });
   liveNav(mount);
 }
