@@ -162,16 +162,19 @@ function liveColors(box){
 /* ---------- поиски разметки: ведете по дороге — макеты меняются, колесо катится ---------- */
 function searchHTML(c){
   const n = c.items.length;
-  // подсказка — не мелкой строкой, а крупно над карточкой; игрушка по центру страницы
+  // инструкция — шаги с иконками над карточкой, по ее левому краю; игрушка по центру страницы
+  const icon = { mouse: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 7.5-6.2 1.7L10 18.5z" fill="currentColor"/></svg>`, wheel: WHEEL };
+  const steps = (c.steps || []).map(st => `<li><span class="fl-step-ic">${icon[st.icon] || ''}</span>${H.T(st.text)}</li>`).join('');
   return `<div class="fl-search-row"><div class="fl-search" style="--n:${n}">
-    <div class="fl-stage">${c.items.map((x, i) => `<img class="${i ? '' : 'on'}" src="${x.img}" alt="" loading="lazy" draggable="false">`).join('')}
+    ${steps ? `<ol class="fl-steps">${steps}</ol>` : ''}
+    <div class="fl-stage">${c.items.map((x, i) => `<img class="${i ? '' : 'on'}" src="${x.img}" alt="" decoding="async" draggable="false">`).join('')}
       ${c.items.map((x, i) => `<span class="fl-tag${i ? '' : ' on'}${i === n - 1 ? ' last' : ''}">${H.T(x.name)}</span>`).join('')}</div>
     <div class="fl-track">
       <i class="fl-dash"></i>
       <span class="fl-wh-box"><span class="fl-car-wh">${WHEEL}</span></span>
       <input class="fl-range" type="range" min="0" max="${n - 1}" step="any" value="0" aria-label="Варианты разметки, от первых проб к финалу">
     </div>
-  </div>${c.hint ? `<p class="fl-side">${H.T(c.hint)}</p>` : ''}</div>`;
+  </div></div>`;
 }
 function liveSearch(box){
   const imgs = [...box.querySelectorAll('.fl-stage img')], tags = [...box.querySelectorAll('.fl-tag')];
@@ -186,8 +189,12 @@ function liveSearch(box){
     wh.style.transform = `translate(-50%,-50%) rotate(${(p * 900).toFixed(1)}deg)`;
     dash.style.backgroundPosition = `${(-p * 240).toFixed(1)}px 0`;
     if (i !== k) {
+      // новый кадр мягко ложится поверх прежнего, прежний не гаснет — фон между ними не просвечивает
+      const was = imgs[k];
+      imgs.forEach(im => im.classList.remove('under'));
+      if (was) { was.classList.remove('on'); was.classList.add('under'); }
       k = i;
-      imgs.forEach((im, j) => im.classList.toggle('on', j === i));
+      imgs[i].classList.add('on');
       tags.forEach((t, j) => t.classList.toggle('on', j === i));
     }
   };

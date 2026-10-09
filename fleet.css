@@ -66,13 +66,18 @@
 .fl-search-row{display:flex;flex-direction:column;align-items:center;gap:clamp(20px,2.4vw,32px)}
 /* игрушка — ровно посередине страницы, подсказка над ней */
 .fl-search{width:min(560px,62vh,100%)}
-.fl-side{order:-1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:32ch;text-align:center;text-wrap:balance}
+.fl-steps{list-style:none;margin:0 0 clamp(14px,1.6vw,20px);padding:0;display:grid;gap:10px;font-size:17px;line-height:1.35}
+.fl-steps li{display:flex;align-items:center;gap:12px}
+.fl-step-ic{flex:none;width:32px;height:32px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--ink)}
+.fl-step-ic svg{width:18px;height:18px;display:block}
 .fl-stage{position:relative;aspect-ratio:900/950;border-radius:var(--r-img);overflow:hidden;background:#F7F7F7;cursor:ew-resize}
-.fl-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s var(--ease)}
-.fl-stage img.on{opacity:1}
-.fl-tag{position:absolute;left:14px;top:14px;font-size:16px;line-height:1;padding:7px 13px 10px;border-radius:999px;background:#FFFFFF;color:#1D222A;opacity:0;transform:translateY(-6px);transition:opacity .3s var(--ease),transform .4s var(--ease)}
+.fl-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:0;transition:opacity .6s ease}
+/* прежний кадр остается под новым, пока тот проявляется */
+.fl-stage img.under{opacity:1;z-index:1;transition:none}
+.fl-stage img.on{opacity:1;z-index:2}
+.fl-tag{position:absolute;z-index:3;left:14px;top:14px;font-size:16px;line-height:1;padding:7px 13px 10px;border-radius:999px;background:#FFFFFF;color:#1D222A;opacity:0;transition:opacity .4s ease}
 .fl-tag.last{background:#1D222A;color:#FFFFFF}
-.fl-tag.on{opacity:1;transform:none}
+.fl-tag.on{opacity:1}
 .fl-track{position:relative;height:56px;margin-top:18px;border-radius:999px;background:var(--fl-asphalt);display:flex;align-items:center;padding:0 28px}
 .fl-track .fl-dash{flex:1;height:3px;background-image:repeating-linear-gradient(90deg,var(--fl-mark) 0 26px,transparent 26px 48px)}
 .fl-wh-box{position:absolute;top:0;bottom:0;left:28px;right:28px;pointer-events:none}
