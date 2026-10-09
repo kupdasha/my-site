@@ -58,7 +58,7 @@
 .mk-logo{position:absolute;left:6%;top:7%;width:var(--logo);height:auto;fill:var(--mk-t);z-index:2;opacity:var(--mk-logo,1);transition:fill .5s var(--ease)}
 .mk-post[data-f="tall"] .mk-logo{top:6%;left:8%}
 
-/* текст: куда встает — задает композиция (те же числа — ANCHOR в maket.js) */
+/* текст: куда встает — задает композиция */
 .mk-copy{position:absolute;z-index:2;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);display:flex;flex-direction:column;align-items:var(--al);gap:var(--gap);
   transform:translate(calc(var(--ax) * -1%),calc(var(--ay) * -1%)) translate(var(--dx,0px),var(--dy,0px))}
 .mk-copy.snap{transition:transform .75s var(--ease)}
@@ -96,8 +96,16 @@
    feed — лента «как умеют»
    ================================================================ */
 .mk-feed{padding:clamp(16px,4vw,56px)}
-.mk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.2vw,16px);max-width:760px;margin:0 auto}
-.mk-tile{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:6px;transition:background-color .9s var(--ease)}
+.mk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.2vw,16px);max-width:720px;margin:0 auto}
+/* карточка поста: аватарка и имя одни и те же — пишет один паблик */
+.mk-card{display:flex;flex-direction:column;gap:clamp(6px,.7vw,9px);padding:clamp(6px,.7vw,9px);border-radius:10px;background:#FFFFFF}
+.mk-card-head{display:flex;align-items:center;gap:8px}
+.mk-ava{flex:none;display:grid;place-items:center;width:clamp(20px,2.2vw,28px);aspect-ratio:1;border-radius:50%;background:var(--mk-lime)}
+.mk-ava-mark{width:34%;height:auto;margin-left:-6%;fill:var(--mk-black)}
+.mk-card-head b{width:44%;height:clamp(5px,.55vw,7px);border-radius:4px;background:#1D222A}
+.mk-card-foot{display:flex;gap:10px}
+.mk-card-foot svg{width:clamp(14px,1.4vw,18px);height:auto;fill:none;stroke:#A3A7AF;stroke-width:1.8;stroke-linejoin:round}
+.mk-tile{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:5px;transition:background-color .9s var(--ease)}
 .mk-j{position:absolute;display:block;transition:left 1.8s var(--ease),top 1.8s var(--ease),width 1.8s var(--ease),height 1.8s var(--ease),transform 1.8s var(--ease),background-color .9s,fill .9s,border-color .9s}
 .mk-j-l1{height:8%}
 .mk-j-l2{height:6.5%;border-radius:2px}
@@ -142,22 +150,28 @@
 @media (max-width:560px){.mk-rail{display:none}.mk-app{padding:8px}.mk-bar{padding:10px 12px}}
 
 /* ================================================================
-   style — текст тянется, но встает только в разрешенное место
+   style — что ни вставь, конструктор поставит на место
    ================================================================ */
 .mk-style{padding:clamp(16px,4vw,64px)}
-.mk-zone{position:relative;max-width:860px;margin:0 auto}
-.mk-big .mk-copy{cursor:grab;touch-action:none}
-.mk-zone.drag .mk-copy{cursor:grabbing}
-/* поля и разрешенные места видны, только пока текст тянут */
+.mk-zone{position:relative;max-width:860px;margin:0 auto;cursor:pointer;border-radius:10px}
+.mk-zone:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+/* «как вставили»: сдвиг, наклон, растяжение и чужой цвет; без них элемент стоит как положено */
+.mk-style .mk-logo,.mk-style .mk-copy > *{transform:translate(var(--cx,0px),var(--cy,0px)) rotate(var(--cr,0deg)) scale(var(--csx,1),var(--csy,1));
+  transition:transform .8s var(--ease),background-color .6s var(--ease),fill .6s var(--ease)}
+.mk-style .mk-logo{transform-origin:0 0;fill:var(--cc,var(--mk-t))}
+.mk-style .mk-line{background:var(--cc,var(--mk-t));border-radius:var(--crad,var(--mk-r,99px))}
+.mk-style .mk-sub{background:var(--cc,var(--mk-sub))}
+.mk-style .mk-tags i{box-shadow:inset 0 0 0 var(--tagb) var(--cc,var(--mk-t));transition:box-shadow .6s var(--ease),background-color .6s var(--ease)}
+.mk-style .mk-post[data-g="fill"] .mk-tags i{background:var(--cc,var(--mk-t))}
+.mk-zone.raw *{transition:none !important}
+/* поля и колонки сетки видны, пока конструктор расставляет элементы */
 .mk-guides{position:absolute;inset:0;pointer-events:none;z-index:3}
-.mk-guides::before{content:"";position:absolute;inset:8.9% 5%;border-radius:6px;outline:2px dashed rgba(13,13,11,.4);opacity:0;transition:opacity .35s var(--ease)}
-.mk-guides i{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--mk-black);opacity:0;transform:scale(.4);box-shadow:0 0 0 4px color-mix(in srgb,var(--mk-black) 18%,transparent);transition:opacity .35s var(--ease),transform .45s var(--ease)}
-.mk-zone.drag .mk-guides::before{opacity:1}
-.mk-zone.drag .mk-guides i{opacity:.55;transform:none}
-.mk-cur{position:absolute;left:0;top:0;width:28px;height:35px;margin:-3px 0 0 -5px;z-index:5;pointer-events:none;fill:var(--mk-black);stroke:#FFFFFF;stroke-width:1.6;stroke-linejoin:round;opacity:0;transition:opacity .4s var(--ease),scale .2s var(--ease)}
-.mk-zone.cur-on .mk-cur{opacity:1}
-.mk-zone.grab .mk-cur{scale:.86}
-.mk-zone.touched .mk-cur{opacity:0}
+.mk-guides::before{content:"";position:absolute;inset:8.9% 5%;border-radius:6px;outline:2px dashed color-mix(in srgb,var(--mk-black) 40%,transparent);opacity:0;transition:opacity .4s var(--ease)}
+.mk-guides i{position:absolute;top:8.9%;bottom:8.9%;width:0;border-left:1.5px dashed color-mix(in srgb,var(--mk-black) 25%,transparent);opacity:0;transition:opacity .4s var(--ease)}
+.mk-guides i:nth-child(1){left:27.5%}
+.mk-guides i:nth-child(2){left:50%}
+.mk-guides i:nth-child(3){left:72.5%}
+.mk-zone.fixing .mk-guides::before,.mk-zone.fixing .mk-guides i{opacity:1}
 .mk-hint{margin-top:16px;text-align:center;font-size:18px;line-height:1.3;opacity:.6}
 
 /* ================================================================
@@ -179,37 +193,6 @@
 .mk-mixbtn:hover{background:#DFF200}
 .mk-mixbtn:active,.mk-mixbtn.press{transform:scale(.94)}
 .mk-mixbtn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-
-/* ================================================================
-   photo — водяной знак не пройдет
-   ================================================================ */
-.mk-pics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;padding:clamp(20px,4vw,56px)}
-.mk-pics-post{width:100%;max-width:320px;justify-self:end}
-.mk-pics-side{display:flex;flex-direction:column;gap:clamp(16px,2vw,24px);width:100%;max-width:300px}
-.mk-slot{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--mk-t) 12%,transparent)}
-.mk-slot svg{width:22%;fill:none;stroke:var(--mk-t);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.6}
-.mk-pic{position:absolute;inset:0;opacity:0;transition:opacity .3s var(--ease)}
-.mk-pic.on{opacity:1}
-.mk-photo.shake{animation:mkShake .45s linear}
-@keyframes mkShake{20%{translate:-6px 0}40%{translate:5px 0}60%{translate:-3px 0}80%{translate:2px 0}}
-.mk-bad{position:relative;z-index:3;aspect-ratio:4 / 3;border-radius:6px;overflow:hidden;opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease),transform .65s var(--ease)}
-.mk-bad.show{opacity:1;transform:none}
-.mk-bad.go{transform:translate(var(--tx),var(--ty)) scale(.86)}
-.mk-bad.back{transform:rotate(-3deg);transition:opacity .5s var(--ease),transform .5s var(--ease)}
-.mk-bad.out{opacity:0}
-.mk-x{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:#E5484D;stroke-width:5;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .5s var(--ease)}
-.mk-bad.no .mk-x{stroke-dashoffset:0}
-.mk-thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.mk-th{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;transition:transform .4s var(--ease),opacity .3s var(--ease)}
-.mk-th.lift{transform:translateY(-8px)}
-.mk-th.gone{opacity:0}
-.mk-fly{position:absolute;z-index:4;border-radius:6px;overflow:hidden}
-.mk-fly.flying{transition:left .8s var(--ease),top .8s var(--ease),width .8s var(--ease),height .8s var(--ease),border-radius .8s}
-/* на телефоне — те же две колонки, только теснее */
-@media (max-width:560px){
-  .mk-pics{gap:16px;padding:20px 16px}
-  .mk-thumbs{gap:6px}
-}
 
 /* ================================================================
    compare — нейросеть каждый раз по-новому, конструктор — в стиле

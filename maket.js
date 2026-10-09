@@ -3,15 +3,16 @@
    Иллюстрации почти без слов, в цветах самого конструктора
    (заказчик — «Одна кавычка»: лайм, черный, розовый, знак-кавычка).
    Заголовки в макетах — полоски, а не буквы.
-   Главы: feed — лента, где каждый пост сделан «как умеют»: логотип
-   растянут, верстка медленно разъезжается; file — окно браузера
-   с конструктором: заголовок печатается, фото падает в рамку,
-   формат меняется 16:9 ⇄ 4:5; style — заголовок можно утащить
-   за край, но он встает только в разрешенное место (пока никто
-   не трогал, тянет курсор); mix — кнопка «замиксовать» перебирает
-   палитру, фон и композицию, нажимается сама, пока не тронули;
-   photo — картинка с водяным знаком отскакивает от рамки, фото
-   из подборки прилетает на ее место; compare — нейросеть каждый раз
+   Главы: feed — лента одного паблика: у карточек одна аватарка
+   и одно имя, а сами макеты все разные, логотип растянут, верстка
+   медленно разъезжается; file — окно браузера с конструктором:
+   заголовок печатается, фото падает в рамку, формат меняется
+   16:9 ⇄ 4:5; style — в макет попадает что попало (чужой цвет,
+   кривая строка, растянутый логотип), и конструктор по очереди
+   ставит каждый элемент на место: в фирменный цвет, по полям,
+   в пропорции; нажатие — испортить еще раз; mix — кнопка
+   «замиксовать» перебирает палитру, фон и композицию, нажимается
+   сама, пока не тронули; compare — нейросеть каждый раз
    рисует по-новому, конструктор — всегда в стиле; под ней —
    демо и «написать» (maket.try).
    Тексты — в content.js, оформление — maket.css.
@@ -59,9 +60,6 @@ const SCHEMES = ['lime', 'black', 'rose'];
 const PATTERNS = ['dots', 'grid', 'checker', 'clean'];
 const LAYOUTS = ['bl', 'tl', 'center', 'br', 'tr'];
 const TAGS = ['line', 'fill'];
-// где стоит текст в каждой композиции: x, y — точка в процентах макета, ax, ay — какой угол текста к ней приложен
-// (то же записано в maket.css: при правке менять в обоих местах)
-const ANCHOR = { bl: [7, 90, 0, 100], tl: [7, 24, 0, 0], tr: [93, 9, 100, 0], center: [50, 52, 50, 50], br: [93, 90, 100, 100] };
 
 // фото — плоская картинка из трех фигур: небо, солнце, два холма
 const scene = k => `<div class="mk-scene" data-k="${k}"><i class="mk-sun"></i><i class="mk-hill"></i><i class="mk-hill mk-hill2"></i></div>`;
@@ -137,13 +135,20 @@ const side = ch => `<div class="mk-side">
 // цвета, которых в брендбуке нет (оранжевого нет и тут)
 const WRONG_BG = ['#8FD3FF', '#FFE45C', '#B79CFF', '#9EE6A8', '#FF9DBA', '#FFFFFF', '#2E2E33', '#7AE0D4', '#DCD3C4'];
 const WRONG_INK = ['#E5484D', '#1F4FD8', '#2E2E33', '#FFFFFF', '#14A06B', '#8A2BE2', '#FF4FA3'];
+const ICON_LIKE = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/></svg>`;
+const ICON_TALK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 11.6a7.5 7 0 1 1 3.4 5.9L4.2 19l1.2-3.4a6.7 6.7 0 0 1-.9-4z"/></svg>`;
+// карточка ленты: одна и та же аватарка с кавычкой и одно имя — видно, что пишет один паблик
 function feedHTML(){
-  const tile = () => `<div class="mk-tile">
-    <div class="mk-j mk-j-photo">${scene(3)}<i class="mk-wm"></i></div>
-    <svg class="mk-j mk-j-logo" viewBox="0 0 232 309" preserveAspectRatio="none" aria-hidden="true"><path d="${MARK}"/></svg>
-    <i class="mk-j mk-j-tag"></i><i class="mk-j mk-j-l1"></i><i class="mk-j mk-j-l2"></i><i class="mk-j mk-j-sub"></i>
+  const card = () => `<div class="mk-card">
+    <div class="mk-card-head"><span class="mk-ava">${logo('mk-ava-mark')}</span><b></b></div>
+    <div class="mk-tile">
+      <div class="mk-j mk-j-photo">${scene(3)}<i class="mk-wm"></i></div>
+      <svg class="mk-j mk-j-logo" viewBox="0 0 232 309" preserveAspectRatio="none" aria-hidden="true"><path d="${MARK}"/></svg>
+      <i class="mk-j mk-j-tag"></i><i class="mk-j mk-j-l1"></i><i class="mk-j mk-j-l2"></i><i class="mk-j mk-j-sub"></i>
+    </div>
+    <div class="mk-card-foot">${ICON_LIKE}${ICON_TALK}</div>
   </div>`;
-  return `<div class="mk-stage mk-feed"><div class="mk-grid">${Array.from({ length: 6 }, tile).join('')}</div></div>`;
+  return `<div class="mk-stage mk-feed"><div class="mk-grid">${Array.from({ length: 6 }, card).join('')}</div></div>`;
 }
 // каждый элемент — свои координаты в процентах плитки; разъезжаются понемногу от прежних
 function messUp(tile, full){
@@ -151,7 +156,10 @@ function messUp(tile, full){
   const drift = (k, a, b, d) => { st[k] = full || st[k] == null ? rnd(a, b) : Math.min(b + d, Math.max(a - d, st[k] + rnd(-d, d))); return st[k]; };
   const set = (sel, css) => Object.assign(tile.querySelector(sel).style, css);
   if (full) {
-    tile.style.background = any(WRONG_BG);
+    // у каждого поста свой фон — ни одного повтора в ленте
+    const taken = [...tile.closest('.mk-grid').querySelectorAll('.mk-tile')].filter(t => t !== tile).map(t => t._bg);
+    tile._bg = any(WRONG_BG.filter(c => !taken.includes(c)));
+    tile.style.background = tile._bg;
     st.ink = any(WRONG_INK.filter(c => c !== tile.style.background));
     st.photo = Math.random() < .55;
   }
@@ -220,15 +228,13 @@ function liveFile(box){
 }
 
 /* ================================================================
-   style — заголовок тянется, но встает только туда, где можно
+   style — в макет попадает что попало, конструктор всё ставит на место
    ================================================================ */
-const CURSOR = `<svg class="mk-cur" viewBox="0 0 24 30" aria-hidden="true"><path d="M3.8 2.4v20.2l5-4.6 3.6 8 3.4-1.5-3.6-7.8 6.9-.5z"/></svg>`;
 function styleHTML(c){
   return `<div class="mk-stage mk-style">
-    <div class="mk-zone">
+    <div class="mk-zone" role="button" tabindex="0" aria-label="${esc(H.pick(c.hint || ''))}">
       ${postHTML({ s: 'lime', p: 'dots', l: 'bl', lines: [.82, .56], cls: 'mk-big' })}
-      <div class="mk-guides" aria-hidden="true">${Object.keys(ANCHOR).map(k => `<i data-a="${k}"></i>`).join('')}</div>
-      ${CURSOR}
+      <div class="mk-guides" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
   </div>
   ${c.hint ? `<p class="mk-hint">${H.T(c.hint)}</p>` : ''}`;
@@ -236,94 +242,47 @@ function styleHTML(c){
 function liveStyle(box){
   const zone = box.querySelector('.mk-zone');
   const post = zone.querySelector('.mk-post');
-  const copy = post.querySelector('.mk-copy');
-  const cur = zone.querySelector('.mk-cur');
-  const guides = zone.querySelectorAll('.mk-guides i');
-  let touched = false;
-  // точки разрешенных мест — там, где оказался бы центр текста
-  const centerOf = (k, W, Hh, w, h) => {
-    const [x, y, ax, ay] = ANCHOR[k];
-    return [x / 100 * W - ax / 100 * w + w / 2, y / 100 * Hh - ay / 100 * h + h / 2];
+  // по очереди: знак, теги, строки заголовка, подзаголовок
+  const parts = [post.querySelector('.mk-logo'), ...post.querySelectorAll('.mk-copy > *')];
+  let poke = null, kick = () => {};
+  // «как вставили»: чужой цвет, наклон, сдвиг за поле, растянуто или сплющено
+  const spoil = () => {
+    zone.classList.add('raw');
+    post.dataset.s = other(SCHEMES, post.dataset.s);
+    post.dataset.p = any(PATTERNS);
+    post.dataset.l = any(LAYOUTS);
+    parts.forEach((el, i) => {
+      const logo = i === 0;
+      el.style.setProperty('--cx', rnd(-18, 18).toFixed(1) + 'cqw');
+      el.style.setProperty('--cy', rnd(-9, 9).toFixed(1) + 'cqw');
+      el.style.setProperty('--cr', rnd(-14, 14).toFixed(1) + 'deg');
+      el.style.setProperty('--csx', (logo ? rnd(1.8, 3) : rnd(.7, 1.35)).toFixed(2));
+      el.style.setProperty('--csy', (logo ? rnd(.55, .8) : rnd(.6, 1.9)).toFixed(2));
+      el.style.setProperty('--cc', any(WRONG_INK));
+      el.style.setProperty('--crad', any(['0px', '3px', '99px']));   // у строк — чужая форма, как другой шрифт
+    });
+    zone.offsetWidth;
+    zone.classList.remove('raw');
   };
-  const placeGuides = () => {
-    const W = post.clientWidth, Hh = post.clientHeight, w = copy.offsetWidth, h = copy.offsetHeight;
-    guides.forEach(g => { const [cx, cy] = centerOf(g.dataset.a, W, Hh, w, h); g.style.left = cx + 'px'; g.style.top = cy + 'px'; });
-  };
-  // перетаскивание с «резинкой»: за полем макета текст едва сдвигается
-  let r0 = null;
-  const begin = () => {
-    copy.classList.remove('snap');
-    const pr = post.getBoundingClientRect(), cr = copy.getBoundingClientRect();
-    r0 = { x: cr.left - pr.left, y: cr.top - pr.top, w: cr.width, h: cr.height, W: pr.width, H: pr.height };
-    placeGuides();
-    zone.classList.add('drag');
-  };
-  const rubber = (v, size, max, m) => {
-    if (v < m) return m - (m - v) * .16;
-    if (v + size > max - m) { const over = v + size - (max - m); return v - over + over * .16; }
-    return v;
-  };
-  const dragTo = (dx, dy) => {
-    const m = r0.W * .05;
-    const x = rubber(r0.x + dx, r0.w, r0.W, m), y = rubber(r0.y + dy, r0.h, r0.H, m);
-    copy.style.setProperty('--dx', (x - r0.x) + 'px'); copy.style.setProperty('--dy', (y - r0.y) + 'px');
-    return [x + r0.w / 2, y + r0.h / 2];
-  };
-  const nearest = (cx, cy) => {
-    let best = 'bl', d = Infinity;
-    for (const k in ANCHOR) {
-      const [ax, ay] = centerOf(k, r0.W, r0.H, r0.w, r0.h);
-      const dd = (ax - cx) ** 2 + (ay - cy) ** 2;
-      if (dd < d) { d = dd; best = k; }
-    }
-    return best;
-  };
-  const end = (k) => { zone.classList.remove('drag'); moveCopy(post, k); r0 = null; };
-
-  // посетитель тянет сам — курсор-подсказка больше не нужен
-  let start = null, last = null;
-  copy.addEventListener('pointerdown', e => {
-    touched = true; zone.classList.add('touched');
-    copy.setPointerCapture(e.pointerId);
-    start = [e.clientX, e.clientY]; begin(); last = dragTo(0, 0);
-    e.preventDefault();
-  });
-  copy.addEventListener('pointermove', e => { if (start) last = dragTo(e.clientX - start[0], e.clientY - start[1]); });
-  const up = () => { if (!start) return; start = null; end(nearest(...last)); };
-  copy.addEventListener('pointerup', up);
-  copy.addEventListener('pointercancel', up);
-
-  // пока не трогали — тянет курсор: хватает текст, уводит за край, отпускает
-  const curAt = (x, y) => { cur.style.transform = `translate(${x}px, ${y}px)`; };
-  curAt(post.clientWidth * .62, post.clientHeight * .4);
+  const fix = el => ['--cx', '--cy', '--cr', '--csx', '--csy', '--cc', '--crad'].forEach(k => el.style.removeProperty(k));
+  // нажатие — испортить еще раз
+  const again = () => { kick(); };
+  zone.addEventListener('click', again);
+  zone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); again(); } });
+  if (still()) return;
   runner(zone, async alive => {
-    if (touched) { await wait(3000); return; }
-    const from = post.dataset.l;
-    const to = other(LAYOUTS, from);
-    const pr = post.getBoundingClientRect(), cr = copy.getBoundingClientRect();
-    const sx = cr.left - pr.left + cr.width * .3, sy = cr.top - pr.top + cr.height * .5;
-    // курсор подъезжает к тексту
-    const c0 = cur.style.transform.match(/-?[\d.]+/g)?.map(Number) || [sx, sy];
-    zone.classList.add('cur-on');
-    await tween(700, t => curAt(c0[0] + (sx - c0[0]) * t, c0[1] + (sy - c0[1]) * t));
-    if (!alive() || touched) return;
-    zone.classList.add('grab'); begin();
-    // тянет дальше нужного места — за край макета
-    const W = pr.width, Hh = pr.height;
-    const [tx, ty] = centerOf(to, W, Hh, cr.width, cr.height);
-    const [fx, fy] = centerOf(from, W, Hh, cr.width, cr.height);
-    const dx = (tx - fx) * 1.25 + Math.sign(tx - fx || 1) * W * .12, dy = (ty - fy) * 1.25 + Math.sign(ty - fy) * Hh * .1;
-    await tween(1100, t => { dragTo(dx * t, dy * t); curAt(sx + dx * t, sy + dy * t); });
-    if (!alive() || touched) { end(from); zone.classList.remove('grab'); return; }
-    await wait(350);
-    zone.classList.remove('grab');
-    end(to);
-    await wait(500);
-    const c1 = [sx + dx, sy + dy], rest = [W * (.35 + Math.random() * .3), Hh * (.3 + Math.random() * .3)];
-    await tween(600, t => curAt(c1[0] + (rest[0] - c1[0]) * t, c1[1] + (rest[1] - c1[1]) * t));
-    await wait(1500);
+    spoil();
+    await wait(1300);
+    if (!alive()) return;
+    zone.classList.add('fixing');
+    for (const el of parts) { fix(el); await wait(320); if (!alive()) return; }
+    await wait(700);
+    zone.classList.remove('fixing');
+    // держим готовый макет; нажатие обрывает паузу
+    poke = new Promise(r => { kick = r; });
+    await Promise.race([wait(2600), poke]);
+    kick = () => {};
   }, .45);
-  addEventListener('resize', placeGuides, { passive: true });
 }
 
 /* ================================================================
@@ -365,73 +324,6 @@ function liveMix(box){
     btn.classList.remove('press');
     shuffle();
   }, .45);
-}
-
-/* ================================================================
-   photo — картинка с водяным знаком отскакивает, фото из подборки встает
-   ================================================================ */
-function photoHTML(){
-  return `<div class="mk-stage mk-pics">
-    <div class="mk-pics-post">${postHTML({ s: 'black', p: 'clean', f: 'tall', l: 'bl', lines: [.8, .5], photo: `<div class="mk-slot"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.6"/><circle cx="8.6" cy="9.6" r="1.6"/><path d="M4 16.6l4.6-4.6 3.4 3.4 3-3 5.5 5.5"/></svg></div><div class="mk-pic"></div>` })}</div>
-    <div class="mk-pics-side">
-      <div class="mk-bad">${scene(3)}<i class="mk-wm"></i><svg class="mk-x" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="100" d="M8 8L92 92M92 8L8 92"/></svg></div>
-      <div class="mk-thumbs">${[0, 1, 2].map(k => `<div class="mk-th">${scene(k)}</div>`).join('')}</div>
-    </div>
-  </div>`;
-}
-function livePhoto(box){
-  const st = box.querySelector('.mk-pics');
-  const frame = st.querySelector('.mk-photo');
-  const pic = st.querySelector('.mk-pic');
-  const bad = st.querySelector('.mk-bad');
-  const ths = [...st.querySelectorAll('.mk-th')];
-  let k = 0;
-  if (still()) { pic.innerHTML = scene(0); pic.classList.add('on'); return; }
-  const rel = el => { const a = el.getBoundingClientRect(), b = st.getBoundingClientRect(); return { x: a.left - b.left, y: a.top - b.top, w: a.width, h: a.height }; };
-  runner(st, async alive => {
-    // 1. из гугла несут картинку с водяным знаком — рамка ее не берет
-    pic.classList.remove('on');
-    bad.className = 'mk-bad';
-    ths.forEach(t => t.classList.remove('lift', 'gone'));
-    await wait(700);
-    if (!alive()) return;
-    bad.classList.add('show');
-    await wait(900);
-    const a = rel(bad), f = rel(frame);
-    // подлетает вплотную к рамке
-    const dx = f.x + f.w * .5 - (a.x + a.w * .5), dy = f.y + f.h * .5 - (a.y + a.h * .5);
-    bad.style.setProperty('--tx', dx * .82 + 'px'); bad.style.setProperty('--ty', dy * .82 + 'px');
-    bad.classList.add('go');
-    await wait(650);
-    if (!alive()) return;
-    frame.classList.add('shake');
-    bad.classList.add('back');
-    await wait(500);
-    frame.classList.remove('shake');
-    bad.classList.add('no');
-    await wait(1100);
-    bad.classList.add('out');
-    await wait(500);
-    if (!alive()) return;
-    // 2. фото из подборки поднимается и встает в рамку
-    const th = ths[k % ths.length];
-    th.classList.add('lift');
-    await wait(450);
-    const s = rel(th), d = rel(frame);
-    const fly = document.createElement('div');
-    fly.className = 'mk-fly'; fly.innerHTML = scene(k % ths.length);
-    Object.assign(fly.style, { left: s.x + 'px', top: s.y + 'px', width: s.w + 'px', height: s.h + 'px' });
-    st.appendChild(fly);
-    th.classList.add('gone');
-    fly.offsetWidth;
-    Object.assign(fly.style, { left: d.x + 'px', top: d.y + 'px', width: d.w + 'px', height: d.h + 'px' });
-    fly.classList.add('flying');
-    await wait(800);
-    pic.innerHTML = scene(k % ths.length); pic.classList.add('on');
-    fly.remove();
-    k++;
-    await wait(2600);
-  }, .4);
 }
 
 /* ================================================================
@@ -504,7 +396,6 @@ const CHAPTERS = [
   ['file', fileHTML, liveFile, 'left'],
   ['style', styleHTML, liveStyle, 'head'],
   ['mix', mixHTML, liveMix, 'right'],
-  ['photo', photoHTML, livePhoto, 'left'],
   ['compare', compareHTML, liveCompare, 'head'],
 ];
 
