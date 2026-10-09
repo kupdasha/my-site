@@ -1,0 +1,260 @@
+/* ================================================================
+   КЕЙС «КОНСТРУКТОР МАКЕТОВ ДЛЯ СОЦСЕТЕЙ» (maket.js, поле maket у проекта)
+   Цвета сайта — для текста и подложек (--ink, --soft, --line).
+   Макеты внутри иллюстраций — в цветах самого конструктора:
+   лайм #EBFF00, черный #0D0D0B, розовый #F17DD6. Плоско: без теней
+   и градиентов; узоры фона (точки, сетка, шахматка) — как в конструкторе.
+   Размеры внутри макета — в cqw: макет масштабируется целиком.
+   ================================================================ */
+.mk{overflow-x:clip;--mk-gap:clamp(72px,9vw,144px);--mk-lime:#EBFF00;--mk-black:#0D0D0B;--mk-rose:#F17DD6}
+.mk-ch{margin-bottom:var(--mk-gap)}
+.mk-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(32px,4vw,56px)}
+.mk-label{grid-column:1 / span 3;grid-row:1}
+.mk-title{grid-column:5 / -1;font-weight:500;font-size:clamp(32px,4.2vw,60px);line-height:1.04;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.mk-text{grid-column:5 / -1;font-family:var(--font-read);font-size:clamp(20px,1.8vw,26px);line-height:1.4;max-width:40ch}
+@media (max-width:760px){.mk-label,.mk-title,.mk-text{grid-column:1 / -1}.mk-label{grid-row:auto}}
+
+/* заголовок: слова поднимаются из-под строки одно за другим */
+.mk-w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.mk-w > span{display:inline-block;transform:translateY(105%);transition:transform .9s var(--ease) calc(var(--i) * 55ms)}
+.mk-ch.in .mk-w > span{transform:none}
+.mk-text,.mk-label{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease) .25s,transform .9s var(--ease) .25s}
+.mk-ch.in .mk-text,.mk-ch.in .mk-label{opacity:1;transform:none}
+.mk-viz{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .3s,transform 1.1s var(--ease) .3s}
+.mk-ch.in .mk-viz{opacity:1;transform:none}
+
+/* иллюстрация слева или справа от текста */
+.mk-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
+.mk-left > .mk-viz{grid-column:1 / span 7}
+.mk-left > .mk-side{grid-column:9 / -1}
+.mk-right > .mk-viz{grid-column:6 / -1;grid-row:1}
+.mk-right > .mk-side{grid-column:1 / span 4;grid-row:1}
+.mk-side{display:flex;flex-direction:column;gap:20px}
+.mk-side .mk-title{font-size:clamp(30px,3.2vw,48px);max-width:none}
+.mk-side .mk-text{font-size:clamp(19px,1.5vw,22px)}
+@media (max-width:900px){.mk-split > .mk-viz,.mk-split > .mk-side{grid-column:1 / -1;grid-row:auto}.mk-side{order:-1}}
+
+/* общая подложка живых блоков */
+.mk-stage{position:relative;border-radius:var(--r-img);background:var(--soft);overflow:hidden}
+
+/* ================================================================
+   макет из конструктора
+   ================================================================ */
+.mk-post{position:relative;overflow:hidden;container-type:inline-size;border-radius:var(--mk-rad,10px);background:var(--mk-bg);color:var(--mk-t);
+  transition:background-color .5s var(--ease);user-select:none;-webkit-user-select:none;
+  --mk-sub:color-mix(in srgb,var(--mk-t) 42%,transparent);
+  --mk-pat:color-mix(in srgb,var(--mk-t) 15%,transparent);
+  --mk-pat2:color-mix(in srgb,var(--mk-t) 6%,transparent)}
+.mk-post[data-f="wide"]{aspect-ratio:16/9;--span:50cqw;--lh0:3.9cqw;--gap:1.3cqw;--tagw:8.4cqw;--tagh:3cqw;--tagb:.32cqw;--logo:3.4cqw}
+.mk-post[data-f="tall"]{aspect-ratio:4/5;--span:78cqw;--lh0:7.4cqw;--gap:2.4cqw;--tagw:15cqw;--tagh:5.4cqw;--tagb:.6cqw;--logo:6.6cqw}
+.mk-post[data-s="lime"]{--mk-bg:var(--mk-lime);--mk-t:var(--mk-black)}
+.mk-post[data-s="black"]{--mk-bg:var(--mk-black);--mk-t:var(--mk-lime)}
+.mk-post[data-s="rose"]{--mk-bg:var(--mk-rose);--mk-t:#FFFFFF}
+/* узор фона: точки, сетка, «прозрачный фон» из фотошопа, чистый */
+.mk-post::before{content:"";position:absolute;inset:0;pointer-events:none}
+.mk-post[data-p="dots"]::before{background:radial-gradient(circle,var(--mk-pat) .42cqw,transparent .5cqw) 0 0 / 4.4cqw 4.4cqw}
+.mk-post[data-p="grid"]::before{background-image:linear-gradient(var(--mk-pat) .14cqw,transparent .14cqw),linear-gradient(90deg,var(--mk-pat) .14cqw,transparent .14cqw);background-size:6.25cqw 6.25cqw}
+.mk-post[data-p="checker"]::before{background:conic-gradient(var(--mk-pat2) 25%,transparent 0 50%,var(--mk-pat2) 0 75%,transparent 0) 0 0 / 6.25cqw 6.25cqw}
+.mk-logo{position:absolute;left:6%;top:7%;width:var(--logo);height:auto;fill:var(--mk-t);z-index:2;opacity:var(--mk-logo,1);transition:fill .5s var(--ease)}
+.mk-post[data-f="tall"] .mk-logo{top:6%;left:8%}
+
+/* текст: куда встает — задает композиция (те же числа — ANCHOR в maket.js) */
+.mk-copy{position:absolute;z-index:2;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);display:flex;flex-direction:column;align-items:var(--al);gap:var(--gap);
+  transform:translate(calc(var(--ax) * -1%),calc(var(--ay) * -1%)) translate(var(--dx,0px),var(--dy,0px))}
+.mk-copy.snap{transition:transform .75s var(--ease)}
+.mk-post[data-l="bl"]{--x:7;--y:90;--ax:0;--ay:100;--al:flex-start}
+.mk-post[data-l="tl"]{--x:7;--y:24;--ax:0;--ay:0;--al:flex-start}
+.mk-post[data-l="tr"]{--x:93;--y:9;--ax:100;--ay:0;--al:flex-end}
+.mk-post[data-l="center"]{--x:50;--y:52;--ax:50;--ay:50;--al:center}
+.mk-post[data-l="br"]{--x:93;--y:90;--ax:100;--ay:100;--al:flex-end}
+.mk-post[data-f="tall"][data-l="bl"],.mk-post[data-f="tall"][data-l="br"]{--y:92}
+.mk-line{display:block;width:calc(var(--w) * var(--span));height:calc(var(--lh0) * var(--mk-lh,1));border-radius:var(--mk-r,99px);background:var(--mk-t);transition:background-color .5s var(--ease),width .6s var(--ease)}
+.mk-sub{display:block;width:calc(var(--w) * var(--span) * .8);height:calc(var(--lh0) * .4);margin-top:calc(var(--gap) * .5);border-radius:99px;background:var(--mk-sub)}
+.mk-tags{display:flex;gap:calc(var(--gap) * .6);margin-bottom:calc(var(--gap) * .4)}
+.mk-tags i{display:block;width:var(--tagw);height:var(--tagh);border-radius:99px;box-shadow:inset 0 0 0 var(--tagb) var(--mk-t)}
+.mk-tags i + i{width:calc(var(--tagw) * .78)}
+.mk-post[data-g="fill"] .mk-tags i{background:var(--mk-t)}
+/* фото: в 16:9 — колонка справа, в 4:5 — верхняя половина */
+.mk-photo{position:absolute;z-index:1;overflow:hidden;left:56%;top:0;width:44%;height:100%}
+.mk-post[data-f="tall"] .mk-photo{left:0;top:0;width:100%;height:50%}
+.mk-post[data-f="wide"]:has(.mk-photo){--span:44cqw}
+
+/* фото — плоская картинка: небо, солнце, два холма */
+.mk-scene{position:absolute;inset:0;overflow:hidden;background:var(--sky)}
+.mk-sun{position:absolute;left:60%;top:16%;width:22%;aspect-ratio:1;border-radius:50%;background:var(--sun)}
+.mk-hill{position:absolute;left:-24%;bottom:-40%;width:92%;aspect-ratio:1.5;border-radius:50%;background:var(--h1)}
+.mk-hill2{left:28%;bottom:-52%;width:104%;background:var(--h2)}
+.mk-scene[data-k="0"]{--sky:#CFE3F5;--sun:#EBFF00;--h1:#2F5D50;--h2:#3F7A66}
+.mk-scene[data-k="1"]{--sky:#F7D9EC;--sun:#FFFFFF;--h1:#6B4A8C;--h2:#8E6BB0}
+.mk-scene[data-k="2"]{--sky:#D7F0E4;--sun:#F17DD6;--h1:#1F3B4D;--h2:#2E5870}
+.mk-scene[data-k="3"]{--sky:#B9C0C7;--sun:#D9DDE1;--h1:#7D858D;--h2:#959DA5}
+/* водяной знак: косые полосы и круглая печать поверх картинки */
+.mk-wm{position:absolute;inset:0;background:repeating-linear-gradient(-35deg,transparent 0 12px,rgba(255,255,255,.5) 12px 15px)}
+.mk-wm::after{content:"";position:absolute;left:50%;top:50%;width:36%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);box-shadow:inset 0 0 0 3px rgba(255,255,255,.8),inset 0 0 0 10px rgba(255,255,255,.25)}
+
+/* ================================================================
+   feed — лента «как умеют»
+   ================================================================ */
+.mk-feed{padding:clamp(16px,4vw,56px)}
+.mk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.2vw,16px);max-width:760px;margin:0 auto}
+.mk-tile{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:6px;transition:background-color .9s var(--ease)}
+.mk-j{position:absolute;display:block;transition:left 1.8s var(--ease),top 1.8s var(--ease),width 1.8s var(--ease),height 1.8s var(--ease),transform 1.8s var(--ease),background-color .9s,fill .9s,border-color .9s}
+.mk-j-l1{height:8%}
+.mk-j-l2{height:6.5%;border-radius:2px}
+.mk-j-sub{height:3%;border-radius:99px;opacity:.55}
+.mk-j-tag{width:17%;height:6%;border:2px solid;border-radius:99px}
+.mk-j-photo{overflow:hidden}
+.mk-tile.mk-redo{animation:mkRedo .9s var(--ease)}
+@keyframes mkRedo{0%{opacity:1}35%{opacity:.25}100%{opacity:1}}
+@media (max-width:640px){.mk-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ================================================================
+   file — конструктор в окне браузера
+   ================================================================ */
+.mk-file{padding:clamp(14px,3vw,44px)}
+.mk-win{border-radius:14px;overflow:hidden;background:#FFFFFF;color:#1D222A}
+.mk-bar{display:flex;align-items:center;gap:7px;padding:12px 16px}
+.mk-bar > i{width:10px;height:10px;border-radius:50%;background:#E3E4E8}
+.mk-addr{flex:1;max-width:320px;height:28px;margin-left:12px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:99px;background:#F1F2F4}
+.mk-addr b{width:46%;height:6px;border-radius:3px;background:#D4D6DB}
+.mk-fileic{flex:none;width:17px;height:17px;fill:none;stroke:#1D222A;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* серое поле с белыми карточками — как в самом конструкторе */
+.mk-app{display:flex;gap:10px;padding:10px;background:#E8E9EB}
+.mk-rail{flex:none;width:clamp(34px,4vw,48px);display:flex;flex-direction:column;gap:7px;padding:7px;border-radius:14px;background:#FFFFFF;align-self:flex-start}
+.mk-rail i{display:block;aspect-ratio:1;border-radius:8px;background:#F1F2F4}
+.mk-rail i:first-child{background:#0B0B0C}
+.mk-work{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.mk-seg{align-self:flex-start;display:flex;padding:4px;border-radius:99px;background:#FFFFFF}
+.mk-seg span{padding:4px 14px 6px;border-radius:99px;font-size:16px;line-height:1.2;color:#6B7078;transition:background-color .35s var(--ease),color .35s var(--ease)}
+.mk-file[data-f="wide"] .mk-seg [data-f="wide"],.mk-file[data-f="tall"] .mk-seg [data-f="tall"]{background:#0B0B0C;color:#FFFFFF}
+.mk-canvas{container-type:size;aspect-ratio:16 / 10;display:grid;place-items:center}
+.mk-file .mk-post{transition:width .9s var(--ease),height .9s var(--ease),background-color .5s var(--ease)}
+.mk-file .mk-post[data-f="wide"]{width:96cqw;height:calc(96cqw * 9 / 16)}
+.mk-file .mk-post[data-f="tall"]{height:96cqh;width:calc(96cqh * .8)}
+.mk-file .mk-photo{transform:translateY(-104%);transition:transform .7s var(--ease),left .9s var(--ease),top .9s var(--ease),width .9s var(--ease),height .9s var(--ease)}
+.mk-file[data-step="3"] .mk-photo{transform:none}
+/* заголовок печатается: строка открывается слева направо рывками, как набор */
+.mk-file .mk-line,.mk-file .mk-sub{clip-path:inset(0 100% 0 0)}
+.mk-file .mk-line.on,.mk-file .mk-sub.on{animation:mkType .85s steps(9) both}
+@keyframes mkType{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.mk-file .mk-tags{opacity:0;transition:opacity .4s var(--ease)}
+.mk-file .mk-tags.on{opacity:1}
+@media (max-width:560px){.mk-rail{display:none}.mk-app{padding:8px}.mk-bar{padding:10px 12px}}
+
+/* ================================================================
+   style — текст тянется, но встает только в разрешенное место
+   ================================================================ */
+.mk-style{padding:clamp(16px,4vw,64px)}
+.mk-zone{position:relative;max-width:860px;margin:0 auto}
+.mk-big .mk-copy{cursor:grab;touch-action:none}
+.mk-zone.drag .mk-copy{cursor:grabbing}
+/* поля и разрешенные места видны, только пока текст тянут */
+.mk-guides{position:absolute;inset:0;pointer-events:none;z-index:3}
+.mk-guides::before{content:"";position:absolute;inset:8.9% 5%;border-radius:6px;outline:2px dashed rgba(13,13,11,.4);opacity:0;transition:opacity .35s var(--ease)}
+.mk-guides i{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--mk-black);opacity:0;transform:scale(.4);box-shadow:0 0 0 4px color-mix(in srgb,var(--mk-black) 18%,transparent);transition:opacity .35s var(--ease),transform .45s var(--ease)}
+.mk-zone.drag .mk-guides::before{opacity:1}
+.mk-zone.drag .mk-guides i{opacity:.55;transform:none}
+.mk-cur{position:absolute;left:0;top:0;width:28px;height:35px;margin:-3px 0 0 -5px;z-index:5;pointer-events:none;fill:var(--mk-black);stroke:#FFFFFF;stroke-width:1.6;stroke-linejoin:round;opacity:0;transition:opacity .4s var(--ease),scale .2s var(--ease)}
+.mk-zone.cur-on .mk-cur{opacity:1}
+.mk-zone.grab .mk-cur{scale:.86}
+.mk-zone.touched .mk-cur{opacity:0}
+.mk-hint{margin-top:16px;text-align:center;font-size:18px;line-height:1.3;opacity:.6}
+
+/* ================================================================
+   mix — «замиксовать»
+   ================================================================ */
+.mk-mix{display:flex;flex-direction:column;align-items:center;gap:clamp(18px,2.4vw,28px);padding:clamp(18px,4vw,56px)}
+.mk-mix-post{width:100%;max-width:720px}
+.mk-post.flash{animation:mkFlash .6s var(--ease)}
+@keyframes mkFlash{from{transform:scale(.975)}to{transform:none}}
+.mk-mix-bar{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center}
+.mk-sws{display:flex;gap:10px}
+.mk-sws i{width:30px;height:30px;border-radius:9px;transition:box-shadow .3s var(--ease)}
+.mk-sws [data-s="lime"]{background:var(--mk-lime)}
+.mk-sws [data-s="black"]{background:var(--mk-black)}
+.mk-sws [data-s="rose"]{background:var(--mk-rose)}
+.mk-sws i.on{box-shadow:0 0 0 2px var(--soft),0 0 0 4px var(--ink)}
+/* та самая кнопка конструктора — лаймовая пилюля */
+.mk-mixbtn{height:48px;padding:0 24px 3px;border:0;border-radius:99px;background:var(--mk-lime);color:#0B0B0C;font:inherit;font-size:18px;font-weight:500;cursor:pointer;transition:transform .2s var(--ease),background-color .3s}
+.mk-mixbtn:hover{background:#DFF200}
+.mk-mixbtn:active,.mk-mixbtn.press{transform:scale(.94)}
+.mk-mixbtn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+/* ================================================================
+   photo — водяной знак не пройдет
+   ================================================================ */
+.mk-pics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;padding:clamp(20px,4vw,56px)}
+.mk-pics-post{width:100%;max-width:320px;justify-self:end}
+.mk-pics-side{display:flex;flex-direction:column;gap:clamp(16px,2vw,24px);width:100%;max-width:300px}
+.mk-slot{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--mk-t) 12%,transparent)}
+.mk-slot svg{width:22%;fill:none;stroke:var(--mk-t);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.6}
+.mk-pic{position:absolute;inset:0;opacity:0;transition:opacity .3s var(--ease)}
+.mk-pic.on{opacity:1}
+.mk-photo.shake{animation:mkShake .45s linear}
+@keyframes mkShake{20%{translate:-6px 0}40%{translate:5px 0}60%{translate:-3px 0}80%{translate:2px 0}}
+.mk-bad{position:relative;z-index:3;aspect-ratio:4 / 3;border-radius:6px;overflow:hidden;opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease),transform .65s var(--ease)}
+.mk-bad.show{opacity:1;transform:none}
+.mk-bad.go{transform:translate(var(--tx),var(--ty)) scale(.86)}
+.mk-bad.back{transform:rotate(-3deg);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.mk-bad.out{opacity:0}
+.mk-x{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:#E5484D;stroke-width:5;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .5s var(--ease)}
+.mk-bad.no .mk-x{stroke-dashoffset:0}
+.mk-thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mk-th{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;transition:transform .4s var(--ease),opacity .3s var(--ease)}
+.mk-th.lift{transform:translateY(-8px)}
+.mk-th.gone{opacity:0}
+.mk-fly{position:absolute;z-index:4;border-radius:6px;overflow:hidden}
+.mk-fly.flying{transition:left .8s var(--ease),top .8s var(--ease),width .8s var(--ease),height .8s var(--ease),border-radius .8s}
+/* на телефоне — те же две колонки, только теснее */
+@media (max-width:560px){
+  .mk-pics{gap:16px;padding:20px 16px}
+  .mk-thumbs{gap:6px}
+}
+
+/* ================================================================
+   compare — нейросеть каждый раз по-новому, конструктор — в стиле
+   ================================================================ */
+.mk-cmp{display:flex;flex-direction:column;gap:clamp(20px,3vw,44px);padding:clamp(18px,4vw,56px)}
+.mk-row{width:100%;max-width:880px;margin:0 auto;display:grid;grid-template-columns:clamp(40px,5.4vw,80px) minmax(0,1fr);gap:clamp(14px,2.4vw,36px);align-items:center}
+.mk-ico svg{display:block;width:100%;height:auto}
+.mk-spark{fill:var(--ink)}
+.mk-coin{fill:var(--accent)}
+.mk-coin-l{fill:none;stroke:#1D222A;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.mk-page{fill:var(--mk-lime)}
+.mk-page-fold,.mk-page-code{fill:none;stroke:#1D222A;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.mk-posts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1.4vw,20px)}
+.mk-cmp .mk-post{--mk-rad:6px;opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease) calc(var(--i) * 140ms),transform .7s var(--ease) calc(var(--i) * 140ms)}
+.mk-cmp .mk-row-own .mk-post{transition-delay:calc(var(--i) * 140ms + 70ms)}
+.mk-cmp.in .mk-post{opacity:1;transform:none}
+.mk-cmp.out .mk-post{opacity:0;transform:none;transition-delay:0s}
+@media (max-width:640px){
+  .mk-posts{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mk-posts .mk-post:nth-child(4){display:none}
+}
+
+/* под сравнением — демо и «написать» */
+.mk-try{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);margin-top:clamp(40px,5vw,72px)}
+.mk-try-in{grid-column:5 / -1;display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding-top:clamp(20px,2.4vw,32px);border-top:1.5px solid var(--line);
+  opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease) .45s,transform .9s var(--ease) .45s}
+.mk-ch.in .mk-try-in{opacity:1;transform:none}
+.mk-try-title{font-size:clamp(22px,1.8vw,28px);font-weight:500;line-height:1.15}
+.mk-try-text{font-family:var(--font-read);font-size:19px;line-height:1.4;max-width:36ch}
+.mk-try-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+/* кнопка демо — лаймовая в обеих версиях, как у других вайб-кейсов */
+:root .mk-try .mk-try-btn{background:var(--accent);color:var(--accent-text)}
+:root .mk-try .mk-try-btn::after{display:block}
+:root .mk-try .mk-try-btn:hover{background:var(--ink);color:var(--bg)}
+@media (max-width:760px){.mk-try-in{grid-column:1 / -1}}
+
+/* на телефоне заголовки чуть мельче: строки, склеенные неразрывными пробелами, не вылезают за край */
+@media (max-width:480px){.mk-title,.mk-side .mk-title{font-size:min(7.4vw,32px)}}
+/* текст в начале кейса: на планшете 2 × 2 */
+@media (min-width:761px) and (max-width:1100px){
+  .case-body:has(.mk-mount) .scheme-cols>.camp-col{grid-column:span 6 !important}
+}
+@media (prefers-reduced-motion:reduce){
+  .mk-w > span,.mk-text,.mk-label,.mk-viz,.mk-try-in{transition:none;transform:none;opacity:1}
+}
+/* темная версия: черный макет и черная плашка палитры не тонут в темной подложке */
+:root[data-theme="dark"] .mk-post[data-s="black"],:root[data-theme="dark"] .mk-sws [data-s="black"]{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14)}
+:root[data-theme="dark"] .mk-sws [data-s="black"].on{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14),0 0 0 2px var(--soft),0 0 0 4px var(--ink)}
