@@ -2198,6 +2198,20 @@ function watchLogoWall(wall){
 }
 // элемент галереи кейса: { row, caption } — ряд макетов одной высоты, { collage } — коллаж,
 // { morph } — фигуры перетекают друг в друга, остальное — во всю ширину
+// проект на один экран (элемент { screen } в галерее, см. «Разное» в 3D)
+function screenHTML(x){
+  const cell = src => campCell(src).replace(/<img src="(img\/[^"]+)\.webp"/, '<img src="$1.webp" srcset="$1-s.webp 900w, $1.webp 2000w" sizes="(max-width:760px) 92vw, 50vw"');
+  const head = x.title || x.text ? `${x.title ? `<h3>${T(x.title)}</h3>` : ''}${x.text ? `<p>${T(x.text)}</p>` : ''}` : '';
+  const g = x.screen;
+  if (!Array.isArray(g)) {
+    const inGrid = g.cells.some(c => c.head);
+    return `<div class="wrap scr-proj">${!inGrid && head ? `<div class="scr-head">${head}</div>` : ''}<div class="collage camp-row scr-grid" style="grid-template-areas:${g.areas.replace(/"/g, '&quot;')};grid-template-columns:${g.cols};grid-template-rows:${g.rows || ''};--ratio:${g.ratio}">${
+      g.cells.map(c => c.head ? `<div class="collage-cell scr-cell-head" style="grid-area:${c.area}">${head}</div>`
+        : `<div class="collage-cell" style="grid-area:${c.area}${c.pos ? `;--pos:${c.pos}` : ''}">${cell(c.img)}</div>`).join('')}</div></div>`;
+  }
+  return `<div class="wrap scr-proj">${head ? `<div class="scr-head">${head}</div>` : ''}${
+    g.map(r => [].concat(r)).map(r => `<div class="camp-row fit" style="--n:${r.length}">${r.map(cell).join('')}</div>`).join('')}</div>`;
+}
 function galleryItem(x){
   if (Array.isArray(x)) return x.map(galleryItem).join('');
   if (x && x.head) return `<div class="wrap">${blockHead(x.head)}</div>`;
@@ -2244,10 +2258,10 @@ function galleryItem(x){
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   // { screen: [ряды], title, text } — проект во весь экран: название и подпись, под ними ряды картинок; ряд — картинка
   // или список картинок рядом (высокие плакаты — парой), ряд не выше экрана, широкий кадр — во всю ширину.
-  // У img/… с копией -s (900 px) телефон берет ее (см. «Разное» в 3D)
-  if (x && x.screen) return `<div class="wrap scr-proj">${x.title || x.text ? `<div class="scr-head">${x.title ? `<h3>${T(x.title)}</h3>` : ''}${x.text ? `<p>${T(x.text)}</p>` : ''}</div>` : ''}${
-    x.screen.map(r => [].concat(r)).map(r => `<div class="camp-row fit" style="--n:${r.length}">${
-      r.map(s => campCell(s).replace(/<img src="(img\/[^"]+)\.webp"/, '<img src="$1.webp" srcset="$1-s.webp 900w, $1.webp 2000w" sizes="(max-width:760px) 84vw, 60vw"')).join('')}</div>`).join('')}</div>`;
+  // { screen: { areas, cols, rows, ratio, cells: [{ area, img } | { area, head: true }] }, title, text } — коллаж:
+  // сетка по схеме, весь коллаж не выше экрана (ratio — ширина к высоте), head — ячейка с названием и подписью.
+  // Картинки увеличиваются по нажатию. У img/… с копией -s (900 px) телефон берет ее (см. «Разное» в 3D)
+  if (x && x.screen) return screenHTML(x);
   if (x && x.collage) return campCollage(x);
   // { film: 'img/….mp4', poster, caption } — ролик для просмотра: со звуком и плеером, сам не запускается, грузится по нажатию;
   // film: 'kinescope:ID' и другие плееры — встраиваются окном, с теми же отступами

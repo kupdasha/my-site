@@ -1319,10 +1319,18 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .scr-head h3+p{margin-top:0}
 .scr-proj>.camp-row.fit{max-width:calc((100svh - 150px) * var(--sum, 1.6) + (var(--n) - 1) * clamp(8px,1vw,16px));margin-inline:auto}
 .scr-proj>.camp-row.fit+.camp-row.fit{margin-top:clamp(8px,1vw,16px)}
+/* коллаж проекта: весь не выше экрана, картинки в ячейках целиком (прозрачные рендеры — прямо на фоне страницы) */
+.scr-grid{aspect-ratio:var(--ratio);max-width:calc((100svh - 150px) * var(--ratio));margin-inline:auto}
+.scr-grid .collage-cell>.camp-shot img{object-position:var(--pos,center)}
+.scr-cell-head h3{font-size:clamp(22px,2.3vw,34px);line-height:1.15;font-weight:500;text-wrap:balance}
+.scr-cell-head p{margin-top:12px;font-size:clamp(16px,1.3vw,19px);line-height:1.4;max-width:34ch;opacity:.65;text-wrap:pretty}
 @media (max-width:760px){
   .scr-head{display:block}
   .scr-head p{margin-top:8px}
   .scr-proj>.camp-row.fit{max-width:none}
+  .scr-grid.collage{display:flex;flex-direction:column;overflow:visible;scroll-snap-type:none;max-width:none;margin:0;padding:0}
+  .scr-grid .collage-cell{display:flex!important;width:100%}
+  .scr-grid .camp-shot{flex:none!important;width:100%!important;aspect-ratio:var(--ar)}
 }
 /* узкий ряд — по ширине текстовой колонки, для картинок низкого разрешения */
 .camp-rowbox.narrow>.camp-row{width:calc(66.67% + clamp(16px,2vw,28px) / 3);margin-left:auto}

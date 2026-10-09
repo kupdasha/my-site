@@ -3750,24 +3750,49 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   '3D',
         image: 'https://static.tildacdn.com/tild3837-3762-4131-b332-306438306566/2.png',
         thumb: 'img/thumbs/w37.webp',   // легкая копия обложки для сетки (1208 КБ → 80 КБ)
-        /* каждый проект — блок { screen }: название, подпись и картинки рядом, ряд не выше экрана.
-           Картинки — img/raznoe (-s — копия 900 px для телефона); склейки Darrow и L'Oréal разрезаны на кадры */
+        /* каждый проект — блок { screen }: коллаж не выше экрана, название и подпись в ячейке head или над коллажем,
+           картинки увеличиваются по нажатию. Картинки — img/raznoe (-s — копия 900 px для телефона; у грузовика и
+           Star Wars фон прозрачный); склейки Darrow и L'Oréal разрезаны на кадры */
         gallery: [
           [
-            { screen: ['img/raznoe/lego-truck.webp'], title: 'LEGO в «Пятерочке»' },
-            { screen: [['img/raznoe/lego-kv-aero.webp', 'img/raznoe/lego-kv-dragon.webp']],
+            { title: 'LEGO в «Пятерочке»',
               text: ['Плакаты: свою 3D-модель кассы, которую сама отрендерила, соединила с оригинальными рендерами наборов от LEGO.',
-                     'Кассу смоделировала и отрендерила сама, а наборы на ней — оригинальные рендеры от LEGO'] },
-            { screen: ['img/raznoe/starwars-1.webp', 'img/raznoe/starwars-2.webp'], title: 'LEGO Star Wars' },
-            { screen: ['img/raznoe/loreal-1.webp', 'img/raznoe/loreal-2.webp'], title: 'L’Oréal' },
-            { screen: ['img/raznoe/darrow-1.webp', 'img/raznoe/darrow-2.webp'], title: 'Darrow' },
-            { screen: ['img/raznoe/gancia.webp'], title: 'Gancia' },
-            { screen: ['img/raznoe/mosbirzha-1.webp', 'img/raznoe/mosbirzha-2.webp'], title: 'MatchMaking',
-              text: ['Одна конструкция в двух брендингах: «Москва Карьера» и Московская биржа.',
-                     'Один стенд, два наряда: «Москва Карьера» и Московская биржа'] },
-            { screen: ['img/raznoe/philips-1.webp', 'img/raznoe/philips-2.webp', 'img/raznoe/philips-3.webp'], title: 'Philips',
+                     'Кассу смоделировала и отрендерила сама, а наборы на ней — оригинальные рендеры от LEGO'],
+              screen: { areas: '"h a b" "c a b"', cols: '412fr 438fr 438fr', rows: '373fr 231fr', ratio: 2.13, cells: [
+                { area: 'h', head: true },
+                { area: 'c', img: 'img/raznoe/lego-truck.webp', pos: 'bottom' },
+                { area: 'a', img: 'img/raznoe/lego-kv-aero.webp' },
+                { area: 'b', img: 'img/raznoe/lego-kv-dragon.webp' } ] } },
+            { title: 'LEGO Star Wars',
+              screen: { areas: '"a h" "a b"', cols: '2fr 1fr', rows: '1fr 1fr', ratio: 2.67, cells: [
+                { area: 'h', head: true },
+                { area: 'a', img: 'img/raznoe/starwars-1.webp' },
+                { area: 'b', img: 'img/raznoe/starwars-2.webp', pos: 'bottom' } ] } },
+            { title: 'L’Oréal',
+              screen: { areas: '"h a" "b a"', cols: '1fr 2fr', rows: '1fr 1fr', ratio: 2.67, cells: [
+                { area: 'h', head: true },
+                { area: 'a', img: 'img/raznoe/loreal-1.webp' },
+                { area: 'b', img: 'img/raznoe/loreal-2.webp', pos: 'bottom' } ] } },
+            { title: 'Darrow и Gancia',
+              text: ['Выкладка для магазинов: стойки для бутылок в торговом зале.',
+                     'Выкладка для магазинов: чтобы бутылку заметили в зале раньше соседних'],
+              screen: { areas: '"a b h" "a b c"', cols: '430fr 463fr 395fr', rows: '284fr 220fr', ratio: 2.54, cells: [
+                { area: 'h', head: true },
+                { area: 'a', img: 'img/raznoe/darrow-1.webp' },
+                { area: 'b', img: 'img/raznoe/gancia.webp' },
+                { area: 'c', img: 'img/raznoe/darrow-2.webp', pos: 'bottom' } ] } },
+            { title: 'MatchMaking',
+              screen: { areas: '"a h" "a b"', cols: '2fr 1fr', rows: '1fr 1fr', ratio: 2.67, cells: [
+                { area: 'h', head: true },
+                { area: 'a', img: 'img/raznoe/mosbirzha-1.webp' },
+                { area: 'b', img: 'img/raznoe/mosbirzha-2.webp', pos: 'bottom' } ] } },
+            { title: 'Philips',
               text: ['Круглый павильон: по краю — секции за цветными рейками, в центре — газон с креслами-мешками и очистителями воздуха Philips.',
-                     'Круглый павильон: по краю — цветные секции, в центре — газон, кресла-мешки и очистители воздуха Philips между ними'] },
+                     'Круглый павильон: по краю — цветные секции, в центре — газон, кресла-мешки и очистители воздуха Philips между ними'],
+              screen: { areas: '"a b" "a c"', cols: '2fr 1fr', rows: '1fr 1fr', ratio: 2.67, cells: [
+                { area: 'a', img: 'img/raznoe/philips-1.webp' },
+                { area: 'b', img: 'img/raznoe/philips-2.webp' },
+                { area: 'c', img: 'img/raznoe/philips-3.webp' } ] } },
           ],
         ],
         link:  'https://kupdasha.ru/stands',
