@@ -30,6 +30,10 @@
 .stk-side{display:flex;flex-direction:column;gap:20px}
 .stk-side .stk-title{font-size:clamp(30px,3.2vw,48px);max-width:none}
 .stk-side .stk-text{font-size:clamp(19px,1.5vw,22px)}
+/* этапы: что делали и кто */
+.stk-steps{list-style:none;margin:8px 0 0;padding:0;border-top:1.5px solid var(--line)}
+.stk-steps li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1.5px solid var(--line);font-size:17px;line-height:1.3}
+.stk-by{flex:none;color:color-mix(in srgb,var(--ink) 55%,transparent);text-align:right}
 @media (max-width:900px){.stk-split > .stk-viz,.stk-split > .stk-side{grid-column:1 / -1;grid-row:auto}.stk-side{order:-1}}
 
 /* стикер: прозрачный ролик, первый кадр — постер */
@@ -80,8 +84,12 @@
 .stk-msg p{margin:0;padding:9px 15px 10px;border-radius:18px;font-size:17px;line-height:1.35;background:var(--stk-in);text-wrap:pretty}
 .stk-msg.in p{border-bottom-left-radius:6px}
 .stk-msg.out p{background:var(--stk-out);border-bottom-right-radius:6px}
-.stk-msg.st{width:clamp(128px,16vw,168px);aspect-ratio:1}
-@media (prefers-reduced-motion:reduce){.stk-msg{transition:none}}
+.stk-msg.st{position:relative;width:clamp(128px,16vw,168px);aspect-ratio:1}
+.stk-msg.st .stk-v{position:relative}
+/* новый стикер приходит на зеленом, как из нейросети, и фон стирается слева направо — клинап */
+.stk-chroma{position:absolute;inset:0;border-radius:14px;background:var(--stk-green);clip-path:inset(0 0 0 0);transition:clip-path .9s var(--ease-io)}
+.stk-msg.clean .stk-chroma{clip-path:inset(0 0 0 100%)}
+@media (prefers-reduced-motion:reduce){.stk-msg,.stk-chroma{transition:none}}
 
 /* панель стикерпака: герои вкладками, под ними сетка стикеров */
 .stk-pack{border-top:1.5px solid var(--line);background:var(--stk-win)}
@@ -122,45 +130,3 @@
 .stk-emo{font-size:clamp(18px,1.6vw,24px);font-weight:500;line-height:1.2;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .7s var(--ease)}
 .stk-face.on .stk-emo{opacity:1;transform:none}
 @media (max-width:760px){.stk-ribbon{--fw:58vw}}
-
-/* ================================================================
-   steps — один стикер проходит все этапы; подпись — кто делал
-   ================================================================ */
-@property --stk-rv{syntax:'<percentage>';inherits:true;initial-value:0%}
-.stk-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:28px;align-items:center}
-.stk-stage{grid-column:1 / span 6;position:relative;aspect-ratio:1;width:min(100%,72vh);margin-inline:auto;border-radius:var(--r-img);overflow:hidden;
-  /* «прозрачный фон» — шахматка, как в редакторе */
-  background:conic-gradient(#E9E9EC 25%,#FFFFFF 0 50%,#E9E9EC 0 75%,#FFFFFF 0) 0 0 / 28px 28px}
-:root[data-theme="dark"] .stk-stage{background:conic-gradient(#24262D 25%,#1B1C21 0 50%,#24262D 0 75%,#1B1C21 0) 0 0 / 28px 28px}
-.stk-stage > i{position:absolute;inset:0}
-.stk-wall{background-size:cover;background-position:50% 40%;opacity:0;transition:opacity 1s var(--ease)}
-/* зеленый фон стирается слева направо */
-.stk-green{background:var(--stk-green);clip-path:inset(0 0 0 0);transition:clip-path 1.2s var(--ease-io)}
-.stk-one{position:absolute;inset:9%;
-  /* надпись под героем спрятана, на шаге «надписи» проявляется слева направо */
-  --stk-rv:var(--l);
-  clip-path:polygon(0 0,100% 0,100% var(--t),var(--stk-rv) var(--t),var(--stk-rv) 100%,0 100%,0 var(--t));
-  transition:--stk-rv 1.3s var(--ease-io),transform 1s var(--ease)}
-.stk-ok,.stk-file{position:absolute;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px 2px;border-radius:99px;font-size:17px;font-weight:500;
-  opacity:0;transform:translateY(10px) scale(.9);transition:opacity .5s var(--ease),transform .7s cubic-bezier(.3,1.5,.5,1)}
-.stk-ok{top:5%;right:5%;background:var(--ink);color:var(--bg);padding-left:12px}
-.stk-ok svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.stk-file{left:5%;bottom:5%;background:var(--bg);color:var(--ink)}
-.stk-stage:not([data-s="0"]) .stk-green{clip-path:inset(0 0 0 100%)}
-.stk-stage[data-s="2"] .stk-one,.stk-stage[data-s="3"] .stk-one,.stk-stage[data-s="4"] .stk-one{--stk-rv:calc(var(--r) + 4%)}
-.stk-stage[data-s="3"] .stk-ok{opacity:1;transform:none}
-.stk-stage[data-s="4"] .stk-wall{opacity:1}
-.stk-stage[data-s="4"] .stk-one{transform:scale(.86) translateY(-3%)}
-.stk-stage[data-s="4"] .stk-file{opacity:1;transform:none}
-.stk-stage.jump *{transition:none !important}
-
-.stk-caps{grid-column:8 / -1;display:grid;max-width:34ch}
-.stk-cap{grid-area:1 / 1;display:flex;flex-direction:column;gap:14px;opacity:0;transform:translateY(12px);transition:opacity .5s,transform .7s var(--ease);pointer-events:none}
-.stk-cap.on{opacity:1;transform:none;pointer-events:auto}
-.stk-by{font-size:17px;font-weight:500;color:color-mix(in srgb,var(--ink) 55%,transparent)}
-.stk-cap p{margin:0;font-family:var(--font-read);font-size:clamp(20px,1.7vw,25px);line-height:1.4;text-wrap:pretty}
-@media (max-width:900px){
-  .stk-stage,.stk-caps{grid-column:1 / -1}
-  .stk-stage{max-width:560px}
-}
-@media (prefers-reduced-motion:reduce){.stk-stage *,.stk-cap{transition:none !important}}

@@ -5,14 +5,13 @@
    Стикеры вырезаны из презентации без фона: у каждого .webm (VP9
    с прозрачностью — Chrome, Firefox, Android), -hevc.mp4 (HEVC
    с прозрачностью — Safari и всё на iPhone) и .webp (первый кадр).
-   Главы: chat — переписка стикерами: панель стикерпака внизу,
-     нажатие отправляет стикер в чат, собеседник отвечает; пока
-     не тронули, переписка идет сама;
-   faces — один герой, разные эмоции: лента эмоций сменяется сама
+   Главы: faces — один герой, разные эмоции: лента эмоций сменяется сама
      (одна эмоция — один круг стикера), строка героев сверху;
-   steps — один стикер проходит все этапы: анимация на зеленом,
-     клинап, надпись от руки, согласование, Телеграм; у шага — кто
-     его делал.
+   chat — от рендера до мессенджера: переписка стикерами, панель
+     стикерпака внизу; каждый новый стикер приходит на зеленом фоне,
+     и фон стирается — как при клинапе; нажатие отправляет стикер,
+     собеседник отвечает; пока не тронули, переписка идет сама.
+     Рядом с чатом — этапы списком: что и кто делал.
    Тексты и список стикеров — в content.js, оформление — stickers.css.
    ================================================================ */
 let H;   // помощники из app.js: T (типограф), pick, openViewer, base
@@ -80,6 +79,8 @@ const side = ch => `<div class="stk-side">
   <span class="case-label stk-label">${H.T(ch.label)}</span>
   <h2 class="stk-title">${H.T(ch.title)}</h2>
   <p class="stk-text">${H.T(ch.text)}</p>
+  ${ch.steps ? `<ul class="stk-steps">${ch.steps.map(st =>
+    `<li><span>${H.T(st.name)}</span><span class="stk-by">${H.T(st.who)}</span></li>`).join('')}</ul>` : ''}
 </div>`;
 
 // строка надписей сверху: текущая темная, под ней бежит полоска таймера
@@ -153,10 +154,12 @@ function liveChat(sec, c, all){
   function send(from, { text, st }, instant){
     const m = document.createElement('div');
     m.className = `stk-msg ${from}${st ? ' st' : ''}${instant ? ' show' : ''}`;
-    m.innerHTML = st ? vid(st.src) : `<p>${H.T(text)}</p>`;
+    m.innerHTML = st ? `${instant ? '' : '<i class="stk-chroma"></i>'}${vid(st.src)}` : `<p>${H.T(text)}</p>`;
     msgs.append(m);
     watch(m);
     if (!instant) requestAnimationFrame(() => requestAnimationFrame(() => m.classList.add('show')));
+    // зеленый фон уходит, когда стикер уже на месте; при «меньше движения» его нет сразу
+    if (st && !instant) setTimeout(() => m.classList.add('clean'), still() ? 0 : 700);
     while (msgs.children.length > 8) msgs.firstElementChild.remove();
   }
 
@@ -232,63 +235,11 @@ function liveFaces(sec, c, all){
   setHero(0);
 }
 
-/* ================================================================
-   steps — один стикер от зеленого фона до Телеграма
-   ================================================================ */
-const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5L10 17.5L19 7"/></svg>';
-function stepsHTML(c, all){
-  const t = c.text || {};
-  return `<div class="stk-box">
-    ${tabs(c.items.map(s => H.T(s.name)))}
-    <div class="stk-row">
-      <div class="stk-stage" data-s="0">
-        <i class="stk-wall" style="background-image:url(&quot;${esc(all.stickers.wall)}&quot;)"></i>
-        <i class="stk-green"></i>
-        <div class="stk-one" style="--t:${(t.top ?? 1) * 100}%;--l:${(t.left ?? 0) * 100}%;--r:${(t.right ?? 1) * 100}%">${vid(c.sticker)}</div>
-        <span class="stk-ok">${CHECK}<span>${H.T(c.done)}</span></span>
-        ${c.file ? `<span class="stk-file">${esc(c.file)}</span>` : ''}
-      </div>
-      <div class="stk-caps">${c.items.map((s, i) => `<div class="stk-cap${i ? '' : ' on'}">
-        <span class="stk-by">${H.T(s.who)}</span>
-        <p>${H.T(s.text)}</p>
-      </div>`).join('')}</div>
-    </div>
-  </div>`;
-}
-function liveSteps(sec, c){
-  const box = sec.querySelector('.stk-box'), stage = sec.querySelector('.stk-stage');
-  const btns = [...box.querySelectorAll('.stk-tab')], caps = [...sec.querySelectorAll('.stk-cap')];
-  const n = c.items.length, MS = 3400;
-  let cur = 0, timer = 0, seen = false, touched = false;
-  const set = i => {
-    const back = i < cur;
-    cur = (i + n) % n;
-    selectTab(btns, cur);
-    caps.forEach((s, k) => s.classList.toggle('on', k === cur));
-    // назад — без обратной анимации: зеленый фон просто возвращается
-    if (back) stage.classList.add('jump');
-    stage.dataset.s = cur;
-    if (back) { void stage.offsetWidth; stage.classList.remove('jump'); }
-    run();
-  };
-  const run = () => {
-    clearTimeout(timer);
-    if (touched || !seen || still()) { tick(null, box); return; }
-    tick(btns[cur], box, MS);
-    timer = setTimeout(() => set(cur + 1 < n ? cur + 1 : 0), MS);
-  };
-  btns.forEach((b, i) => b.addEventListener('click', () => { touched = true; set(i); }));
-  onScreen(box, v => { seen = v; run(); }, .35);
-  watch(stage);
-  set(0);
-}
-
 /* ---------- запуск ---------- */
 // [ключ, иллюстрация, оживление, раскладка]: head — заголовок сверху; left — иллюстрация слева от текста
 const CHAPTERS = [
-  ['chat', chatHTML, liveChat, 'left'],
   ['faces', facesHTML, liveFaces, 'head'],
-  ['steps', stepsHTML, liveSteps, 'head'],
+  ['chat', chatHTML, liveChat, 'left'],
 ];
 
 let cssReady;
