@@ -5,8 +5,10 @@
    Стикеры вырезаны из презентации без фона: у каждого .webm (VP9
    с прозрачностью — Chrome, Firefox, Android), -hevc.mp4 (HEVC
    с прозрачностью — Safari и всё на iPhone) и .webp (первый кадр).
-   Главы: faces — один герой, разные эмоции: лента эмоций сменяется сама
-     (одна эмоция — один круг стикера), строка героев сверху;
+   Главы: faces — модель училась на рендерах студии: сверху позы героев,
+     модель «читает» их по очереди, от плашки «обучение модели, начало 2024»
+     поток уходит вниз, в живую ленту эмоций одного героя (одна эмоция —
+     один круг стикера), строка героев с таймером;
    chat — от рендера до мессенджера: переписка стикерами, панель
      стикерпака внизу; каждый новый стикер приходит на зеленом фоне,
      и фон стирается — как при клинапе; нажатие отправляет стикер,
@@ -185,7 +187,13 @@ function liveChat(sec, c, all){
    faces — один герой, разные эмоции: лента сменяется сама
    ================================================================ */
 function facesHTML(c, all){
-  return `<div class="stk-box">
+  // сверху — рендеры, на которых училась модель; от плашки «обучение модели» поток уходит вниз, в живую ленту
+  const train = c.renders ? `<div class="stk-train">
+    <div class="stk-renders">${c.renders.map((r, k) => `<span class="stk-render" style="--k:${k}"><img src="${esc(r)}" alt="" loading="lazy" decoding="async" draggable="false"></span>`).join('')}</div>
+    <p class="stk-rcap">${H.T(c.rendersCap)}</p>
+    <div class="stk-model" aria-hidden="true"><i class="stk-flow"></i><span class="stk-chip"><b>${H.T(c.model)}</b><span>${H.T(c.when)}</span></span><i class="stk-flow"></i></div>
+  </div>` : '';
+  return `${train}<div class="stk-box">
     ${tabs(all.stickers.heroes.map(h => H.T(h.name)))}
     <div class="stk-ribbon"><div class="stk-track"></div></div>
   </div>`;
