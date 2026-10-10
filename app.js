@@ -590,10 +590,16 @@ function setupDeck(){
     card.style.transform = `translate(${dir * 140}%, -10%) rotate(${dir * 28}deg)`;
     card.style.opacity = '0';
     if (dir > 0) joke('match');
+    // следующие карточки подъезжают сразу, вместе с улетающей, а не скачком в конце
+    const next = card.previousElementSibling, after = next && next.previousElementSibling;
+    if (next) next.style.transform = 'none';
+    if (after) after.style.transform = 'scale(.96) translateY(10px)';
     setTimeout(() => {   // карточка уходит под низ колоды — фото листаются по кругу
       card.style.transition = 'none'; card.style.transform = ''; card.style.opacity = '';
       card.classList.remove('like', 'nope');
       deck.prepend(card);
+      [next, after].forEach(c => c && (c.style.transform = ''));   // теперь их место задает CSS, сдвига нет
+      card.offsetWidth; card.style.transition = '';
     }, 520);
   };
   let drag = null;
