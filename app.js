@@ -63,7 +63,7 @@ addEventListener('error', e => {
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -2578,6 +2578,8 @@ function renderCase(k, keepScroll){
   if (p.isle) body += `<div class="ia ia-mount"></div>`;
   // maket — конструктор макетов для соцсетей: лента «как умеют», файл в браузере, заголовок не утащить за край, «замиксовать», фото без водяных знаков, GPT и конструктор; рисует maket.js
   if (p.maket) body += `<div class="mk mk-mount"></div>`;
+  // stickers — ИИ стикеры: переписка стикерами, один герой — разные эмоции, стикер от зеленого фона до Телеграма; рисует stickers.js
+  if (p.stickers) body += `<div class="stk stk-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // heroEnd — ролик из шапки уходит в самый конец кейса, после живых глав (см. интерактивные презентации)
   if (p.heroEnd) body += `<div class="wrap case-hero-end"><div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div></div>`;
@@ -2730,6 +2732,10 @@ function renderCase(k, keepScroll){
   if (mk) caseImport('maket')
     .then(m => m.mountMaket(mk, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс конструктора макетов не загрузился', err));
+  const stk = caseContent.querySelector('.stk-mount');
+  if (stk) caseImport('stickers')
+    .then(m => m.mountStickers(stk, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс ИИ стикеров не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
