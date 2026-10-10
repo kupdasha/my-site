@@ -514,10 +514,24 @@ function viewShow(){
   viewer.querySelector('.viewer-count').innerHTML = viewCaps[viewAt] ? `${T(viewCaps[viewAt])} <span class="viewer-n">${count}</span>` : count;
   viewer.classList.toggle('single', viewList.length < 2);
 }
+/* кадр в просмотр: если на странице уже загружена его миниатюра — сразу показываем ее, а крупную версию
+   подменяем, как только догрузится (иначе, пока она грузится, на экране висит прежний кадр и кажется,
+   что листание срабатывает через раз); соседние кадры подгружаем заранее */
+function viewSet(k){
+  const full = viewList[k], el = viewFrom[k];
+  const thumb = el && el.tagName === 'IMG' && el.complete && el.naturalWidth ? el.currentSrc || el.src : '';
+  if (thumb && thumb !== full) {
+    viewImg.src = thumb;
+    const big = new Image();
+    big.onload = () => { if (viewList[viewAt] === full) viewImg.src = full; };
+    big.src = full;
+  } else viewImg.src = full;
+  [1, -1].forEach(d => { if (viewList.length > 1) new Image().src = viewList[(k + d + viewList.length) % viewList.length]; });
+}
 function openViewer(list, k, from, caps){
   viewCaps = caps || [];
   viewList = list; viewAt = k; viewFrom = from || [];
-  viewImg.src = list[k]; viewShow();
+  viewSet(k); viewShow();
   const src = viewFrom[k];
   viewImg.style.transition = 'none'; viewImg.style.transform = '';
   viewer.classList.add('fly'); viewer.getBoundingClientRect(); viewer.classList.add('open');   // фон темнеет плавно
@@ -546,7 +560,7 @@ function stepViewer(d){
   viewAt = (viewAt + d + viewList.length) % viewList.length;
   if (old) old.style.visibility = '';
   if (viewFrom[viewAt]) viewFrom[viewAt].style.visibility = 'hidden';
-  viewImg.src = viewList[viewAt]; viewShow();
+  viewSet(viewAt); viewShow();
   viewImg.animate([{ opacity: 0, transform: `translateX(${d * 40}px)` }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' });
 }
 viewer.addEventListener('click', e => {
