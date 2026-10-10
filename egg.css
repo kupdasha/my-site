@@ -46,37 +46,34 @@
 .eg-lbl.swap{animation:egLbl .45s cubic-bezier(.22,1,.36,1)}
 @keyframes egLbl{from{transform:translateY(110%);opacity:0}}
 
-/* ---------- cond: кастрюля, время и два переключателя ---------- */
-.eg-cond-top{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(16px,3vw,40px);margin-bottom:clamp(24px,3vw,40px)}
-.eg-pot{width:100%;max-width:340px;justify-self:center;overflow:visible}
-.eg-pot path,.eg-pot circle{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.eg-potline{stroke:var(--eg-ink);stroke-width:3.5}
-.eg-pot .eg-water{fill:#E3EDF9;stroke:none}
-.eg-wave{stroke:#9FBEE3;stroke-width:3;transform-box:view-box;transform-origin:0 88px;transform:scaleY(.15);transition:transform .6s var(--ease)}
-.eg-in > path{fill:#fff;stroke:var(--eg-ink);stroke-width:3;transition:fill .6s}
-.eg-frost path{stroke:#7FA8E0;stroke-width:2.2}
-.eg-frost{transition:opacity .6s,transform .6s var(--ease);transform-box:fill-box;transform-origin:center}
-.eg-cond-app[data-room="0"] .eg-in > path{fill:#EEF4FD}
-.eg-cond-app[data-room="1"] .eg-frost{opacity:0;transform:scale(.6)}
-.eg-bub circle{stroke:#9FBEE3;stroke-width:2.4;opacity:0}
-.eg-steam path{stroke:var(--eg-ink2);stroke-width:2.6;opacity:0;transition:opacity .6s}
-.eg-cond-app[data-boil="1"] .eg-wave{transform:scaleY(1)}
-.eg-cond-app[data-boil="1"] .eg-steam path{opacity:.55}
-.eg-cond-app.run[data-boil="1"] .eg-wave{animation:egWave 1.4s linear infinite}
-.eg-cond-app.run[data-boil="1"] .eg-bub circle{animation:egBub 1.6s ease-in infinite}
-.eg-bub circle:nth-child(2){animation-delay:-.5s!important}.eg-bub circle:nth-child(3){animation-delay:-1s!important}
-.eg-bub circle:nth-child(4){animation-delay:-.25s!important}.eg-bub circle:nth-child(5){animation-delay:-1.3s!important}
-.eg-cond-app.run[data-boil="1"] .eg-steam path{stroke-dasharray:6 6;animation:egSteam 1.2s linear infinite}
-.eg-cond-app.run[data-boil="1"] .eg-in{animation:egJig .5s ease-in-out infinite alternate}
-.eg-in{transform-box:fill-box;transform-origin:50% 100%}
-@keyframes egWave{from{translate:0 0}to{translate:-44px 0}}
-@keyframes egBub{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(-72px)}}
-@keyframes egSteam{to{stroke-dashoffset:-24}}
-@keyframes egJig{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
-.eg-cond-app .eg-read{text-align:center}
+/* ---------- cond: яйцо слева; справа переключатели-иконки, время и разница, пять желтков ---------- */
+.eg-cond-app{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:center}
+.eg-cond-egg{position:relative;width:100%;max-width:290px;justify-self:center}
+.eg-cond-side{display:grid;gap:clamp(22px,2.6vw,34px)}
+/* яйцо из холодильника — скорлупа холодная */
+.eg-cond-app[data-room="0"] .eg-white{fill:#EEF4FD}
+/* в кипятке над яйцом пар */
+.eg-cond-egg .eg-puff{top:-2%;opacity:0}
+.eg-cond-app[data-boil="1"] .eg-puff{opacity:1}
+.eg-cond-egg .eg-puff i{background:radial-gradient(closest-side,rgba(42,38,33,.18),transparent 70%)}
+.eg-cond-app.run .eg-puff i{animation:egPuff 4.2s linear infinite}
+.eg-cond-app .eg-read{text-align:left}
+.eg-cond-app .eg-time{justify-content:flex-start}
+.eg-delta{min-height:1.3em;margin-top:6px;font-size:clamp(20px,1.8vw,26px);font-weight:500;color:var(--eg-pink)}
+.eg-delta.swap{animation:egLbl .45s cubic-bezier(.22,1,.36,1)}
+/* переключатели — только иконки */
+.eg-iseg button{display:grid;place-items:center;padding:14px 8px}
+.eg-iseg svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.eg-seg.hit,.eg-yk.hit{animation:egPick .5s cubic-bezier(.34,1.56,.64,1)}
+/* пять желтков: выбранный — в черном кольце */
+.eg-yolks{display:grid;grid-template-columns:repeat(5,minmax(0,52px));gap:8px}
+.eg-yk{width:100%;aspect-ratio:1;padding:5px;border:0;border-radius:50%;background:var(--eg-card);cursor:pointer;box-shadow:inset 0 0 0 2.5px transparent;transition:box-shadow .25s,transform .45s cubic-bezier(.34,1.56,.64,1)}
+.eg-yk svg{display:block;width:100%;height:100%}
+.eg-yk:hover{transform:translateY(-2px)}
+.eg-yk.sel{box-shadow:inset 0 0 0 2.5px var(--eg-ink)}
+.eg-yk:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
-.eg-qs{display:grid;gap:22px}
-.eg-qn{display:block;font-size:17px;font-weight:600;color:var(--eg-ink2);margin:0 4px 10px}
+.eg-qs{display:grid;gap:12px}
 /* две белые подложки, черная пилюля переезжает пружиной */
 .eg-seg{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative}
 .eg-seg::before,.eg-seg::after{content:"";position:absolute;top:0;height:100%;width:calc(50% - 6px);border-radius:18px;background:var(--eg-card)}
@@ -91,23 +88,10 @@
 /* ---------- яйцо ---------- */
 .eg-egg{display:block;width:100%;overflow:visible}
 .eg-rim{fill:none;stroke-width:2.5}
-.eg-rim.raw{stroke:#F59AB4;opacity:max(0, calc(1 - var(--set,0) * 2))}   /* розовая и желтая обводки не накладываются — без оранжевого */
-.eg-rim.set{stroke:#F3CF3E;opacity:max(0, calc(var(--set,0) * 2 - 1))}
+.eg-rim.raw{stroke:#F59AB4;opacity:clamp(0, calc((.5 - var(--set,0)) * 1000), 1)}   /* обводка розовая, пока желток больше жидкий, потом сразу желтая — цвета не накладываются, без оранжевого */
+.eg-rim.set{stroke:#F3CF3E;opacity:clamp(0, calc((var(--set,0) - .5) * 1000 + 1), 1)}
 
-/* ---------- yolk: яйцо в разрезе и пять плиток ---------- */
-.eg-yolk-app{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,3vw,44px);align-items:center}
-.eg-yolk-egg{max-width:300px;width:100%;justify-self:center}
-.eg-yolk-egg .eg-lbl-clip{margin-top:18px;min-height:2.6em}
-.eg-tiles{display:grid;gap:10px}
-.eg-tile{position:relative;display:grid;grid-template-columns:5.2em 1fr;align-items:baseline;gap:8px;text-align:left;background:var(--eg-card);border:0;border-radius:18px;padding:15px 18px;overflow:hidden;cursor:pointer;font:inherit;color:var(--eg-ink);transition:transform .45s cubic-bezier(.34,1.56,.64,1),background .2s}
-.eg-tile:hover{transform:translateY(-2px)}
-.eg-tile.sel{background:var(--eg-sel)}
-.eg-tile.just{animation:egPick .5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes egPick{0%{transform:scale(.965)}55%{transform:scale(1.03)}100%{transform:scale(1)}}
-.eg-mins{font-size:20px;font-weight:600;white-space:nowrap}
-.eg-nm{font-size:17px}
-.eg-tile i{position:absolute;left:0;bottom:0;height:3px;width:calc(var(--p,0) * 100%);background:var(--eg-ink)}
-.eg-tile:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
 /* ---------- timer: экран таймера ---------- */
 .eg-timer-app{aspect-ratio:4 / 5;max-height:86vh;width:100%;max-width:560px;margin:0 auto;padding:0;display:block;--cook:0}
@@ -159,11 +143,11 @@
 :root .eg-try .eg-try-btn:hover{background:var(--ink);color:var(--bg)}
 
 @media (max-width:640px){
-  .eg-cond-top{grid-template-columns:1fr;gap:8px}
-  .eg-pot{max-width:240px}
-  .eg-seg button{padding:14px 8px;font-size:16px}
-  .eg-yolk-app{grid-template-columns:1fr}
-  .eg-yolk-egg{max-width:200px}
+  .eg-cond-app{grid-template-columns:1fr}
+  .eg-cond-egg{max-width:180px}
+  .eg-cond-app .eg-read{text-align:center}
+  .eg-cond-app .eg-time{justify-content:center}
+  .eg-yolks{justify-content:center}
   .eg-timer-app{aspect-ratio:3 / 4}
   .eg-tap{width:40%;top:34%}
 }
@@ -171,4 +155,3 @@
   .eg-col > *,.eg-viz{transform:none;opacity:1;transition:none}
   .eg *{animation:none!important}
 }
-@media (max-width:640px){.eg-tile{padding:12px 16px}}

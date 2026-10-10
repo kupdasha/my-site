@@ -5,9 +5,9 @@
    по одной. Яйцо — той же формы, что в приложении; желток застывает
    от края к центру: розовая жидкая середина сжимается внутри желтого
    (цвета не смешиваются — без оранжевого).
-   cond  — переключатели «яйца» и «вода», кастрюля и время пересчитываются
+   cond  — условия и желток вместе, почти без слов: переключатели-иконки
+           «яйцо» и «вода», пять желтков, время и разница пересчитываются
            (переключаются сами, пока не тронули);
-   yolk  — пять плиток консистенции, яйцо показывает желток (перебираются сами);
    timer — экран таймера: отсчет ускорен, пар, «готово» с волной,
            нажатие на яйцо — пауза; под текстом — кнопка демо (egg.try).
    Минуты — по формуле приложения: base из yolk.kinds, кипяток −1 мин,
@@ -119,108 +119,77 @@ const chapter = (k, viz, c, t, flipSide) =>
   `<section class="eg-ch wrap eg-split eg-${k}${flipSide ? ' rev' : ''}"><div class="eg-viz">${viz}</div>${block(c, t)}</section>`;
 
 /* ================================================================
-   cond — откуда яйцо и какая вода: кастрюля, переключатели, время
+   cond — условия и желток в одной главе, почти без слов:
+   слева яйцо в разрезе с выбранным желтком (у яйца из холодильника
+   скорлупа холодная, в кипятке над ним пар); справа два переключателя-
+   иконки — яйцо (снежинка / дом) и вода (кастрюля / кастрюля с паром),
+   крупное время и разница с «холодильник + холодная вода»;
+   внизу пять желтков — консистенция. Желток один и тот же, меняется время
    ================================================================ */
-const seg = (k, q) => `<div class="eg-q"><span class="eg-qn">${H.T(q[0])}</span>
-  <div class="eg-seg" data-k="${k}">${q[1].map((o, i) => `<button type="button" class="${i ? '' : 'sel'}" data-i="${i}">${H.T(o)}</button>`).join('')}<i class="eg-pill" aria-hidden="true"></i></div></div>`;
-// кастрюля линиями: вода спокойная или с пузырями, у яйца из холодильника — иней
-const POT = `<svg class="eg-pot" viewBox="0 0 260 190" aria-hidden="true">
-  <g class="eg-steam"><path d="M98 34C92 26 104 20 98 10"/><path d="M130 30C124 22 136 16 130 6"/><path d="M162 34C156 26 168 20 162 10"/></g>
-  <path class="eg-water" d="M36 88C66 88 80 88 130 88C180 88 194 88 224 88V148C224 166 212 176 194 176H66C48 176 36 166 36 148Z"/>
-  <path class="eg-wave" d="M36 88Q58 80 80 88T124 88T168 88T212 88T256 88"/>
-  <g class="eg-bub"><circle cx="70" cy="168" r="4"/><circle cx="104" cy="170" r="3"/><circle cx="160" cy="168" r="4.5"/><circle cx="190" cy="170" r="3"/><circle cx="132" cy="171" r="3.5"/></g>
-  <g class="eg-in"><path d="M130 96C146 96 154 110 158 128C162 148 158 168 130 168C102 168 98 148 102 128C106 110 114 96 130 96Z"/>
-    <g class="eg-frost"><path d="M114 116L120 122M120 116L114 122M117 114V124M112 119H122"/><path d="M142 138L147 143M147 138L142 143M144.5 136V145M140 140.5H149"/><path d="M120 146L124 150M124 146L120 150"/></g></g>
-  <path class="eg-potline" d="M36 64V148C36 166 48 176 66 176H194C212 176 224 166 224 148V64M24 64H236M24 72H8M236 72H252"/>
-</svg>`;
+const ICO = {
+  fridge: '<path d="M12 3V21M4.2 7.5L19.8 16.5M4.2 16.5L19.8 7.5M9.5 4.5L12 7L14.5 4.5M9.5 19.5L12 17L14.5 19.5"/>',
+  room:   '<path d="M3.5 11.5L12 4L20.5 11.5M6 9.5V20H18V9.5"/><path d="M10 20V15H14V20"/>',
+  cold:   '<path d="M3 10H21M5 10V16A4 4 0 0 0 9 20H15A4 4 0 0 0 19 16V10"/><path d="M7.5 14H16.5"/>',
+  boil:   '<path d="M3 10H21M5 10V16A4 4 0 0 0 9 20H15A4 4 0 0 0 19 16V10"/><path d="M8.5 7C7.5 5.8 9.5 4.8 8.5 3.5M12 7C11 5.8 13 4.8 12 3.5M15.5 7C14.5 5.8 16.5 4.8 15.5 3.5"/>',
+};
+const iseg = (k, a, b, c) => `<div class="eg-seg eg-iseg" data-k="${k}">
+  ${[a, b].map((n, i) => `<button type="button" class="${i ? '' : 'sel'}" data-i="${i}" aria-label="${esc(H.pick(c.aria[n]))}" title="${esc(H.pick(c.aria[n]))}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICO[n]}</svg></button>`).join('')}
+  <i class="eg-pill" aria-hidden="true"></i></div>`;
+// мини-желток: желтый круг, розовая жидкая середина размером liq
+const miniYolk = k => `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#FFD84D"/>${k.liq > 0 ? `<circle cx="20" cy="20" r="${(15 * k.liq).toFixed(1)}" fill="#F0506E"/>` : ''}</svg>`;
 function condHTML(c, y){
   return `<div class="eg-app eg-cond-app" data-room="0" data-boil="0">
-    <div class="eg-cond-top">${POT}
-      <div class="eg-read"><div class="eg-time"></div><div class="eg-lbl-clip"><div class="eg-lbl"></div></div></div>
+    <div class="eg-cond-egg">${eggSVG()}<span class="eg-puff" aria-hidden="true"><i></i><i></i><i></i></span></div>
+    <div class="eg-cond-side">
+      <div class="eg-qs">${iseg('room', 'fridge', 'room', c)}${iseg('boil', 'cold', 'boil', c)}</div>
+      <div class="eg-read"><div class="eg-time"></div><div class="eg-delta" aria-live="polite"></div></div>
+      <div class="eg-yolks">${y.kinds.map((k, i) => `<button type="button" class="eg-yk" data-i="${i}" aria-label="${esc(H.pick(k.name))}" title="${esc(H.pick(k.name))}">${miniYolk(k)}</button>`).join('')}</div>
     </div>
-    <div class="eg-qs">${seg('room', c.egg)}${seg('boil', c.water)}</div>
   </div>`;
 }
 function liveCond(box, c, y){
   const app = box.querySelector('.eg-cond-app');
-  const kind = y.kinds.find(k => k.best) || y.kinds[0];
+  const egg = eggCtl(app.querySelector('.eg-egg'), 1);
   const setT = digits(app.querySelector('.eg-time'));
-  const lbl = app.querySelector('.eg-lbl');
-  const st = { room: 0, boil: 0 };
-  const paint = () => {
+  const delta = app.querySelector('.eg-delta');
+  const yks = [...app.querySelectorAll('.eg-yk')];
+  const st = { room: 0, boil: 0, y: Math.max(0, y.kinds.findIndex(k => k.best)) };
+  const pulse = el => { if (still() || !el) return; el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); };
+  const paint = (changed, now) => {
     app.dataset.room = st.room; app.dataset.boil = st.boil;
     app.querySelectorAll('.eg-seg').forEach(s => {
       const v = st[s.dataset.k];
       s.classList.toggle('right', !!v);
       s.querySelectorAll('button').forEach(b => b.classList.toggle('sel', +b.dataset.i === v));
     });
-    const m = minutes(kind.base, st.room, st.boil);
+    yks.forEach((b, i) => b.classList.toggle('sel', i === st.y));
+    const k = y.kinds[st.y];
+    egg.set(k.liq, now);
+    const m = minutes(k.base, st.room, st.boil), d = k.base - m;
     setT(fmt(m * 60));
-    flip(lbl, H.T(c.for).replace('{n}', H.T(kind.name).toLowerCase()));
+    flip(delta, d ? '−' + fmt(d * 60).replace(/^0/, '') : '');
+    if (changed) pulse(changed === 'y' ? yks[st.y] : app.querySelector(`.eg-seg[data-k="${changed}"]`));
   };
-  // переключаются сами по одному: стол, кипяток, холодильник, холодная вода — пока посетитель не нажал
-  const ORDER = [['room', 1], ['boil', 1], ['room', 0], ['boil', 0]];
+  // сами, по одному: условия меняются чаще желтка — главное в главе — они
+  const STEPS = [['room', 1], ['boil', 1], ['room', 0], ['boil', 0], ['y', 1]];
   let step = 0, timer = 0, touched = false, on = false;
   const go = () => {
     clearInterval(timer);
     if (!on || touched || still()) return;
     timer = setInterval(() => {
       if (!app.isConnected) return clearInterval(timer);
-      const [k, v] = ORDER[step++ % ORDER.length]; st[k] = v; paint();
-    }, 2200);
+      const [key, v] = STEPS[step++ % STEPS.length];
+      if (key === 'y') st.y = (st.y + 1) % y.kinds.length; else st[key] = v;
+      paint(key);
+    }, 2000);
   };
+  const stop = () => { touched = true; clearInterval(timer); };
   app.querySelectorAll('.eg-seg button').forEach(b => b.addEventListener('click', () => {
-    touched = true; clearInterval(timer);
-    st[b.parentNode.dataset.k] = +b.dataset.i; paint();
+    stop(); const k = b.parentNode.dataset.k; st[k] = +b.dataset.i; paint(k);
   }));
-  paint();
-  onScreen(app, v => { on = v; app.classList.toggle('run', v && !still()); go(); }, .35);
-}
-
-/* ================================================================
-   yolk — пять плиток консистенции и яйцо в разрезе
-   ================================================================ */
-function yolkHTML(y){
-  return `<div class="eg-app eg-yolk-app">
-    <div class="eg-yolk-egg">${eggSVG()}<div class="eg-lbl-clip"><div class="eg-lbl eg-desc"></div></div></div>
-    <div class="eg-tiles">${y.kinds.map((k, i) => `<button type="button" class="eg-tile" data-i="${i}">
-      <span class="eg-mins">${fmtMin(minutes(k.base, 0, 0))} ${H.T(y.min)}</span><span class="eg-nm">${H.T(k.name)}</span><i></i></button>`).join('')}</div>
-  </div>`;
-}
-function liveYolk(box, y){
-  const app = box.querySelector('.eg-yolk-app');
-  const egg = eggCtl(app.querySelector('.eg-egg'), y.kinds[0].liq);
-  const tiles = [...app.querySelectorAll('.eg-tile')];
-  const desc = app.querySelector('.eg-desc');
-  let cur = -1, touched = false, on = false, raf = 0, t0 = 0;
-  const LAP = 2600;
-  const show = (i, now) => {
-    if (i === cur) return;
-    cur = i; const k = y.kinds[i];
-    tiles.forEach((t, j) => { t.classList.toggle('sel', j === i); if (j !== i) t.style.setProperty('--p', 0); });
-    egg.set(k.liq, now);
-    flip(desc, H.T(k.desc));
-    if (!still()) { const t = tiles[i]; t.classList.remove('just'); void t.offsetWidth; t.classList.add('just'); }
-  };
-  // плитки перебираются сами; полоска на текущей — сколько до следующей
-  const tick = now => {
-    if (!on || touched || !app.isConnected) { raf = 0; return; }
-    if (!t0) t0 = now;
-    const t = (now - t0) / LAP, n = Math.floor(t);
-    show(n % tiles.length);
-    tiles[cur].style.setProperty('--p', t - n);
-    raf = requestAnimationFrame(tick);
-  };
-  const stop = () => { touched = true; tiles.forEach(t => t.style.setProperty('--p', 0)); };
-  tiles.forEach((t, i) => {
-    t.addEventListener('click', () => { stop(); show(i); });
-    t.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { stop(); show(i); } });
-  });
-  show(0, true);
-  onScreen(app, v => {
-    on = v; egg.run(v);
-    if (v && !touched && !raf && !still()) { t0 = 0; cur = -1; raf = requestAnimationFrame(tick); }
-  }, .35);
+  yks.forEach((b, i) => b.addEventListener('click', () => { stop(); st.y = i; paint('y'); }));
+  paint(null, true);
+  onScreen(app, v => { on = v; egg.run(v); app.classList.toggle('run', v && !still()); go(); }, .35);
 }
 
 /* ================================================================
@@ -321,11 +290,9 @@ export async function mountEgg(mount, p, helpers){
   const e = p.egg, y = e.yolk;
   mount.innerHTML =
       (e.cond ? chapter('cond', condHTML(e.cond, y), e.cond) : '')
-    + (y ? chapter('yolk', yolkHTML(y), y, null, true) : '')
-    + (e.timer ? chapter('timer', timerHTML(e.timer), e.timer, e.try) : '');
+    + (e.timer ? chapter('timer', timerHTML(e.timer), e.timer, e.try, true) : '');
   mount.querySelectorAll('.eg-ch').forEach(s => reveal.observe(s));
   const q = s => mount.querySelector(s);
   if (e.cond) liveCond(q('.eg-cond'), e.cond, y);
-  if (y) liveYolk(q('.eg-yolk'), y);
   if (e.timer) liveTimer(q('.eg-timer'), e.timer, y);
 }
