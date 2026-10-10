@@ -97,29 +97,18 @@
 }
 
 /* ================================================================
-   faces — рендер и он же оживший, призрак рендера под живым;
-   строка поз внизу — переключатель с полоской таймера
+   faces — нюансы ретуши: стикер на подложке, кольцо над местом правки
+   и лупа в углу; под ними — что правили
    ================================================================ */
-.stk-pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,24px);width:min(100%,calc(2 * 62vh));margin-inline:auto}
-.stk-pane{position:relative;aspect-ratio:1;border-radius:var(--r-img);background:var(--soft);overflow:hidden}
-.stk-still,.stk-alive{position:absolute;inset:8%;opacity:0;transition:opacity .5s var(--ease)}
-.stk-still.on,.stk-alive.on{opacity:1}
-.stk-still,.stk-ghost{width:100%;height:100%;object-fit:contain;display:block}
-.stk-alive .stk-ghost{position:absolute;inset:0;opacity:.28;filter:grayscale(1)}
-.stk-alive .stk-v{position:relative}
-.stk-tag{position:absolute;left:16px;bottom:14px;padding:8px 14px 9px;border-radius:99px;background:var(--bg);color:var(--ink);font-size:16px;font-weight:500;line-height:1.2}
-.stk-set{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:clamp(16px,2vw,24px)}
-.stk-pose{position:relative;flex:none;width:clamp(56px,7vw,88px);aspect-ratio:1;padding:6px 6px 10px;border:0;border-radius:12px;background:none;cursor:pointer;opacity:.45;transition:opacity .3s,background-color .3s}
-.stk-pose img{width:100%;height:100%;object-fit:contain;display:block}
-.stk-pose:hover{opacity:.8}
-.stk-pose[aria-selected="true"]{opacity:1;background:var(--soft)}
-.stk-pose:focus{outline:none}
-.stk-pose:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-.stk-pose .stk-tick{position:absolute;left:10px;right:10px;bottom:5px;height:2px;border-radius:2px;overflow:hidden;opacity:0;transition:opacity .3s}
-.stk-pose .stk-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%;transform:scaleX(0)}
-.stk-pose[aria-selected="true"] .stk-tick{opacity:1}
-.stk-pose.run .stk-tick::after{animation:stkTick var(--ms) linear both}
-@keyframes stkTick{from{transform:scaleX(0)}to{transform:none}}
-.stk-rcap{margin:12px 0 0;font-size:17px;color:color-mix(in srgb,var(--ink) 55%,transparent);text-align:center;text-wrap:balance}
-@media (max-width:760px){.stk-pair{gap:8px}.stk-tag{left:8px;bottom:8px;font-size:15px;padding:6px 10px 7px}.stk-pose{width:calc((100% - 42px) / 8)}}
-@media (prefers-reduced-motion:reduce){.stk-still,.stk-alive{transition:none}}
+.stk-fixes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2vw,28px)}
+.stk-fix{margin:0;display:flex;flex-direction:column;gap:20px}
+.stk-fixp{position:relative;aspect-ratio:1;border-radius:var(--r-img);background:var(--soft);overflow:hidden}
+.stk-fixp > .stk-v{position:absolute;left:0;top:20%;width:68%;height:68%}
+/* кольцо стоит над местом правки — в координатах самого стикера */
+.stk-ring{position:absolute;left:calc(var(--x) * .68);top:calc(20% + var(--y) * .68);width:calc(var(--r) * 2 * .68);aspect-ratio:1;
+  transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 2px var(--ink);opacity:.9}
+.stk-loupe{position:absolute;right:5%;top:5%;width:38%;aspect-ratio:1;border-radius:50%;background:var(--bg);box-shadow:0 0 0 2px var(--ink)}
+.stk-fix .stk-by{text-align:left;font-size:18px;font-weight:500}
+.stk-fix figcaption{display:flex;flex-direction:column;gap:10px;max-width:40ch}
+.stk-fix p{margin:0;font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;text-wrap:pretty}
+@media (max-width:760px){.stk-fixes{grid-template-columns:1fr;gap:48px}}

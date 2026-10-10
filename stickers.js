@@ -5,10 +5,8 @@
    Стикеры вырезаны из презентации без фона: у каждого .webm (VP9
    с прозрачностью — Chrome, Firefox, Android), -hevc.mp4 (HEVC
    с прозрачностью — Safari и всё на iPhone) и .webp (первый кадр).
-   Главы: faces — рендер студии и он же оживший рядом, под ожившим —
-     призрак рендера (совпадает всё, кроме того, что сдвинулось); внизу
-     строка поз, на которых училась модель, — переключатель с таймером,
-     одна поза — один круг стикера;
+   Главы: faces — нюансы ретуши: у стикера лупа над местом правки
+     (блики, которые у нейросети катались; слеза, добавленная программно);
    chat — от рендера до мессенджера: переписка стикерами, панель
      стикерпака внизу; каждый новый стикер приходит на зеленом фоне,
      и фон стирается — как при клинапе; нажатие отправляет стикер,
@@ -164,50 +162,39 @@ function liveChat(sec, c, all){
 }
 
 /* ================================================================
-   faces — рендер студии и он же оживший рядом; под ожившим — призрак
-   рендера: тело и глаз совпадают, видно только то, что сдвинулось.
-   Внизу строка поз, на которых училась модель, — из нее выбирается, кто
-   оживает; сменяется сама, одна поза — один круг стикера
+   faces — нюансы ретуши: стикер и лупа над местом правки
+   (блики, которые у нейросети катались; слеза, добавленная программно).
+   Лупа — canvas: каждый кадр берет тот же кусок из ролика, поэтому
+   увеличение всегда совпадает с самим стикером
    ================================================================ */
 function facesHTML(c){
-  return `<div class="stk-pair">
-    <div class="stk-pane stk-stillp">
-      ${c.set.map((src, k) => `<img class="stk-still${k ? '' : ' on'}" src="${esc(src)}.webp" alt="" ${k ? 'loading="lazy" ' : ''}decoding="async" draggable="false">`).join('')}
-      <span class="stk-tag">${H.T(c.still)}</span>
+  return `<div class="stk-fixes">${c.fixes.map(f => `<figure class="stk-fix">
+    <div class="stk-fixp" style="--x:${f.x * 100}%;--y:${f.y * 100}%;--r:${f.r * 100}%">
+      ${vid(f.src)}
+      <i class="stk-ring" aria-hidden="true"></i>
+      <canvas class="stk-loupe" width="320" height="320" aria-hidden="true"></canvas>
     </div>
-    <div class="stk-pane stk-alivep">
-      ${c.set.map((src, k) => `<div class="stk-alive${k ? '' : ' on'}"><img class="stk-ghost" src="${esc(src)}.webp" alt="" ${k ? 'loading="lazy" ' : ''}decoding="async" draggable="false">${vid(src)}</div>`).join('')}
-      <span class="stk-tag">${H.T(c.alive)}</span>
-    </div>
-  </div>
-  <div class="stk-set" role="tablist">${c.set.map((src, k) =>
-    `<button class="stk-pose" type="button" role="tab" aria-selected="${k === 0}" data-k="${k}" style="--ms:3000ms"><img src="${esc(src)}.webp" alt="" loading="lazy" decoding="async" draggable="false"><i class="stk-tick"></i></button>`).join('')}</div>
-  <p class="stk-rcap">${H.T(c.setCap)}</p>`;
+    <figcaption><span class="stk-by">${H.T(f.name)}</span><p>${H.T(f.text)}</p></figcaption>
+  </figure>`).join('')}</div>`;
 }
 function liveFaces(sec, c){
-  const stills = [...sec.querySelectorAll('.stk-still')], alives = [...sec.querySelectorAll('.stk-alive')];
-  const poses = [...sec.querySelectorAll('.stk-pose')];
-  const n = c.set.length, MS = 3000;   // одна поза — один круг стикера
-  let cur = 0, timer = 0, seen = false, touched = false;
-  const set = i => {
-    cur = (i + n) % n;
-    stills.forEach((x, k) => x.classList.toggle('on', k === cur));
-    alives.forEach((x, k) => x.classList.toggle('on', k === cur));
-    poses.forEach((b, k) => { b.setAttribute('aria-selected', k === cur); b.classList.remove('run'); });
-    const v = alives[cur].querySelector('video');
-    if (v.getAttribute('src')) { v.currentTime = 0; if (seen && !still()) v.play().catch(() => {}); }
-    run();
-  };
-  const run = () => {
-    clearTimeout(timer);
-    if (touched || !seen || still()) return;
-    void poses[cur].offsetWidth; poses[cur].classList.add('run');
-    timer = setTimeout(() => set(cur + 1), MS);
-  };
-  poses.forEach((b, k) => b.addEventListener('click', () => { touched = true; set(k); }));
+  sec.querySelectorAll('.stk-fix').forEach((fig, i) => {
+    const f = c.fixes[i], v = fig.querySelector('video'), cv = fig.querySelector('canvas'), g = cv.getContext('2d');
+    const poster = new Image(); poster.src = f.src + '.webp';
+    const draw = () => {
+      const src = v.readyState >= 2 ? v : poster, w = v.videoWidth || poster.naturalWidth;
+      if (!w) return;
+      const s = f.r * 2 * w;
+      g.clearRect(0, 0, cv.width, cv.height);
+      g.drawImage(src, (f.x - f.r) * w, (f.y - f.r) * w, s, s, 0, 0, cv.width, cv.height);
+    };
+    poster.onload = draw;
+    let on = false, raf = 0;
+    const loop = () => { draw(); raf = on ? requestAnimationFrame(loop) : 0; };
+    onScreen(fig, vis => { on = vis && !still(); if (on && !raf) loop(); else draw(); }, .2);
+    v.addEventListener('loadeddata', draw);
+  });
   watch(sec);
-  onScreen(sec.querySelector('.stk-pair'), v => { seen = v; run(); }, .35);
-  set(0);
 }
 
 /* ---------- запуск ---------- */
