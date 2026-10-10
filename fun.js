@@ -152,10 +152,10 @@ function setupRunners(){
   rows.forEach(list => {
     list.sort((a, b) => a.base - b.base);
     const manual = list[0].el.dataset.mood;
-    let mood = manual || (list.length >= 3 ? 'push' : list.length === 2 ? (list[0].el.closest('#hero') ? 'clash' : 'hug') : list[0].el.closest('#nda') ? 'sleep' : 'run');
-    if (list.length < 2 && (mood === 'push' || mood === 'hug' || mood === 'clash')) mood = 'run';
+    let mood = manual || (list.length >= 3 ? 'push' : list.length === 2 ? (list[0].el.closest('#hero') ? 'clash' : list[0].el.closest('#contact') ? 'part' : 'hug') : list[0].el.closest('#nda') ? 'sleep' : 'run');
+    if (list.length < 2 && (mood === 'push' || mood === 'hug' || mood === 'clash' || mood === 'part')) mood = 'run';
     list.forEach(r => r.mood = mood);
-    if (mood === 'hug' || mood === 'push' || mood === 'clash') {
+    if (mood === 'hug' || mood === 'push' || mood === 'clash' || mood === 'part') {
       const g = { mood, list, state: 'rest', until: performance.now() + rand(1200, 2500), off: 0, trip: null, next: performance.now() + rand(1500, 3500) };
       list.forEach(r => r.g = g);
       groupRange(g);
@@ -186,6 +186,7 @@ function groupRange(g){
 }
 /* компания идет вместе на новое место, а там снова обнимается, толкается или сталкивается */
 function stepTrip(g, dt, now){
+  if (g.mood === 'part') return false;      // у этих свой маршрут: от центра к краям и обратно
   const free = g.state === 'rest' || (g.mood === 'clash' && g.state === 'roam');
   if (g.trip == null) {
     if (!free || g.max - g.min < 60 || g.list.some(r => r.caught)) return false;
@@ -305,6 +306,40 @@ function stepSleep(r, dt, now){
 function stepGroup(g, dt, now){
   if (stepTrip(g, dt, now)) return;
   const [A, B] = g.list;
+  if (g.mood === 'part') {
+    // «ну что, пишем?»: стоят по центру, расходятся к краям страницы, сбегаются обратно и сталкиваются
+    const spring = r => { r.v += (-r.x * 40 - r.v * 6) * dt; r.x += r.v * dt; };
+    if (g.state === 'rest') {
+      g.list.forEach(r => { if (r.caught) return; spring(r); r.rot *= 0.9; idle(r, dt); });
+      if (now > g.until) g.state = 'apart';
+    } else if (g.state === 'apart') {
+      const a = A.caught || walkTo(A, g.min, 200, dt), b = B.caught || walkTo(B, g.max, 200, dt);
+      A.rot += (-4 - A.rot) * 0.15; B.rot += (4 - B.rot) * 0.15;
+      if (a && b) { g.state = 'wait'; g.until = now + rand(700, 1400); }
+    } else if (g.state === 'wait') {
+      g.list.forEach(r => { if (r.caught) return; r.rot *= 0.85; idle(r, dt); });
+      if (now > g.until) g.state = 'charge';
+    } else if (g.state === 'charge') {
+      const meet = (B.base - (A.base + A.width)) / 2 + 2;
+      const a = A.caught || walkTo(A, meet, 380, dt), b = B.caught || walkTo(B, -meet, 380, dt);
+      A.rot += (6 - A.rot) * 0.2; B.rot += (-6 - B.rot) * 0.2;           // наклонились навстречу
+      const kick = Math.max(160, Math.min(440, (g.max - g.min) * 1.2));   // на телефоне отлетают ближе — не за край экрана
+      if (a && b) { g.state = 'bump'; g.until = now + 900; A.v = -kick; B.v = kick; }
+    } else if (g.state === 'bump') {
+      g.list.forEach((r, i) => {
+        if (r.caught) return;
+        spring(r);
+        r.rot += ((i ? 1 : -1) * Math.min(18, Math.abs(r.v) * 0.05) - r.rot) * 0.25;
+        r.phase += dt * 25; r.y = -Math.abs(Math.sin(r.phase * 0.5)) * 4;
+        setLegs(r, [0, 1, 2, 3].map(j => Math.sin(r.phase + j) * 28), 18);
+      });
+      if (now > g.until) { g.state = 'dizzy'; g.until = now + 1300; }
+    } else if (g.state === 'dizzy') {
+      g.list.forEach(r => { if (r.caught) return; spring(r); r.rot = Math.sin(now / 90) * 5 * Math.max(0, (g.until - now) / 1300); idle(r, dt); });
+      if (now > g.until) { g.state = 'rest'; g.until = now + rand(1200, 2200); }
+    }
+    return;
+  }
   if (g.mood === 'clash') {
     // столкновение: бегают туда-сюда, разгоняются навстречу, сталкиваются, отлетают, покачиваются
     const spring = r => { r.v += (-r.x * 40 - r.v * 6) * dt; r.x += r.v * dt; };
