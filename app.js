@@ -391,7 +391,8 @@ document.addEventListener('pointerover', e => {
   const l = e.target.closest && e.target.closest('.ev-link');
   if (!l || touch) return;
   const E = SITE.photos.events;
-  showPreviewImage(E.items[talkShown++ % E.items.length].thumb);
+  const it = E.items[talkShown++ % E.items.length];
+  showPreviewImage(it.thumb, it.focus);   // focus — кадрирование, чтобы лица были в центре превью
 });
 document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.ev-link')) showPreviewImage(''); });
 /* Фото в ленте выступлений сами сменяются: раз в несколько секунд все окошки разом показывают
@@ -1071,10 +1072,11 @@ clientPreview.className = 'client-preview'; clientPreview.setAttribute('aria-hid
 document.body.appendChild(clientPreview);
 // listPreview — свое превью для строки «других работ» (картинка или тихий ролик mp4); иначе легкая копия обложки
 const previewOf = w => { const m = parseMedia(legacyVideo(w)); return w.listPreview || w.thumb || w.image || (m && m.type === 'drive' ? `https://drive.google.com/thumbnail?id=${m.id}&sz=w800` : ''); };
-function showPreviewImage(img){
+function showPreviewImage(img, focus){
   clientPreview.classList.toggle('show', !!img);
   if (img && clientPreview.dataset.src !== img) {
     clientPreview.dataset.src = img;
+    clientPreview.style.setProperty('--focus', focus || '50% 50%');
     clientPreview.classList.toggle('square', /\.mp4(\?|$)/.test(img));
     clientPreview.innerHTML = /\.mp4(\?|$)/.test(img) ? `<video src="${img}" muted loop playsinline autoplay preload="auto"></video>` : `<img src="${img}" alt="">`;
   }

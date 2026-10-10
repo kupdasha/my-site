@@ -2231,3 +2231,6 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 
 /* cardTint: полупрозрачная заливка поверх обложки карточки (например, черная 3% у белой картинки) */
 .media-tint{position:absolute;inset:0;z-index:1;pointer-events:none}
+
+/* превью фото при наведении: кадр по точке focus (лица в центре) */
+.client-preview img{object-position:var(--focus,50% 50%)}
