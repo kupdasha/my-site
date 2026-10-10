@@ -169,7 +169,7 @@ function liveChat(sec, c, all){
    ================================================================ */
 function facesHTML(c){
   return `<div class="stk-fixes">${c.fixes.map(f => `<figure class="stk-fix">
-    <div class="stk-fixp" style="--x:${f.x * 100}%;--y:${f.y * 100}%;--r:${f.r * 100}%">
+    <div class="stk-fixp" style="--x:${f.x};--y:${f.y};--r:${f.r}">
       ${vid(f.src)}
       <i class="stk-ring" aria-hidden="true"></i>
       <canvas class="stk-loupe" width="320" height="320" aria-hidden="true"></canvas>

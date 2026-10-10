@@ -94,6 +94,10 @@
   .stk-top{padding:10px 14px}
   .stk-msgs{padding:12px}
   .stk-grid{grid-template-columns:repeat(4,minmax(0,1fr));height:168px}
+  /* три героя помещаются в строку без прокрутки */
+  .stk-packs{gap:2px;padding:8px 8px 4px}
+  .stk-pk{flex:1 1 0;justify-content:center;gap:4px;height:40px;padding:0 8px 0 4px;min-width:0}
+  .stk-pk img{width:28px;height:28px}
 }
 
 /* ================================================================
@@ -102,13 +106,17 @@
    ================================================================ */
 .stk-fixes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2vw,28px)}
 .stk-fix{margin:0;display:flex;flex-direction:column;gap:20px}
-.stk-fixp{position:relative;aspect-ratio:1;border-radius:var(--r-img);background:var(--soft);overflow:hidden}
-.stk-fixp > .stk-v{position:absolute;left:0;top:20%;width:68%;height:68%}
+.stk-fixp{position:relative;aspect-ratio:1;border-radius:var(--r-img);background:var(--soft);overflow:hidden;container-type:inline-size;
+  /* стикер — квадрат в долях ширины карточки: кольцо считается от него и не съезжает при другой высоте карточки */
+  --sz:68cqw;--top:20cqw}
+.stk-fixp > .stk-v{position:absolute;left:0;top:var(--top);width:var(--sz);height:var(--sz)}
 /* кольцо стоит над местом правки — в координатах самого стикера */
-.stk-ring{position:absolute;left:calc(var(--x) * .68);top:calc(20% + var(--y) * .68);width:calc(var(--r) * 2 * .68);aspect-ratio:1;
+.stk-ring{position:absolute;left:calc(var(--sz) * var(--x));top:calc(var(--top) + var(--sz) * var(--y));width:calc(var(--sz) * var(--r) * 2);aspect-ratio:1;
   transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 2px var(--ink);opacity:.9}
 .stk-loupe{position:absolute;right:5%;top:5%;width:38%;aspect-ratio:1;border-radius:50%;background:var(--bg);box-shadow:0 0 0 2px var(--ink)}
 .stk-fix .stk-by{text-align:left;font-size:18px;font-weight:500}
 .stk-fix figcaption{display:flex;flex-direction:column;gap:10px;max-width:40ch}
 .stk-fix p{margin:0;font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;text-wrap:pretty}
-@media (max-width:760px){.stk-fixes{grid-template-columns:1fr;gap:48px}}
+/* планшет: карточки ниже, стикер и лупа рядом */
+@media (max-width:1024px){.stk-fixp{aspect-ratio:10 / 9;--sz:66cqw;--top:16cqw}}
+@media (max-width:760px){.stk-fixes{grid-template-columns:1fr;gap:44px}.stk-fixp{aspect-ratio:5 / 4;--sz:62cqw;--top:15cqw}.stk-loupe{width:40%;right:4%;top:6%}.stk-fix{gap:16px}}
