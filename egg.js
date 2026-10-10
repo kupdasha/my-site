@@ -2,9 +2,8 @@
    КЕЙС «ТАЙМЕР ДЛЯ ЯЙЦА» (поле egg у проекта)
    Иллюстрации — интерфейс самого таймера (egg.kupdaria26.workers.dev):
    светлый экран, белые подложки, черная пилюля, цифры прокручиваются
-   по одной. Яйцо — той же формы, что в приложении; желток застывает
-   от края к центру: розовая жидкая середина сжимается внутри желтого
-   (цвета не смешиваются — без оранжевого).
+   по одной. Яйцо — картинки из самого приложения (img/egg) со свечением:
+   сырое розовое плавно становится готовым желтым, как в программе.
    cond  — условия и желток вместе, почти без слов: переключатели-иконки
            «яйцо» и «вода», пять желтков, время и разница пересчитываются
            (переключаются сами, пока не тронули);
@@ -55,53 +54,32 @@ function flip(el, html){
   el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
 }
 
-/* ---------- яйцо: белок той же формы, что в приложении, желток в разрезе ---------- */
-const SHELL = 'M100 12C144 12 162 52 174 112C186 172 184 238 100 238C16 238 14 172 26 112C38 52 56 12 100 12Z';
-const YX = 100, YY = 156, YR = 54;
-let gid = 0;
-function eggSVG(){
-  const id = 'egr' + (++gid);
-  return `<svg class="eg-egg" viewBox="0 0 200 250" aria-hidden="true">
-    <defs>
-      <radialGradient id="${id}r" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#F0284A"/><stop offset=".7" stop-color="#FF6F8C"/><stop offset="1" stop-color="#FF9AB0"/></radialGradient>
-      <radialGradient id="${id}y" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFD12E"/><stop offset="1" stop-color="#FFE47A"/></radialGradient>
-      <radialGradient id="${id}w" cx=".5" cy=".42" r=".6"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#FBF3F5"/></radialGradient>
-    </defs>
-    <path class="eg-white" d="${SHELL}" fill="url(#${id}w)"/>
-    <path class="eg-rim raw" d="${SHELL}"/>
-    <path class="eg-rim set" d="${SHELL}"/>
-    <circle class="eg-y" cx="${YX}" cy="${YY}" r="${YR}" fill="url(#${id}y)"/>
-    <path class="eg-core" fill="url(#${id}r)"/>
-  </svg>`;
-}
-// liq — доля жидкой середины: 1 — сырой, 0 — вкрутую. Жидкая середина дрожит, тем сильнее, чем ее больше
-function eggCtl(svg, liq = 1){
-  const core = svg.querySelector('.eg-core');
-  let cur = liq, goal = liq, raf = 0, on = false, last = 0;
-  const draw = t => {
-    const r = YR * cur, a = still() ? 0 : .045 * cur, N = 40;
-    svg.style.setProperty('--set', (1 - cur).toFixed(3));
-    if (r < .6) { core.setAttribute('d', ''); return; }
-    let d = '';
-    for (let i = 0; i <= N; i++) {
-      const th = i / N * Math.PI * 2;
-      const k = 1 + a * (.6 * Math.sin(3 * th + t * 2.1) + .4 * Math.sin(5 * th - t * 1.7));
-      d += (i ? 'L' : 'M') + (YX + Math.cos(th) * r * k).toFixed(2) + ' ' + (YY + Math.sin(th) * r * k).toFixed(2);
-    }
-    core.setAttribute('d', d + 'Z');
+/* ---------- яйцо — картинки из самого приложения (img/egg), собраны так же, как там:
+   розовое свечение вверх, желтое — длинным следом, мягкая маска цвета фона у макушки,
+   сырое яйцо плавно сменяется готовым. cook: 0 — сырое, 1 — готово ---------- */
+const eggHTML = () => {
+  const u = n => H.base + 'img/egg/' + n + '.webp';
+  return `<span class="eg-egg" aria-hidden="true">
+    <span class="eg-aura"></span>
+    <img class="eg-l glow raw" src="${u('red-shadow')}" alt="" decoding="async">
+    <img class="eg-l glow set" src="${u('yellow-shadow')}" alt="" decoding="async">
+    <span class="eg-mask"></span>
+    <img class="eg-l body raw" src="${u('red-egg')}" alt="" decoding="async">
+    <img class="eg-l body set" src="${u('yellow-egg')}" alt="" decoding="async">
+  </span>`;
+};
+// цвет свечения — формула приложения: от розового hsl(348 88% 63%) к готовому hsl(40 100% 62%)
+const glowColor = c => c >= 1 ? 'hsl(40 100% 62%)'
+  : `hsl(${((348 + 44 * c) % 360).toFixed(1)} ${(88 + 12 * c).toFixed(0)}% ${(63 - 6 * c).toFixed(0)}%)`;
+// host — элемент, на котором ставятся --cook, --trail и цвет (вся панель: фон тоже подкрашивается)
+function eggCtl(host, cook = 0){
+  const set = c => {
+    host.style.setProperty('--cook', c.toFixed(3));
+    host.style.setProperty('--trail', (c * c * (3 - 2 * c)).toFixed(3));   // плавное перекрашивание, как в приложении
+    host.style.setProperty('--eg-glow', glowColor(c));
   };
-  const loop = now => {
-    if (!svg.isConnected || !on) { raf = 0; return; }
-    const dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
-    cur += (goal - cur) * Math.min(1, dt * 5);
-    draw(now / 1000);
-    raf = requestAnimationFrame(loop);
-  };
-  draw(0);
-  return {
-    set(v, now){ goal = v; if (now) cur = v; if (!raf) draw(performance.now() / 1000); },
-    run(v){ on = v; if (on && !raf) { last = 0; raf = requestAnimationFrame(loop); } },
-  };
+  set(cook);
+  return { set, run(){} };
 }
 
 /* ---------- текст главы: подпись, заголовок, абзац, кнопка демо ---------- */
@@ -135,11 +113,11 @@ const ICO = {
 const iseg = (k, a, b, c) => `<div class="eg-seg eg-iseg" data-k="${k}">
   ${[a, b].map((n, i) => `<button type="button" class="${i ? '' : 'sel'}" data-i="${i}" aria-label="${esc(H.pick(c.aria[n]))}" title="${esc(H.pick(c.aria[n]))}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICO[n]}</svg></button>`).join('')}
   <i class="eg-pill" aria-hidden="true"></i></div>`;
-// мини-желток: желтый круг, розовая жидкая середина размером liq
-const miniYolk = k => `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#FFD84D"/>${k.liq > 0 ? `<circle cx="20" cy="20" r="${(15 * k.liq).toFixed(1)}" fill="#F0506E"/>` : ''}</svg>`;
+// мини-желток в цвете свечения приложения для этой готовности
+const miniYolk = k => `<span class="eg-myk" style="--c:${glowColor(1 - k.liq)}"></span>`;
 function condHTML(c, y){
   return `<div class="eg-app eg-cond-app" data-room="0" data-boil="0">
-    <div class="eg-cond-egg">${eggSVG()}<span class="eg-puff" aria-hidden="true"><i></i><i></i><i></i></span></div>
+    <div class="eg-cond-egg">${eggHTML()}<span class="eg-puff" aria-hidden="true"><i></i><i></i><i></i></span></div>
     <div class="eg-cond-side">
       <div class="eg-qs">${iseg('room', 'fridge', 'room', c)}${iseg('boil', 'cold', 'boil', c)}</div>
       <div class="eg-read"><div class="eg-time"></div><div class="eg-delta" aria-live="polite"></div></div>
@@ -149,7 +127,7 @@ function condHTML(c, y){
 }
 function liveCond(box, c, y){
   const app = box.querySelector('.eg-cond-app');
-  const egg = eggCtl(app.querySelector('.eg-egg'), 1);
+  const egg = eggCtl(app);
   const setT = digits(app.querySelector('.eg-time'));
   const delta = app.querySelector('.eg-delta');
   const yks = [...app.querySelectorAll('.eg-yk')];
@@ -164,7 +142,7 @@ function liveCond(box, c, y){
     });
     yks.forEach((b, i) => b.classList.toggle('sel', i === st.y));
     const k = y.kinds[st.y];
-    egg.set(k.liq, now);
+    egg.set(1 - k.liq);
     const m = minutes(k.base, st.room, st.boil), d = k.base - m;
     setT(fmt(m * 60));
     flip(delta, d ? '−' + fmt(d * 60).replace(/^0/, '') : '');
@@ -197,9 +175,8 @@ function liveCond(box, c, y){
    ================================================================ */
 function timerHTML(t){
   return `<div class="eg-app eg-timer-app">
-    <div class="eg-aura raw"></div><div class="eg-aura set"></div>
     <button type="button" class="eg-tap" aria-label="${esc(H.pick(t.ui.pause))}">
-      <span class="eg-float">${eggSVG()}</span>
+      <span class="eg-float">${eggHTML()}</span>
       <span class="eg-puff" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       <span class="eg-ring" aria-hidden="true"></span>
     </button>
@@ -211,7 +188,7 @@ function timerHTML(t){
 function liveTimer(box, t, y){
   const app = box.querySelector('.eg-timer-app');
   const kind = y.kinds.find(k => k.best) || y.kinds[0];
-  const egg = eggCtl(app.querySelector('.eg-egg'), 1);
+  const egg = eggCtl(app);
   const setT = digits(app.querySelector('.eg-time'));
   const lbl = app.querySelector('.eg-lbl'), btn = app.querySelector('.eg-btn'), tap = app.querySelector('.eg-tap');
   const float = app.querySelector('.eg-float');
@@ -219,8 +196,7 @@ function liveTimer(box, t, y){
   const STEP = 10, EVERY = 300;                   // 10 секунд отсчета за 0,3 с — восемь минут проходят за 14 с
   let left = TOTAL, state = 'cook', timer = 0, on = false, userPaused = false, again = 0;
   const progress = p => {
-    app.style.setProperty('--cook', p.toFixed(3));
-    egg.set(1 - p * (1 - kind.liq));
+    egg.set(p);
   };
   const paint = () => {
     setT(fmt(left));
@@ -248,7 +224,7 @@ function liveTimer(box, t, y){
   };
   const reset = () => {
     clearTimeout(again); app.classList.remove('done');
-    left = TOTAL; state = 'cook'; userPaused = false; progress(0); egg.set(1, true); paint(); loop();
+    left = TOTAL; state = 'cook'; userPaused = false; progress(0); paint(); loop();
   };
   const toggle = () => {
     if (state === 'cook') { state = 'pause'; userPaused = true; clearInterval(timer); paint(); }
