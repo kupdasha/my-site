@@ -1350,6 +1350,9 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
    длинные баннеры и LED-ленты не шире половины блока — встают по две в строку */
 .camp-row.compact{flex-wrap:wrap;--h:clamp(110px,15vw,210px);--g:clamp(8px,1vw,16px)}
 .camp-row.compact>.camp-shot{flex:none;width:min(calc(50% - var(--g) / 2), calc(var(--h) * var(--ar)));height:auto}
+.camp-rowbox.narrow.center>.camp-row{margin-left:auto;margin-right:auto}
+.camp-rowbox.narrow.center>.camp-cap{margin-left:auto;margin-right:auto;width:calc(66.67% + clamp(16px,2vw,28px) / 3)}
+@media (max-width:760px){.camp-rowbox.narrow.center>.camp-cap{width:auto}}
 /* второй проект внутри кампании (sub): тонкая черта, заголовок слева, текст справа */
 .camp-sub{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:16px;padding-top:24px;border-top:1px solid var(--line);margin:clamp(40px,5vw,72px) 0 clamp(24px,3vw,40px)}
 .camp-sub-title{grid-column:1 / span 4;font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.15}

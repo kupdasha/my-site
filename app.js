@@ -1493,8 +1493,9 @@ function campCell(src){
 // narrow: true — ряд уже, по ширине текстовой колонки (для картинок низкого разрешения);
 // small: true — еще уже, примерно в половину ширины (маленькие баннеры)
 // stairs: true — картинки лесенкой: каждая следующая ниже и левее (для узких баннеров)
-function campRow(items, caption, narrow, small, stairs){
-  return `<div class="wrap camp-rowbox${narrow ? ' narrow' : ''}${small ? ' small' : ''}">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row${stairs ? ' stairs' : ''}"${stairs ? ` style="--n:${items.length}"` : ''}>${items.map(campCell).join('')}</div></div>`;
+// center: true — узкий ряд (narrow) стоит посередине, а не под текстовой колонкой
+function campRow(items, caption, narrow, small, stairs, center){
+  return `<div class="wrap camp-rowbox${narrow ? ' narrow' : ''}${small ? ' small' : ''}${center ? ' center' : ''}">${caption ? `<p class="camp-cap">${T(caption)}</p>` : ''}<div class="camp-row${stairs ? ' stairs' : ''}"${stairs ? ` style="--n:${items.length}"` : ''}>${items.map(campCell).join('')}</div></div>`;
 }
 // коллаж: ячейки раскладываются по схеме areas, у каждой подпись сверху; фото увеличиваются по нажатию
 // блок-памятка (spec): заголовок и короткие пункты в колонках; у пункта могут быть цвета — плашки с кодом
@@ -1601,7 +1602,7 @@ function campGallery(c){
     else if (g && g.compact) { flush(); out.push(`<div class="wrap camp-rowbox">${g.caption ? `<p class="camp-cap">${T(g.caption)}</p>` : ''}<div class="camp-row compact">${g.compact.map(campCell).join('')}</div></div>`); }
     else if (g && g.slides) { flush(); out.push(campSlides(g)); }
     else if (g && g.collage) { flush(); out.push(campCollage(g)); }
-    else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption, g.narrow, g.small, g.stairs)); }
+    else if (g && g.row) { flush(); out.push(campRow(g.row, g.caption, g.narrow, g.small, g.stairs, g.center)); }
     else if (parseMedia(g).type === 'image') pile.push(g);
     else { flush(); out.push(campRow([g])); }
   });
