@@ -104,9 +104,10 @@
 .eg-l.body{width:54.4%;translate:-50% -50%}
 .eg-l.body.set{opacity:var(--cook,0)}
 .eg-mask{position:absolute;left:50%;top:calc(50% - 16.6%);width:72%;height:44.7%;translate:-50% -50%;border-radius:50%;pointer-events:none;
-  background:radial-gradient(closest-side,var(--eg-paper),var(--eg-paper) 42%,transparent 80%);filter:blur(16px)}
+  background:radial-gradient(closest-side,var(--eg-paper),var(--eg-paper) 38%,color-mix(in srgb,var(--eg-paper) 55%,transparent) 66%,transparent 100%)}
+/* у маски и ауры нет filter: blur — Safari рисовал размытый слой прямоугольником; мягкость дают сами градиенты */
 .eg-aura{position:absolute;left:50%;top:47%;width:140%;height:115%;translate:-50% -50%;pointer-events:none;
-  background:radial-gradient(closest-side,color-mix(in srgb,var(--eg-glow) 90%,transparent),transparent 70%);filter:blur(46px);opacity:.3}
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--eg-glow) 70%,transparent),color-mix(in srgb,var(--eg-glow) 30%,transparent) 45%,transparent 100%);opacity:.3}
 .run .eg-aura{animation:egAura 7.5s ease-in-out infinite}
 .run .eg-l.glow{animation:egBreathe 6s ease-in-out infinite}
 @keyframes egAura{0%,100%{scale:.95;opacity:.24}50%{scale:1.12;opacity:.42}}
