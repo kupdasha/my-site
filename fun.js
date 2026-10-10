@@ -100,7 +100,7 @@ let runners = [], groups = [];
 /* сколько места кнопка может пробежать влево и вправо, не наезжая на соседей */
 function freeRange(r){
   const el = r.el, b = el.getBoundingClientRect();
-  const left = b.left - r.x, right = left + b.width;
+  const left = b.left - r.x - (r.g ? r.g.off : 0), right = left + b.width;
   const wrap = el.closest('.wrap') || document.body, w = wrap.getBoundingClientRect(), ws = getComputedStyle(wrap);
   let lo = w.left + (parseFloat(ws.paddingLeft) || 0), hi = w.right - (parseFloat(ws.paddingRight) || 0);
   (el.closest('section') || document.body).querySelectorAll(OBSTACLES).forEach(o => {
@@ -155,7 +155,12 @@ function setupRunners(){
     let mood = manual || (list.length >= 3 ? 'push' : list.length === 2 ? (list[0].el.closest('#hero') ? 'clash' : 'hug') : list[0].el.closest('#nda') ? 'sleep' : 'run');
     if (list.length < 2 && (mood === 'push' || mood === 'hug' || mood === 'clash')) mood = 'run';
     list.forEach(r => r.mood = mood);
-    if (mood === 'hug' || mood === 'push' || mood === 'clash') groups.push({ mood, list, state: 'rest', until: performance.now() + rand(1200, 2500) });
+    if (mood === 'hug' || mood === 'push' || mood === 'clash') {
+      const g = { mood, list, state: 'rest', until: performance.now() + rand(1200, 2500), off: 0, trip: null, next: performance.now() + rand(1500, 3500) };
+      list.forEach(r => r.g = g);
+      groupRange(g);
+      groups.push(g);
+    }
     if (mood === 'sleep') list.forEach(r => {
       const z = document.createElement('span'); z.className = 'zzz'; z.setAttribute('aria-hidden', 'true');
       z.innerHTML = '<i style="--k:0">з</i><i style="--k:1">з</i><i style="--k:2">з</i>';
@@ -164,11 +169,62 @@ function setupRunners(){
   });
 }
 
+/* куда может уйти вся компания кнопок целиком: по всей ширине страницы, не наезжая на чужие элементы */
+function groupRange(g){
+  const left = Math.min(...g.list.map(r => r.base)), right = Math.max(...g.list.map(r => r.base + r.width));
+  const tops = g.list.map(r => r.el.getBoundingClientRect()), top = Math.min(...tops.map(b => b.top)), bottom = Math.max(...tops.map(b => b.bottom));
+  let lo = 16, hi = document.documentElement.clientWidth - 16;
+  (g.list[0].el.closest('section') || document.body).querySelectorAll(OBSTACLES).forEach(o => {
+    if (g.list.some(r => o === r.el || r.el.contains(o) || o.contains(r.el))) return;
+    const q = o.getBoundingClientRect();
+    if (!q.width || q.bottom < top - 4 || q.top > bottom + 24) return;
+    if (q.right <= left + 2) lo = Math.max(lo, q.right + 18);
+    else if (q.left >= right - 2) hi = Math.min(hi, q.left - 18);
+  });
+  g.min = Math.min(0, lo - left);
+  g.max = Math.max(0, hi - right);
+}
+/* компания идет вместе на новое место, а там снова обнимается, толкается или сталкивается */
+function stepTrip(g, dt, now){
+  const free = g.state === 'rest' || (g.mood === 'clash' && g.state === 'roam');
+  if (g.trip == null) {
+    if (!free || g.max - g.min < 60 || g.list.some(r => r.caught)) return false;
+    let flee = false;
+    if (!touchDev) g.list.forEach(r => { const b = r.el.getBoundingClientRect(); if (Math.hypot(Math.max(b.left - px, 0, px - b.right), Math.max(b.top - py, 0, py - b.bottom)) < 70) flee = true; });
+    if (flee) {
+      const b = g.list.map(r => r.el.getBoundingClientRect()), mid = (Math.min(...b.map(q => q.left)) + Math.max(...b.map(q => q.right))) / 2;
+      const t = mid > px ? g.max : g.min;
+      if (Math.abs(t - g.off) < 30) return false;
+      g.trip = t; g.tripSpeed = FUN.runners.fleeSpeed;
+    } else if (now > g.next) {
+      const span = g.max - g.min;
+      let t, n = 0; do { t = g.min + Math.random() * span; } while (Math.abs(t - g.off) < Math.min(120, span / 3) && ++n < 20);
+      g.trip = t; g.tripSpeed = FUN.runners.speed * 1.3;
+    } else return false;
+  }
+  if (g.list.some(r => r.caught)) { g.trip = null; g.next = now + 1500; return false; }
+  const d = g.trip - g.off, step = g.tripSpeed * dt, dir = Math.sign(d) || 1;
+  if (Math.abs(d) <= step) {
+    g.off = g.trip; g.trip = null; g.next = now + rand(4000, 7000);
+    g.state = g.mood === 'clash' ? 'roam' : 'rest'; g.until = now + rand(500, 1200);
+    g.list.forEach(r => { r.state = 'squat'; r.until = now + 300; r.v = 0; });
+    return true;
+  }
+  g.off += dir * step;
+  g.list.forEach(r => {
+    r.x += (0 - r.x) * 0.15; r.v = 0; r.rot += (dir * 4 - r.rot) * 0.15; r.dir = dir;
+    r.phase += dt * g.tripSpeed / 9;
+    r.y = -Math.abs(Math.sin(r.phase)) * 3;
+    setLegs(r, [0, 1, 2, 3].map(i => Math.sin(r.phase + (i % 2) * Math.PI) * 30 * dir), 18);
+  });
+  return true;
+}
+
 function setLegs(r, angles, len){
   r.legs.forEach((leg, i) => { leg.style.setProperty('--a', angles[i].toFixed(1) + 'deg'); leg.style.setProperty('--leg', len.toFixed(1) + 'px'); });
 }
 function place(r){
-  r.el.style.translate = `${r.x.toFixed(1)}px ${r.y.toFixed(1)}px`;
+  r.el.style.translate = `${(r.x + (r.g ? r.g.off : 0)).toFixed(1)}px ${r.y.toFixed(1)}px`;
   r.el.style.rotate = `${r.rot.toFixed(2)}deg`;
 }
 /* пойманная кнопка: на цыпочках дрожит */
@@ -247,6 +303,7 @@ function stepSleep(r, dt, now){
 }
 
 function stepGroup(g, dt, now){
+  if (stepTrip(g, dt, now)) return;
   const [A, B] = g.list;
   if (g.mood === 'clash') {
     // столкновение: бегают туда-сюда, разгоняются навстречу, сталкиваются, отлетают, покачиваются
