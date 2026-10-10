@@ -32,7 +32,7 @@
 .stk-side .stk-text{font-size:clamp(19px,1.5vw,22px)}
 /* этапы: что делали и кто */
 .stk-steps{list-style:none;margin:8px 0 0;padding:0;border-top:1.5px solid var(--line)}
-.stk-steps li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1.5px solid var(--line);font-size:17px;line-height:1.3}
+.stk-steps li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:12px 0;border-bottom:1.5px solid var(--line);font-size:17px;line-height:1.3}
 .stk-by{flex:none;color:color-mix(in srgb,var(--ink) 55%,transparent);text-align:right}
 @media (max-width:900px){.stk-split > .stk-viz,.stk-split > .stk-side{grid-column:1 / -1;grid-row:auto}.stk-side{order:-1}}
 
