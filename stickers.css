@@ -39,25 +39,6 @@
 /* стикер: прозрачный ролик, первый кадр — постер */
 .stk-v{display:block;width:100%;height:100%;object-fit:contain;background:transparent;pointer-events:none}
 
-/* строка надписей сверху: текущая темная, под ней бежит полоска таймера */
-.stk-tabs{display:flex;column-gap:clamp(20px,2.6vw,40px);border-bottom:1.5px solid var(--line);margin-bottom:clamp(20px,2.6vw,32px)}
-.stk-tab{position:relative;padding:0 0 14px;margin-bottom:-1.5px;font-size:clamp(20px,1.7vw,26px);font-weight:500;line-height:1.15;white-space:nowrap;color:inherit;
-  background:none;border:0;opacity:.38;cursor:pointer;transition:opacity .35s}
-.stk-tab:hover{opacity:.75}
-.stk-tab[aria-selected="true"]{opacity:1}
-.stk-tab:focus{outline:none}
-.stk-tab:focus-visible{outline:2px solid currentColor;outline-offset:6px;border-radius:4px}
-.stk-tick{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;transition:opacity .3s}
-.stk-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%}
-.stk-tab[aria-selected="true"] .stk-tick{opacity:1}
-.stk-tab.run .stk-tick::after{animation:stkTick var(--ms) linear both}
-@keyframes stkTick{from{transform:scaleX(0)}to{transform:none}}
-/* на планшете и телефоне строка не переносится, а листается вбок */
-@media (max-width:1024px){
-  .stk-tabs{overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad);scroll-padding-inline:var(--pad)}
-  .stk-tabs::-webkit-scrollbar{display:none}
-}
-
 /* ================================================================
    chat — окно мессенджера: шапка, переписка на обоях, панель стикерпака
    ================================================================ */
@@ -116,38 +97,29 @@
 }
 
 /* ================================================================
-   faces — рендеры студии → обучение модели → живые эмоции
+   faces — рендер и он же оживший, призрак рендера под живым;
+   строка поз внизу — переключатель с полоской таймера
    ================================================================ */
-.stk-train{display:flex;flex-direction:column;align-items:center}
-.stk-renders{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(6px,1vw,12px);width:min(100%,820px)}
-.stk-render{position:relative;aspect-ratio:1;border-radius:var(--r-img);overflow:hidden;background:#E9E9EB}
-.stk-render img{width:100%;height:100%;object-fit:cover;display:block}
-/* модель «читает» рендеры по очереди: карточка вспыхивает рамкой и чуть приподнимается */
-.stk-render::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2.5px var(--ink);opacity:0}
-.stk-faces-ch.in .stk-render{animation:stkRead 6s var(--ease) calc(var(--k) * .5s) infinite}
-.stk-faces-ch.in .stk-render::after{animation:stkRing 6s var(--ease) calc(var(--k) * .5s) infinite}
-@keyframes stkRead{0%,14%,100%{transform:none}5%{transform:translateY(-6px)}}
-@keyframes stkRing{0%,16%,100%{opacity:0}3%,9%{opacity:1}}
-.stk-rcap{margin:14px 0 0;font-size:17px;color:color-mix(in srgb,var(--ink) 55%,transparent);text-align:center;text-wrap:balance}
-/* плашка между рендерами и лентой, поток бежит сверху вниз */
-.stk-model{display:flex;flex-direction:column;align-items:center;margin:8px 0 12px}
-.stk-flow{width:2px;height:clamp(32px,4vw,52px);background:linear-gradient(var(--ink) 50%,transparent 0) 0 0 / 2px 10px;opacity:.5}
-.stk-faces-ch.in .stk-flow{animation:stkFlow .7s linear infinite}
-@keyframes stkFlow{to{background-position:0 10px}}
-.stk-chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 24px 13px;border-radius:20px;background:var(--ink);color:var(--bg);line-height:1.2;text-align:center}
-.stk-chip b{font-weight:500;font-size:18px}
-.stk-chip span{font-size:16px;opacity:.7}
-@media (prefers-reduced-motion:reduce){.stk-render,.stk-render::after,.stk-flow{animation:none !important}}
-
-.stk-ribbon{position:relative;overflow:hidden;border-radius:var(--r-img);background:var(--soft);padding:clamp(28px,4vw,56px) 0 clamp(20px,3vw,40px);--fw:clamp(170px,24vw,330px)}
-.stk-track{position:relative;left:50%;display:flex;width:max-content;transform:translateX(calc(var(--e,0) * var(--fw) * -1 - var(--fw) / 2));transition:transform .9s var(--ease)}
-.stk-track.jump{transition:none}
-.stk-face{flex:none;width:var(--fw);display:flex;flex-direction:column;align-items:center;gap:8px;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer}
-.stk-face .stk-v{width:100%;height:auto;aspect-ratio:1;transform:scale(.62);opacity:.4;transition:transform .9s var(--ease),opacity .6s}
-.stk-face.on .stk-v{transform:none;opacity:1}
-.stk-face:hover:not(.on) .stk-v{opacity:.7}
-.stk-face:focus{outline:none}
-.stk-face:focus-visible .stk-emo{outline:2px solid currentColor;outline-offset:4px;border-radius:4px}
-.stk-emo{font-size:clamp(18px,1.6vw,24px);font-weight:500;line-height:1.2;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .7s var(--ease)}
-.stk-face.on .stk-emo{opacity:1;transform:none}
-@media (max-width:760px){.stk-ribbon{--fw:58vw}}
+.stk-pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,24px);width:min(100%,calc(2 * 62vh));margin-inline:auto}
+.stk-pane{position:relative;aspect-ratio:1;border-radius:var(--r-img);background:var(--soft);overflow:hidden}
+.stk-still,.stk-alive{position:absolute;inset:8%;opacity:0;transition:opacity .5s var(--ease)}
+.stk-still.on,.stk-alive.on{opacity:1}
+.stk-still,.stk-ghost{width:100%;height:100%;object-fit:contain;display:block}
+.stk-alive .stk-ghost{position:absolute;inset:0;opacity:.28;filter:grayscale(1)}
+.stk-alive .stk-v{position:relative}
+.stk-tag{position:absolute;left:16px;bottom:14px;padding:8px 14px 9px;border-radius:99px;background:var(--bg);color:var(--ink);font-size:16px;font-weight:500;line-height:1.2}
+.stk-set{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:clamp(16px,2vw,24px)}
+.stk-pose{position:relative;flex:none;width:clamp(56px,7vw,88px);aspect-ratio:1;padding:6px 6px 10px;border:0;border-radius:12px;background:none;cursor:pointer;opacity:.45;transition:opacity .3s,background-color .3s}
+.stk-pose img{width:100%;height:100%;object-fit:contain;display:block}
+.stk-pose:hover{opacity:.8}
+.stk-pose[aria-selected="true"]{opacity:1;background:var(--soft)}
+.stk-pose:focus{outline:none}
+.stk-pose:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.stk-pose .stk-tick{position:absolute;left:10px;right:10px;bottom:5px;height:2px;border-radius:2px;overflow:hidden;opacity:0;transition:opacity .3s}
+.stk-pose .stk-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%;transform:scaleX(0)}
+.stk-pose[aria-selected="true"] .stk-tick{opacity:1}
+.stk-pose.run .stk-tick::after{animation:stkTick var(--ms) linear both}
+@keyframes stkTick{from{transform:scaleX(0)}to{transform:none}}
+.stk-rcap{margin:12px 0 0;font-size:17px;color:color-mix(in srgb,var(--ink) 55%,transparent);text-align:center;text-wrap:balance}
+@media (max-width:760px){.stk-pair{gap:8px}.stk-tag{left:8px;bottom:8px;font-size:15px;padding:6px 10px 7px}.stk-pose{width:calc((100% - 42px) / 8)}}
+@media (prefers-reduced-motion:reduce){.stk-still,.stk-alive{transition:none}}

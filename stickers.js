@@ -5,10 +5,10 @@
    Стикеры вырезаны из презентации без фона: у каждого .webm (VP9
    с прозрачностью — Chrome, Firefox, Android), -hevc.mp4 (HEVC
    с прозрачностью — Safari и всё на iPhone) и .webp (первый кадр).
-   Главы: faces — модель училась на рендерах студии: сверху позы героев,
-     модель «читает» их по очереди, от плашки «обучение модели, начало 2024»
-     поток уходит вниз, в живую ленту эмоций одного героя (одна эмоция —
-     один круг стикера), строка героев с таймером;
+   Главы: faces — рендер студии и он же оживший рядом, под ожившим —
+     призрак рендера (совпадает всё, кроме того, что сдвинулось); внизу
+     строка поз, на которых училась модель, — переключатель с таймером,
+     одна поза — один круг стикера;
    chat — от рендера до мессенджера: переписка стикерами, панель
      стикерпака внизу; каждый новый стикер приходит на зеленом фоне,
      и фон стирается — как при клинапе; нажатие отправляет стикер,
@@ -84,26 +84,6 @@ const side = ch => `<div class="stk-side">
   ${ch.steps ? `<ul class="stk-steps">${ch.steps.map(st =>
     `<li><span>${H.T(st.name)}</span><span class="stk-by">${H.T(st.who)}</span></li>`).join('')}</ul>` : ''}
 </div>`;
-
-// строка надписей сверху: текущая темная, под ней бежит полоска таймера
-const tabs = names => `<div class="stk-tabs" role="tablist">${names.map((n, i) =>
-  `<button class="stk-tab" type="button" role="tab" aria-selected="${i === 0}" data-i="${i}"><span>${n}</span><i class="stk-tick"></i></button>`).join('')}</div>`;
-function selectTab(btns, cur){
-  btns.forEach((b, j) => b.setAttribute('aria-selected', j === cur));
-  // на телефоне строка — лента вбок: текущая подъезжает в видимую часть
-  const bar = btns[cur].parentElement;
-  if (bar.scrollWidth > bar.clientWidth + 2) {
-    const d = btns[cur].getBoundingClientRect().left - bar.getBoundingClientRect().left;
-    bar.scrollTo({ left: bar.scrollLeft + d - 20, behavior: still() ? 'auto' : 'smooth' });
-  }
-}
-// полоска таймера под текущей надписью: перезапуск
-function tick(btn, box, ms){
-  box.querySelectorAll('.stk-tab.run').forEach(b => b.classList.remove('run'));
-  if (!btn) return;
-  box.style.setProperty('--ms', ms + 'ms');
-  void btn.offsetWidth; btn.classList.add('run');
-}
 
 /* ================================================================
    chat — переписка стикерами, внизу панель стикерпака
@@ -184,63 +164,50 @@ function liveChat(sec, c, all){
 }
 
 /* ================================================================
-   faces — один герой, разные эмоции: лента сменяется сама
+   faces — рендер студии и он же оживший рядом; под ожившим — призрак
+   рендера: тело и глаз совпадают, видно только то, что сдвинулось.
+   Внизу строка поз, на которых училась модель, — из нее выбирается, кто
+   оживает; сменяется сама, одна поза — один круг стикера
    ================================================================ */
-function facesHTML(c, all){
-  // сверху — рендеры, на которых училась модель; от плашки «обучение модели» поток уходит вниз, в живую ленту
-  const train = c.renders ? `<div class="stk-train">
-    <div class="stk-renders">${c.renders.map((r, k) => `<span class="stk-render" style="--k:${k}"><img src="${esc(r)}" alt="" loading="lazy" decoding="async" draggable="false"></span>`).join('')}</div>
-    <p class="stk-rcap">${H.T(c.rendersCap)}</p>
-    <div class="stk-model" aria-hidden="true"><i class="stk-flow"></i><span class="stk-chip"><b>${H.T(c.model)}</b><span>${H.T(c.when)}</span></span><i class="stk-flow"></i></div>
-  </div>` : '';
-  return `${train}<div class="stk-box">
-    ${tabs(all.stickers.heroes.map(h => H.T(h.name)))}
-    <div class="stk-ribbon"><div class="stk-track"></div></div>
-  </div>`;
+function facesHTML(c){
+  return `<div class="stk-pair">
+    <div class="stk-pane stk-stillp">
+      ${c.set.map((src, k) => `<img class="stk-still${k ? '' : ' on'}" src="${esc(src)}.webp" alt="" ${k ? 'loading="lazy" ' : ''}decoding="async" draggable="false">`).join('')}
+      <span class="stk-tag">${H.T(c.still)}</span>
+    </div>
+    <div class="stk-pane stk-alivep">
+      ${c.set.map((src, k) => `<div class="stk-alive${k ? '' : ' on'}"><img class="stk-ghost" src="${esc(src)}.webp" alt="" ${k ? 'loading="lazy" ' : ''}decoding="async" draggable="false">${vid(src)}</div>`).join('')}
+      <span class="stk-tag">${H.T(c.alive)}</span>
+    </div>
+  </div>
+  <div class="stk-set" role="tablist">${c.set.map((src, k) =>
+    `<button class="stk-pose" type="button" role="tab" aria-selected="${k === 0}" data-k="${k}" style="--ms:3000ms"><img src="${esc(src)}.webp" alt="" loading="lazy" decoding="async" draggable="false"><i class="stk-tick"></i></button>`).join('')}</div>
+  <p class="stk-rcap">${H.T(c.setCap)}</p>`;
 }
-function liveFaces(sec, c, all){
-  const heroes = all.stickers.heroes;
-  const box = sec.querySelector('.stk-box'), track = sec.querySelector('.stk-track');
-  const btns = [...box.querySelectorAll('.stk-tab')];
-  const MS = 3000;   // одна эмоция — один круг стикера
-  let h = -1, e = 0, faces = [], timer = 0, seen = false, touched = false;
-
-  const setHero = i => {
-    h = (i + heroes.length) % heroes.length;
-    selectTab(btns, h);
-    track.innerHTML = heroes[h].items.map((it, k) =>
-      `<button class="stk-face" type="button" data-k="${k}">${vid(it.src)}<span class="stk-emo">${H.T(it.emo)}</span></button>`).join('');
-    faces = [...track.children];
-    faces.forEach((f, k) => f.addEventListener('click', () => { touched = true; setFace(k); }));
-    watch(track);
-    track.classList.add('jump');
-    setFace(0);
-    void track.offsetWidth; track.classList.remove('jump');
-  };
-  const setFace = k => {
-    e = k;
-    track.style.setProperty('--e', e);
-    faces.forEach((f, j) => {
-      f.classList.toggle('on', j === e);
-      f.setAttribute('aria-pressed', j === e);
-    });
-    // эмоция начинается сначала — вместе с полоской таймера
-    const v = faces[e].querySelector('video');
-    if (v && v.getAttribute('src')) { v.currentTime = 0; if (seen && !still()) v.play().catch(() => {}); }
+function liveFaces(sec, c){
+  const stills = [...sec.querySelectorAll('.stk-still')], alives = [...sec.querySelectorAll('.stk-alive')];
+  const poses = [...sec.querySelectorAll('.stk-pose')];
+  const n = c.set.length, MS = 3000;   // одна поза — один круг стикера
+  let cur = 0, timer = 0, seen = false, touched = false;
+  const set = i => {
+    cur = (i + n) % n;
+    stills.forEach((x, k) => x.classList.toggle('on', k === cur));
+    alives.forEach((x, k) => x.classList.toggle('on', k === cur));
+    poses.forEach((b, k) => { b.setAttribute('aria-selected', k === cur); b.classList.remove('run'); });
+    const v = alives[cur].querySelector('video');
+    if (v.getAttribute('src')) { v.currentTime = 0; if (seen && !still()) v.play().catch(() => {}); }
     run();
   };
   const run = () => {
     clearTimeout(timer);
-    if (touched || !seen || still()) { tick(null, box); return; }
-    tick(btns[h], box, MS);
-    timer = setTimeout(() => {
-      if (e + 1 < faces.length) setFace(e + 1);
-      else setHero(h + 1);
-    }, MS);
+    if (touched || !seen || still()) return;
+    void poses[cur].offsetWidth; poses[cur].classList.add('run');
+    timer = setTimeout(() => set(cur + 1), MS);
   };
-  btns.forEach((b, i) => b.addEventListener('click', () => { touched = true; setHero(i); }));
-  onScreen(box, v => { seen = v; run(); }, .35);
-  setHero(0);
+  poses.forEach((b, k) => b.addEventListener('click', () => { touched = true; set(k); }));
+  watch(sec);
+  onScreen(sec.querySelector('.stk-pair'), v => { seen = v; run(); }, .35);
+  set(0);
 }
 
 /* ---------- запуск ---------- */
