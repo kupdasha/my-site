@@ -1215,9 +1215,13 @@ function heroHTML(p){
   // heroRatio — шапка в пропорциях картинки: целиком и без увеличения, карточка в сетке не меняется (см. СДВГ)
   const himg = p.heroImage || p.image;
   const poster = himg ? `<img src="${himg}" alt=""${p.pos && !p.heroImage ? ` style="object-position:${p.pos}"` : ''}>` : '';
+  // heroPreview — пока грузится плеер Vimeo, в шапке сразу крутится тихое превью из сетки (preview: mp4),
+  // чтобы с первой секунды было видно, что это ролик, а не картинка (см. showreel)
+  const pm = p.heroPreview && p.preview ? parseMedia(p.preview) : null;
+  const moving = pm && pm.type === 'file' ? `<video src="${pm.src}" ${himg ? `poster="${himg}"` : ''} muted loop playsinline autoplay preload="auto"></video>` : '';
   // Vimeo запускается сам поверх обложки; тяжелые плееры (Rutube, VK, Kinescope) грузятся по нажатию —
   // до этого видна обложка с кнопкой, и кейс открывается сразу
-  if (m && m.type === 'vimeo') return poster + `<iframe class="hero-frame" src="${embedURL(m, false)}" allow="${FRAME_ALLOW}" allowfullscreen onload="setTimeout(()=>this.classList.add('ready'),400)"></iframe>`;
+  if (m && m.type === 'vimeo') return (moving || poster) + `<iframe class="hero-frame" src="${embedURL(m, false)}" allow="${FRAME_ALLOW}" allowfullscreen onload="setTimeout(()=>this.classList.add('ready'),400)"></iframe>`;
   if (m && m.type !== 'image' && m.type !== 'drive' && p.image)
     return poster + `<button class="hero-play" data-src="${embedURL(m, false)}${m.type === 'rutube' ? '?autoplay=1' : m.type === 'kinescope' ? '?autoplay=1' : ''}" aria-label="Смотреть видео"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>`;
   if (m && m.type !== 'image') return `<iframe src="${embedURL(m, false)}" allow="${FRAME_ALLOW}" allowfullscreen></iframe>`;

@@ -27,11 +27,22 @@ function frameAt(el, i){
   el.style.backgroundPosition = `${c / (COLS - 1) * 100}% ${r / (ROWS - 1) * 100}%`;
 }
 
-/* «креативные и яркие»: каждая буква со своим наклоном, высотой и цветом из ярких кадров второй половины,
-   буквы по очереди подпрыгивают. Цвета без оранжевого */
-const JUMP = ['#E0457B', '#7B4CE0', '#2F7BE8', '#3FA34D', '#C23BB0'];
-const jumpy = text => [...text].map((ch, k) => ch === ' ' ? ' ' :
-  `<span style="--r:${[-8, 5, -3, 7, -6, 3][k % 6]}deg;--y:${[0, -3, 2, -2, 3, -1][k % 7 % 6]}px;--c:${JUMP[k % JUMP.length]};--k:${k}" aria-hidden="true">${ch}</span>`).join('');
+/* «креативные и яркие»: по слову проходит плавный градиент, буквы по очереди разворачиваются волной.
+   Буквы — отдельные span, поэтому градиент у каждой свой, но сдвинут на ее место в слове (--x),
+   и вместе они читаются как один сплошной перелив. Цвета без оранжевого */
+const jumpy = text => [...text].map((ch, k) => ch === ' ' ? ' ' : `<span style="--k:${k}" aria-hidden="true">${ch}</span>`).join('');
+// место каждой буквы в слове — для сплошного градиента
+function gradientLetters(tag){
+  const spans = [...tag.querySelectorAll('span')];
+  const set = () => {
+    const x0 = tag.getBoundingClientRect().left;
+    tag.style.setProperty('--w', tag.scrollWidth + 'px');
+    spans.forEach(s => s.style.setProperty('--x', (s.offsetLeft) + 'px'));
+  };
+  set();
+  document.fonts && document.fonts.ready.then(set);
+  addEventListener('resize', set, { passive: true });
+}
 
 // на телефоне полоска на секунду, а не на полсекунды: иначе они тоньше пикселя
 let STEP = 1;
@@ -89,7 +100,7 @@ function live(box){
     const w = pop.offsetWidth, W = bars.clientWidth, x = b.offsetLeft + b.offsetWidth / 2;
     pop.style.left = Math.max(0, Math.min(W - w, x - w / 2)) + 'px';
     pop.classList.toggle('low', i >= FLIP);
-    box.classList.add('hov', 'tried');
+    box.classList.add('hov');
   };
   const hide = () => { if (on >= 0) list[on].classList.remove('on'); on = -1; box.classList.remove('hov'); };
   bars.addEventListener('pointermove', e => show(pick(e)));
@@ -123,4 +134,5 @@ export async function mountShowreel(mount, p, helpers){
     ${chartHTML(f)}
   </section>`;
   live(mount.querySelector('.sr-viz'));
+  gradientLetters(mount.querySelector('.sr-tag-2'));
 }
