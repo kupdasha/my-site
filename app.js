@@ -63,7 +63,7 @@ addEventListener('error', e => {
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -2607,6 +2607,8 @@ function renderCase(k, keepScroll){
   if (p.stickers) body += `<div class="stk stk-mount"></div>`;
   // egg — таймер для яйца: переключатели условий и кастрюля, пять желтков, экран таймера; рисует egg.js
   if (p.egg) body += `<div class="eg eg-mount"></div>`;
+  // flip — шоурил Bright Side: полоски громкости в цветах кадров, вторая половина переворачивается вместе с музыкой; рисует showreel.js
+  if (p.flip) body += `<div class="sr sr-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // heroEnd — ролик из шапки уходит в самый конец кейса, после живых глав (см. интерактивные презентации)
   if (p.heroEnd) body += `<div class="wrap case-hero-end"><div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div></div>`;
@@ -2767,6 +2769,10 @@ function renderCase(k, keepScroll){
   if (eg) caseImport('egg')
     .then(m => m.mountEgg(eg, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс таймера для яйца не загрузился', err));
+  const sr = caseContent.querySelector('.sr-mount');
+  if (sr) caseImport('showreel')
+    .then(m => m.mountShowreel(sr, p, { T, pick, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс шоурила не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));

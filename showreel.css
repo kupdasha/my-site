@@ -1,0 +1,48 @@
+/* ================================================================
+   КЕЙС «SHOWREEL BRIGHT SIDE» (showreel.js, поле flip у проекта)
+   Цвета полосок — настоящие цвета кадров, поэтому вокруг них
+   только цвета сайта: линии, текст и подложка.
+   ================================================================ */
+.sr-ch{margin-bottom:clamp(72px,9vw,144px)}
+.sr-intro{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:18px;margin-bottom:clamp(32px,4vw,56px)}
+.sr-intro .case-label{grid-column:1 / span 3;padding-top:.5em}
+.sr-title{grid-column:4 / -1;font-weight:500;font-size:clamp(30px,3.2vw,48px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
+.sr-text{grid-column:4 / span 7;font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4}
+@media (max-width:900px){.sr-intro .case-label,.sr-title,.sr-text{grid-column:1 / -1}}
+
+/* кадр под курсором или под музыкой */
+.sr-frame{position:relative;width:min(100%,760px);margin:0 auto clamp(28px,3vw,44px);aspect-ratio:2400/1020;border-radius:var(--r-img);
+  background-color:#111;background-size:1200% 1500%;background-repeat:no-repeat}
+.sr-time{position:absolute;left:12px;bottom:10px;padding:2px 10px 4px;border-radius:99px;background:rgba(0,0,0,.55);color:#fff;font-size:16px;font-variant-numeric:tabular-nums}
+
+/* полоски: верхняя половина — до переворота, нижняя — после */
+.sr-chart{position:relative;padding:44px 0}
+.sr-bars{position:relative;display:flex;height:clamp(200px,26vw,340px);cursor:pointer;touch-action:pan-y}
+.sr-bars::before{content:"";position:absolute;left:0;right:0;top:50%;height:1.5px;margin-top:-.75px;background:var(--line)}
+.sr-b{position:relative;flex:1 1 0;height:100%}
+.sr-b i{position:absolute;left:0;right:1px;bottom:50%;height:calc(var(--h) * .5%);background:var(--c);border-radius:2px 2px 0 0;
+  transform-origin:50% 100%;transform:scaleY(0);transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .3s}
+.in .sr-b i{transform:scaleY(1);transition-delay:var(--d1),0s}
+.flip .sr-b.a i{transform:scaleY(-1);transition:transform .9s cubic-bezier(.65,0,.25,1),opacity .3s;transition-delay:var(--d2),0s}
+.flip .sr-b:not(.a) i{transition-delay:0s}
+.play .sr-b.later i{opacity:.28}
+
+/* отметка переворота */
+.sr-mark{position:absolute;left:var(--at);top:0;bottom:0;width:0;border-left:1.5px dashed var(--ink);pointer-events:none}
+.sr-mark span{position:absolute;top:0;left:12px;font-size:16px;white-space:nowrap}
+.sr-tag{position:absolute;font-size:16px;color:var(--ink);opacity:.7;pointer-events:none}
+.sr-tag-1{left:0;top:0}
+.sr-tag-2{right:0;bottom:0}
+.sr-head,.sr-hover{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ink);opacity:0;pointer-events:none}
+.sr-hover{opacity:0;background:var(--ink);transition:opacity .2s}
+.hov .sr-hover{opacity:.5}
+
+.sr-ctrl{display:flex;align-items:center;flex-wrap:wrap;gap:16px 28px;margin-top:8px}
+.sr-hint{font-size:16px;opacity:.7;text-wrap:balance}
+
+@media (max-width:760px){
+  .sr-mark span{white-space:normal;width:min(48vw,200px);line-height:1.25}
+  .sr-tag-1{max-width:45%}
+  .sr-tag-2{max-width:45%;text-align:right}
+}
+@media (prefers-reduced-motion:reduce){.sr-b i{transition:none!important}}
