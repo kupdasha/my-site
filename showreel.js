@@ -46,7 +46,7 @@ function gradientLetters(tag){
 
 // на телефоне полоска на секунду, а не на полсекунды: иначе они тоньше пикселя
 let STEP = 1;
-/* подсказка без слов: курсор ездит над маленькими полосками, над ним всплывает кадр.
+/* подсказка без слов: курсор (на сенсорных экранах — точка касания) ездит над маленькими полосками, над ним всплывает кадр.
    Пропадает, как только посетитель сам навел курсор на график */
 const hintHTML = f => `<span class="sr-hint" role="img" aria-label="${H.T(f.hint)}">
   <svg viewBox="0 0 96 48" width="96" height="48" fill="none" aria-hidden="true">
@@ -54,6 +54,7 @@ const hintHTML = f => `<span class="sr-hint" role="img" aria-label="${H.T(f.hint
     <g class="sr-hint-move">
       <rect class="sr-hint-frame" x="-12" y="2" width="24" height="12" rx="2.5"/>
       <path class="sr-hint-cur" d="M0 18v19l5-5 4 8 3.5-1.6-4-8H15z"/>
+      <circle class="sr-hint-tap" cx="0" cy="26" r="6"/>
     </g>
   </svg>
 </span>`;

@@ -595,6 +595,12 @@ img,video{display:block;max-width:100%}
 @media (prefers-reduced-motion:reduce){.gd *,.gd-box::before,.gd-box::after{transition:none!important}}
 /* схема кейса одной строкой (schemeCols) */
 .scheme-cols{border-top:0;padding-top:0;margin-bottom:clamp(56px,7vw,104px)}
+/* schemeTabletRows: колонки схемы на планшете слишком узкие — блоки встают друг под другом: подпись слева, текст справа */
+@media (min-width:761px) and (max-width:1100px){
+  .scheme-cols.tab-rows>.camp-col{grid-column:1 / -1 !important;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px)}
+  .scheme-cols.tab-rows>.camp-col .camp-label{grid-column:1 / span 3;margin:0;padding-top:.2em}
+  .scheme-cols.tab-rows>.camp-col p{grid-column:4 / -1;font-size:19px}
+}
 /* коллаж (collage): сетка по схеме из content.js, подпись над каждым фото */
 .collage{display:grid;gap:clamp(8px,1vw,16px)}
 .collage-cell{display:flex;flex-direction:column;min-width:0;min-height:0}

@@ -2541,9 +2541,10 @@ function renderCase(k, keepScroll){
   let body = '', g = 0;
   // schemeCols: все блоки схемы одной строкой, колонками (как текст кампаний);
   // число — столько колонок в ряд, остальные блоки переносятся ниже (schemeCols: 2 — сетка 2 × 2, см. Ростех)
+  // schemeTabletRows — на планшете блоки друг под другом: подпись слева, текст справа (см. showreel)
   if (p.schemeCols) {
     const per = typeof p.schemeCols === 'number' ? p.schemeCols : blocks.length;
-    body += `<div class="wrap"><div class="camp-head scheme-cols">${
+    body += `<div class="wrap"><div class="camp-head scheme-cols${p.schemeTabletRows ? ' tab-rows' : ''}">${
       blocks.map(([label, par]) => `<div class="camp-col" style="grid-column:span ${Math.floor(12 / per)}"><span class="camp-label">${T(label)}</span><p>${T(par)}</p></div>`).join('')}</div></div>`;
     blocks = [];
   }

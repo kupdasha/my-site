@@ -4,12 +4,13 @@
    только цвета сайта: линии, текст и подложка.
    Вся глава — заголовок, текст и график — помещается в один экран.
    ================================================================ */
-.sr-ch{margin-bottom:clamp(72px,9vw,144px)}
+.sr-ch{margin-top:clamp(40px,6vw,96px);margin-bottom:clamp(72px,9vw,144px)}   /* сверху — отступ от текста схемы, чтобы блоки не слипались */
 .sr-intro{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:14px;align-items:start;margin-bottom:clamp(28px,3.4vw,48px)}
 .sr-intro .case-label{grid-column:1 / span 3;padding-top:.5em}
 .sr-title{grid-column:4 / span 4;font-weight:500;font-size:clamp(28px,2.8vw,42px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
 .sr-text{grid-column:8 / -1;font-family:var(--font-read);font-size:clamp(18px,1.4vw,21px);line-height:1.4}
-@media (max-width:900px){.sr-intro .case-label,.sr-title,.sr-text{grid-column:1 / -1}}
+@media (max-width:1100px){.sr-title,.sr-text{grid-column:4 / -1}}   /* планшет: подпись слева, заголовок и текст справа, как в схеме выше */
+@media (max-width:760px){.sr-intro .case-label,.sr-title,.sr-text{grid-column:1 / -1}}
 
 /* график: верхняя половина — до переворота, нижняя — после */
 .sr-viz{position:relative;display:grid;grid-template-columns:1fr auto;grid-template-areas:"t1 t1" "bars bars" ". t2";row-gap:14px;column-gap:24px}
@@ -35,6 +36,9 @@
 .sr-hint-frame{transform-box:fill-box;transform-origin:50% 100%;animation:srHintFrame 1.6s ease-in-out infinite}
 @keyframes srHintMove{from{transform:translateX(20px)}to{transform:translateX(74px)}}
 @keyframes srHintFrame{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:none}}
+.sr-hint-tap{display:none;fill:currentColor;opacity:.85;transform-box:fill-box;transform-origin:50% 50%;animation:srTap 1.6s ease-in-out infinite}
+@keyframes srTap{0%,100%{transform:scale(.7);opacity:.5}50%{transform:none;opacity:.9}}
+@media (hover:none){.sr-hint-cur{display:none}.sr-hint-tap{display:block}}   /* без мыши — точка касания вместо стрелки */
 .hov .sr-hint{opacity:0}   /* прячется только пока курсор на графике, потом возвращается */
 @media (prefers-reduced-motion:reduce){.sr-tag-2 span{animation:none}.sr-hint-move,.sr-hint-frame{animation:none}.sr-hint-move{transform:translateX(46px)}}
 .sr-bars{grid-area:bars;position:relative;display:flex;gap:2px;height:clamp(260px,42vh,400px);cursor:crosshair;touch-action:pan-y;user-select:none}
@@ -58,7 +62,7 @@
 
 @media (max-width:760px){
   .sr-viz{grid-template-columns:1fr;grid-template-areas:"t1" "bars" "t2"}
-  .sr-bars{gap:1px;height:clamp(240px,46vh,340px)}
+  .sr-bars{gap:1px;height:clamp(220px,36vh,300px)}
   .sr-tag-1{max-width:44%}
   .sr-mark{bottom:calc(20px * 1.2 + 14px)}
   .sr-mark span{white-space:normal;width:min(48vw,200px)}
