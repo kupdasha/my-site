@@ -29,6 +29,18 @@ function frameAt(el, i){
 
 // на телефоне полоска на секунду, а не на полсекунды: иначе они тоньше пикселя
 let STEP = 1;
+/* подсказка без слов: курсор ездит над маленькими полосками, над ним всплывает кадр.
+   Пропадает, как только посетитель сам навел курсор на график */
+const hintHTML = f => `<span class="sr-hint" role="img" aria-label="${H.T(f.hint)}">
+  <svg viewBox="0 0 96 48" width="96" height="48" fill="none" aria-hidden="true">
+    <g class="sr-hint-bars">${[14, 22, 18, 26, 20, 16, 24].map((h, k) => `<rect x="${6 + k * 12}" y="${44 - h}" width="4" height="${h}" rx="2"/>`).join('')}</g>
+    <g class="sr-hint-move">
+      <rect class="sr-hint-frame" x="-12" y="2" width="24" height="12" rx="2.5"/>
+      <path class="sr-hint-cur" d="M0 18v19l5-5 4 8 3.5-1.6-4-8H15z"/>
+    </g>
+  </svg>
+</span>`;
+
 function chartHTML(f){
   STEP = innerWidth < 760 ? 2 : 1;
   let bars = '';
@@ -42,7 +54,7 @@ function chartHTML(f){
       <div class="sr-pop" aria-hidden="true"><span class="sr-frame"></span><span class="sr-time"></span></div>
     </div>
     <span class="sr-tag sr-tag-2">${H.T(f.after)}</span>
-    <p class="sr-hint">${H.T(f.hint)}</p>
+    ${hintHTML(f)}
   </div>`;
 }
 
@@ -71,7 +83,7 @@ function live(box){
     const w = pop.offsetWidth, W = bars.clientWidth, x = b.offsetLeft + b.offsetWidth / 2;
     pop.style.left = Math.max(0, Math.min(W - w, x - w / 2)) + 'px';
     pop.classList.toggle('low', i >= FLIP);
-    box.classList.add('hov');
+    box.classList.add('hov', 'tried');
   };
   const hide = () => { if (on >= 0) list[on].classList.remove('on'); on = -1; box.classList.remove('hov'); };
   bars.addEventListener('pointermove', e => show(pick(e)));
