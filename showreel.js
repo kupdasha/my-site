@@ -27,6 +27,12 @@ function frameAt(el, i){
   el.style.backgroundPosition = `${c / (COLS - 1) * 100}% ${r / (ROWS - 1) * 100}%`;
 }
 
+/* «креативные и яркие»: каждая буква со своим наклоном, высотой и цветом из ярких кадров второй половины,
+   буквы по очереди подпрыгивают. Цвета без оранжевого */
+const JUMP = ['#E0457B', '#7B4CE0', '#2F7BE8', '#3FA34D', '#C23BB0'];
+const jumpy = text => [...text].map((ch, k) => ch === ' ' ? ' ' :
+  `<span style="--r:${[-8, 5, -3, 7, -6, 3][k % 6]}deg;--y:${[0, -3, 2, -2, 3, -1][k % 7 % 6]}px;--c:${JUMP[k % JUMP.length]};--k:${k}" aria-hidden="true">${ch}</span>`).join('');
+
 // на телефоне полоска на секунду, а не на полсекунды: иначе они тоньше пикселя
 let STEP = 1;
 /* подсказка без слов: курсор ездит над маленькими полосками, над ним всплывает кадр.
@@ -52,9 +58,9 @@ function chartHTML(f){
     <span class="sr-mark"><span>${H.T(f.flipLabel)}</span></span>
     <div class="sr-bars">${bars}
       <div class="sr-pop" aria-hidden="true"><span class="sr-frame"></span><span class="sr-time"></span></div>
+      ${hintHTML(f)}
     </div>
-    <span class="sr-tag sr-tag-2">${H.T(f.after)}</span>
-    ${hintHTML(f)}
+    <span class="sr-tag sr-tag-2" aria-label="${H.T(f.after)}">${jumpy(H.pick(f.after))}</span>
   </div>`;
 }
 
