@@ -245,7 +245,7 @@ function renderLists(){
     const style = `--d:${(k * 0.03).toFixed(2)}s;${c.color ? `--c:${c.color}` : ''}`;
     const cls = `client${c.color ? ' tinted' : ''}`;
     return i >= 0
-      ? `<a class="${cls}" href="${HOME}#case-${i + 1}" target="_blank" data-k="${k}" data-reveal style="${style}">${T(c.name)}</a>`
+      ? `<a class="${cls}" href="${HOME}#case-${SITE.works.items[i].n || i + 1}" target="_blank" data-k="${k}" data-reveal style="${style}">${T(c.name)}</a>`
       : `<span class="${cls}" data-k="${k}" data-reveal style="${style}">${T(c.name)}</span>`;
   }).join('');
   $('#clientsWhat').innerHTML = T(SITE.clients.hint);
@@ -1057,13 +1057,13 @@ if (!touch) {
   }, { passive: true });
 }
 /* Кейс открывается в новой вкладке; в ней сразу показан кейс, «все работы» ведут на главную */
-const openInTab = k => window.open(location.pathname + location.search + '#case-' + (+k + 1), '_blank');
+const openInTab = k => window.open(location.pathname + location.search + '#case-' + caseNum(k), '_blank');
 /* На странице NDA кейс открывается в той же вкладке: пароль Тильды живет только в текущей вкладке,
    новая попросила бы его снова. «Назад» возвращает к карточкам */
 $('#ndaProjects').addEventListener('click', e => {
   const w = e.target.closest('button.work');
   if (!w) return;
-  history.pushState(null, '', '#case-' + (+w.dataset.k + 1));
+  history.pushState(null, '', '#case-' + caseNum(w.dataset.k));
   openedByClick = true;
   openCase(+w.dataset.k);
 });
@@ -1194,6 +1194,9 @@ const caseEl = $('#case'), caseContent = $('#caseContent');
 let caseIndex = null, openedByClick = false;
 /* на странице NDA кейсы берутся из ее списка, на главной — из проектов */
 const caseItems = () => isNdaPage ? SITE.ndaPage.items || [] : SITE.works.items;
+// номер кейса в ссылке #case-N постоянный (поле n), от порядка в списке не зависит
+const caseNum = k => { const it = caseItems()[k]; return it && it.n || +k + 1; };
+const caseByNum = n => { const i = caseItems().findIndex(it => it.n === n); return i >= 0 ? i : caseItems().some(it => it.n) ? -1 : n - 1; };
 
 function shotHTML(src){
   const m = parseMedia(src);
@@ -2882,7 +2885,7 @@ function closeCase(){
 }
 function readHash(){
   const m = /^#case-(\d+)$/.exec(location.hash);
-  const k = m ? +m[1] - 1 : null;
+  const k = m ? caseByNum(+m[1]) : null;
   if (k != null && caseItems()[k] && caseItems()[k].page == null) { openedByClick = openedByClick || false; openCase(k); }
   else {
     if (caseEl.classList.contains('boot')) { unboot(); caseEl.classList.remove('open'); caseContent.innerHTML = ''; }
@@ -2901,7 +2904,7 @@ caseContent.addEventListener('click', e => {
   // кнопка внизу кейса — то же, что «назад» в верхней полоске
   if (e.target.closest('.case-to-list')) { $('#caseBack').click(); return; }
   const n = e.target.closest('.case-next');
-  if (n) history.replaceState(null, '', '#case-' + (+n.dataset.next + 1)), openCase(+n.dataset.next);
+  if (n) history.replaceState(null, '', '#case-' + caseNum(n.dataset.next)), openCase(+n.dataset.next);
 });
 caseEl.addEventListener('scroll', () => {
   if (caseEl.scrollTop + caseEl.clientHeight >= caseEl.scrollHeight - 4) joke('sheet');
