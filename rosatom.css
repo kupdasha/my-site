@@ -152,7 +152,7 @@
 /* цепочка платформы: четыре шага слева направо, линия со стрелкой */
 .ra-chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(16px,2vw,28px);list-style:none;counter-reset:none}
 .ra-chain li{position:relative;padding-top:28px;border-top:2px solid var(--ink)}
-.ra-chain li::after{content:"";position:absolute;right:-3px;top:-7px;width:12px;height:12px;border-top:2px solid var(--ink);border-right:2px solid var(--ink);transform:rotate(45deg)}
+.ra-chain li::after{content:"";position:absolute;right:1px;top:-7px;width:12px;height:12px;border-top:2px solid var(--ink);border-right:2px solid var(--ink);transform:rotate(45deg)}
 .ra-chain li:last-child::after{display:none}
 .ra-chain-k{display:block;font-weight:500;font-size:clamp(22px,2vw,28px);margin-bottom:12px}
 .ra-chain-t{display:block;font-size:17px;line-height:1.42;opacity:.8}
