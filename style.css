@@ -1442,7 +1442,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .fun-on #otherList .article .go .note{display:block}
 
 /* ---------- Страница NDA (nda.html) ---------- */
-.nda-page{padding-top:76px}
+.nda-page{padding-top:76px;padding-bottom:clamp(120px,14vw,220px)}   /* снизу воздух: последняя карточка не упирается в подвал Тильды */
 .nda-page > .case-head .case-title{max-width:none}
 .nda-project{border-top:2px solid var(--line)}
 .nda-project .case-head{padding-bottom:0}
