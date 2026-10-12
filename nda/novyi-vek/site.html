@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Новый век — прототип сайта</title>
-<script src="../nda.js?v=14"></script>
+<script src="../nda.js?v=15"></script>
 <script>/* прототип тоже под паролем: без пароля — на страницу проекта, там замок */
 (function(){var ok=!!window.NDA_EMBED;try{ok=ok||sessionStorage.getItem('nda-pass')===NDA.PASS||localStorage.getItem('nda-pass')===NDA.PASS}catch(e){} if(!ok) location.replace('./');})();
 if('scrollRestoration' in history) history.scrollRestoration='manual';</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<!-- шрифты со своего сервера, не с Google -->
+<link rel="stylesheet" href="../../fonts.css?v=15">
+<link rel="stylesheet" href="../fonts-nv.css?v=15">
 <!--
   ПРОТОТИП САЙТА БАНКА «НОВЫЙ ВЕК» (по макетам из PDF)
   Страницы внутри одного файла: #main — главная, #credit — калькулятор, #news — новости.

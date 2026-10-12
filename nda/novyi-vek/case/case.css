@@ -202,7 +202,7 @@ body{overflow-x:clip}
 /* ===== планшет ===== */
 @media (max-width:1100px){
   .cs,.scene{margin-top:120px}
-  .hs-mark{left:64%;width:min(56vh,46vw)}
+  .hs-mark{left:74%;width:min(46vh,34vw)}
 }
 /* ===== телефон ===== */
 .m-only{display:none}
