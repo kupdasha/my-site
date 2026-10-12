@@ -1,0 +1,1184 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Орбитали водорода — анимация</title>
+<style>
+  :root{
+    --ground:#F1F1EC; --panel:#FBFBF7; --stage:#FFFFFF;
+    --ink:#17180F; --muted:#6C6D63; --faint:#9C9D93; --line:#D7D7CE; --grid:#E6E6DE;
+    --accent:#DE6B0A; --accent-deep:#B4550A; --accent-soft:#EFE3D2; --focus:#17180F;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0C0D0F; --panel:#131518; --stage:#0A0B0D;
+      --ink:#E9E9E3; --muted:#8A8C85; --faint:#5C5E57; --line:#24262B; --grid:#191B1E;
+      --accent:#F0913C; --accent-deep:#F0913C; --accent-soft:#241C14; --focus:#F0913C;
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F1F1EC; --panel:#FBFBF7; --stage:#FFFFFF;
+    --ink:#17180F; --muted:#6C6D63; --faint:#9C9D93; --line:#D7D7CE; --grid:#E6E6DE;
+    --accent:#DE6B0A; --accent-deep:#B4550A; --accent-soft:#EFE3D2; --focus:#17180F;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0C0D0F; --panel:#131518; --stage:#0A0B0D;
+    --ink:#E9E9E3; --muted:#8A8C85; --faint:#5C5E57; --line:#24262B; --grid:#191B1E;
+    --accent:#F0913C; --accent-deep:#F0913C; --accent-soft:#241C14; --focus:#F0913C;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--ground); color:var(--ink);
+    font-family:"Helvetica Neue","Helvetica","Arial","Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased; font-size:14px; line-height:1.4}
+  ::selection{background:var(--accent); color:#fff}
+  .wrap{display:grid; grid-template-columns:348px 1fr; min-height:100vh}
+  @media (max-width:820px){ .wrap{grid-template-columns:1fr} }
+
+  aside{background:var(--panel); border-right:1px solid var(--line);
+    padding:32px 30px 48px; display:flex; flex-direction:column; gap:0}
+
+  /* ---- шапка-«прибор»: моно-код + название ---- */
+  .head{margin:0 0 4px}
+  .kicker{font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px;
+    letter-spacing:.18em; color:var(--accent); margin:0 0 12px; display:flex; gap:8px; align-items:center}
+  .kicker::before{content:""; width:22px; height:1px; background:var(--accent)}
+  h1{font-size:24px; font-weight:600; letter-spacing:-.02em; margin:0; line-height:1.08}
+  .tagline{font-size:12.5px; color:var(--muted); margin:12px 0 0; line-height:1.55; max-width:31ch}
+  .psi{font-family:ui-monospace,monospace; color:var(--ink)}
+
+  /* ---- переключатель вкладок ---- */
+  .tabs{display:flex; margin:20px 0 6px; border:1px solid var(--line); border-radius:2px; overflow:hidden}
+  .tabs button{flex:1; padding:11px 6px; border:0; background:transparent; color:var(--muted);
+    font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; letter-spacing:.01em;
+    border-right:1px solid var(--line); transition:background .15s, color .15s}
+  .tabs button:last-child{border-right:0}
+  .tabs button.on{background:var(--ink); color:var(--ground)}
+  .tabs button:not(.on):hover{background:var(--accent-soft); color:var(--accent)}
+
+  /* ---- секции: тонкая линия + моно-подписи, без капса ---- */
+  label{display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+    font-size:12.5px; font-weight:500; letter-spacing:.005em; color:var(--muted);
+    text-transform:none; border-top:1px solid var(--line);
+    margin:26px 0 12px; padding-top:18px}
+  .val{font-family:ui-monospace,"SF Mono",monospace; color:var(--ink); font-weight:600;
+    font-variant-numeric:tabular-nums; letter-spacing:0}
+
+  .row{display:flex; gap:8px}
+  .qn{flex:1}
+  select{width:100%; padding:10px 6px 9px; border:1px solid var(--line); border-radius:2px;
+    background:var(--panel); color:var(--ink); font-size:15px;
+    font-family:ui-monospace,monospace; font-weight:600; cursor:pointer;
+    appearance:none; text-align:center; transition:border-color .15s}
+  select:hover{border-color:var(--muted)}
+  select:focus-visible{outline:none; border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+  .qn small{display:block; text-align:center; font-size:10px; color:var(--faint);
+    margin-top:5px; font-family:ui-monospace,monospace; letter-spacing:.02em}
+
+  /* ---- слайдер-«самописец»: волосяная дорожка + узкий брусок-ползунок ---- */
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:20px;
+    background:transparent; cursor:pointer; margin:2px 0 4px}
+  input[type=range]::-webkit-slider-runnable-track{height:1px; background:var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:7px; height:15px;
+    background:var(--ink); border-radius:1px; margin-top:-7px; transition:background .15s}
+  input[type=range]:hover::-webkit-slider-thumb{background:var(--accent)}
+  input[type=range]::-moz-range-track{height:1px; background:var(--line)}
+  input[type=range]::-moz-range-thumb{width:7px; height:15px; background:var(--ink);
+    border:0; border-radius:1px}
+  input[type=range]:hover::-moz-range-thumb{background:var(--accent)}
+  input[type=range]:focus-visible{outline:1px solid var(--accent); outline-offset:4px}
+
+  .swatches{display:flex; gap:7px; align-items:center}
+  .swatch{width:26px; height:26px; border-radius:2px; border:1px solid var(--line);
+    cursor:pointer; padding:0; transition:border-color .12s}
+  .swatch.on{border-color:var(--ink); box-shadow:inset 0 0 0 2px var(--panel)}
+  .swatch:hover{border-color:var(--muted)}
+  input[type=color]{width:30px; height:26px; border:1px solid var(--line);
+    border-radius:2px; padding:0; background:none; cursor:pointer}
+  .swatches.locked{opacity:.35; pointer-events:none}
+  .switch{display:flex; align-items:center; gap:10px; justify-content:flex-start;
+    font-size:12.5px; font-weight:500; color:var(--ink); cursor:pointer;
+    border-top:1px solid var(--line); margin-top:24px; padding-top:18px}
+  .switch input{width:15px; height:15px; accent-color:var(--accent); cursor:pointer; flex:none}
+  .switch .mono{font-family:ui-monospace,monospace; color:var(--accent); font-weight:600}
+
+  /* ---- шаги: трек-лист, острые края, левый регистр активного ---- */
+  .step{border:1px solid var(--line); border-left:2px solid var(--line); border-radius:2px;
+    padding:12px 15px 15px; margin-top:9px; background:var(--panel);
+    transition:border-color .18s, background .18s}
+  .step.live{border-left-color:var(--accent); background:var(--accent-soft)}
+  .stephead{display:flex; align-items:center; gap:10px}
+  .steptype{font-size:13px; font-weight:600; letter-spacing:.01em}
+  .stepno{font-family:ui-monospace,monospace; font-size:11px; color:var(--accent); font-weight:600}
+  .stepbtns{margin-left:auto; display:flex; gap:5px}
+  .sbtn{width:24px; height:24px; border:1px solid var(--line); border-radius:2px;
+    background:transparent; color:var(--ink); cursor:pointer; font-size:12px;
+    display:flex; align-items:center; justify-content:center; padding:0; transition:.12s}
+  .sbtn:hover{border-color:var(--accent); color:var(--accent)}
+  .sbtn:disabled{opacity:.28; cursor:default}
+  .step label{border-top:0; margin:13px 0 7px; padding-top:0}
+  .step label:first-of-type{margin-top:11px}
+  .addrow{display:flex; gap:7px; margin-top:11px}
+  .addrow button{flex:1; padding:10px 4px; border:1px solid var(--line); border-radius:2px;
+    background:transparent; color:var(--ink); font-size:12px; font-weight:500;
+    font-family:ui-monospace,monospace; letter-spacing:.02em; cursor:pointer; transition:.12s}
+  .addrow button:hover{border-color:var(--accent); color:var(--accent)}
+  .empty{font-size:12px; color:var(--muted); padding:16px 8px; text-align:center; line-height:1.5;
+    border:1px dashed var(--line); border-radius:2px; margin-top:9px}
+
+  .actions{display:flex; flex-direction:column; gap:8px; margin-top:28px}
+  .btn{padding:14px; border:1px solid var(--ink); border-radius:2px; cursor:pointer;
+    font-size:13px; font-weight:600; font-family:inherit; letter-spacing:.01em;
+    transition:background .15s, color .15s, border-color .15s}
+  .btn.primary{background:var(--ink); color:var(--ground)}
+  .btn.primary:hover{background:var(--accent); border-color:var(--accent); color:#fff}
+  .btn.ghost{background:transparent; color:var(--ink); border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--ink)}
+  .btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .btn:disabled{opacity:.4; cursor:default}
+  .subrow{display:flex; gap:8px}
+  .subrow .btn{flex:1; padding:12px; font-size:12.5px; font-family:ui-monospace,monospace;
+    font-weight:500}
+
+  .foot{margin-top:26px; font-size:11px; color:var(--faint); line-height:1.65;
+    border-top:1px solid var(--line); padding-top:16px}
+  .foot b{color:var(--muted); font-weight:600}
+
+  /* ---- рабочее поле: миллиметровка + сцена в рамке с рег-метками ---- */
+  main{display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px; gap:16px; position:sticky; top:0; height:100vh; overflow:hidden;
+    background:
+      repeating-linear-gradient(var(--grid) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 28px), var(--ground)}
+  @media (max-width:820px){ main{position:static; height:auto; overflow:visible} }
+  .figure{display:flex; flex-direction:column; align-items:center; gap:11px}
+  .frame{position:relative; width:min(calc(100vh - 200px), 100%)}
+  .frame::before,.frame::after{content:""; position:absolute; width:11px; height:11px;
+    z-index:3; pointer-events:none}
+  .frame::before{top:-6px; left:-6px; border-top:1.5px solid var(--accent); border-left:1.5px solid var(--accent)}
+  .frame::after{bottom:-6px; right:-6px; border-bottom:1.5px solid var(--accent); border-right:1.5px solid var(--accent)}
+  #stage{display:block; width:100%; background:var(--stage); border-radius:0;
+    border:1px solid var(--ink); overflow:hidden; cursor:pointer}
+  #view{display:block; width:100%; height:auto}
+  figcaption{font-family:ui-monospace,"SF Mono",monospace; font-size:11px; color:var(--muted);
+    letter-spacing:.02em; display:flex; gap:9px; align-items:center; flex-wrap:wrap; justify-content:center}
+  figcaption b{color:var(--ink); font-weight:600}
+  figcaption i{color:var(--faint); font-style:normal}
+
+  .playrow{display:flex; align-items:stretch; gap:0}
+  .playbtn{width:40px; height:40px; border-radius:2px; border:1px solid var(--ink);
+    background:transparent; color:var(--ink); font-size:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; transition:.15s; flex:none;
+    margin-right:20px}
+  .playbtn:hover{background:var(--ink); color:var(--ground)}
+
+  .readout{display:flex; align-items:stretch; font-family:ui-monospace,"SF Mono",monospace}
+  .node{display:flex; flex-direction:column; gap:3px; padding:0 18px;
+    border-left:1px solid var(--line)}
+  .node:first-child{padding-left:0; border-left:0}
+  .node .k{color:var(--faint); font-size:10px; letter-spacing:.03em; text-transform:none}
+  .node .v{color:var(--ink); font-size:16px; font-weight:600; font-variant-numeric:tabular-nums}
+  .node .d{color:var(--faint); font-size:10px}
+
+  .badge{position:absolute; top:22px; right:30px; font-family:ui-monospace,monospace;
+    font-size:11px; color:var(--muted); display:flex; align-items:center; gap:8px;
+    font-variant-numeric:tabular-nums; letter-spacing:.02em}
+  .badge::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--accent);
+    animation:ringPulse 1.8s ease-in-out infinite}
+  @keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 var(--accent)} 50%{box-shadow:0 0 0 4px transparent}}
+  @media (max-width:820px){ .badge{display:none} }
+  @media (prefers-reduced-motion:reduce){ .badge::before{animation:none} }
+
+  .toast{position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(12px);
+    background:var(--ink); color:var(--ground); padding:11px 18px; border-radius:2px;
+    font-family:ui-monospace,monospace; font-size:12px; font-weight:500; opacity:0;
+    pointer-events:none; transition:opacity .2s, transform .2s; z-index:10; max-width:80vw; text-align:center}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+
+<div class="wrap">
+  <aside>
+    <div class="head">
+      <div class="kicker">H · водород · срез x–z</div>
+      <h1>Орбитали в движении</h1>
+      <div class="tagline">Собери ролик из шагов — <span class="psi">биения</span>,
+        <span class="psi">пульс</span>, <span class="psi">волна</span> — в любом порядке.
+        Всё зациклено, экспорт в MP4.</div>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button data-tab="orbit" class="on">Орбитали</button>
+      <button data-tab="bg">Фоны</button>
+    </div>
+
+    <div id="panel-orbit">
+      <label>Орбиталь — базовое состояние</label>
+      <div class="row">
+        <div class="qn"><select id="n"></select><small>n · главное</small></div>
+        <div class="qn"><select id="l"></select><small>ℓ · орбит.</small></div>
+        <div class="qn"><select id="m"></select><small>m · магн.</small></div>
+      </div>
+
+      <label>Последовательность <span class="val" id="totalT">0 с</span></label>
+      <div id="steps"></div>
+      <div class="addrow">
+        <button id="addBeats">+ Биения</button>
+        <button id="addPulse">+ Пульс</button>
+        <button id="addWave">+ Волна</button>
+      </div>
+    </div>
+
+    <div id="panel-bg" style="display:none">
+      <label>Стиль фона</label>
+      <div class="row">
+        <div class="qn"><select id="bgstyle">
+          <option value="flow" selected>Поток</option>
+          <option value="tunnel">Тоннель</option>
+          <option value="horizon">Горизонт · волны</option>
+          <option value="eclipse">Затмение</option>
+        </select><small>тип движения</small></div>
+      </div>
+      <label>Формат плашки</label>
+      <div class="row">
+        <div class="qn"><select id="aspect">
+          <option value="1:1">1:1</option>
+          <option value="16:9" selected>16:9</option>
+          <option value="9:16">9:16</option>
+          <option value="4:5">4:5</option>
+          <option value="3:2">3:2</option>
+        </select><small>соотношение</small></div>
+        <div class="qn"><select id="seed">
+          <option>1</option><option>2</option><option>3</option><option>4</option>
+          <option>5</option><option>6</option><option>7</option><option>8</option>
+          <option>9</option><option>10</option><option>11</option><option>12</option>
+        </select><small>сид · композиция</small></div>
+      </div>
+      <label>Пятен <span class="val" id="blobsv">5</span></label>
+      <input type="range" id="blobs" min="2" max="9" value="5">
+      <label>Размер пятен <span class="val" id="bscalev">100%</span></label>
+      <input type="range" id="bscale" min="55" max="170" value="100">
+      <label>Скорость петли <span class="val" id="bspeedv">6.0 с</span></label>
+      <input type="range" id="bspeed" min="20" max="150" value="60">
+    </div>
+
+    <label>Кадр/с <span class="val" id="fpsv">30</span></label>
+    <input type="range" id="fps" min="6" max="60" step="2" value="30">
+
+    <label>Свечение γ <span class="val" id="gv">0.40</span></label>
+    <input type="range" id="gamma" min="25" max="70" value="40">
+
+    <label>Мягкость краёв <span class="val" id="sv">18</span></label>
+    <input type="range" id="soft" min="0" max="40" value="18">
+
+    <label>Масштаб в кадре <span class="val" id="zoomv">100%</span></label>
+    <input type="range" id="zoom" min="30" max="300" step="5" value="100">
+
+    <label>Фон</label>
+    <div class="swatches">
+      <button class="swatch on" data-bg="#FDEFDD" style="background:#FDEFDD" title="кремовый"></button>
+      <button class="swatch" data-bg="#12100D" style="background:#12100D" title="тёмный"></button>
+      <button class="swatch" data-bg="#FFFFFF" style="background:#fff" title="белый"></button>
+      <input type="color" id="bgcustom" value="#fdefdd" title="свой цвет">
+    </div>
+
+    <label class="switch"><input type="checkbox" id="invert">
+      <span>Инверсия — оранжевый фон <span class="mono">#F79133</span></span></label>
+
+    <label>Разрешение MP4 <span class="val" id="resv">2048²</span></label>
+    <div class="row">
+      <div class="qn"><select id="res">
+        <option value="1080">1080</option>
+        <option value="1440">1440</option>
+        <option value="2048" selected>2048 · 2K</option>
+        <option value="2560">2560</option>
+      </select><small>сторона, px</small></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="mp4">Скачать MP4 · 2K · зацикленный</button>
+      <div class="subrow">
+        <button class="btn ghost" id="gif">GIF 480</button>
+        <button class="btn ghost" id="png">PNG кадра</button>
+      </div>
+    </div>
+
+    <label>SVG-раскадровка · вектор для Figma</label>
+    <div class="row">
+      <div class="qn"><select id="phases">
+        <option value="4">4</option>
+        <option value="6" selected>6</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="12">12</option>
+      </select><small>фаз цикла</small></div>
+      <div class="qn"><select id="svglevels">
+        <option value="12">12</option>
+        <option value="16">16</option>
+        <option value="20" selected>20</option>
+        <option value="28">28</option>
+      </select><small>слоёв</small></div>
+    </div>
+    <div class="subrow">
+      <button class="btn ghost" id="svgsheet">SVG · лист</button>
+      <button class="btn ghost" id="svgframe">SVG · кадр</button>
+    </div>
+
+    <div class="foot">
+      Каждый шаг начинается и заканчивается в базовом состоянии орбитали —
+      поэтому шаги стыкуются <b>без швов</b> в любом порядке, а конец ролика
+      точно переходит в начало. Биения — честная суперпозиция
+      ψ_A + ψ_B·e<sup>−iΔωt</sup>. MP4 кодируется через <b>WebCodecs</b>
+      (H.264, точно fps×длительность кадров, до 2560²); где WebCodecs
+      недоступен — запись через MediaRecorder.
+    </div>
+  </aside>
+
+  <main>
+    <div class="badge" id="badge">кадры цикла…</div>
+    <figure class="figure">
+      <div class="frame"><div id="stage" title="клик — пауза/пуск"><canvas id="view"></canvas></div></div>
+      <figcaption>рис. · <b>|ψ(t)|²</b> · плотность вероятности <i>·</i> клик — пауза</figcaption>
+    </figure>
+    <div class="playrow">
+      <button class="playbtn" id="play" title="пауза / пуск">⏸</button>
+      <div class="readout" id="readout"></div>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+"use strict";
+const TAU=Math.PI*2;
+/* ================= физика: точные водородные волновые функции ================ */
+const FACT=[1]; for(let i=1;i<=40;i++)FACT[i]=FACT[i-1]*i;
+const fact=n=>FACT[n];
+function laguerre(k,a,x){ if(k===0)return 1;
+  let L0=1,L1=1+a-x;
+  for(let i=1;i<k;i++){ const L2=((2*i+1+a-x)*L1-(i+a)*L0)/(i+1); L0=L1;L1=L2; }
+  return L1; }
+function plgndr(l,m,x){
+  let pmm=1;
+  if(m>0){ const s=Math.sqrt((1-x)*(1+x)); let f=1;
+    for(let i=1;i<=m;i++){ pmm*=-f*s; f+=2; } }
+  if(l===m)return pmm;
+  let pmmp1=x*(2*m+1)*pmm; if(l===m+1)return pmmp1;
+  let pll=0;
+  for(let ll=m+2;ll<=l;ll++){ pll=(x*(2*ll-1)*pmmp1-(ll+m-1)*pmm)/(ll-m); pmm=pmmp1; pmmp1=pll; }
+  return pll; }
+function radial(n,l,r){
+  const norm=Math.sqrt(Math.pow(2/n,3)*fact(n-l-1)/(2*n*fact(n+l)));
+  const rho=2*r/n;
+  return norm*Math.exp(-r/n)*Math.pow(rho,l)*laguerre(n-l-1,2*l+1,rho); }
+const autoHalf=n=>1.4*n*(n+3);
+
+// вещественная ψ (срез x–z, φ=0): R(r)·N·P_l^m(cosθ) — со знаком, для суперпозиций
+function psiGrid(n,l,m,px,half){
+  const v=new Float32Array(px*px), am=Math.abs(m);
+  const norm=Math.sqrt((2*l+1)/(4*Math.PI)*fact(l-am)/fact(l+am));
+  for(let r=0;r<px;r++){ const z=-half+2*half*r/(px-1);
+    for(let c=0;c<px;c++){ const x=-half+2*half*c/(px-1);
+      let rr=Math.hypot(x,z); if(rr<1e-9)rr=1e-9;
+      v[r*px+c]=radial(n,l,rr)*norm*plgndr(l,am,z/rr); } }
+  return v; }
+
+/* ================= палитра ================ */
+const WARM=[[0,[253,236,214]],[.45,[245,166,35]],[.72,[246,133,31]],[.88,[250,200,120]],[1,[255,255,255]]];
+const WARM_INV=[[0,[247,145,51]],[.30,[248,161,76]],[.55,[250,191,122]],[.80,[253,226,184]],[1,[255,255,255]]];
+let inverted=false;
+const pal=()=>inverted?WARM_INV:WARM;
+function lerpRGB(t){ const P=pal(); t=Math.max(0,Math.min(1,t));
+  for(let i=0;i<P.length-1;i++){ const[a,ca]=P[i],[b,cb]=P[i+1];
+    if(t>=a&&t<=b){ const f=b===a?0:(t-a)/(b-a);
+      return [Math.round(ca[0]+(cb[0]-ca[0])*f),Math.round(ca[1]+(cb[1]-ca[1])*f),Math.round(ca[2]+(cb[2]-ca[2])*f)]; }}
+  return [255,255,255]; }
+let COL=new Uint8Array(512*3), ALP=new Uint8Array(512);
+function buildCOL(){ for(let k=0;k<512;k++){ const t=k/511, [r,g,b]=lerpRGB(t);
+  COL[k*3]=r; COL[k*3+1]=g; COL[k*3+2]=b;
+  ALP[k]=Math.round(255*Math.min(1,t*1.25)); } }
+buildCOL();
+
+/* ================= рендер кадра: раскраска + фирменное свечение ============== */
+function off(w,h){ const c=document.createElement("canvas"); c.width=w;c.height=h; return c; }
+function ctx2d(c){ return c.getContext("2d",{willReadFrequently:true}); }
+function smooth(a,b,x){ if(b===a)return x<a?0:1;
+  let t=Math.min(1,Math.max(0,(x-a)/(b-a))); return t*t*(3-2*t); }
+function layer(src,S,blur){ const c=off(S,S), x=ctx2d(c);
+  x.imageSmoothingEnabled=true; x.imageSmoothingQuality="high";
+  if(blur>0)x.filter=`blur(${blur}px)`;
+  x.drawImage(src,0,0,S,S); return x.getImageData(0,0,S,S).data; }
+function colorize(v,px){ const c=off(px,px), x=ctx2d(c);
+  const img=x.createImageData(px,px), D=img.data;
+  for(let i=0;i<v.length;i++){ let t=v[i]; t=t<0?0:t>1?1:t;
+    const k=(t*511)|0, o=k*3, j=i*4;
+    D[j]=COL[o]; D[j+1]=COL[o+1]; D[j+2]=COL[o+2]; D[j+3]=ALP[k]; }
+  x.putImageData(img,0,0); return c; }
+function glowComposite(src,S,soft){
+  const f=soft/40, r1=S*f*0.016, r2=S*f*0.045;
+  const A=layer(src,S,0), B=layer(src,S,r1), C=layer(src,S,r2);
+  const out=new ImageData(S,S), O=out.data;
+  for(let p=0;p<S*S;p++){ const j=p*4, mask=A[j+3]/255;
+    const w1=smooth(.12,.45,mask), w2=smooth(.45,.82,mask);
+    for(let k=0;k<4;k++){ const big=C[j+k], mid=B[j+k], sh=A[j+k];
+      const v1=big+(mid-big)*w1; O[j+k]=v1+(sh-v1)*w2; } }
+  const c=off(S,S); ctx2d(c).putImageData(out,0,0);
+  return c; }
+
+/* ============ базы: сетки ψ и нормировки — один раз на настройку =============
+   Ключ бесшовности: каждый шаг начинается и заканчивается на чистой |ψ_A|².
+   Биения: примесь B входит с огибающей b(u)=sin(πu) и выходит.
+   Волна: рябь с огибающей sin(πu). Пульс: γ(u) с sin(2πku) — сам замкнут.     */
+/* ============ движок «Фоны»: текучее тёплое поле из движущихся пятен ========= */
+function bgRng(seed){ let s=(seed>>>0)||1; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function aspectWH(long, aspect){ const [aw,ah]=aspect.split(":").map(Number);
+  let W,H; if(aw>=ah){ W=long; H=Math.round(long*ah/aw); } else { H=long; W=Math.round(long*aw/ah); }
+  return [W-(W%2), H-(H%2)]; }
+function makeBlobs(p){ const r=bgRng((p.seed*2654435761)>>>0 ^ 0x9e3779b9), K=p.blobs, a=[];
+  for(let k=0;k<K;k++) a.push({ x:0.5+(r()-0.5)*0.55, y:0.5+(r()-0.5)*0.55,
+    rx:0.10+r()*0.22, ry:0.10+r()*0.22, fx:1+((r()*2)|0), fy:1+((r()*2)|0),
+    px:r(), py:r(), sig:(0.13+r()*0.15)*p.scale, amp:0.55+r()*0.7 });
+  return a; }
+function buildBG(S,p){ const [W,H]=aspectWH(S,p.aspect), SS=Math.max(W,H);
+  const fres=SS>800?520:Math.max(220,Math.round(SS*0.62));
+  return {mode:"bg", S:SS, SS, W, H, fres, p, T:p.bgPeriod||6,
+    tmp:new Float32Array(fres*fres), blobs:makeBlobs(p)}; }
+
+function buildBases(S,p){
+  if(p.mode==="bg") return buildBG(S,p);
+  const fres=S>800?680:Math.max(240,Math.round(S*0.9));
+  const b={S,fres,p,tmp:new Float32Array(fres*fres),W:S,H:S};
+  b.T=p.steps.reduce((a,s)=>a+s.dur,0);
+  const halves=[autoHalf(p.n)];
+  p.steps.forEach(s=>{ if(s.type==="beats")halves.push(autoHalf(s.n2)); });
+  const half=Math.max(...halves);
+  const psiA=psiGrid(p.n,p.l,p.m,fres,half);
+  const A2=new Float32Array(fres*fres); let maxA2=0;
+  for(let i=0;i<A2.length;i++){ A2[i]=psiA[i]*psiA[i]; if(A2[i]>maxA2)maxA2=A2[i]; }
+  maxA2=maxA2||1;
+  const F0=new Float32Array(fres*fres);
+  for(let i=0;i<F0.length;i++) F0[i]=A2[i]/maxA2;
+  b.A2=A2; b.maxA2=maxA2; b.F0=F0;
+  if(p.steps.some(s=>s.type==="wave")){
+    b.rn=new Float32Array(fres*fres);
+    for(let r=0;r<fres;r++)for(let c=0;c<fres;c++){
+      const z=-1+2*r/(fres-1), x=-1+2*c/(fres-1);
+      b.rn[r*fres+c]=Math.min(1,Math.hypot(x,z)); }
+  }
+  b.stepData=p.steps.map(s=>{
+    if(s.type!=="beats")return null;
+    const psiB=psiGrid(s.n2,s.l2,s.m2,fres,half);
+    const B2=new Float32Array(fres*fres), AB=new Float32Array(fres*fres);
+    for(let i=0;i<B2.length;i++){ B2[i]=psiB[i]*psiB[i]; AB[i]=psiA[i]*psiB[i]; }
+    // нормировка по времени: макс. плотности для примеси b=j/16 (точная петля яркости)
+    const Mb=new Float64Array(17);
+    for(let j=0;j<=16;j++){ const bm=j/16, bb=bm*bm, cr=2*bm*Math.sqrt(1-bb);
+      let mx=0;
+      for(let i=0;i<B2.length;i++){ const d=(1-bb)*A2[i]+bb*B2[i]+cr*Math.abs(AB[i]);
+        if(d>mx)mx=d; }
+      Mb[j]=mx||1; }
+    return {B2,AB,Mb};
+  });
+  return b; }
+function segAt(steps,t){ let acc=0;
+  for(let i=0;i<steps.length;i++){ const s=steps[i];
+    if(t<acc+s.dur||i===steps.length-1) return {s,i,u:Math.min(.99999,Math.max(0,(t-acc)/s.dur))};
+    acc+=s.dur; }
+  return null; }
+function computeV(b,phase){
+  const p=b.p, t=b.tmp, N=t.length, g=p.gamma;
+  if(b.mode==="bg"){
+    const fres=b.fres, ph=TAU*phase, sty=p.bgStyle||"flow", EX=Math.exp;
+    const rr=bgRng((p.seed*40503)>>>0 ^ 0x85ebca6b);
+    const ox=(rr()-0.5)*0.3, oy=(rr()-0.5)*0.3, rot0=rr()*TAU;
+    let f; // f(x,y) → значение поля, все формулы периодичны по phase (петля бесшовна)
+    if(sty==="tunnel"){
+      const cx=0.5+ox+0.06*Math.cos(ph), cy=0.5+oy+0.06*Math.sin(ph);
+      const freq=0.8+p.blobs*0.35, cs=(0.10+0.12*p.scale), c2=1/(2*cs*cs);
+      f=(x,y)=>{ const dx=x-cx, dy=y-cy, r=Math.hypot(dx,dy);
+        return 0.5+0.5*Math.cos(TAU*(freq*r-phase))+EX(-(r*r)*c2); };
+    } else if(sty==="horizon"){
+      const waveN=1+p.blobs*0.6, bs=(0.10+0.14*p.scale), b2=1/(2*bs*bs);
+      const sunX=0.5+0.26*Math.cos(ph), sunY=0.5+0.30*Math.sin(ph);
+      f=(x,y)=>{ const base=0.5+0.5*Math.sin(TAU*(waveN*y-phase));
+        const dx=x-sunX, dy=y-sunY; return base*0.55+EX(-(dx*dx+dy*dy)*b2); };
+    } else if(sty==="eclipse"){
+      const th=rot0+TAU*phase, ct=Math.cos(th), st=Math.sin(th);
+      const ax=0.34+0.06*p.scale, ay=0.20+0.05*p.scale, R=0.32+0.10*Math.cos(ph);
+      const w=Math.max(0.03,0.10-p.blobs*0.009), w2=1/(2*w*w), cx=0.5+ox*0.4, cy=0.5+oy*0.4;
+      const cr=1/(2*(R*0.55)*(R*0.55));
+      f=(x,y)=>{ const dx=x-cx, dy=y-cy, xr=dx*ct+dy*st, yr=-dx*st+dy*ct;
+        const ed=Math.sqrt(xr*xr/(ax*ax)+yr*yr/(ay*ay));
+        return EX(-((ed-R)*(ed-R))*w2)+0.55*EX(-(ed*ed)*cr); };
+    } else { // flow — движущиеся пятна
+      const C=b.blobs.map(bl=>({ cx:bl.x+bl.rx*Math.cos(bl.fx*ph+TAU*bl.px),
+        cy:bl.y+bl.ry*Math.sin(bl.fy*ph+TAU*bl.py), inv2:1/(2*bl.sig*bl.sig), amp:bl.amp }));
+      f=(x,y)=>{ let s=0; for(let q=0;q<C.length;q++){ const o=C[q], dx=x-o.cx, dy=y-o.cy;
+        s+=o.amp*EX(-(dx*dx+dy*dy)*o.inv2); } return s; };
+    }
+    let mx=1e-6;
+    for(let r=0;r<fres;r++){ const y=r/(fres-1);
+      for(let c=0;c<fres;c++){ const sv=f(c/(fres-1),y); const idx=r*fres+c;
+        t[idx]=sv; if(sv>mx)mx=sv; } }
+    const inv=1/mx; for(let i=0;i<N;i++){ let v=t[i]*inv; if(v<0)v=0; else if(v>1)v=1; t[i]=Math.pow(v,g); }
+    return t; }
+  if(!p.steps.length||!b.T){ for(let i=0;i<N;i++)t[i]=Math.pow(b.F0[i],g); return t; }
+  const seg=segAt(p.steps,phase*b.T), s=seg.s, si=seg.i;
+  const u=(EASE_F[s.ease]||EASE_F.linear)(seg.u); // темп Безье: гнём время внутри шага
+  if(s.type==="pulse"){
+    const gt=g*(1+0.55*s.depth*Math.sin(TAU*s.k*u));
+    for(let i=0;i<N;i++) t[i]=Math.pow(b.F0[i],gt);
+  } else if(s.type==="wave"){
+    const de=s.depth*Math.sin(Math.PI*u), kf=1/(1+de), ph=TAU*s.k*u, cyc=s.cyc;
+    for(let i=0;i<N;i++)
+      t[i]=Math.pow(b.F0[i],g)*(1+de*Math.sin(TAU*cyc*b.rn[i]-ph))*kf;
+  } else { // beats: примесь B с огибающей, точное |c_Aψ_A + c_Bψ_B e^{-iωt}|²
+    const sd=b.stepData[si];
+    const bm=Math.sin(Math.PI*u), bb=bm*bm, cr=2*bm*Math.sqrt(1-bb);
+    const cs=Math.cos(TAU*s.k*u);
+    const jf=bm*16, j0=Math.min(15,jf|0), fr=jf-j0;
+    const M=sd.Mb[j0]+(sd.Mb[j0+1]-sd.Mb[j0])*fr, inv=1/M;
+    for(let i=0;i<N;i++){
+      const d=((1-bb)*b.A2[i]+bb*sd.B2[i]+cr*sd.AB[i]*cs)*inv;
+      t[i]=d<=0?0:Math.pow(d,g);
+    }
+  }
+  return t; }
+function drawFrame(ctx,b,phase){
+  const p=b.p, z=p.zoom||1;
+  if(b.mode==="bg"){
+    const [r,g,bl]=lerpRGB(0); ctx.fillStyle=`rgb(${r},${g},${bl})`;
+    ctx.fillRect(0,0,b.W,b.H);
+    const glow=glowComposite(colorize(computeV(b,phase),b.fres), b.SS, p.soft);
+    const dw=b.SS*z; ctx.drawImage(glow, (b.W-dw)/2, (b.H-dw)/2, dw, dw);
+    return; }
+  const S=b.S;
+  ctx.fillStyle=p.bg; ctx.fillRect(0,0,S,S);
+  const glow=glowComposite(colorize(computeV(b,phase),b.fres),S,p.soft);
+  const dw=S*z; ctx.drawImage(glow, (S-dw)/2, (S-dw)/2, dw, dw); }
+function frameCanvas(b,phase){ const c=off(b.W||b.S,b.H||b.S); drawFrame(ctx2d(c),b,phase); return c; }
+
+/* ================= последовательность шагов ================ */
+const $=s=>document.querySelector(s);
+let steps=[
+  {type:"beats",dur:4,n2:4,l2:3,m2:0,k:1},
+  {type:"pulse",dur:3,depth:.7,k:2},
+  {type:"wave",dur:3,depth:.6,cyc:3,k:1},
+];
+const STEP_RU={beats:"Биения",pulse:"Пульс",wave:"Волна"};
+// темп шага — кривые Безье по времени внутри шага
+const EASE_RU={linear:"равномерно",inq:"разгон · медленно → быстро",
+  outq:"торможение · быстро → медленно",inout:"плавно · разгон и торможение",
+  strong:"рывок · резкий центр"};
+const EASE_F={linear:u=>u, inq:u=>u*u*u, outq:u=>1-(1-u)*(1-u)*(1-u),
+  inout:u=>u*u*(3-2*u), strong:u=>{const t=u*u*(3-2*u); return t*t*(3-2*t);}};
+function selHTML(k,max,val,note){ let o="";
+  for(let i=0;i<=max;i++)o+=`<option value="${i}"${i===val?" selected":""}>${i}</option>`;
+  return `<div class="qn"><select data-k="${k}">${o}</select><small>${note}</small></div>`; }
+function rangeHTML(k,min,max,val,step){
+  return `<input type="range" data-k="${k}" min="${min}" max="${max}" value="${val}"${step?` step="${step}"`:""}>`; }
+function stepCard(s,i){
+  const head=`<div class="stephead"><span class="stepno">${String(i+1).padStart(2,"0")}</span>
+    <span class="steptype">${STEP_RU[s.type]}</span>
+    <span class="stepbtns">
+      <button class="sbtn" data-act="up" title="раньше" ${i===0?"disabled":""}>↑</button>
+      <button class="sbtn" data-act="down" title="позже" ${i===steps.length-1?"disabled":""}>↓</button>
+      <button class="sbtn" data-act="del" title="удалить">✕</button>
+    </span></div>`;
+  const dur=`<label>Длительность <span class="val durv">${s.dur.toFixed(1)} с</span></label>
+    ${rangeHTML("dur",10,80,Math.round(s.dur*10))}
+    <label>Темп · кривая Безье</label>
+    <div class="row"><div class="qn"><select data-k="ease">${
+      Object.keys(EASE_RU).map(v=>`<option value="${v}"${(s.ease||"linear")===v?" selected":""}>${EASE_RU[v]}</option>`).join("")
+    }</select></div></div>`;
+  let body="";
+  if(s.type==="beats"){
+    body=`<label>Состояние B</label>
+      <div class="row">${selHTML("n2",6,s.n2,"n′").replace('value="0"','value="0" disabled')}
+        ${selHTML("l2",s.n2-1,s.l2,"ℓ′")}${selHTML("m2",s.l2,s.m2,"m′")}</div>
+      <label>Колебаний за шаг <span class="val kv">${s.k}</span></label>
+      ${rangeHTML("k",1,4,s.k)}`;
+  } else if(s.type==="pulse"){
+    body=`<label>Глубина <span class="val depv">${Math.round(s.depth*100)}%</span></label>
+      ${rangeHTML("depth",10,100,Math.round(s.depth*100))}
+      <label>Пульсов за шаг <span class="val kv">${s.k}</span></label>
+      ${rangeHTML("k",1,6,s.k)}`;
+  } else {
+    body=`<label>Глубина <span class="val depv">${Math.round(s.depth*100)}%</span></label>
+      ${rangeHTML("depth",10,100,Math.round(s.depth*100))}
+      <label>Волн по радиусу <span class="val cycv">${s.cyc}</span></label>
+      ${rangeHTML("cyc",1,6,s.cyc)}
+      <label>Пробегов за шаг <span class="val kv">${s.k}</span></label>
+      ${rangeHTML("k",1,4,s.k)}`;
+  }
+  return `<div class="step" data-i="${i}">${head}${dur}${body}</div>`; }
+function renderSteps(){
+  const el=$("#steps");
+  el.innerHTML=steps.length?steps.map(stepCard).join("")
+    :`<div class="empty">Пусто — добавь шаги кнопками ниже.<br>Без шагов картинка статична.</div>`;
+  liveStep=-1; // после перерисовки подсветку активного шага ставим заново
+  updTotal(); }
+function updTotal(){ const T=steps.reduce((a,s)=>a+s.dur,0);
+  $("#totalT").textContent=T?T.toFixed(1)+" с":"0 с"; }
+// n′ для биений начинается с 1
+document.addEventListener("DOMContentLoaded",()=>{});
+
+const stepsEl=$("#steps");
+stepsEl.addEventListener("input",e=>{
+  const card=e.target.closest(".step"); if(!card)return;
+  const s=steps[+card.dataset.i], k=e.target.dataset.k; if(!k)return;
+  const val=+e.target.value;
+  if(k==="dur"){ s.dur=val/10; card.querySelector(".durv").textContent=s.dur.toFixed(1)+" с"; updTotal(); }
+  if(k==="depth"){ s.depth=val/100; card.querySelector(".depv").textContent=val+"%"; }
+  if(k==="k"){ s.k=val; card.querySelector(".kv").textContent=val; }
+  if(k==="cyc"){ s.cyc=val; card.querySelector(".cycv").textContent=val; }
+  schedule(); });
+stepsEl.addEventListener("change",e=>{
+  const card=e.target.closest(".step"); if(!card)return;
+  const s=steps[+card.dataset.i], k=e.target.dataset.k;
+  if(k==="ease"){ s.ease=e.target.value; schedule(); return; }
+  if(!["n2","l2","m2"].includes(k))return;
+  s[k]=+e.target.value;
+  if(s.n2<1)s.n2=1;
+  s.l2=Math.min(s.l2,s.n2-1); s.m2=Math.min(s.m2,s.l2);
+  renderSteps(); schedule(); });
+stepsEl.addEventListener("click",e=>{
+  const btn=e.target.closest("[data-act]"); if(!btn)return;
+  const i=+btn.closest(".step").dataset.i, act=btn.dataset.act;
+  if(act==="del")steps.splice(i,1);
+  if(act==="up"&&i>0)[steps[i-1],steps[i]]=[steps[i],steps[i-1]];
+  if(act==="down"&&i<steps.length-1)[steps[i+1],steps[i]]=[steps[i],steps[i+1]];
+  renderSteps(); schedule(); });
+$("#addBeats").onclick=()=>{ steps.push({type:"beats",dur:4,n2:4,l2:3,m2:0,k:1}); renderSteps(); schedule(); };
+$("#addPulse").onclick=()=>{ steps.push({type:"pulse",dur:3,depth:.7,k:2}); renderSteps(); schedule(); };
+$("#addWave").onclick=()=>{ steps.push({type:"wave",dur:3,depth:.6,cyc:3,k:1}); renderSteps(); schedule(); };
+
+/* ================= общие контролы ================ */
+let bg="#FDEFDD", tab="orbit";
+const effBg=()=>inverted?"#F79133":bg;
+const P=()=>{ const base={ mode:tab,
+    fps:+$("#fps").value, gamma:+$("#gamma").value/100, soft:+$("#soft").value,
+    zoom:+$("#zoom").value/100, bg:effBg() };
+  if(tab==="bg") return { ...base, steps:[], bgStyle:$("#bgstyle").value,
+    blobs:+$("#blobs").value, scale:+$("#bscale").value/100, seed:+$("#seed").value,
+    aspect:$("#aspect").value, bgPeriod:+$("#bspeed").value/10 };
+  return { ...base, n:+$("#n").value, l:+$("#l").value, m:+$("#m").value,
+    steps:steps.map(s=>({...s})) }; };
+function fill(el,max,keep){ const cur=keep?+el.value:0; el.innerHTML="";
+  for(let i=0;i<=max;i++){ const o=document.createElement("option"); o.value=i;o.textContent=i; el.appendChild(o);} el.value=Math.min(cur,max); }
+(function(){ const el=$("#n"); for(let i=1;i<=6;i++){ const o=document.createElement("option");o.value=i;o.textContent=i;el.appendChild(o);} el.value=3; })();
+fill($("#l"),2); $("#l").value=2; fill($("#m"),2); $("#m").value=0;
+function syncLM(){ const n=+$("#n").value; fill($("#l"),n-1,true); fill($("#m"),+$("#l").value,true); }
+
+function updReadout(p,NF,T){
+  let nodes;
+  if(p.mode==="bg"){
+    const styRU={flow:"поток",tunnel:"тоннель",horizon:"волны",eclipse:"затмение"}[p.bgStyle]||"поток";
+    nodes=[["цикл",T?T.toFixed(1):"—","секунд"],["кадр/с",p.fps,"в экспорте"],
+      ["формат",p.aspect,"плашка"],["стиль",styRU,`сид ${p.seed}${inverted?" · инв":""}`]];
+  } else {
+    const order=p.steps.map(s=>STEP_RU[s.type].toLowerCase()).join("→")||"статично";
+    nodes=[["цикл",T?T.toFixed(1):"—","секунд"],["кадр/с",p.fps,"в экспорте"],
+      ["превью",NF,"кадров + сглаживание"],["ролик",order,`база (${p.n},${p.l},${p.m})`]];
+  }
+  $("#readout").innerHTML=nodes.map(([k,v,d])=>
+    `<div class="node"><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></div>`).join("");
+}
+
+/* ---- живой цикл: базы + ленивый кэш кадров + rAF-плеер со сторожем ---- */
+const PLAY_S=460;
+let bases=null, cache=[], token=0, playing=true, phase=0, tPrev=performance.now(), liveStep=-1;
+const view=$("#view"); view.width=view.height=PLAY_S;
+const vctx=view.getContext("2d");
+// превью: до 30 физических кадр/с (кэш ≤360 кадров), между ними — сглаживание
+// на каждый кадр монитора; экспорт считает все кадры честно, до 900
+const playCount=(p,T)=>T?Math.max(12,Math.min(360,Math.round(Math.min(p.fps,30)*T))):1;
+const exportCount=(p,T)=>T?Math.max(12,Math.min(900,Math.round(p.fps*T))):1;
+
+function rebuild(){
+  const t=++token, p=P();
+  buildCOL();
+  $("#fpsv").textContent=p.fps;
+  $("#gv").textContent=p.gamma.toFixed(2);
+  $("#sv").textContent=p.soft;
+  $("#zoomv").textContent=Math.round(p.zoom*100)+"%";
+  const Tp = p.mode==="bg" ? p.bgPeriod : p.steps.reduce((a,s)=>a+s.dur,0);
+  const anim = p.mode==="bg" ? Tp>0 : p.steps.length>0;
+  const NF = anim ? playCount(p,Tp) : 1;
+  // при большом числе кадров превью считаем мельче — иначе кэш не влезает в память
+  const S=NF>160?340:PLAY_S;
+  bases=buildBases(S,p);
+  if(view.width!==bases.W||view.height!==bases.H){ view.width=bases.W; view.height=bases.H; }
+  cache=new Array(NF).fill(null);
+  updReadout(p,NF,bases.T);
+  $("#badge").textContent=anim?"кадры цикла: 0/"+NF:"статично";
+  buildNext(t);
+}
+function buildNext(t){
+  if(t!==token)return;
+  const i=cache.indexOf(null);
+  if(i<0){ if(bases.T)$("#badge").textContent="цикл готов"; return; }
+  cache[i]=frameCanvas(bases,i/cache.length);
+  if(bases.T)$("#badge").textContent=`кадры цикла: ${i+1}/${cache.length}`;
+  setTimeout(()=>buildNext(t),0);
+}
+function markLive(idx){
+  if(idx===liveStep)return; liveStep=idx;
+  stepsEl.querySelectorAll(".step").forEach((c,i)=>c.classList.toggle("live",i===idx));
+}
+function step(now){
+  if(!bases)return;
+  if(playing&&bases.T) phase=(phase+Math.min(200,now-tPrev)/1000/bases.T)%1;
+  tPrev=now;
+  const N=cache.length, pos=phase*N, i0=Math.floor(pos)%N, f=pos-Math.floor(pos);
+  let a=null, j=i0;
+  for(let d=0;d<N;d++){ j=(i0-d+N)%N; if(cache[j]){ a=cache[j]; break; } }
+  if(a){ vctx.globalAlpha=1; vctx.drawImage(a,0,0);
+    // сглаживание: смешиваем со следующим кадром по дробной фазе
+    const nx=cache[(j+1)%N];
+    if(nx&&j===i0&&f>0.02){ vctx.globalAlpha=f; vctx.drawImage(nx,0,0); vctx.globalAlpha=1; } }
+  if(bases.T&&bases.p.mode!=="bg"&&bases.p.steps.length) markLive(segAt(bases.p.steps,phase*bases.T).i);
+}
+function loop(now){ requestAnimationFrame(loop); step(now); }
+requestAnimationFrame(loop);
+window.__dbg=()=>({phase,playing,T:bases&&bases.T,N:cache.length,
+  built:cache.filter(Boolean).length,tPrev,now:performance.now()});
+// сторож: если rAF заморожен (фоновая вкладка, встроенные панели) — ведём таймером
+setInterval(()=>{ const now=performance.now();
+  if(now-tPrev>140) step(now); },160);
+
+let timer; const schedule=()=>{ clearTimeout(timer); timer=setTimeout(rebuild,180); };
+$("#n").addEventListener("change",()=>{syncLM();schedule();});
+$("#l").addEventListener("change",()=>{syncLM();schedule();});
+$("#m").addEventListener("change",schedule);
+["#fps","#gamma","#soft","#zoom"].forEach(s=>$(s).addEventListener("input",schedule));
+document.querySelectorAll(".swatch").forEach(sw=>sw.onclick=()=>{
+  document.querySelectorAll(".swatch").forEach(x=>x.classList.remove("on"));
+  sw.classList.add("on"); bg=sw.dataset.bg; rebuild(); });
+$("#bgcustom").addEventListener("input",e=>{
+  document.querySelectorAll(".swatch").forEach(x=>x.classList.remove("on"));
+  bg=e.target.value; schedule(); });
+$("#invert").addEventListener("change",e=>{ inverted=e.target.checked;
+  $(".swatches").classList.toggle("locked",inverted); rebuild(); });
+
+$("#res").addEventListener("change",e=>{ const S=e.target.value;
+  $("#resv").textContent=S+(tab==="bg"?" · дл. сторона":"²");
+  $("#mp4").textContent=`Скачать MP4 · ${S==="2048"?"2K":S} · зацикленный`; });
+
+/* ---- вкладки: орбитали / фоны ---- */
+document.querySelectorAll("#tabs button").forEach(btn=>btn.onclick=()=>{
+  tab=btn.dataset.tab;
+  document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===btn));
+  $("#panel-orbit").style.display = tab==="orbit"?"":"none";
+  $("#panel-bg").style.display    = tab==="bg"?"":"none";
+  if(tab==="bg"){ $(".kicker").textContent="фоны · текучий градиент";
+    document.querySelector("h1").textContent="Анимация фонов";
+    document.querySelector(".tagline").innerHTML="Плашки с перетекающим тёплым свечением — твоя палитра и инверсия. Зациклено, экспорт MP4 / GIF / SVG.";
+    document.querySelector("figcaption").innerHTML='рис. · <b>фон-градиент</b> · текучее свечение <i>·</i> клик — пауза';
+  } else { $(".kicker").textContent="H · водород · срез x–z";
+    document.querySelector("h1").textContent="Орбитали в движении";
+    document.querySelector(".tagline").innerHTML='Собери ролик из шагов — <span class="psi">биения</span>, <span class="psi">пульс</span>, <span class="psi">волна</span> — в любом порядке. Всё зациклено, экспорт в MP4.';
+    document.querySelector("figcaption").innerHTML='рис. · <b>|ψ(t)|²</b> · плотность вероятности <i>·</i> клик — пауза';
+  }
+  rebuild();
+});
+/* ---- контролы фонов ---- */
+const BLOBS_LABEL={flow:"Пятен",tunnel:"Колец",horizon:"Волн",eclipse:"Резкость края"};
+function relabelBlobs(){ const st=$("#bgstyle").value, lab=$("#blobsv").parentNode;
+  lab.childNodes[0].textContent=(BLOBS_LABEL[st]||"Деталей")+" "; }
+$("#bgstyle").addEventListener("change",()=>{ relabelBlobs(); schedule(); });
+$("#aspect").addEventListener("change",schedule);
+$("#seed").addEventListener("change",schedule);
+$("#blobs").addEventListener("input",e=>{ $("#blobsv").textContent=e.target.value; schedule(); });
+$("#bscale").addEventListener("input",e=>{ $("#bscalev").textContent=e.target.value+"%"; schedule(); });
+$("#bspeed").addEventListener("input",e=>{ $("#bspeedv").textContent=(e.target.value/10).toFixed(1)+" с"; schedule(); });
+
+function setPlaying(v){ playing=v; $("#play").textContent=v?"⏸":"▶"; }
+$("#play").onclick=()=>setPlaying(!playing);
+$("#stage").onclick=()=>setPlaying(!playing);
+
+function toast(msg,sticky){ const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._t); if(!sticky) t._t=setTimeout(()=>t.classList.remove("show"),2400); }
+function toastHide(){ const t=$("#toast"); clearTimeout(t._t); t.classList.remove("show"); }
+function baseName(){ const p=P();
+  if(p.mode==="bg") return `bg_${p.bgStyle}_${p.aspect.replace(":","x")}_seed${p.seed}${inverted?"_inv":""}`;
+  const tags=p.steps.map(s=>s.type[0]).join("")||"static";
+  return `orbital_seq_${tags}_${p.n}${p.l}${p.m}`; }
+const tick=()=>new Promise(r=>setTimeout(r,0));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function download(blob,name){
+  if(!blob||!blob.size){ toast("Пустой файл — экспорт не дал данных"); return false; }
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000); return true; }
+let exporting=false;
+function lockUI(v){ exporting=v; ["#mp4","#gif","#png"].forEach(s=>$(s).disabled=v); }
+
+async function renderFrames(S,p,N){
+  const b=buildBases(S,p), out=[];
+  for(let i=0;i<N;i++){
+    out.push(frameCanvas(b,i/N));
+    toast(`Кадр ${i+1}/${N}…`,true); await tick();
+  }
+  return {frames:out,T:b.T}; }
+// для видео кадры держим сжатыми (JPEG) — иначе 60 кадр/с не влезает в память
+async function renderFrameBlobs(S,p){
+  const b=buildBases(S,p), N=exportCount(p,b.T), blobs=[];
+  for(let i=0;i<N;i++){
+    const c=frameCanvas(b,i/N);
+    blobs.push(await new Promise(r=>c.toBlob(r,"image/jpeg",0.95)));
+    toast(`Кадр ${i+1}/${N}…`,true); await tick();
+  }
+  return {blobs,N,T:b.T}; }
+
+/* ============ MP4-муксер (ISOBMFF, один H.264-трек, AVCC-семплы) ============ */
+function mp4Mux(samples, avcC, W, H, fps){
+  const te=new TextEncoder();
+  const u8=a=>a instanceof Uint8Array?a:new Uint8Array(a);
+  const b32=v=>{ const a=new Uint8Array(4); new DataView(a.buffer).setUint32(0,v>>>0); return a; };
+  const b16=v=>{ const a=new Uint8Array(2); new DataView(a.buffer).setUint16(0,v&65535); return a; };
+  const cat=arrs=>{ let n=0; arrs.forEach(a=>n+=a.length); const o=new Uint8Array(n); let p=0;
+    arrs.forEach(a=>{o.set(a,p);p+=a.length;}); return o; };
+  function box(type,...parts){ const bodies=parts.map(u8); let len=8; bodies.forEach(b=>len+=b.length);
+    const out=new Uint8Array(len); new DataView(out.buffer).setUint32(0,len); out.set(te.encode(type),4);
+    let o=8; bodies.forEach(b=>{out.set(b,o);o+=b.length;}); return out; }
+  function fbox(type,ver,flags,...parts){ const h=new Uint8Array(4);
+    h[0]=ver; h[1]=(flags>>16)&255; h[2]=(flags>>8)&255; h[3]=flags&255; return box(type,h,...parts); }
+  const N=samples.length, movTS=1000, mediaTS=fps;
+  const durMovie=Math.round(N/fps*movTS), durMedia=N;
+  const ftyp=box("ftyp", te.encode("isom"), b32(0x200),
+    te.encode("isom"), te.encode("iso2"), te.encode("avc1"), te.encode("mp41"));
+  const sizes=samples.map(s=>s.data.length);
+  const mdat=box("mdat", cat(samples.map(s=>s.data)));
+  const mdatOffset=ftyp.length+8;
+  const avc1body=cat([new Uint8Array(6), b16(1), new Uint8Array(16), b16(W), b16(H),
+    b32(0x00480000), b32(0x00480000), b32(0), b16(1), new Uint8Array(32), b16(0x18), b16(0xffff)]);
+  const avc1=box("avc1", avc1body, box("avcC", avcC));
+  const stsd=fbox("stsd",0,0, b32(1), avc1);
+  const stts=fbox("stts",0,0, b32(1), b32(N), b32(1));
+  const keys=[]; samples.forEach((s,i)=>{ if(s.key)keys.push(i+1); });
+  const stss=fbox("stss",0,0, b32(keys.length), ...keys.map(b32));
+  const stsc=fbox("stsc",0,0, b32(1), b32(1), b32(N), b32(1));
+  const stsz=fbox("stsz",0,0, b32(0), b32(N), ...sizes.map(b32));
+  const stco=fbox("stco",0,0, b32(1), b32(mdatOffset));
+  const stbl=box("stbl", stsd, stts, stss, stsc, stsz, stco);
+  const vmhd=fbox("vmhd",0,1, new Uint8Array(8));
+  const dinf=box("dinf", fbox("dref",0,0, b32(1), fbox("url ",0,1)));
+  const minf=box("minf", vmhd, dinf, stbl);
+  const hdlr=fbox("hdlr",0,0, b32(0), te.encode("vide"), new Uint8Array(12), te.encode("Orbital\0"));
+  const mdhd=fbox("mdhd",0,0, b32(0), b32(0), b32(mediaTS), b32(durMedia), b16(0x55c4), b16(0));
+  const mdia=box("mdia", mdhd, hdlr, minf);
+  const M=[0x10000,0,0, 0,0x10000,0, 0,0,0x40000000].map(b32);
+  const tkhd=fbox("tkhd",0,3, cat([b32(0),b32(0),b32(1),b32(0),b32(durMovie),new Uint8Array(8),
+    b16(0),b16(0),b16(0),b16(0), ...M, b32(W<<16), b32(H<<16)]));
+  const trak=box("trak", tkhd, mdia);
+  const mvhd=fbox("mvhd",0,0, cat([b32(0),b32(0),b32(movTS),b32(durMovie),
+    b32(0x00010000),b16(0x0100),b16(0),b32(0),b32(0), ...M,
+    b32(0),b32(0),b32(0),b32(0),b32(0),b32(0), b32(2)]));
+  const moov=box("moov", mvhd, trak);
+  return new Blob([ftyp, mdat, moov], {type:"video/mp4"});
+}
+/* ---- детерминированный экспорт: WebCodecs H.264 → MP4, точные кадры, петля ---- */
+async function encodeMP4(S, p, onprog){
+  const fps=p.fps, b=buildBases(S,p), T=b.T, N=Math.max(2,Math.round(fps*T));
+  const W=b.W, H=b.H, long=Math.max(W,H);
+  const bitrate=long>=2560?60e6:long>=2048?45e6:long>=1440?28e6:16e6;
+  const chunks=[]; let avcC=null, err=null;
+  const enc=new VideoEncoder({
+    output:(chunk,meta)=>{ if(!avcC&&meta&&meta.decoderConfig&&meta.decoderConfig.description)
+        avcC=new Uint8Array(meta.decoderConfig.description);
+      const buf=new Uint8Array(chunk.byteLength); chunk.copyTo(buf);
+      chunks.push({data:buf, key:chunk.type==="key", ts:chunk.timestamp}); },
+    error:e=>{ err=e; } });
+  // realtime → без B-кадров: порядок декодирования = порядок показа (муксер не требует ctts)
+  enc.configure({codec:"avc1.640034", width:W, height:H, bitrate, framerate:fps,
+    avc:{format:"avc"}, latencyMode:"realtime"});
+  const c=off(W,H), cx=ctx2d(c), gop=Math.max(1,Math.round(fps)), us=1e6/fps;
+  for(let i=0;i<N;i++){
+    if(err)throw err;
+    drawFrame(cx, b, i/N);
+    const vf=new VideoFrame(c, {timestamp:Math.round(i*us), duration:Math.round(us)});
+    enc.encode(vf, {keyFrame:i%gop===0}); vf.close();
+    if(onprog)onprog(i+1,N);
+    // мягкий бэкпрешер с ограничением — очередь advisory, зависать нельзя
+    let guard=0;
+    while(enc.encodeQueueSize>16 && guard++<300){ if(err)throw err; await sleep(5); }
+    await tick();
+  }
+  await enc.flush(); enc.close();
+  if(err)throw err;
+  if(!avcC)throw new Error("кодек не отдал описание (avcC)");
+  // страховка: если вдруг порядок вывода не по времени — сортируем по ts
+  let mono=true; for(let i=1;i<chunks.length;i++) if(chunks[i].ts<chunks[i-1].ts){mono=false;break;}
+  if(!mono) chunks.sort((a,b)=>a.ts-b.ts);
+  return {blob:mp4Mux(chunks, avcC, W, H, fps), N, T, W, H};
+}
+/* ---- запасной путь: MediaRecorder в реальном времени ---- */
+function pickVideoMime(){
+  const cand=["video/mp4;codecs=avc1.640034","video/mp4;codecs=avc1.42E01E","video/mp4",
+    "video/webm;codecs=vp9","video/webm"];
+  for(const m of cand) if(MediaRecorder.isTypeSupported(m)) return m;
+  return null; }
+// авто-захват потока в реальном времени — надёжнее ручного requestFrame (Safari/Firefox)
+async function mp4ViaRecorder(p, S){
+  if(typeof MediaRecorder==="undefined") throw new Error("MediaRecorder недоступен");
+  const mime=pickVideoMime(); if(!mime) throw new Error("нет видеокодека для записи");
+  const isMp4=mime.startsWith("video/mp4");
+  const b=buildBases(S,p), T=b.T; if(!T) throw new Error("нет анимации");
+  const fps=Math.min(Math.max(p.fps,24),30);
+  const c=off(b.W,b.H), x=c.getContext("2d");
+  drawFrame(x,b,0); // непустой первый кадр до старта записи
+  const stream=c.captureStream(fps); // авто-семплинг канваса на fps
+  const br=S>=2048?40e6:S>=1440?26e6:14e6;
+  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:br});
+  const parts=[]; rec.ondataavailable=e=>{ if(e.data&&e.data.size)parts.push(e.data); };
+  const done=new Promise(r=>rec.onstop=r);
+  rec.start(250); // регулярные чанки
+  const t0=performance.now();
+  await new Promise(res=>{
+    // setTimeout, а не rAF — прогресс не замирает даже в фоновой вкладке
+    (function frame(){ const el=(performance.now()-t0)/1000;
+      drawFrame(x,b,(el/T)%1);
+      toast(`Запись ${isMp4?"MP4":"WebM"} ${S}²: ${el.toFixed(1)}/${T.toFixed(1)} с…`,true);
+      if(el>=T){ res(); return; }
+      setTimeout(frame, Math.max(8, 1000/fps));
+    })();
+  });
+  rec.stop(); await done;
+  stream.getTracks().forEach(t=>t.stop());
+  const blob=new Blob(parts,{type:mime.split(";")[0]});
+  if(!blob.size) throw new Error("захват канваса не дал данных — этот браузер не умеет записывать видео с canvas");
+  download(blob, baseName()+`_${S}${isMp4?".mp4":".webm"}`);
+  return {isMp4,S,T}; }
+
+$("#mp4").onclick=async()=>{
+  if(exporting)return;
+  const p=P();
+  if(p.mode!=="bg" && !p.steps.length){ toast("Добавь хотя бы один шаг — иначе ролик статичен"); return; }
+  const S=+($("#res").value)||2048;
+  lockUI(true);
+  try{
+    let canWC=false;
+    if(typeof VideoEncoder!=="undefined" && typeof VideoFrame!=="undefined"){
+      try{ canWC=(await VideoEncoder.isConfigSupported({codec:"avc1.640034",width:S,height:S,
+        bitrate:20e6,framerate:p.fps,avc:{format:"avc"},latencyMode:"realtime"})).supported; }catch(_){ canWC=false; }
+    }
+    if(canWC){
+      toast(`Кодирую MP4 ${S}…`,true);
+      const {blob,N,T,W,H}=await encodeMP4(S,p,(i,n)=>{ if(i%4===0||i===n) toast(`MP4ᵂᶜ: кадр ${i}/${n}…`,true); });
+      if(!blob||!blob.size) throw new Error("кодировщик вернул пустой файл");
+      download(blob, baseName()+`_${W}x${H}_loop.mp4`);
+      toastHide(); toast(`Готово: MP4 ${W}×${H}, ${N} кадров, петля ${T.toFixed(1)} с`);
+    } else {
+      toast(`WebCodecs недоступен — запись ${S}² в реальном времени…`,true);
+      const r=await mp4ViaRecorder(p,S);
+      toastHide(); toast(`Готово: ${r.isMp4?"MP4":"WebM"} ${S}×${S}, петля ${r.T.toFixed(1)} с`);
+    }
+  }catch(e){
+    try{ toast("Кодировщик не сработал ("+e.message+") — пишу в реальном времени…",true);
+      const r=await mp4ViaRecorder(p,S);
+      toastHide(); toast(`Готово (запись): ${r.isMp4?"MP4":"WebM"} ${r.S}×${r.S}`);
+    }catch(e2){ toastHide(); toast("Экспорт не удался: "+e2.message+" · попробуй GIF"); }
+  }
+  lockUI(false); };
+
+/* ================= GIF: медианное сечение + LZW, точный цикл ================= */
+function buildPalette(samples){
+  const range=box=>{ let lo=[255,255,255],hi=[0,0,0];
+    for(const p of box)for(let c=0;c<3;c++){ if(p[c]<lo[c])lo[c]=p[c]; if(p[c]>hi[c])hi[c]=p[c]; }
+    let ch=0,best=-1; for(let c=0;c<3;c++){ const r=hi[c]-lo[c]; if(r>best){best=r;ch=c;} }
+    return {span:best,ch}; };
+  let boxes=[samples];
+  while(boxes.length<256){
+    let bi=-1,bs=-1;
+    boxes.forEach((b,i)=>{ if(b.length>1){ const r=range(b); if(r.span>bs){bs=r.span;bi=i;} }});
+    if(bi<0||bs<=0)break;
+    const b=boxes[bi], ch=range(b).ch;
+    b.sort((p,q)=>p[ch]-q[ch]);
+    const mid=b.length>>1;
+    boxes.splice(bi,1,b.slice(0,mid),b.slice(mid));
+  }
+  const pal=boxes.map(b=>{ let r=0,g=0,bl=0;
+    for(const p of b){ r+=p[0]; g+=p[1]; bl+=p[2]; }
+    const n=b.length||1; return [Math.round(r/n),Math.round(g/n),Math.round(bl/n)]; });
+  while(pal.length<256) pal.push([0,0,0]);
+  return pal; }
+function buildLUT(pal){
+  const lut=new Uint8Array(32768);
+  for(let r=0;r<32;r++)for(let g=0;g<32;g++)for(let b=0;b<32;b++){
+    const R=r*8+4,G=g*8+4,B=b*8+4; let bi=0,bd=1e9;
+    for(let i=0;i<256;i++){ const p=pal[i],
+      d=(R-p[0])*(R-p[0])+(G-p[1])*(G-p[1])+(B-p[2])*(B-p[2]);
+      if(d<bd){bd=d;bi=i;} }
+    lut[r<<10|g<<5|b]=bi; }
+  return lut; }
+function ditherIndex(data,W,H,pal,lut){
+  const idx=new Uint8Array(W*H), buf=new Float32Array(W*H*3);
+  for(let i=0;i<W*H;i++){ buf[i*3]=data[i*4]; buf[i*3+1]=data[i*4+1]; buf[i*3+2]=data[i*4+2]; }
+  const cl=x=>x<0?0:x>255?255:x;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const i=y*W+x, r=cl(buf[i*3]),g=cl(buf[i*3+1]),b=cl(buf[i*3+2]);
+    const pi=lut[(r>>3)<<10|(g>>3)<<5|(b>>3)]; idx[i]=pi;
+    const P=pal[pi], er=r-P[0],eg=g-P[1],eb=b-P[2];
+    const put=(xx,yy,f)=>{ if(xx<0||xx>=W||yy>=H)return; const j=(yy*W+xx)*3;
+      buf[j]+=er*f; buf[j+1]+=eg*f; buf[j+2]+=eb*f; };
+    put(x+1,y,7/16); put(x-1,y+1,3/16); put(x,y+1,5/16); put(x+1,y+1,1/16);
+  }
+  return idx; }
+function lzwEncode(minSize,px){
+  const CLEAR=1<<minSize, EOI=CLEAR+1, out=[];
+  let acc=0,nbits=0,codeSize=minSize+1,dict=new Map(),next=EOI+1;
+  const emit=c=>{ acc|=c<<nbits; nbits+=codeSize;
+    while(nbits>=8){ out.push(acc&255); acc>>>=8; nbits-=8; } };
+  emit(CLEAR);
+  let prev=px[0];
+  for(let i=1;i<px.length;i++){
+    const k=px[i], key=prev*256+k, hit=dict.get(key);
+    if(hit!==undefined){ prev=hit; continue; }
+    emit(prev);
+    dict.set(key,next); next++;
+    if(next===(1<<codeSize)&&codeSize<12) codeSize++;
+    if(next===4096){ emit(CLEAR); dict=new Map(); next=EOI+1; codeSize=minSize+1; }
+    prev=k;
+  }
+  emit(prev); emit(EOI);
+  if(nbits>0) out.push(acc&255);
+  return out; }
+function gifFromFrames(frames,W,H,delayCs){
+  const samples=[];
+  const step=Math.max(1,Math.round(frames.length/4));
+  for(let f=0;f<frames.length;f+=step){
+    const d=ctx2d(frames[f]).getImageData(0,0,W,H).data;
+    for(let i=0;i<W*H;i+=13) samples.push([d[i*4],d[i*4+1],d[i*4+2]]);
+  }
+  const pal=buildPalette(samples), lut=buildLUT(pal);
+  const B=[];
+  const str=s=>{ for(const ch of s) B.push(ch.charCodeAt(0)); };
+  const u16=v=>{ B.push(v&255,(v>>8)&255); };
+  str("GIF89a"); u16(W); u16(H); B.push(0xF7,0,0);
+  for(const p of pal) B.push(p[0],p[1],p[2]);
+  B.push(0x21,0xFF,0x0B); str("NETSCAPE2.0"); B.push(3,1,0,0,0); // вечный цикл
+  const encode=f=>{
+    const data=ctx2d(frames[f]).getImageData(0,0,W,H).data;
+    const idx=ditherIndex(data,W,H,pal,lut);
+    B.push(0x21,0xF9,4,0x04,delayCs&255,(delayCs>>8)&255,0,0);
+    B.push(0x2C); u16(0); u16(0); u16(W); u16(H); B.push(0);
+    B.push(8);
+    const lz=lzwEncode(8,idx);
+    for(let i=0;i<lz.length;i+=255){ const n=Math.min(255,lz.length-i);
+      B.push(n); for(let j=0;j<n;j++) B.push(lz[i+j]); }
+    B.push(0);
+  };
+  return {encode, finish:()=>{ B.push(0x3B); return new Uint8Array(B); }};
+}
+window.__gif=gifFromFrames; // для отладки
+
+$("#gif").onclick=async()=>{
+  if(exporting)return; lockUI(true);
+  try{
+    const p=P(), S=480;
+    // GIF: не выше 25 кадр/с и не более 400 кадров — иначе формат раздувается
+    const Tp = p.mode==="bg" ? p.bgPeriod : p.steps.reduce((a,s)=>a+s.dur,0);
+    const N=Tp?Math.max(12,Math.min(400,Math.round(Math.min(p.fps,25)*Tp))):1;
+    const {frames,T}=await renderFrames(S,p,N);
+    const W=frames[0].width, H=frames[0].height;
+    const delay=Math.max(2,Math.round((T||1)*100/frames.length));
+    const g=gifFromFrames(frames,W,H,delay);
+    for(let i=0;i<frames.length;i++){ g.encode(i);
+      toast(`GIF: кодируем ${i+1}/${frames.length}…`,true); await tick(); }
+    const bytes=g.finish();
+    download(new Blob([bytes],{type:"image/gif"}),baseName()+"_loop.gif");
+    toastHide(); toast(`Готово: GIF ${W}×${H}, ${frames.length} кадров, цикл ${(T||0).toFixed(1)} с`);
+  }catch(e){ toastHide(); toast("Ошибка экспорта GIF: "+e.message); }
+  lockUI(false); };
+
+$("#png").onclick=()=>{
+  if(exporting)return;
+  const p=P(), S=2000;
+  toast("Считаем кадр…",true);
+  setTimeout(()=>{ try{
+    const b=buildBases(S,p);
+    const c=frameCanvas(b,phase);
+    c.toBlob(bl=>{ download(bl,baseName()+`_${c.width}x${c.height}.png`);
+      toastHide(); toast(`PNG ${c.width}×${c.height} скачивается`); },"image/png");
+  }catch(e){ toastHide(); toast("Ошибка PNG: "+e.message); } },30); };
+
+/* ============ SVG-вектор: marching squares по кадру ролика (для Figma) ======== */
+function lerpHex(t){ const[r,g,b]=lerpRGB(t);
+  return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join(""); }
+function marching(v,px,lev){ const segs=[];
+  for(let r=0;r<px-1;r++)for(let c=0;c<px-1;c++){
+    const tl=v[r*px+c],tr=v[r*px+c+1],br=v[(r+1)*px+c+1],bl=v[(r+1)*px+c], pts={};
+    if((tl>=lev)!==(tr>=lev)) pts.T=[c+(lev-tl)/(tr-tl),r];
+    if((tr>=lev)!==(br>=lev)) pts.R=[c+1,r+(lev-tr)/(br-tr)];
+    if((br>=lev)!==(bl>=lev)) pts.B=[c+(lev-bl)/(br-bl),r+1];
+    if((bl>=lev)!==(tl>=lev)) pts.L=[c,r+(lev-tl)/(bl-tl)];
+    const k=Object.keys(pts);
+    if(k.length===2) segs.push([pts[k[0]],pts[k[1]]]);
+    else if(k.length===4){ segs.push([pts.T,pts.R]); segs.push([pts.B,pts.L]); } }
+  return stitch(segs); }
+function stitch(segs){ const K=p=>Math.round(p[0]*100)+","+Math.round(p[1]*100);
+  const byk=new Map();
+  segs.forEach((s,i)=>{ for(const p of s){ const k=K(p);
+    (byk.get(k)||byk.set(k,[]).get(k)).push(i); }});
+  const used=new Array(segs.length).fill(false), polys=[];
+  for(let i=0;i<segs.length;i++){ if(used[i])continue; used[i]=true;
+    const poly=[segs[i][0],segs[i][1]]; let grow=true;
+    while(grow){ grow=false; const end=poly[poly.length-1], cand=byk.get(K(end))||[];
+      for(const jj of cand){ if(used[jj])continue; const[p,q]=segs[jj];
+        if(K(p)===K(end)){poly.push(q);used[jj]=true;grow=true;break;}
+        if(K(q)===K(end)){poly.push(p);used[jj]=true;grow=true;break;} } }
+    if(poly.length>2) polys.push(poly); }
+  return polys; }
+// контурные полосы из скалярного поля v (fres×fres), цвет — по текущей палитре (учитывает инверсию)
+function bandsSVG(v,fres,levels){
+  let mx=0; for(let i=0;i<v.length;i++) if(v[i]>mx)mx=v[i]; if(mx<=0)return "";
+  const parts=["<g>"];
+  for(let i=0;i<levels;i++){ const t=i/(levels-1), lev=mx*(0.06+0.90*t);
+    const polys=marching(v,fres,lev); if(!polys.length)continue;
+    const d=polys.map(p=>"M"+p.map(q=>q[0].toFixed(2)+","+q[1].toFixed(2)).join("L")+"Z").join("");
+    parts.push(`<path d="${d}" fill="${lerpHex(t)}" fill-rule="evenodd"/>`); }
+  parts.push("</g>"); return parts.join(""); }
+// computeV возвращает b.tmp (переиспользуемый буфер) — векторизуем сразу, до следующей фазы
+function frameBody(b,phase,levels){ const body=bandsSVG(computeV(b,phase), b.fres, levels);
+  const z=b.p.zoom||1; if(z===1) return body; const cx=b.fres/2;
+  return `<g transform="translate(${cx} ${cx}) scale(${z}) translate(${-cx} ${-cx})">${body}</g>`; }
+function singleSVG(b,phase,levels,bg){ const px=b.fres;
+  const rect=bg?`<rect width="${px}" height="${px}" fill="${bg}"/>`:"";
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${px} ${px}">${rect}${frameBody(b,phase,levels)}</svg>`; }
+// лист-контактник: nPhases равномерных фаз петли сеткой, подпись фазы под каждым
+function sheetSVG(b,nPhases,levels,bg){
+  const px=b.fres, cols=Math.min(nPhases,3), rows=Math.ceil(nPhases/cols);
+  const gap=Math.round(px*0.05), lab=Math.round(px*0.09), cw=px+gap, ch=px+gap+lab;
+  const W=cols*cw+gap, H=rows*ch+gap, txt=inverted?"#7A3D05":"#C9660A";
+  const parts=[bg?`<rect width="${W}" height="${H}" fill="${bg}"/>`:""];
+  for(let i=0;i<nPhases;i++){ const phase=i/nPhases;
+    const cx=gap+(i%cols)*cw, cy=gap+((i/cols)|0)*ch;
+    parts.push(`<g transform="translate(${cx},${cy})">${frameBody(b,phase,levels)}</g>`);
+    parts.push(`<text x="${cx+px/2}" y="${cy+px+lab*0.66}" text-anchor="middle" font-family="ui-monospace,monospace" font-size="${Math.round(lab*0.46)}" fill="${txt}">φ ${phase.toFixed(2)}</text>`); }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">${parts.join("")}</svg>`; }
+function saveSVG(svg,name){ download(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}), name); }
+
+$("#svgframe").onclick=()=>{
+  if(exporting)return;
+  const p=P(), levels=+$("#svglevels").value;
+  toast("Векторизую кадр…",true);
+  setTimeout(()=>{ try{
+    const b=buildBases(360,p);
+    saveSVG(singleSVG(b, phase, levels, effBg()), baseName()+"_frame.svg");
+    toastHide(); toast("SVG кадра — скачивается");
+  }catch(e){ toastHide(); toast("Ошибка SVG: "+e.message); } },30); };
+
+$("#svgsheet").onclick=()=>{
+  if(exporting)return;
+  const p=P();
+  if(p.mode!=="bg" && !p.steps.length){ toast("Добавь шаги — иначе раскадровка статична"); return; }
+  const nP=+$("#phases").value, levels=+$("#svglevels").value;
+  toast(`Векторизую ${nP} фаз…`,true);
+  setTimeout(()=>{ try{
+    const b=buildBases(360,p);
+    saveSVG(sheetSVG(b, nP, levels, effBg()), baseName()+`_${nP}phases${inverted?"_inv":""}.svg`);
+    toastHide(); toast(`SVG-лист: ${nP} фаз${inverted?", инверсия":""} — скачивается`);
+  }catch(e){ toastHide(); toast("Ошибка SVG: "+e.message); } },30); };
+
+renderSteps();
+rebuild();
+</script>
