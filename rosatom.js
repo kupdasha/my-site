@@ -293,7 +293,7 @@ const KINDS = {
   }],
 
   /* ---- свечение Черенкова: два ролика из презентации ---- */
-  cher: [c => `<div class="ra-cher">${c.videos.map(v => `<span class="ra-vid ra-cher-v"><video src="${url(v.src)}" poster="${url(v.poster)}" muted loop playsinline autoplay preload="auto"></video></span>`).join('')}</div>`,
+  cher: [c => `<div class="ra-cher">${c.videos.map(v => `<span class="ra-vid ra-cher-v"><video data-src="${url(v.src)}" poster="${url(v.poster)}" muted loop playsinline preload="none"></video></span>`).join('')}</div>`,
     (sec) => playWhenSeen(sec)],
 
   /* ---- поле на всю ширину сайта: зацикленная орбиталь водорода считается живьем, в центре — знак ---- */
@@ -328,7 +328,7 @@ const KINDS = {
     let i = 0;
     // элемент — путь к картинке или { src, video }: макет с живым фоном играет как ролик, постер — та же картинка
     const pic = (it, cls) => it.video
-      ? `<span class="ra-shot ra-shot-v ${cls}"><video src="${url(it.video)}" poster="${url(small(it.src))}" muted loop playsinline autoplay preload="auto"></video></span>`
+      ? `<span class="ra-shot ra-shot-v ${cls}"><video data-src="${url(it.video)}" poster="${url(small(it.src))}" muted loop playsinline preload="none"></video></span>`
       : `<button class="ra-pic ra-shot ${cls}" data-g="shots" data-i="${i++}" aria-label="Увеличить"><img src="${url(cls === 'ui' ? it : small(it))}" data-full="${url(it)}" alt="" loading="lazy" draggable="false"></button>`;
     return `<div class="ra-shots">
       <div class="ra-shots-ui">${c.ui.map(s => pic(s, 'ui')).join('')}</div>
@@ -401,7 +401,7 @@ const KINDS = {
 
   /* ---- движение: ролики из конструктора, играют, пока на экране ---- */
   videos: [c => `<div class="ra-videos">${c.items.map(v =>
-      `<span class="ra-vid"><video src="${url(v.src)}" poster="${url(v.poster)}" muted loop playsinline autoplay preload="auto"></video></span>`).join('')}</div>`,
+      `<span class="ra-vid"><video data-src="${url(v.src)}" poster="${url(v.poster)}" muted loop playsinline preload="none"></video></span>`).join('')}</div>`,
     (sec) => playWhenSeen(sec)],
 
   /* ---- марка углубления: фото с бортов ---- */
@@ -431,9 +431,28 @@ function hexPath(x, y, s, pointy){
   for (let i = 0; i < 6; i++) { const a = Math.PI / 180 * (60 * i + (pointy ? 30 : 0)); pts.push([x + s * Math.cos(a), y + s * Math.sin(a)]); }
   return 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L') + 'Z';
 }
+// ролики кейса грузятся лениво: адрес ставится, когда ролик в 600 px от экрана, играют только на экране.
+// muted ставим свойством — Safari иначе не дает играть без звука
+const vidNear = new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if (e.isIntersecting && !v.src && v.dataset.src) { v.muted = true; v.src = v.dataset.src; v.preload = 'auto'; }
+}), { rootMargin: '600px 0px' });
 function playWhenSeen(sec){
-  sec.querySelectorAll('video').forEach(v => onScreen(v, on => { if (on && !still()) v.play().catch(() => {}); else v.pause(); }, .2));
+  sec.querySelectorAll('video').forEach(v => {
+    v.muted = true;
+    vidNear.observe(v);
+    onScreen(v, on => {
+      v._on = on;
+      if (on && !still()) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); }
+      else if (v.src) v.pause();
+    }, .15);
+  });
 }
+// вкладку открыли снова — запустить ролики, которые стоят на экране (в фоне браузер их не пускает)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || still()) return;
+  document.querySelectorAll('.ra-mount video').forEach(v => { if (v._on && v.paused) v.play().catch(() => {}); });
+});
 
 /* ---------- вода в знаке третьей концепции: волна бежит, уровень — от нагрузки ---------- */
 function liveWater(sec){
