@@ -203,6 +203,9 @@
 .ra-mood{grid-area:1 / 1;opacity:0;visibility:hidden;transition:opacity .6s var(--ease),visibility 0s .6s}
 .ra-mood.on{opacity:1;visibility:visible;transition:opacity .6s var(--ease)}
 .ra-mood-pic{position:relative;width:100%;aspect-ratio:16/9;margin-bottom:16px;container-type:inline-size}
+.ra-players .ra-mood-tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media (max-width:760px){.ra-players .ra-mood-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ra-players .ra-mood-pic{margin-bottom:0}
 .ra-mood-stage{grid-template-columns:minmax(0,1fr)}
 .ra-mood-corner{position:absolute;left:4%;top:5%;display:flex;flex-direction:column;color:#1D222A;font-size:2.6cqw;line-height:1.1;text-align:left;pointer-events:none}
 .ra-mood-corner b{font-weight:500;font-size:4.8cqw;letter-spacing:-.02em}

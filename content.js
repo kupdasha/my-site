@@ -4374,6 +4374,19 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 { name: 'WebSoft', imgs: ['websoft1', 'websoft2', 'websoft3', 'websoft4'] },
               ],
             },
+            players: {
+              title: ['как у больших игроков', 'как у больших'],
+              text:  ['У сильных брендов дизайн отражает ценности и стратегию. Самые продвинутые компании приходят к **тотальному единству бренда**: продукты называются почти одинаково и говорят одним визуальным языком',
+                      'У больших всё называется почти одинаково и говорит одним языком'],
+              items: [
+                { name: 'Google', img: 'img/rosatom-hr/players/google.webp' },
+                { name: 'VK', img: 'img/rosatom-hr/players/vk.webp' },
+                { name: 'Ростелеком', img: 'img/rosatom-hr/players/rostelecom.webp' },
+                { name: 'Контур', img: 'img/rosatom-hr/players/kontur.webp' },
+                { name: 'МТС', img: 'img/rosatom-hr/players/mts.webp' },
+                { name: 'Microsoft', img: 'img/rosatom-hr/players/microsoft.webp' },
+              ],
+            },
             platform: {
               title: ['платформа бренда', 'на чем стоит'],
               steps: [

@@ -145,6 +145,14 @@ function researchHTML(R){
   const market = sub(R.market.title, `<p class="ra-rs-text">${H.T(R.market.text)}</p>
     <div class="ra-market">${R.market.groups.map((g, gi) => `<div class="ra-mk-g"><span class="ra-map-sub">${H.T(g.name)}</span>
       <div class="ra-mk-shots">${g.imgs.map((n, i) => `<button class="ra-pic" data-g="market${gi}" data-i="${i}" aria-label="Увеличить"><img src="${url('img/rosatom-hr/market/' + n + '.webp')}" alt="" loading="lazy" draggable="false"></button>`).join('')}</div></div>`).join('')}</div>`);
+  // большие игроки: одна рамка, названия сверху переключаются сами, как мудборды
+  const P = R.players;
+  const players = P ? sub(P.title, `<p class="ra-rs-text">${H.T(P.text)}</p>
+    <div class="ra-moods ra-players">
+      <div class="ra-mood-tabs">${P.items.map((m, i) => `<button class="ra-mood-tab${i ? '' : ' on'}" data-i="${i}">${esc(m.name)}<i class="ra-prog"><b></b></i></button>`).join('')}</div>
+      <div class="ra-mood-stage">${P.items.map((m, i) => `<div class="ra-mood${i ? '' : ' on'}" data-i="${i}">
+        <button class="ra-pic ra-mood-pic" data-g="players" data-i="${i}" aria-label="Увеличить"><img src="${url(m.img)}" alt="" loading="lazy" draggable="false"></button></div>`).join('')}</div>
+    </div>`) : '';
   const platform = sub(R.platform.title, `<ol class="ra-chain">${R.platform.steps.map((s, i) =>
     `<li style="--i:${i}"><span class="ra-chain-k">${H.T(s.k)}</span><span class="ra-chain-t">${H.T(s.t)}</span></li>`).join('')}</ol>`);
   // критерии знака: три рисунка с короткой подписью
@@ -167,7 +175,7 @@ function researchHTML(R){
   return `<div class="ra-research">${head(R)}
     <button class="btn btn-line ra-rs-btn" aria-expanded="false"><span class="ra-rs-lbl">${H.T(R.open)}</span><span class="ra-rs-arr" aria-hidden="true">↓</span></button>
     <p class="ra-rs-lead">${H.T(R.lead)}</p>
-    <div class="ra-rs-body"><div class="ra-rs-in">${before}${map}${market}${platform}${criteria}${moods}${road}</div></div>
+    <div class="ra-rs-body"><div class="ra-rs-in">${before}${map}${market}${players}${platform}${criteria}${moods}${road}</div></div>
   </div>`;
 }
 // линии схемы: от низа карточки продукта к верху связанной карточки, плавной кривой; пересчет при раскрытии и ресайзе
@@ -202,13 +210,15 @@ function liveResearch(sec, R){
     }
   });
   liveMap(box.querySelector('.ra-map'));
-  // мудборды: переключаются сами, пока не тронули; полоска показывает время до следующего
-  const tabs = [...box.querySelectorAll('.ra-mood-tab')], panes = [...box.querySelectorAll('.ra-mood')];
-  let mk = 0, mt = 0, mtouch = false, mvis = false;
-  const show = i => { mk = i; tabs.forEach((t, j) => t.classList.toggle('on', j === i)); panes.forEach((p, j) => p.classList.toggle('on', j === i)); };
-  const mloop = () => { clearTimeout(mt); box.querySelector('.ra-moods').classList.toggle('run', mvis && !mtouch && !still()); if (!mvis || mtouch || still()) return; mt = setTimeout(() => { show((mk + 1) % tabs.length); mloop(); }, 4200); };
-  tabs.forEach((t, i) => t.addEventListener('click', () => { mtouch = true; show(i); mloop(); }));
-  onScreen(box.querySelector('.ra-moods'), v => { mvis = v; mloop(); });
+  // мудборды и большие игроки: переключаются сами, пока не тронули; полоска показывает время до следующего
+  box.querySelectorAll('.ra-moods').forEach(wrap => {
+    const tabs = [...wrap.querySelectorAll('.ra-mood-tab')], panes = [...wrap.querySelectorAll('.ra-mood')];
+    let mk = 0, mt = 0, mtouch = false, mvis = false;
+    const show = i => { mk = i; tabs.forEach((t, j) => t.classList.toggle('on', j === i)); panes.forEach((p, j) => p.classList.toggle('on', j === i)); };
+    const mloop = () => { clearTimeout(mt); wrap.classList.toggle('run', mvis && !mtouch && !still()); if (!mvis || mtouch || still()) return; mt = setTimeout(() => { show((mk + 1) % tabs.length); mloop(); }, 4200); };
+    tabs.forEach((t, i) => t.addEventListener('click', () => { mtouch = true; show(i); mloop(); }));
+    onScreen(wrap, v => { mvis = v; mloop(); });
+  });
 }
 
 /* ================================================================
