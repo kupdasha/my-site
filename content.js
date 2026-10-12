@@ -4295,7 +4295,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         short: ['Три концепции бренда HR-экосистемы: одно имя и один знак вместо зоопарка логотипов',
                 'Как превратить десяток логотипов с «атомом» в одну экосистему. Три способа'],
         image: 'img/rosatom-hr/cover.jpg',
-        preview: 'img/rosatom-hr/cover-loop.mp4',   // зацикленная орбиталь со знаком, 5 с, 50 КБ; cover.jpg — ее первый кадр
+        preview: 'img/rosatom-hr/cover-loop.mp4',   // зацикленная орбиталь со знаком, 2,5 с, 35 КБ, шесть колец волны; cover.jpg — ее первый кадр
         noHero: true,
         schemeCols: true,
         scheme: {
