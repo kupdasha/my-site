@@ -20,7 +20,8 @@ const VERS = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? Date.now() :
 const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const url = p => H.base + p;
+// на Тильде app.js уже перевел пути img/… из content.js в полные адреса — их не трогаем
+const url = p => /^(https?:)?\/\//.test(p) ? p : H.base + p;
 // у растровых макетов и мудбордов есть легкая копия -s (900 px) — ее берет сетка, крупно — полная
 const small = p => /\/[abc]-[^/]+\.webp$/.test(p) ? p.replace(/\.webp$/, '-s.webp') : p;
 const onScreen = (el, cb, threshold = .25) =>
