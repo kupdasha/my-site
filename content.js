@@ -4539,6 +4539,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
            в кейсе оба внизу, под текстом; на карточке ролик 2024 играет без звука */
         preview:  'kinescope:p19WBRvZ4TPBW3N9YotBGh',
         image:    'https://edge-ams-1.kinescopecdn.net/7e15cdff-4b7a-4226-a05e-7528f8d68441/posters/11b0fcda-c180-4221-8406-011970caaf93/poster_lg/01a10d29-df28-7158-a83c-e227ea7b8efa.jpg',   // обложка — кадр ролика с Kinescope
+        thumb:    'https://edge-ams-1.kinescopecdn.net/7e15cdff-4b7a-4226-a05e-7528f8d68441/posters/11b0fcda-c180-4221-8406-011970caaf93/poster_md/01a10d29-df28-7158-a83c-e227ea7b8efa.webp',   // легкая копия кадра для карточки
         noHero: true,   // в шапке кейса ролика нет, сразу текст
         labels: ['мой вклад', 'оформление'],
         story: [
@@ -4560,6 +4561,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'сайт банка',
         short: 'Анимационный прототип сайта банка для бизнеса и частных лиц',
         image: 'img/novyi-vek.jpg',
+        thumb: 'img/thumbs/novyi-vek.webp',   // легкая копия обложки для карточки (91 КБ → 13 КБ)
         /* кейс — отдельная страница из репозитория, открывается целиком в окне кейса */
         embed: 'nda/novyi-vek/index.html',
       },

@@ -10,18 +10,19 @@ cd "$(dirname "$0")/.." || exit 1
 git fetch -q origin main 2>/dev/null
 sha=$(git rev-parse origin/main) || exit 1
 
-# все скрипты и стили из корня и таплинк (его блок тоже берет файл по номеру версии), в том числе живые главы кейсов (office.js, anon.css…): иначе первый посетитель
+# все скрипты и стили из корня, таплинк и кейс «Новый век» со страницы NDA (он открывается в окне целиком) (его блок тоже берет файл по номеру версии), в том числе живые главы кейсов (office.js, anon.css…): иначе первый посетитель
 # кейса ждет, пока jsDelivr соберет их по новому номеру (~2 с на файл, скрипт и стили по очереди). Параллельно, по 8
-git ls-files -- '*.js' '*.css' 'taplink.html' | grep -v / | xargs -P 8 -I{} curl -s -o /dev/null --max-time 60 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/{}"
+{ git ls-files -- '*.js' '*.css' 'taplink.html' | grep -v /; git ls-files -- 'nda/*.js' 'nda/*.css' 'nda/novyi-vek/*.html' 'nda/novyi-vek/case/*.js' 'nda/novyi-vek/case/*.css'; } | xargs -P 8 -I{} curl -s -o /dev/null --max-time 60 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/{}"
 
 # шрифты и всё, что видно на главной без кликов: обложки карточек (thumb, image), превью-ролики, картинки «других работ».
 # Адрес картинки меняется с каждой версией, и холодный файл jsDelivr отдает 1–5 с, а бывает и не отдает вовсе —
 # тогда у карточки на главной нет обложки. Прогреваем их ДО того, как сайт переключится на новую версию (ниже)
-{ git ls-files -- 'fonts/*.woff2'; node -e "
+{ git ls-files -- 'fonts/*.woff2'; git ls-files -- 'nda/novyi-vek/img/*' 'nda/novyi-vek/case/*' | grep -v '\.js$\|\.css$'; node -e "
 global.window=global; require('./content.js');
 const out=new Set(); const add=v=>{ if (typeof v==='string' && v.startsWith('img/')) out.add(v) };
 SITE.works.items.forEach(p=>['thumb','image','preview','listPreview','video'].forEach(k=>add(p[k])));
 (SITE.photos&&SITE.photos.events&&SITE.photos.events.items||[]).forEach(e=>{add(e.thumb)});
+(SITE.ndaPage&&SITE.ndaPage.items||[]).forEach(p=>{['thumb','image','preview','video'].forEach(k=>add(p[k])); if (p.embed) out.add(p.embed)});
 console.log([...out].join('\\n'));" 2>/dev/null; } | sort -u | xargs -P 16 -I{} curl -s -o /dev/null --max-time 40 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/{}"
 
 blob=$(print -n "$sha" | git hash-object -w --stdin)

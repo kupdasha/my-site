@@ -940,6 +940,8 @@ const inCat = p => !workFilter || [].concat(p.cat).includes(workFilter);
 /* год проекта — маленькой цифрой рядом с названием */
 const yearHTML = p => p.year ? `<sup class="yr">${T(p.year)}</sup>` : '';
 function renderWorks(){
+  // сетки проектов на этой странице нет (NDA, «Обо мне») — не рисуем ее в пустышку: браузер скачал бы обложки зря
+  if (!document.querySelector('#workList')) return;
   const W = SITE.works;
   // фильтры: над проектами и еще раз в самом конце, под «другими работами»
   const chips = (W.filters || []).map(f =>
@@ -1164,6 +1166,7 @@ $('#podList').addEventListener('click', e => { const b = e.target.closest('.ep')
 const LOCK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"/></svg>';
 
 function renderNda(){
+  if (!document.querySelector('#ndaList')) return;
   const N = SITE.nda;
   $('#ndaList').innerHTML = N.items.map((p, k) => {
     const cols = (p.colors || ['#EAECF0', '#D4D5D9', '#80858E', '#D4D5D9']).join(',');
