@@ -220,7 +220,7 @@ function renderTexts(){
   });
   $$('[data-href]').forEach(el => el.href = get(el.dataset.href));
   document.title = pick(isNdaPage ? SITE.ndaPage.pageTitle : isSpeakerPage ? SITE.speaker.pageTitle : isAboutPage ? SITE.about.pageTitle : SITE.pageTitle);
-  if (SITE.about.photo) $('#photo').src = SITE.about.photo;
+  if (SITE.about.photo && $('#photo')) { const ph = pick(SITE.about.photo); if ($('#photo').getAttribute('src') !== ph) $('#photo').src = ph; }
 }
 
 function renderLists(){
