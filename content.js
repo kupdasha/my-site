@@ -4737,7 +4737,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         { src: 'img/events/ev-65.jpg', thumb: 'img/events/ev-65-s.jpg', ratio: 0.72, caption: '«Среда», церемония награждения', focus: '50% 0%' },
         { src: 'img/events/ev-66.jpg', thumb: 'img/events/ev-66-s.jpg', ratio: 0.56, caption: 'Подкаст «Одна кавычка»', focus: '50% 30%' },
         { src: 'img/events/ev-67.jpg', thumb: 'img/events/ev-67-s.jpg', ratio: 0.8, caption: 'Новый год «Сетки»', focus: '50% 21%' },
-        { src: 'img/events/ev-70.jpg', thumb: 'img/events/ev-70-s.jpg', ratio: 1, caption: 'Церемония награждения Серебряного Меркурия', focus: '50% 22%' },
+        { src: 'img/events/ev-70.jpg', thumb: 'img/events/ev-70-s.jpg', ratio: 0.8, caption: 'Церемония награждения Серебряного Меркурия', focus: '50% 22%' },
       ],
     },
     /* в дружеской версии фотографии — колода, как в приложении знакомств */
