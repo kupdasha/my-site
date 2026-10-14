@@ -2241,11 +2241,11 @@ function screenHTML(x){
   const g = x.screen;
   if (!Array.isArray(g)) {
     const inGrid = g.cells.some(c => c.head);
-    return `<div class="wrap scr-proj">${!inGrid && head ? `<div class="scr-head">${head}</div>` : ''}<div class="collage camp-row scr-grid" style="grid-template-areas:${g.areas.replace(/"/g, '&quot;')};grid-template-columns:${g.cols};grid-template-rows:${g.rows || ''};--ratio:${g.ratio}">${
+    return `<div class="wrap scr-proj${x.read ? ' scr-read' : ''}">${!inGrid && head ? `<div class="scr-head">${head}</div>` : ''}<div class="collage camp-row scr-grid" style="grid-template-areas:${g.areas.replace(/"/g, '&quot;')};grid-template-columns:${g.cols};grid-template-rows:${g.rows || ''};--ratio:${g.ratio}">${
       g.cells.map(c => c.head ? `<div class="collage-cell scr-cell-head" style="grid-area:${c.area}">${head}</div>`
         : `<div class="collage-cell${c.half ? ' half' : ''}" style="grid-area:${c.area}${c.pos ? `;--pos:${c.pos}` : ''}">${cell(c.img)}</div>`).join('')}</div></div>`;
   }
-  return `<div class="wrap scr-proj">${head ? `<div class="scr-head">${head}</div>` : ''}${
+  return `<div class="wrap scr-proj${x.read ? ' scr-read' : ''}">${head ? `<div class="scr-head">${head}</div>` : ''}${
     g.map(r => [].concat(r)).map(r => `<div class="camp-row fit" style="--n:${r.length}">${r.map(cell).join('')}</div>`).join('')}</div>`;
 }
 function galleryItem(x){
@@ -2280,7 +2280,7 @@ function galleryItem(x){
   if (x && x.steps) return stepsHTML(x.steps);
   if (x && x.rules) return rulesHTML(x.rules);
   // { bigTitle, sub } — крупный заголовок блока и строка пояснения под ним
-  if (x && x.bigTitle) return `<div class="wrap"><h2 class="deck-title big-title">${T(x.bigTitle)}</h2>${x.sub ? `<p class="case-sub big-sub">${T(x.sub)}</p>` : ''}</div>`;
+  if (x && x.bigTitle) return `<div class="wrap"><h2 class="deck-title big-title">${T(x.bigTitle)}</h2>${x.sub ? `<p class="case-sub big-sub${x.read ? ' read' : ''}">${T(x.sub)}</p>` : ''}</div>`;
   if (x && x.sizes) return sizesHTML(x.sizes);
   if (x && x.safe) return safeHTML(x.safe);
   if (x && x.clips) return clipsHTML(x);
@@ -2297,6 +2297,7 @@ function galleryItem(x){
   // { screen: { areas, cols, rows, ratio, cells: [{ area, img } | { area, head: true }] }, title, text } — коллаж:
   // сетка по схеме, весь коллаж не выше экрана (ratio — ширина к высоте), head — ячейка с названием и подписью.
   // Картинки увеличиваются по нажатию. У img/… с копией -s (900 px) телефон берет ее (см. «Разное» в 3D)
+  // read: true — подпись набрана как текст кейса: с засечками, черная (у bigTitle — так же sub; см. Alia Alive)
   if (x && x.screen) return screenHTML(x);
   if (x && x.collage) return campCollage(x);
   // { film: 'img/….mp4', poster, caption, ratio } — ролик для просмотра (ratio — пропорции, если не 16:9): со звуком и плеером, сам не запускается, грузится по нажатию;
