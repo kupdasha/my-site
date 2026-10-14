@@ -20,6 +20,7 @@ let H;   // помощники из app.js: T (типограф), pick, openView
 
 const VERS = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? Date.now() : Math.floor(Date.now() / 36e5);
 const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const touch = matchMedia('(hover: none)').matches;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const onScreen = (el, cb, threshold = .3) =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { threshold }).observe(el);
@@ -239,13 +240,39 @@ function liveKit(box, c, k){
     delay ? setTimeout(go, delay) : go();
   };
   const ping = e => { const b = els[e]; if (!b || still()) return; b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit'); };
+  // элемент конструктора летит с легенды на зону формы и там растворяется
+  const fly = (e, z) => {
+    const b = els[e]?.querySelector('svg'), g = groups[z];
+    if (!b || !g || still()) return 0;
+    const a = b.getBoundingClientRect(), t = g.getBoundingClientRect();
+    if (!a.width || !t.width) return 0;
+    const c = b.cloneNode(true); c.classList.add('vs-fly');
+    c.style.cssText = `left:${a.left}px;top:${a.top}px;width:${a.width}px;height:${a.height}px`;
+    document.body.appendChild(c);
+    const dx = t.left + t.width / 2 - (a.left + a.width / 2), dy = t.top + t.height / 2 - (a.top + a.height / 2);
+    c.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${dx}px,${dy}px) scale(.55)`, opacity: 0 }],
+      { duration: 520, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).onfinish = () => c.remove();
+    return 380;
+  };
+  // наклон формы за курсором
+  if (!touch) {
+    let rx = 0, ry = 0, raf = 0;
+    const kitbox = box.querySelector('.vs-kitbox');
+    kitbox.addEventListener('pointermove', e => {
+      const r = kitbox.getBoundingClientRect();
+      ry = ((e.clientX - r.left) / r.width - .5) * 14; rx = (.5 - (e.clientY - r.top) / r.height) * 8;
+      if (!raf) raf = requestAnimationFrame(() => { svg.style.transform = `perspective(1200px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`; raf = 0; });
+    });
+    kitbox.addEventListener('pointerleave', () => { svg.style.transform = ''; });
+  }
   const elOf = f => f.b.g != null ? 'grad' : f.t || 'fill';
   const whole = (stagger = 0) => { const t = team(); ZONES.forEach((zz, i) => set(zz.z, t[zz.z], stagger * i)); };
   whole();
   const change = (z, el) => {
     el = el || rnd(ELEMS);
     if (z === 'collar' && TEX.includes(el)) el = 'fill';
-    set(z, apply(el, st[z])); ping(elOf(st[z]));
+    const f = apply(el, st[z]), e = elOf(f);
+    ping(e); set(z, f, fly(e, z));
   };
   // нажатие на зону — новая заливка; элемент легенды — на следующую зону по кругу
   let idleUntil = 0, turn = 0;

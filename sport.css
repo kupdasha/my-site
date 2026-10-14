@@ -57,11 +57,14 @@
 .vs-grads{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(6px,.8vw,12px)}
 .vs-grads i{aspect-ratio:1;border-radius:calc(var(--r-img) * .6);--vs-s:0;transition:--vs-s 1.6s cubic-bezier(.65,0,.35,1) calc(var(--i) * 70ms)}
 .vs-pal.soft .vs-grads i{--vs-s:1}
-@media (max-width:600px){.vs-grads{grid-template-columns:repeat(4,minmax(0,1fr))}.vs-stripes{height:200px}}
+@media (max-width:600px){.vs-grads{grid-template-columns:repeat(4,minmax(0,1fr))}.vs-stripes{height:200px}
+  /* на телефоне открытая полоса шире — подпись помещается */
+  .vs-stripe.on{flex-grow:calc(var(--w) + 7)}.vs-sw-t{right:4px}}
 
 /* ---------- kit: конструктор формы ---------- */
 .vs-kitbox{background:var(--vs-paper);border-radius:var(--r-img);padding:clamp(16px,3vw,44px) clamp(16px,4vw,64px);display:grid;place-items:center}
-.vs-kitsvg{width:100%;max-width:min(520px,calc(72vh * .7));height:auto;display:block;overflow:visible}
+.vs-kitsvg{width:100%;max-width:min(520px,calc(72vh * .7));height:auto;display:block;overflow:visible;transition:transform .35s ease-out;will-change:transform}
+.vs-fly{position:fixed;z-index:60;border-radius:12px;pointer-events:none}
 .vs-z{cursor:pointer}
 .vs-z:hover{filter:brightness(1.08)}
 .vs-lay.new{animation:vsIn .65s var(--ease) both}
@@ -79,7 +82,16 @@
 .vs-el.hit svg{animation:vsPick .55s cubic-bezier(.34,1.56,.64,1)}
 @keyframes vsPick{40%{transform:scale(1.14) rotate(-3deg)}}
 .vs-again{margin-top:8px}
-@media (max-width:900px){.vs-legend{grid-template-columns:repeat(6,minmax(0,1fr));max-width:none}.vs-el{font-size:16px}}
+@media (max-width:900px){
+  /* на планшете и телефоне: подпись, заголовок, текст и легенда — над формой, кнопка — под ней */
+  section.vs-kit{row-gap:16px}
+  section.vs-kit > .vs-col{display:contents}
+  section.vs-kit .vs-col > *{grid-column:1 / -1;order:-1}
+  section.vs-kit .vs-legend{margin-top:8px}
+  section.vs-kit .vs-viz{order:0;margin-top:8px}
+  section.vs-kit .vs-again{order:1;margin:0;justify-self:start}
+  .vs-kitsvg{max-width:340px}
+  .vs-legend{grid-template-columns:repeat(6,minmax(0,1fr));max-width:none}.vs-el{font-size:16px}}
 @media (max-width:600px){.vs-legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 /* ---------- honor: строка этапов с полоской таймера и canvas ---------- */
