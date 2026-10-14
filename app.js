@@ -67,7 +67,7 @@ addEventListener('error', e => {
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -2625,6 +2625,8 @@ function renderCase(k, keepScroll){
   if (p.flip) body += `<div class="sr sr-mount"></div>`;
   // rosatom — ребрендинг HR-экосистемы Росатома: зоопарк логотипов, ресерч под спойлером, три концепции с липким меню; рисует rosatom.js
   if (p.rosatom) body += `<div class="ra ra-mount"></div>`;
+  // sport — спортивная форма VK: фото команд, палитра и градиенты, конструктор формы, графика достижений, иллюстрация, все формы лентой; рисует sport.js
+  if (p.sport) body += `<div class="vs vs-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // heroEnd — ролик из шапки уходит в самый конец кейса, после живых глав (см. интерактивные презентации)
   if (p.heroEnd) body += `<div class="wrap case-hero-end"><div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div></div>`;
@@ -2793,6 +2795,10 @@ function renderCase(k, keepScroll){
   if (ra) caseImport('rosatom')
     .then(m => m.mountRosatom(ra, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс HR-экосистемы Росатома не загрузился', err));
+  const vs = caseContent.querySelector('.vs-mount');
+  if (vs) caseImport('sport')
+    .then(m => m.mountSport(vs, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс спортивной формы VK не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
