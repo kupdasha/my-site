@@ -4547,7 +4547,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         cardRatio: '16/9',   // ролик на карточке целиком, без обрезки
         /* ролик в шапке — 3 МБ (два прохода, на глаз как исходник): крупные ролики этого репозитория jsDelivr не отдает,
            а воркер на workers.dev из России может быть недоступен */
-        video: 'img/alia/film.mp4',
+        video: 'https://cdn.jsdelivr.net/gh/kupdasha/my-site@9aee8da408c00ef40d28071d6d0bb7c244791ead/img/alia/film.mp4',   // закреплен за коммитом 9aee8da, где jsDelivr его уже отдает целиком: на каждом новом коммите он забирает ролик заново и первое время сбоит
         heroPoster: 'img/alia/film-poster.webp',   // первый кадр ролика, 16:9
         heroSound: true,
         schemeCols: true,
