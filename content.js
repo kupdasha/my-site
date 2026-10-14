@@ -4533,7 +4533,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       /* Рекламная кампания ЖК Alia Alive (агентство Duga, застройщик Asterus). Картинки и ролики — img/alia:
          ключевые визуалы отрисованы из Дашиной Фигмы «alia alive.fig» своим скриптом в 4100 px — плотнее самых крупных
          фото внутри макетов, качество фото не теряется; -s — копия 900 px для телефона.
-         film.mp4 — анимация визуала со звуком (пережата в два прохода до 9 МБ: jsDelivr обрывал файлы больше 10 МБ), values.mp4 — анимация второй идеи как есть.
+         film.mp4 — анимация визуала со звуком (пережата в два прохода до 9 МБ), ролики отдает воркер kup-version, см. ниже, values.mp4 — анимация второй идеи как есть.
          В Фигме только первый заход на закате; светлая версия — light-*, присланы Дашей картинками 14.10 */
       {
         title: 'рекламная кампания Alia Alive',
@@ -4544,7 +4544,10 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         image: 'img/alia/cover.webp',
         thumb: 'img/thumbs/alia.webp',
         preview: 'img/alia/preview.mp4',   // 6 с без звука из второй анимации визуала, 900 КБ
-        video: 'img/alia/film.mp4',
+        /* ролики — не с jsDelivr: крупные файлы этого репозитория он отдает с ошибкой или обрывает на 10 МБ.
+           Их отдает воркер kup-version (tilda/version-worker, адрес /f/<коммит>/img/…) прямо с GitHub, с типом video/mp4 и перемоткой.
+           Заменили ролик — после push поставить номер нового коммита */
+        video: 'https://kup-version.kupdaria26.workers.dev/f/8050ea6a3b0e442d70f5cb724bb6cdba3098d01d/img/alia/film.mp4',
         heroSound: true,
         schemeCols: true,
         scheme: {
@@ -4590,7 +4593,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                     'Концепция вторая: статус — это то, что чувствуешь сам. Выйти в свет, купаться во внимании, смотреть свысока'],
             screen: [
               ['img/alia/value-light.webp', 'img/alia/value-attention.webp'],
-              ['img/alia/value-above.webp', { video: 'img/alia/values.mp4', ratio: 2 }],
+              ['img/alia/value-above.webp', { video: 'https://kup-version.kupdaria26.workers.dev/f/8050ea6a3b0e442d70f5cb724bb6cdba3098d01d/img/alia/values.mp4', ratio: 2 }],
               ['img/alia/value-park.webp', 'img/alia/value-river.webp'],
             ] },
           { read: true, title: ['финансовое предложение', 'про выгоду'],

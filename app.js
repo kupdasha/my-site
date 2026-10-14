@@ -41,7 +41,7 @@ const SCRIPT_BASE = (document.currentScript?.src || [...document.scripts].map(s 
 
 /* СТРАХОВКА ДЛЯ КАРТИНОК: jsDelivr по новому номеру версии иногда отдает файл с ошибкой (403/503), пока не заберет его
    у GitHub. Картинка или ролик не загрузились — пробуем еще раз: растровую картинку сразу с GitHub (raw, ветка main),
-   остальное — снова с jsDelivr через пару секунд; потом еще одна попытка с jsDelivr */
+   остальное — снова с jsDelivr через пару секунд, потом с GitHub */
 addEventListener('error', e => {
   const el = e.target;
   if (!el || !/^(IMG|VIDEO|SOURCE)$/.test(el.tagName)) return;
@@ -50,10 +50,14 @@ addEventListener('error', e => {
          || /^https:\/\/raw\.githubusercontent\.com\/kupdasha\/my-site\/main\/(.+?)(\?.*)?$/.exec(src);
   if (!m) return;
   const n = +(el.dataset.retry || 0);
-  if (n >= 2) return;
+  if (n >= 3) return;
   el.dataset.retry = n + 1;
   const path = m[1], raster = /\.(jpe?g|png|webp|gif|avif)$/i.test(path);
-  const next = n === 0 && raster ? 'https://raw.githubusercontent.com/kupdasha/my-site/main/' + path
+  // ролики: на свежем коммите jsDelivr иногда не отдает крупные файлы («Failed to fetch the requested commit»)
+  // или обрывает их на 10 МБ — после второй неудачи ролик берется прямо с GitHub (raw, ветка main)
+  const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/main/' + path;
+  const next = n === 0 && raster ? raw
+             : n === 2 || (n === 1 && !raster) ? raw
              : SCRIPT_BASE + path + '?r=' + (n + 1);
   setTimeout(() => {
     if (el.tagName === 'SOURCE') { el.src = next; el.parentElement?.load?.(); }
