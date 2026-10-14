@@ -171,18 +171,33 @@ function paletteHTML(c){
 }
 function livePalette(box){
   const pal = box.querySelector('.vs-pal');
+  const stripes = [...pal.querySelectorAll('.vs-stripe')];
   let t, soft = false, on = false;
   const tick = () => { soft = !soft; pal.classList.toggle('soft', soft); t = setTimeout(tick, soft ? 4200 : 2600); };
+  // без наведения (телефон и планшет) подписи сами открываются по очереди, пока не тронули
+  let show, at = 0, idleUntil = 0;
+  const walk = () => {
+    clearTimeout(show);
+    if (!on || still() || !touch) return;
+    show = setTimeout(() => {
+      if (performance.now() > idleUntil) {
+        stripes.forEach(s => s.classList.remove('on'));
+        stripes[at++ % stripes.length].classList.add('on');
+      }
+      walk();
+    }, 2200);
+  };
   onScreen(pal, v => {
     on = v;
     if (v) pal.classList.add('in');
     clearTimeout(t);
-    if (v && !still()) t = setTimeout(tick, 1400);
+    if (v && !still()) { t = setTimeout(tick, 1400); walk(); }
     else if (still()) pal.classList.add('soft');
   }, .35);
-  // на телефоне подпись полосы — по нажатию
-  pal.querySelectorAll('.vs-stripe').forEach(s => s.addEventListener('click', () => {
-    pal.querySelectorAll('.vs-stripe.on').forEach(o => o !== s && o.classList.remove('on'));
+  // нажатие открывает подпись полосы (на телефоне это основной способ)
+  stripes.forEach(s => s.addEventListener('click', () => {
+    idleUntil = performance.now() + 9000;
+    stripes.forEach(o => o !== s && o.classList.remove('on'));
     s.classList.toggle('on');
   }));
 }

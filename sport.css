@@ -90,9 +90,9 @@
   section.vs-kit .vs-legend{margin-top:8px}
   section.vs-kit .vs-viz{order:0;margin-top:8px}
   section.vs-kit .vs-again{order:1;margin:0;justify-self:start}
-  .vs-kitsvg{max-width:340px}
+  .vs-kitsvg{max-width:420px}
   .vs-legend{grid-template-columns:repeat(6,minmax(0,1fr));max-width:none}.vs-el{font-size:16px}}
-@media (max-width:600px){.vs-legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:600px){.vs-legend{grid-template-columns:repeat(3,minmax(0,1fr))}.vs-kitsvg{max-width:320px}}
 
 /* ---------- honor: строка этапов с полоской таймера и canvas ---------- */
 .vs-tabs{display:flex;flex-wrap:wrap;column-gap:clamp(20px,2.6vw,40px);row-gap:4px;border-bottom:1.5px solid color-mix(in srgb,currentColor 14%,transparent);margin-bottom:clamp(18px,2.4vw,32px)}
@@ -135,6 +135,14 @@
 .vs-run{display:flex;gap:clamp(8px,1.4vw,24px);padding-right:clamp(8px,1.4vw,24px)}
 .vs-lineup.run .vs-belt-row{animation:vsRun 70s linear infinite}
 .vs-line-wrap:hover .vs-belt-row{animation-play-state:paused}
+/* на телефоне и планшете лента не едет сама: ее листают пальцем, иначе до дальних форм не добраться */
+@media (hover: none){
+  .vs-line-wrap{overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .vs-line-wrap::-webkit-scrollbar{display:none}
+  .vs-belt-row{animation:none!important;padding-inline:var(--pad)}
+  .vs-run + .vs-run{display:none}
+  .vs-line-wrap .vs-k{scroll-snap-align:center;width:clamp(180px,48vw,260px)}
+}
 @keyframes vsRun{to{transform:translateX(-50%)}}
 .vs-k{flex:none;width:clamp(150px,17vw,250px);padding:0;border:0;background:none;cursor:zoom-in;transition:transform .5s var(--ease)}
 .vs-k img{width:100%;height:auto;display:block}
