@@ -1325,6 +1325,12 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .scr-head h3+p{margin-top:0}
 /* read: true — пояснение набрано как текст кейса: с засечками, черное (см. Alia Alive) */
 .scr-read .scr-head p,.big-sub.read{font-family:var(--font-read);font-weight:400;font-size:18px;line-height:1.5;opacity:1;color:var(--ink)}
+/* на телефоне ряды не лентой, а друг под другом во всю ширину: широкие макеты с текстом видно сразу целиком */
+@media (max-width:760px){
+  .scr-read>.camp-row.fit{flex-direction:column;overflow:visible;scroll-snap-type:none;margin:0;padding:0;gap:8px}
+  .scr-read>.camp-row.fit>.camp-shot{flex:none;width:100%!important}
+  .scr-read>.camp-row.fit+.camp-row.fit{margin-top:8px}
+}
 .scr-proj>.camp-row.fit{max-width:calc((100svh - 150px) * var(--sum, 1.6) + (var(--n) - 1) * clamp(8px,1vw,16px));margin-inline:auto}
 .scr-proj>.camp-row.fit+.camp-row.fit{margin-top:clamp(8px,1vw,16px)}
 /* коллаж проекта: весь не выше экрана, картинки в ячейках целиком (прозрачные рендеры — прямо на фоне страницы) */

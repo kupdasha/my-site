@@ -1216,7 +1216,8 @@ function heroHTML(p){
   // heroImage без heroVideo — в шапке картинка, даже если у проекта есть ролик (он тогда в галерее и задает пропорции карточки, см. Ростех)
   const m = p.heroImage && !p.heroVideo ? null : parseMedia(p.heroVideo || legacyVideo(p));
   // heroSound — ролик со звуком и кнопками управления, запускается по нажатию (см. музыкальный клип)
-  if (m && m.type === 'file' && p.heroSound) return `<video class="hero-full" src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} controls preload="metadata" playsinline></video>`;
+  // heroPoster — своя обложка ролика в его пропорциях (если обложка кейса другой формы, до запуска были бы черные поля, см. Alia Alive)
+  if (m && m.type === 'file' && p.heroSound) return `<video class="hero-full" src="${m.src}" ${p.heroPoster || p.image ? `poster="${p.heroPoster || p.image}"` : ''} controls preload="metadata" playsinline></video>`;
   if (m && m.type === 'file') return `<video src="${m.src}" ${p.image ? `poster="${p.image}"` : ''} muted loop playsinline autoplay></video>`;
   // heroImage — своя картинка в шапке кейса, если она отличается от обложки в сетке;
   // heroRatio — шапка в пропорциях картинки: целиком и без увеличения, карточка в сетке не меняется (см. СДВГ)
