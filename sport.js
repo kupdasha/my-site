@@ -483,6 +483,22 @@ function liveLineup(box, c){
   onScreen(box, v => box.classList.toggle('run', v && !still()), .1);
 }
 
+/* ================================================================
+   shots — финальные кадры формы коллажем в самом конце кейса:
+   первый крупно, рядом вертикальный, дальше во всю ширину и пара;
+   нажатие открывает кадр целиком
+   ================================================================ */
+function shotsHTML(c){
+  return `<div class="vs-shots">${c.photos.map((n, i) => `<button type="button" class="vs-sh" data-i="${i}" aria-label="${esc(H.pick(c.open))}">
+    <img src="${img(n + '.webp')}" srcset="${img(n + '-s.webp')} 760w, ${img(n + '.webp')} 1400w" sizes="(max-width: 900px) 100vw, 66vw" alt="" loading="lazy" decoding="async">
+  </button>`).join('')}</div>`;
+}
+function liveShots(box, c){
+  const imgs = [...box.querySelectorAll('.vs-sh img')];
+  const list = c.photos.map(n => img(n + '.webp'));
+  box.querySelectorAll('.vs-sh').forEach(b => b.addEventListener('click', () => H.openViewer(list, +b.dataset.i, imgs)));
+}
+
 /* ---------- запуск ---------- */
 let cssReady;
 function loadCSS(base){
@@ -509,7 +525,8 @@ export async function mountSport(mount, p, helpers){
     + (s.kit     ? chapter('kit', kitHTML(s.kit, k), s.kit, false, kitCol) : '')
     + (s.honor   ? chapter('honor', honorHTML(s.honor), s.honor, true) : '')
     + (s.art     ? chapter('art', artHTML(s.art), s.art) : '')
-    + (s.lineup  ? `<section class="vs-ch vs-lineup"><div class="wrap vs-lineup-head">${block(s.lineup)}</div>${lineupHTML(s.lineup)}</section>` : '');
+    + (s.lineup  ? `<section class="vs-ch vs-lineup"><div class="wrap vs-lineup-head">${block(s.lineup)}</div>${lineupHTML(s.lineup)}</section>` : '')
+    + (s.shots   ? `<section class="vs-ch wrap vs-shots-ch"><div class="vs-shots-head">${block(s.shots)}</div>${shotsHTML(s.shots)}</section>` : '');
   mount.querySelectorAll('.vs-ch').forEach(el => reveal.observe(el));
   const q = c => mount.querySelector(c);
   if (s.palette) livePalette(q('.vs-palette'));
@@ -517,4 +534,5 @@ export async function mountSport(mount, p, helpers){
   if (s.honor) liveHonor(q('.vs-honor'), s.honor);
   if (s.art) liveArt(q('.vs-art'));
   if (s.lineup) liveLineup(q('.vs-lineup'), s.lineup);
+  if (s.shots) liveShots(q('.vs-shots-ch'), s.shots);
 }
