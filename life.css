@@ -1,0 +1,99 @@
+/* ================================================================
+   КЕЙС «ИМИДЖЕВЫЙ БУКЛЕТ LIFE ВАРШАВСКАЯ» (life.js, поле life у проекта)
+   Внутри иллюстраций — цвета буклета в обеих версиях сайта:
+   темно-зеленая рамка листов #0E6747, серый стол #E6E6E4.
+   ================================================================ */
+.lf{overflow-x:clip;--lf-gap:clamp(72px,9vw,144px);--lf-green:#0E6747;--lf-desk:#E6E6E4}
+.lf-ch{margin-bottom:var(--lf-gap)}
+
+/* ---------- раскладка: картинка 7 колонок, текст 4; rev — картинка справа ---------- */
+.lf-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
+.lf-split > .lf-viz{grid-column:1 / span 7}
+.lf-split > .lf-col{grid-column:9 / -1}
+.lf-split.rev > .lf-viz{grid-column:6 / -1;order:2}
+.lf-split.rev > .lf-col{grid-column:1 / span 4;order:1}
+@media (max-width:900px){
+  .lf-split > .lf-viz,.lf-split > .lf-col,.lf-split.rev > .lf-viz,.lf-split.rev > .lf-col{grid-column:1 / -1}
+  .lf-split > .lf-col,.lf-split.rev > .lf-col{order:-1}
+  .lf-split{row-gap:28px}
+}
+.lf-col{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.lf-title{font-weight:500;font-size:clamp(30px,3.2vw,48px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
+.lf-text{font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;max-width:38ch}
+.lf-head{margin-bottom:clamp(28px,3.5vw,48px)}
+.lf-head .lf-col{max-width:760px}
+
+/* появление */
+.lf-col > *{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.lf-col > :nth-child(2){transition-delay:.08s}.lf-col > :nth-child(n+3){transition-delay:.16s}
+.lf-viz,.lf-grid,.lf-fmts{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .1s,transform 1.1s var(--ease) .1s}
+.lf-ch.in .lf-col > *,.lf-ch.in .lf-viz,.lf-ch.in .lf-grid,.lf-ch.in .lf-fmts{opacity:1;transform:none}
+
+/* ---------- cover: свет по тиснению ---------- */
+.lf-lit{position:relative;overflow:hidden;border-radius:var(--r-img);aspect-ratio:1800/1024;background:var(--lf-desk);cursor:crosshair;touch-action:pan-y}
+.lf-lit img{width:100%;height:100%;object-fit:cover;display:block}
+.lf-lit span{position:absolute;inset:0;pointer-events:none}
+/* вокруг света чуть темнее, у курсора — блик: рельеф листа становится резче */
+.lf-shade{background:radial-gradient(circle at var(--x) var(--y),transparent 0,transparent 14%,rgba(10,30,20,.34) 58%);mix-blend-mode:multiply}
+.lf-glow{background:radial-gradient(circle at var(--x) var(--y),rgba(255,255,255,.75) 0,rgba(255,255,255,.22) 16%,transparent 36%);mix-blend-mode:soft-light}
+.lf-macro{display:block;width:100%;max-width:360px;padding:0;border:0;background:none;border-radius:calc(var(--r-img) * .7);overflow:hidden;cursor:zoom-in}
+.lf-macro img{width:100%;aspect-ratio:1800/1024;object-fit:cover;display:block;transition:transform .8s var(--ease)}
+.lf-macro:hover img{transform:scale(1.05)}
+
+/* ---------- строка надписей: текущая темная, под ней — полоска таймера ---------- */
+.lf-tabs{display:flex;flex-wrap:wrap;column-gap:clamp(20px,2.6vw,40px);row-gap:4px;border-bottom:1.5px solid color-mix(in srgb,currentColor 14%,transparent);margin-bottom:clamp(20px,2.6vw,36px)}
+.lf-tab{position:relative;padding:0 0 14px;margin-bottom:-1.5px;font-size:clamp(20px,1.7vw,26px);font-weight:500;line-height:1.15;white-space:nowrap;color:inherit;
+  background:none;border:0;opacity:.38;cursor:pointer;transition:opacity .35s}
+.lf-tab:hover{opacity:.75}
+.lf-tab[aria-selected="true"]{opacity:1}
+.lf-tick{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;transition:opacity .3s}
+.lf-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%}
+.lf-tab[aria-selected="true"] .lf-tick{opacity:1}
+.lf-tab.run .lf-tick::after{animation:lfTick var(--ms) linear both}
+@keyframes lfTick{from{transform:scaleX(0)}to{transform:none}}
+@media (max-width:760px){
+  .lf-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad)}
+  .lf-tabs::-webkit-scrollbar{display:none}
+  .lf-tab{flex:none}
+}
+
+/* ---------- layers: стопка листов карты ---------- */
+.lf-desk{--tx:0deg;--ty:0deg;position:relative;display:grid;place-items:center;aspect-ratio:1/1;max-height:84vh;border-radius:var(--r-img);background:var(--lf-desk);overflow:hidden;perspective:1800px;color:#000}
+.lf-stack{position:relative;width:min(54%,480px);aspect-ratio:519/685;container-type:inline-size;transform-style:preserve-3d;
+  transform:rotateX(calc(var(--rx,0deg) + var(--ty))) rotateZ(calc(var(--rz,0deg) + var(--tx) * .4)) rotateY(calc(var(--tx) * .5)) scale(var(--sc,1.12));
+  transition:transform 1.3s cubic-bezier(.65,0,.35,1)}
+.lf-sh{position:absolute;inset:0;border:2.5cqw solid var(--lf-green);background:rgba(255,255,255,.1);
+  transform:translateZ(calc(var(--i) * var(--gap,0px) + var(--lift,0px)));transition:transform 1.3s cubic-bezier(.65,0,.35,1),opacity .6s,box-shadow 1s}
+.lf-sh img{width:100%;height:100%;display:block;transition:opacity .6s}
+.lf-sh-base{background:#fff;box-shadow:0 2cqw 6cqw rgba(0,0,0,.12)}
+/* вместе: сложены, карта целиком; слой — стопка раскрыта, нужный лист поднят */
+.lf-desk:not([data-k="all"]) .lf-stack{--rx:44deg;--rz:-28deg;--sc:.98}
+.lf-desk:not([data-k="all"]) .lf-sh{--gap:9cqw}
+.lf-desk:not([data-k="all"]) .lf-sh:not(.lf-sh-base) img{opacity:.22}
+.lf-desk[data-k="kids"] .lf-sh-kids,.lf-desk[data-k="sport"] .lf-sh-sport,.lf-desk[data-k="park"] .lf-sh-park{--lift:calc(40cqw - var(--i) * 9cqw);background:rgba(255,255,255,.06);box-shadow:0 3cqw 8cqw rgba(0,0,0,.1)}
+.lf-desk[data-k="kids"] .lf-stack .lf-sh.lf-sh-kids img,.lf-desk[data-k="sport"] .lf-stack .lf-sh.lf-sh-sport img,.lf-desk[data-k="park"] .lf-stack .lf-sh.lf-sh-park img{opacity:1}
+@media (prefers-reduced-motion:reduce){.lf-stack,.lf-sh{transition:none}}
+@media (max-width:600px){.lf-stack{width:58%}.lf-desk:not([data-k="all"]) .lf-stack{--sc:.8}}
+
+/* ---------- spreads: развороты коллажем ---------- */
+.lf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1vw,16px)}
+.lf-cell{display:block;padding:0;border:0;background:var(--lf-desk);border-radius:var(--r-img);overflow:hidden;cursor:zoom-in;aspect-ratio:1800/1024}
+.lf-cell1{grid-column:1 / -1}
+.lf-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s var(--ease)}
+.lf-cell:hover img{transform:scale(1.04)}
+@media (max-width:600px){.lf-grid{grid-template-columns:1fr}}
+
+/* ---------- outdoor: щит и форматы, «плашка / градиент» ---------- */
+.lf-board,.lf-fmt{position:relative;display:grid;overflow:hidden}
+.lf-board{border-radius:var(--r-img);aspect-ratio:1800/1012;background:var(--lf-desk)}
+.lf-board img,.lf-fmt img{grid-area:1 / 1;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .9s var(--ease)}
+[data-k="plate"] > .lf-b-plate,[data-k="grad"] > .lf-b-grad,
+[data-k="plate"] .lf-fmt > .lf-b-plate,[data-k="grad"] .lf-fmt > .lf-b-grad{opacity:1}
+.lf-fmts{display:grid;gap:clamp(8px,1vw,16px);margin-top:clamp(32px,4vw,56px)}
+.lf-row{display:flex;gap:clamp(8px,1vw,16px);max-width:1180px}
+.lf-fmt{flex:var(--r) 1 0;min-width:0;aspect-ratio:var(--r);padding:0;border:0;background:var(--lf-green);cursor:zoom-in}
+@media (max-width:600px){.lf-row:last-child{flex-direction:column}.lf-row:last-child .lf-fmt{flex:none;width:100%}}
+/* у поднятого листа объекты отбрасывают тень на нижние — видно, что они на прозрачной странице */
+.lf-desk[data-k="kids"] .lf-sh-kids img,.lf-desk[data-k="sport"] .lf-sh-sport img,.lf-desk[data-k="park"] .lf-sh-park img{filter:drop-shadow(0 1.2cqw .8cqw rgba(0,40,20,.28))}
+.lf-sh-park img{filter:saturate(1.8) contrast(1.15)}
+.lf-desk[data-k="park"] .lf-sh-park img{filter:saturate(1.8) contrast(1.15) drop-shadow(0 1.2cqw .8cqw rgba(0,40,20,.28))}
