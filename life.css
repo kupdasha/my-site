@@ -73,7 +73,7 @@
 .lf-desk[data-k="kids"] .lf-sh-kids,.lf-desk[data-k="sport"] .lf-sh-sport,.lf-desk[data-k="park"] .lf-sh-park{--lift:calc(40cqw - var(--i) * 9cqw);background:rgba(255,255,255,.06);box-shadow:0 3cqw 8cqw rgba(0,0,0,.1)}
 .lf-desk[data-k="kids"] .lf-stack .lf-sh.lf-sh-kids img,.lf-desk[data-k="sport"] .lf-stack .lf-sh.lf-sh-sport img,.lf-desk[data-k="park"] .lf-stack .lf-sh.lf-sh-park img{opacity:1}
 @media (prefers-reduced-motion:reduce){.lf-stack,.lf-sh{transition:none}}
-@media (max-width:600px){.lf-stack{width:58%}.lf-desk:not([data-k="all"]) .lf-stack{--sc:.8}}
+@media (max-width:600px){.lf-stack{width:60%}.lf-desk:not([data-k="all"]) .lf-stack{--sc:.8}}
 
 /* ---------- paper: рендеры с калькой — большой слева, два справа ---------- */
 .lf-paper{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:clamp(8px,1vw,16px)}
@@ -98,10 +98,30 @@
 .lf-fmts{display:grid;gap:clamp(8px,1vw,16px);margin-top:clamp(32px,4vw,56px)}
 .lf-row{display:flex;gap:clamp(8px,1vw,16px);max-width:1180px}
 .lf-fmt{flex:var(--r) 1 0;min-width:0;aspect-ratio:var(--r);padding:0;border:0;background:var(--lf-green);cursor:zoom-in}
-@media (max-width:600px){.lf-row:last-child{flex-direction:column}.lf-row:last-child .lf-fmt{flex:none;width:100%}}
+@media (max-width:600px){.lf-row{flex-direction:column;align-items:flex-start}.lf-fmt{flex:none;width:100%}.lf-fmt[data-f="v"]{width:62%}}
 /* у поднятого листа объекты отбрасывают тень на нижние — видно, что они на прозрачной странице */
 .lf-desk[data-k="kids"] .lf-sh-kids img,.lf-desk[data-k="sport"] .lf-sh-sport img,.lf-desk[data-k="park"] .lf-sh-park img{filter:drop-shadow(0 1.2cqw .8cqw rgba(0,40,20,.28))}
 .lf-sh-park img{filter:saturate(1.8) contrast(1.15)}
 .lf-desk[data-k="park"] .lf-sh-park img{filter:saturate(1.8) contrast(1.15) drop-shadow(0 1.2cqw .8cqw rgba(0,40,20,.28))}
 /* калька над схемой: отступ снизу — как между главами, но меньше */
 .lf-top .lf-ch{margin-bottom:clamp(48px,6vw,96px)}
+
+/* ---------- телефон и планшет ---------- */
+@media (max-width:900px){
+  /* обложка: текст, потом обложка со светом, макро тиснения — после нее, во всю ширину */
+  .lf-cover{row-gap:18px}
+  .lf-cover .lf-col{display:contents}
+  .lf-cover .lf-col > *{grid-column:1 / -1;justify-self:start}
+  .lf-cover .lf-viz{order:1;margin-top:10px}
+  .lf-cover .lf-macro{order:2;max-width:none}
+  .lf-lit{cursor:auto}
+}
+@media (max-width:600px){
+  .lf-tabs{column-gap:16px}
+  .lf-tab{font-size:18px}
+}
+@media (min-width:601px) and (max-width:900px){
+  .lf-cover .lf-macro{width:50%}
+  .lf-desk{max-height:none}
+  .lf-desk:not([data-k="all"]) .lf-stack{--sc:.86}
+}
