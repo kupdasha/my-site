@@ -2521,7 +2521,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
           { ctStories: {
             items: [
               { title: 'Мороз', frames: ['img/cartoon/st1-0.jpg', 'img/cartoon/st1-1.jpg', 'img/cartoon/st1-2.jpg', 'img/cartoon/st1-3.jpg'],
-                views: 12000,   // большое число в лаймовом блоке, считается от нуля
+                views: 13000,   // большое число в лаймовом блоке, считается от нуля
                 note: ['просмотров набрала сторис «Мороз» с мандарином в одной из соцсетей', 'раз посмотрели сторис с мандарином'],
                 link: 'https://www.instagram.com/reel/DdyKqxXqRzd/', linkText: ['смотреть', 'смотреть'] },
               { title: 'Хоттабыч', frames: ['img/cartoon/st2-0.jpg', 'img/cartoon/st2-1.jpg', 'img/cartoon/st2-2.jpg', 'img/cartoon/st2-3.jpg'] },
