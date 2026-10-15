@@ -1,5 +1,8 @@
 /* ================================================================
    КЕЙС «ИМИДЖЕВЫЙ БУКЛЕТ LIFE ВАРШАВСКАЯ» (поле life у проекта, страница NDA)
+   paper   — в начале: рендеры с калькой коллажем (большой — листы
+             перелистываются, рядом разворот и крупный план карты),
+             крупно по нажатию;
    cover   — обложка: свет скользит по конгревному тиснению за курсором,
              без касания ходит сам; под текстом — макро тиснения, крупно
              по нажатию;
@@ -60,6 +63,14 @@ function autoTabs(box, tabsEl, ms, set){
     if (v && !hand && !still()) { go(at, true); next(); } else clearTimeout(t);
   }, .35);
   go(0, false);
+}
+
+/* ================================================================
+   paper — рендеры с калькой: большой слева, два справа
+   ================================================================ */
+function paperHTML(c){
+  return `<div class="lf-paper">${c.imgs.map((n, i) =>
+    `<button type="button" class="lf-cell lf-pp${i + 1}" data-i="${i}" aria-label="${esc(H.pick(c.open))}"><img ${pic(n, i ? '(max-width: 900px) 100vw, 32vw' : '(max-width: 900px) 100vw, 64vw')} alt="" decoding="async"></button>`).join('')}</div>`;
 }
 
 /* ================================================================
@@ -128,6 +139,7 @@ function spreadsHTML(c){
   return `<div class="lf-grid">${c.imgs.map((n, i) =>
     `<button type="button" class="lf-cell lf-cell${i + 1}" data-i="${i}" aria-label="${esc(H.pick(c.open))}"><img ${pic(n, i ? '(max-width: 600px) 100vw, 45vw' : '(max-width: 900px) 100vw, 90vw')} alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`;
 }
+// коллаж: нажатие — крупно, листается по всем картинкам главы
 function liveSpreads(box, c){
   const cells = [...box.querySelectorAll('.lf-cell')];
   const list = c.imgs.map(n => img(n + '.webp'));
@@ -178,12 +190,22 @@ export async function mountLife(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   const s = p.life;
   mount.innerHTML =
-      (s.cover   ? chapter('cover', coverHTML(s.cover), s.cover, false, coverExtra(s.cover)) : '')
+      (s.paper   ? `<section class="lf-ch lf-paper-ch"><div class="wrap lf-head">${block(s.paper)}</div><div class="wrap">${paperHTML(s.paper)}</div></section>` : '')
+    + (s.cover   ? chapter('cover', coverHTML(s.cover), s.cover, false, coverExtra(s.cover)) : '')
     + (s.layers  ? chapter('layers', tabsHTML(s.layers.tabs, 'lf-tabs-map') + layersHTML(s.layers), s.layers, true) : '')
     + (s.spreads ? `<section class="lf-ch lf-spreads"><div class="wrap lf-head">${block(s.spreads)}</div><div class="wrap">${spreadsHTML(s.spreads)}</div></section>` : '')
     + (s.outdoor ? `<section class="lf-ch lf-outdoor"><div class="wrap lf-split"><div class="lf-viz">${tabsHTML(s.outdoor.tabs, 'lf-tabs-board')}${outdoorHTML(s.outdoor)}</div>${block(s.outdoor)}</div>${formatsHTML(s.outdoor)}</section>` : '');
-  mount.querySelectorAll('.lf-ch').forEach(el => reveal.observe(el));
+  // калька — в самом начале кейса, выше задачи и роли: сразу видно, что страницы прозрачные
+  const paper = mount.querySelector('.lf-paper-ch'), scheme = mount.parentElement.querySelector(':scope > .wrap:has(.camp-head)');
+  if (paper && scheme) {
+    const top = document.createElement('div');
+    top.className = 'lf lf-top';
+    top.appendChild(paper);
+    scheme.before(top);
+  }
+  mount.parentElement.querySelectorAll('.lf-ch').forEach(el => reveal.observe(el));
   const q = c => mount.querySelector(c);
+  if (paper) liveSpreads(paper, s.paper);
   if (s.cover) liveCover(q('.lf-cover'), s.cover);
   if (s.layers) liveLayers(q('.lf-layers'), s.layers);
   if (s.spreads) liveSpreads(q('.lf-spreads'), s.spreads);
