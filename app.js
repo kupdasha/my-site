@@ -118,6 +118,12 @@ if (isNdaPage) {
   <div id="caseContent"></div>
 </div>`);
 }
+/* Страница NDA: проекты по годам — сверху самые новые, внизу самые старые. Год — последний в поле year
+   («2023–2025» → 2025); при одинаковом годе — как в списке content.js; без года — в самом низу */
+if (SITE.ndaPage && Array.isArray(SITE.ndaPage.items)) {
+  const lastYear = p => Math.max(0, ...(String(p.year || '').match(/\d{4}/g) || []).map(Number));
+  SITE.ndaPage.items = SITE.ndaPage.items.map((p, i) => [p, i]).sort((a, b) => lastYear(b[0]) - lastYear(a[0]) || a[1] - b[1]).map(x => x[0]);
+}
 /* Разделы, которых нет на этой странице (на Тильде у каждой страницы свои тексты), — пустые */
 ['works', 'nda', 'directions', 'clients', 'about'].forEach(k => { SITE[k] = SITE[k] || {}; });
 SITE.works.items = SITE.works.items || []; SITE.nda.items = SITE.nda.items || [];
