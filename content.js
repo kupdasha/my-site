@@ -4824,6 +4824,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
       },
       {
         title: 'Новый век',
+        year:  '2026',
         tag:   'сайт банка',
         short: 'Анимационный прототип сайта банка для бизнеса и частных лиц',
         image: 'img/novyi-vek.jpg',

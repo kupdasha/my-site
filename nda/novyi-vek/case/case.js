@@ -25,7 +25,7 @@ function nvCase(){
         '<i class="hs-blik"></i>'+
         '<svg class="hs-vec" viewBox="-6 -6 232 227">'+L.new.flower.map(function(d,i){ return '<path class="hv hv'+i+'" d="'+d+'"/>'; }).join('')+'</svg>'+
       '</div><i class="hs-shadow"></i></div>'+
-      '<div class="hs-text"><h1 data-t="title"></h1><p class="hs-sub">'+B.heroSub+'</p><div class="tags"></div></div>'+
+      '<div class="hs-text"><h1><span data-t="title"></span>'+(T.year?'<sup class="yr">'+T.year+'</sup>':'')+'</h1><p class="hs-sub">'+B.heroSub+'</p><div class="tags"></div></div>'+
     '</div></section>';
 
   /* ================= история ================= */

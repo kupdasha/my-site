@@ -33,6 +33,7 @@ body{overflow-x:clip}
 .hero-scene.lit .hs-shadow{opacity:1}
 .hs-text{position:absolute;left:0;right:0;bottom:9vh;max-width:var(--max);margin:0 auto;padding:0 var(--pad);will-change:transform,opacity}
 .hs-text h1{margin:0 0 10px}
+.hs-text .yr{display:inline-block;vertical-align:top;margin:.2em 0 0 .35em;font-size:16px;font-weight:500;line-height:1;letter-spacing:0;opacity:.5}
 .hs-text h1,.hs-sub,.hs-text .tags{opacity:0;transform:translateY(40px);transition:opacity .9s ease,transform 1.1s var(--ease)}
 .hs-sub{font-size:clamp(22px,2.4vw,32px);margin-bottom:22px}
 .hero-scene.play .hs-text h1{opacity:1;transform:none;transition-delay:1.5s}
