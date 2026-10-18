@@ -34,10 +34,13 @@ export default {
     const u = new URL(req.url);
     const f = u.pathname.match(/^\/f\/([0-9a-f]{40})\/(img\/.+)$/);
     if (f) return file(req, f[1], decodeURIComponent(f[2]));
-    const cache = caches.default, key = new Request('https://kup-version.cache/main');
+    // ?repo=army-sport — номер версии другого репозитория kupdasha (презентация «Армия спорта»)
+    const repo = (u.searchParams.get('repo') || 'my-site').replace(/[^a-z0-9-]/gi, '');
+    const refs = `https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`;
+    const cache = caches.default, key = new Request('https://kup-version.cache/' + repo);
     const hit = await cache.match(key);
     if (hit) return new Response(await hit.text(), { headers: { ...CORS, 'Cache-Control': 'no-store' } });
-    const r = await fetch(REFS, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
+    const r = await fetch(refs, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
     const m = r.ok && (await r.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/);
     if (!m) return new Response('', { status: 502, headers: CORS });
     ctx.waitUntil(cache.put(key, new Response(m[1], { headers: { 'Cache-Control': 'max-age=5' } })));
