@@ -4977,6 +4977,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         { src: 'img/events/ev-66.jpg', thumb: 'img/events/ev-66-s.jpg', ratio: 0.56, caption: 'Подкаст «Одна кавычка»', focus: '50% 30%' },
         { src: 'img/events/ev-67.jpg', thumb: 'img/events/ev-67-s.jpg', ratio: 0.8, caption: 'Новый год «Сетки»', focus: '50% 21%' },
         { src: 'img/events/ev-70.jpg', thumb: 'img/events/ev-70-s.jpg', ratio: 0.8, caption: 'Церемония награждения Серебряного Меркурия', focus: '50% 22%' },
+        { src: 'img/events/ev-71.jpg', thumb: 'img/events/ev-71-s.jpg', ratio: 1.5, caption: "журила Russian Design Cup '26", focus: '67% 30%' },
+        { src: 'img/events/ev-72.jpg', thumb: 'img/events/ev-72-s.jpg', ratio: 1.5, caption: "журила Russian Design Cup '26", focus: '24% 30%' },
+        { src: 'img/events/ev-73.jpg', thumb: 'img/events/ev-73-s.jpg', ratio: 0.67, caption: "журила Russian Design Cup '26", focus: '52% 34%' },
+        { src: 'img/events/ev-74.jpg', thumb: 'img/events/ev-74-s.jpg', ratio: 1.5, caption: "журила Russian Design Cup '26", focus: '44% 45%' },
+        { src: 'img/events/ev-75.jpg', thumb: 'img/events/ev-75-s.jpg', ratio: 0.67, caption: "журила Russian Design Cup '26", focus: '56% 46%' },
       ],
     },
     /* в дружеской версии фотографии — колода, как в приложении знакомств */
