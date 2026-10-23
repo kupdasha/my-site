@@ -33,11 +33,13 @@ export default {
   async fetch(req, env, ctx) {
     const u = new URL(req.url);
     // /armysport — свежая сборка презентации «Армия спорта» прямо с GitHub, без Тильды:
-    // index.html по последнему коммиту, файлы (as.css, as.js, img, fonts) — с jsDelivr по тому же номеру
-    if (u.pathname === '/armysport' || u.pathname === '/armysport/') {
+    // index.html по последнему коммиту, файлы (as.css, as.js, img, fonts) — с jsDelivr по тому же номеру;
+    // /armysport2 — второй этап (stage2.html), первый остается по старой ссылке
+    const stage = { '/armysport': 'index.html', '/armysport/': 'index.html', '/armysport2': 'stage2.html', '/armysport2/': 'stage2.html' }[u.pathname];
+    if (stage) {
       const r0 = await fetch('https://github.com/kupdasha/army-sport.git/info/refs?service=git-upload-pack', { headers: { 'User-Agent': 'git/2.40 kup-version' } });
       const sha = ((r0.ok && (await r0.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/)) || [])[1] || 'main';
-      const page = await fetch(`https://raw.githubusercontent.com/kupdasha/army-sport/${sha}/index.html`);
+      const page = await fetch(`https://raw.githubusercontent.com/kupdasha/army-sport/${sha}/${stage}`);
       if (!page.ok) return new Response('нет страницы', { status: 502, headers: CORS });
       const html = (await page.text()).replace('<head>', `<head><base href="https://cdn.jsdelivr.net/gh/kupdasha/army-sport@${sha}/">`);
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
