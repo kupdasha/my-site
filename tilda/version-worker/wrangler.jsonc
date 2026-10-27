@@ -2,6 +2,7 @@
   "name": "kup-version",
   "main": "worker.js",
   "compatibility_date": "2026-10-01",
-  // статические страницы (тестовое в Альфа-Банк — /alfa/): отдаются из public до кода воркера; в git не идут
-  "assets": { "directory": "./public", "html_handling": "auto-trailing-slash", "not_found_handling": "none" }
+  // статические страницы (тестовое в Альфа-Банк — /alfa/): отдаются из public до кода воркера; в git не идут;
+  // ролики .mp4 идут через код воркера — он отдает их частями (Range), иначе Safari видео не играет
+  "assets": { "directory": "./public", "binding": "ASSETS", "html_handling": "auto-trailing-slash", "not_found_handling": "none", "run_worker_first": ["/alfa/*.mp4"] }
 }

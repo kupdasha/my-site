@@ -29,9 +29,23 @@ async function file(req, sha, path) {
   return new Response(r.body, { status: r.status, headers: out });
 }
 
+async function rangeAsset(req, env) {
+  const r = await env.ASSETS.fetch(new Request(req.url));
+  if (!r.ok) return r;
+  const buf = await r.arrayBuffer(), size = buf.byteLength;
+  const h = { 'Content-Type': 'video/mp4', 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=3600' };
+  const m = (req.headers.get('Range') || '').match(/bytes=(\d*)-(\d*)/);
+  if (!m) return new Response(buf, { headers: { ...h, 'Content-Length': size } });
+  let a = m[1] === '' ? size - +m[2] : +m[1], b = m[1] !== '' && m[2] !== '' ? Math.min(+m[2], size - 1) : size - 1;
+  if (a >= size || a < 0) return new Response('', { status: 416, headers: { ...h, 'Content-Range': `bytes */${size}` } });
+  return new Response(buf.slice(a, b + 1), { status: 206, headers: { ...h, 'Content-Range': `bytes ${a}-${b}/${size}`, 'Content-Length': b - a + 1 } });
+}
+
 export default {
   async fetch(req, env, ctx) {
     const u = new URL(req.url);
+    // ролики из статики (/alfa/*.mp4) — частями по запросу Range: статика Cloudflare отдает файл только целиком, а Safari без 206 не играет
+    if (env.ASSETS && u.pathname.endsWith('.mp4')) return rangeAsset(req, env);
     // /armysport — свежая сборка презентации «Армия спорта» прямо с GitHub, без Тильды:
     // index.html по последнему коммиту, файлы (as.css, as.js, img, fonts) — с jsDelivr по тому же номеру;
     // /armysport2 — второй этап (stage2.html), первый остается по старой ссылке
