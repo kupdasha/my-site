@@ -1,5 +1,7 @@
 {
   "name": "kup-version",
   "main": "worker.js",
-  "compatibility_date": "2026-10-01"
+  "compatibility_date": "2026-10-01",
+  // статические страницы (тестовое в Альфа-Банк — /alfa/): отдаются из public до кода воркера; в git не идут
+  "assets": { "directory": "./public", "html_handling": "auto-trailing-slash", "not_found_handling": "none" }
 }
