@@ -45,6 +45,18 @@ async function rangeAsset(req, env) {
   return new Response(buf.slice(a, b + 1), { status: 206, headers: { ...h, 'Content-Range': `bytes ${a}-${b}/${size}`, 'Content-Length': b - a + 1 } });
 }
 
+// последний коммит main репозитория kupdasha/<repo>: читается из git на GitHub, держится в кеше узла 5 секунд
+async function latestSha(repo, ctx) {
+  const cache = caches.default, key = new Request('https://kup-version.cache/' + repo);
+  const hit = await cache.match(key);
+  if (hit) return hit.text();
+  const r = await fetch(`https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
+  const m = r.ok && (await r.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/);
+  if (!m) return 'main';
+  ctx.waitUntil(cache.put(key, new Response(m[1], { headers: { 'Cache-Control': 'max-age=5' } })));
+  return m[1];
+}
+
 export default {
   async fetch(req, env, ctx) {
     const u = new URL(req.url);
@@ -60,9 +72,10 @@ export default {
     const pg = PAGES[u.pathname.replace(/\/$/, '')];
     if (pg) {
       const [repo, file] = pg;
-      const r0 = await fetch(`https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
-      const sha = ((r0.ok && (await r0.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/)) || [])[1] || 'main';
-      const page = await fetch(`https://raw.githubusercontent.com/kupdasha/${repo}/${sha}/${file}`);
+      // номер коммита — из кеша узла (5 с), HTML по номеру коммита не меняется — кеш на год:
+      // без этого каждое открытие страницы ходило на GitHub дважды, с узла в России это секунды
+      const sha = await latestSha(repo, ctx);
+      const page = await fetch(`https://raw.githubusercontent.com/kupdasha/${repo}/${sha}/${file}`, { cf: { cacheEverything: true, cacheTtl: sha === 'main' ? 30 : 31536000 } });
       // репозитория (пока) нет — страница отдается из статики воркера (public/alfa), как раньше
       if (!page.ok) return env.ASSETS ? env.ASSETS.fetch(new Request(new URL('/alfa/index.html', req.url))) : new Response('нет страницы', { status: 502, headers: CORS });
       const html = (await page.text()).replace('<head>', `<head><base href="https://cdn.jsdelivr.net/gh/kupdasha/${repo}@${sha}/">`);
