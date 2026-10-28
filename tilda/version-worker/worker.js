@@ -33,7 +33,11 @@ async function rangeAsset(req, env) {
   const r = await env.ASSETS.fetch(new Request(req.url));
   if (!r.ok) return r;
   const buf = await r.arrayBuffer(), size = buf.byteLength;
-  const h = { 'Content-Type': 'video/mp4', 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=3600' };
+  // ETag — версия файла: если ролик перезалили под тем же адресом, телефон не склеит старые куски с новыми
+  const etag = r.headers.get('ETag') || `"${size}"`;
+  const h = { 'Content-Type': 'video/mp4', 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=600, must-revalidate', 'ETag': etag };
+  const ir = req.headers.get('If-Range');
+  if (ir && ir !== etag) return new Response(buf, { headers: { ...h, 'Content-Length': size } });
   const m = (req.headers.get('Range') || '').match(/bytes=(\d*)-(\d*)/);
   if (!m) return new Response(buf, { headers: { ...h, 'Content-Length': size } });
   let a = m[1] === '' ? size - +m[2] : +m[1], b = m[1] !== '' && m[2] !== '' ? Math.min(+m[2], size - 1) : size - 1;
@@ -49,13 +53,19 @@ export default {
     // /armysport — свежая сборка презентации «Армия спорта» прямо с GitHub, без Тильды:
     // index.html по последнему коммиту, файлы (as.css, as.js, img, fonts) — с jsDelivr по тому же номеру;
     // /armysport2 — второй этап (stage2.html), первый остается по старой ссылке
-    const stage = { '/armysport': 'index.html', '/armysport/': 'index.html', '/armysport2': 'stage2.html', '/armysport2/': 'stage2.html' }[u.pathname];
-    if (stage) {
-      const r0 = await fetch('https://github.com/kupdasha/army-sport.git/info/refs?service=git-upload-pack', { headers: { 'User-Agent': 'git/2.40 kup-version' } });
+    // Страницы, у которых HTML берется с GitHub по последнему коммиту main, а файлы (css, js, img, fonts) — с jsDelivr
+    // по номеру того же коммита: /armysport и /armysport2 — «Армия спорта», /alfa — тестовое в Альфа-Банк.
+    // Так файлы не идут через workers.dev: в России его часто душат, а jsDelivr проходит.
+    const PAGES = { '/armysport': ['army-sport', 'index.html'], '/armysport2': ['army-sport', 'stage2.html'], '/alfa': ['alfa', 'index.html'] };
+    const pg = PAGES[u.pathname.replace(/\/$/, '')];
+    if (pg) {
+      const [repo, file] = pg;
+      const r0 = await fetch(`https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
       const sha = ((r0.ok && (await r0.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/)) || [])[1] || 'main';
-      const page = await fetch(`https://raw.githubusercontent.com/kupdasha/army-sport/${sha}/${stage}`);
-      if (!page.ok) return new Response('нет страницы', { status: 502, headers: CORS });
-      const html = (await page.text()).replace('<head>', `<head><base href="https://cdn.jsdelivr.net/gh/kupdasha/army-sport@${sha}/">`);
+      const page = await fetch(`https://raw.githubusercontent.com/kupdasha/${repo}/${sha}/${file}`);
+      // репозитория (пока) нет — страница отдается из статики воркера (public/alfa), как раньше
+      if (!page.ok) return env.ASSETS ? env.ASSETS.fetch(new Request(new URL('/alfa/index.html', req.url))) : new Response('нет страницы', { status: 502, headers: CORS });
+      const html = (await page.text()).replace('<head>', `<head><base href="https://cdn.jsdelivr.net/gh/kupdasha/${repo}@${sha}/">`);
       return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
     }
     const f = u.pathname.match(/^\/f\/([0-9a-f]{40})\/(img\/.+)$/);
