@@ -64,11 +64,11 @@ export default {
     if (env.ASSETS && u.pathname.endsWith('.mp4')) return rangeAsset(req, env);
     // /armysport — свежая сборка презентации «Армия спорта» прямо с GitHub, без Тильды:
     // index.html по последнему коммиту, файлы (as.css, as.js, img, fonts) — с jsDelivr по тому же номеру;
-    // /armysport2 — второй этап (stage2.html), /armysport3 — третья доработка (stage3.html); прошлые остаются по своим ссылкам
+    // /armysport2 — второй этап (stage2.html), /armysport3 — третья доработка (stage3.html), /armysport4 — четвертая (stage4.html); прошлые остаются по своим ссылкам
     // Страницы, у которых HTML берется с GitHub по последнему коммиту main, а файлы (css, js, img, fonts) — с jsDelivr
-    // по номеру того же коммита: /armysport, /armysport2 и /armysport3 — «Армия спорта», /alfa — тестовое в Альфа-Банк.
+    // по номеру того же коммита: /armysport, /armysport2, /armysport3 и /armysport4 — «Армия спорта», /alfa — тестовое в Альфа-Банк.
     // Так файлы не идут через workers.dev: в России его часто душат, а jsDelivr проходит.
-    const PAGES = { '/armysport': ['army-sport', 'index.html'], '/armysport2': ['army-sport', 'stage2.html'], '/armysport3': ['army-sport', 'stage3.html'], '/alfa': ['alfa', 'index.html'] };
+    const PAGES = { '/armysport': ['army-sport', 'index.html'], '/armysport2': ['army-sport', 'stage2.html'], '/armysport3': ['army-sport', 'stage3.html'], '/armysport4': ['army-sport', 'stage4.html'], '/alfa': ['alfa', 'index.html'] };
     const pg = PAGES[u.pathname.replace(/\/$/, '')];
     if (pg) {
       const [repo, file] = pg;
