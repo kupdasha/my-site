@@ -84,7 +84,7 @@
 .sp-show-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s var(--ease),transform 1.2s var(--ease)}
 .sp-show-img img.on{opacity:1}
 .sp-show:hover .sp-show-img img{transform:scale(1.03)}
-.sp-show-name{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-top:14px;font-weight:500;font-size:clamp(23px,2.2vw,32px)}
+.sp-show-name{display:flex;align-items:baseline;gap:.4em;margin-top:14px;font-weight:500;font-size:clamp(23px,2.2vw,32px)}
 .sp-show .arr{transition:transform .45s var(--ease)}
 .sp-show:hover .arr{transform:translateX(5px)}
 
@@ -112,3 +112,4 @@
 
 /* мелкий текст — шрифтом с засечками, как на остальном сайте */
 .sp-lead,.sp-note,.sp-topic-in p,.sp-bio-text p,.sp-org-text,#contact .lead{font-family:var(--font-read)}
+#contactLinks .arr{display:none}
