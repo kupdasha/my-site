@@ -23,7 +23,15 @@ export function mountSpeaker(S, helpers){
     // app.js мог заранее поставить preload: адрес берем у него, браузер возьмет файл из кеша
     const pre = document.querySelector('link[rel="preload"][href*="speaker.css"]');
     const l = document.createElement('link'); l.rel = 'stylesheet';
-    l.href = pre ? pre.href : H.base + 'speaker.css?v=' + Date.now(); document.head.appendChild(l);
+    l.href = pre ? pre.href : H.base + 'speaker.css?v=' + Date.now();
+    // репозиторий больше 50 МБ: jsDelivr иногда отвечает на файл ошибкой — тогда стили берутся с GitHub и вставляются в страницу
+    l.onerror = () => {
+      const m = /my-site@([0-9a-f]{40})\//.exec(l.href);
+      fetch(`https://raw.githubusercontent.com/kupdasha/my-site/${m ? m[1] : 'main'}/speaker.css`).then(r => r.text()).then(css => {
+        const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+      }).catch(() => {});
+    };
+    document.head.appendChild(l);
   }
   const E = SITE.photos.events;
   $('#speakerMail').href = 'mailto:' + S.email;
