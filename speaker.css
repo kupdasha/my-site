@@ -109,3 +109,6 @@
 @media (prefers-reduced-motion:reduce){
   .sp-icon *{animation:none!important}
 }
+
+/* мелкий текст — шрифтом с засечками, как на остальном сайте */
+.sp-lead,.sp-note,.sp-topic-in p,.sp-bio-text p,.sp-org-text,#contact .lead{font-family:var(--font-read)}

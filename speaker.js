@@ -47,6 +47,8 @@ export async function mountSpeaker(S, helpers){
     };
     document.head.appendChild(l);
   }
+  // абзацы первого блока — с точкой, хотя в двух из них по одному предложению: типограф ее убирает, рядом с первым абзацем выходит вразнобой
+  document.querySelectorAll('.sp-lead').forEach(p => { if (!/[.!?…]$/.test(p.textContent.trim())) p.insertAdjacentText('beforeend', '.'); });
   photos(S);
   $('#speakerMail').href = 'mailto:' + S.email;
   $('#speakerMailText').textContent = S.email;
