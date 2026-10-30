@@ -19,8 +19,11 @@ const plural = (n, a, b, c) => { const m = n % 100, k = n % 10; return m > 10 &&
 
 export function mountSpeaker(S, helpers){
   H = helpers;
-  if (!document.querySelector('link[href*="speaker.css"]')) {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = H.base + 'speaker.css' + (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? '?v=' + Date.now() : ''); document.head.appendChild(l);
+  if (!document.querySelector('link[rel="stylesheet"][href*="speaker.css"]')) {
+    // app.js мог заранее поставить preload: адрес берем у него, браузер возьмет файл из кеша
+    const pre = document.querySelector('link[rel="preload"][href*="speaker.css"]');
+    const l = document.createElement('link'); l.rel = 'stylesheet';
+    l.href = pre ? pre.href : H.base + 'speaker.css?v=' + Date.now(); document.head.appendChild(l);
   }
   const E = SITE.photos.events;
   $('#speakerMail').href = 'mailto:' + S.email;
