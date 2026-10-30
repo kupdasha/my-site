@@ -6,7 +6,7 @@
 :root[data-ink] .btn-accent,:root[data-ink] .btn-line{background:var(--ink);color:var(--bg)}
 :root[data-ink] .btn:hover,:root[data-ink] .btn-accent:hover,:root[data-ink] .btn-line:hover{background:var(--ink);color:var(--bg);transform:translateY(-2px)}
 :root[data-ink] .btn-accent::after{display:none}
-:root[data-ink] .btn:hover .ch,:root[data-ink] .fab:hover .ch{animation:none}
+:root[data-ink] .btn:hover .ch{animation:none}
 .sp-btn-quiet,:root[data-ink] .sp-btn-quiet,:root[data-ink] .sp-btn-quiet:hover{background:var(--soft);color:var(--ink)}
 
 /* первый экран */
@@ -14,7 +14,6 @@
 .sp-title{font-weight:500;font-size:clamp(44px,7.4vw,112px);line-height:1;margin-bottom:clamp(32px,4vw,56px)}
 .sp-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px clamp(32px,5vw,88px);align-items:start}
 .sp-lead{font-size:clamp(18px,1.5vw,21px);line-height:1.4;margin-bottom:18px}
-.sp-top .ctas{margin-top:28px}
 .sp-photo{position:relative;border-radius:var(--r-img);overflow:hidden;aspect-ratio:3/2;background:var(--soft)}
 .sp-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%;opacity:0;transform:scale(1.06);transition:opacity 1.2s var(--ease),transform 5s linear}
 .sp-photo img.on{opacity:1;transform:none}
@@ -67,9 +66,10 @@
 
 /* био */
 .sp-bio{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px clamp(32px,5vw,88px);align-items:start}
-.sp-seg{display:inline-flex;gap:4px;padding:4px;border-radius:99px;background:var(--soft);margin-bottom:clamp(20px,2.4vw,32px)}
-.sp-seg button{height:44px;padding:0 20px 2px;border-radius:99px;font-size:18px;font-weight:500;cursor:pointer;transition:background .35s,color .35s}
-.sp-seg button.on{background:var(--ink);color:var(--bg)}
+.sp-seg{display:inline-flex;gap:8px;margin-bottom:clamp(20px,2.4vw,32px)}
+.sp-seg button{height:40px;padding:0 18px 2px;border:1.5px solid var(--line);border-radius:99px;font-size:18px;cursor:pointer;transition:border-color .3s}
+.sp-seg button:hover{border-color:var(--ink)}
+.sp-seg button.on{border-color:var(--ink);font-weight:500}
 .sp-bio-text{overflow:hidden;transition:height .5s var(--ease)}
 .sp-bio-text p{font-size:clamp(20px,1.8vw,26px);line-height:1.38;white-space:pre-line}
 .sp-bio-text p.in{animation:sp-fade .6s var(--ease)}
@@ -103,7 +103,7 @@
   .sp-topic-name{font-size:20px;overflow-wrap:anywhere}
   .sp-topic-in{padding:0 0 24px}
   .sp-seg{display:flex}
-  .sp-seg button{flex:1;padding:0 8px 2px;text-align:center}
+  .sp-seg button{flex:1;padding:0 6px 2px;text-align:center}
   .sp-shows{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){

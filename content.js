@@ -5121,8 +5121,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     title:     'профиль спикера',
     lead:      'Арт-директор коммуникационного дизайна, ex-лид дизайн-команды VK. Спикер о дизайне, ИИ и креативе. Говорю о том, как нейросети меняют профессию, из чего складывается вкус и как вести креативную команду — на опыте работы с крупными брендами.',
     podcast:   'Автор видео-подкаста о дизайне [«Одна кавычка»](https://vkvideo.ru/playlist/-226119573_2): среди гостей Студия Артемия Лебедева, Depot, Супрематика, DDVB и другие.',
-    call:      'позвать выступить',
-    photos:    ['img/events/ev-01.jpg', 'img/events/ev-06.jpg', 'img/events/ev-07.jpg', 'img/events/ev-09.jpg'],   // Росконгресс, сменяются сами
+    photos:    ['img/events/ev-06.jpg', 'img/events/ev-01.jpg', 'img/events/ev-07.jpg', 'img/events/ev-09.jpg'],   // Росконгресс, сменяются сами
     jury:      'Член жюри премий Russian Design Cup, Основа, Таврида х Dprofile и других.',
     topicsTitle: 'темы выступлений',
     topics: [
@@ -5154,9 +5153,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     ],
     shows: [
       { title: 'конференции', link: 'https://kupdasha.ru/comdesign',
-        images: ['https://static.tildacdn.com/tild3439-3265-4130-b235-663862633331/erfer.png', 'https://static.tildacdn.com/tild3964-3066-4336-b965-646635386163/fvdv.png'] },
+        images: ['https://static.tildacdn.com/tild3336-3132-4665-b839-393033346262/Slide_16_9_-_148.jpg', 'https://static.tildacdn.com/tild3365-3864-4433-a432-323565643264/Untitled-1.png', 'https://static.tildacdn.com/tild3439-3265-4130-b235-663862633331/erfer.png', 'https://static.tildacdn.com/tild3964-3066-4336-b965-646635386163/fvdv.png'] },
       { title: 'митапы', link: 'https://kupdasha.ru/love14',
-        images: ['https://static.tildacdn.com/tild3638-3062-4131-b961-363532623033/Slide_16_9_-_134.jpg', 'https://static.tildacdn.com/tild3634-3761-4664-a438-633737356564/Slide_16_9_-_136.jpg', 'https://static.tildacdn.com/tild3964-6233-4330-a264-326139653666/fdfdf.png', 'https://static.tildacdn.com/tild3634-3938-4132-b766-636565666561/rIhWdLJPUYp_vnDyRGCY.jpg', 'https://static.tildacdn.com/tild3336-3132-4665-b839-393033346262/Slide_16_9_-_148.jpg', 'https://static.tildacdn.com/tild3365-3864-4433-a432-323565643264/Untitled-1.png'] },
+        images: ['https://static.tildacdn.com/tild3634-3761-4664-a438-633737356564/Slide_16_9_-_136.jpg', 'https://static.tildacdn.com/tild3638-3062-4131-b961-363532623033/Slide_16_9_-_134.jpg', 'https://static.tildacdn.com/tild3964-6233-4330-a264-326139653666/fdfdf.png', 'https://static.tildacdn.com/tild3634-3938-4132-b766-636565666561/rIhWdLJPUYp_vnDyRGCY.jpg'] },
     ],
     photosButton: 'скачать фотографии',
     orgTitle:  'организую мероприятия',
