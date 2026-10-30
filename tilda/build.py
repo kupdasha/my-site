@@ -25,7 +25,7 @@ def read(name):
         return f.read()
 
 # адреса страниц на Тильде
-LINKS = [("'index.html#", "'/#"), ("'index.html'", "'/'"), ("'about.html'", "'/i'"), ("'speaker.html'", "'/speaker'"), ("'nda.html'", "'/n_d_a'")]
+LINKS = [("'index.html#", "'/#"), ("'index.html'", "'/'"), ("'about.html'", "'/i'"), ("'speaker.html'", "'/profile'"), ("'nda.html'", "'/n_d_a'")]
 
 # Код, стили, картинки и видео лежат на GitHub (kupdasha/my-site) и раздаются через jsDelivr.
 # Блоки в Тильде на них только ссылаются: обновил файлы на GitHub — сайт подхватил сам.
@@ -118,6 +118,11 @@ about_html = read('about.html')
 about_sections = between('<!-- Обо мне -->', '</main>', about_html).replace(
     '<section class="about-page" id="about">', '<section class="about-page" id="about" data-page="about">', 1)
 about_service_html = between('<!-- Кнопка «Связаться»', '<script src=', about_html)
+# страница спикера (speaker.html): только серьезная версия, data-page="speaker" — по нему код узнает страницу на Тильде
+speaker_html = read('speaker.html')
+speaker_sections = between('<!-- Профиль спикера -->', '</main>', speaker_html).replace(
+    '<section class="sp-hero" id="speaker">', '<section class="sp-hero" id="speaker" data-page="speaker">', 1)
+speaker_service_html = between('<!-- Кнопка «Связаться»', '<script src=', speaker_html)
 
 
 # ---------- блоки ----------
@@ -323,6 +328,14 @@ BLOCKS = {
             css_block(), shared_block(), about_sections,
             f'<!-- Кнопки «связаться» и «наверх», сообщения -->\n{about_service_html}',
             js_block(['app.js', 'waves.js', 'fun.js'], 'КОД САЙТА.')])),
+    ],
+    '7 страница спикера': [
+        ('1 страница спикера целиком', '\n\n'.join([
+            css_block().replace("document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'",
+                                "var r=document.documentElement;r.dataset.ink=localStorage.getItem('kd-mode')==='dark'?'black':'white';r.dataset.theme='light'"),
+            shared_block(), speaker_sections,
+            f'<!-- Кнопки «связаться» и «наверх», сообщения -->\n{speaker_service_html}',
+            js_block(['app.js'], 'КОД САЙТА.')])),
     ],
     '9 подвал': [
         ('1 служебные кнопки и окно кейса', once_block(service_html, 'Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах.')),

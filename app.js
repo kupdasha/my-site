@@ -22,7 +22,7 @@ if (window.__kdAppOK || typeof SITE === 'undefined') return; window.__kdAppOK = 
   const onTilda = !document.querySelector('script[src="content.js"]');
   const base = src.replace(/app\.js(\?.*)?$/, '');
   if (onTilda && typeof SITE !== 'undefined') {
-    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/i'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/n_d_a']];
+    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/i'], [/^speaker\.html/, '/profile'], [/^nda\.html/, '/n_d_a']];
     const fix = s => {
       if (s.startsWith('img/')) return base + s;
       for (const [re, to] of PAGES) if (re.test(s)) return s.replace(re, to).replace('/#', '/#').replace(/^\/\/+/, '/');
@@ -67,7 +67,7 @@ addEventListener('error', e => {
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'speaker'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -673,42 +673,14 @@ function renderNdaPage(){
 /* ================================================================
    СТРАНИЦА «ПОЗВАТЬ СПИКЕРОМ»
    ================================================================ */
+let speakerDone = false;
 function renderSpeaker(){
-  const S = SITE.speaker;
-  if (!S || !isSpeakerPage) return;
-  $('#speakerPhoto').src = S.photo;
-  $('#speakerMail').href = 'mailto:' + S.email;
-  $('#speakerMailText').textContent = S.email;
-  $('#topicList').innerHTML = S.topics.map((t, k) => `
-    <div class="topic" data-reveal style="--d:${(k * 0.05).toFixed(2)}s">
-      <h3>${T(t.title)}</h3>
-      <div><p>${T(t.text)}</p>
-        <p class="topic-meta"><b>${T(S.whoLabel)}</b> ${T(t.who)}<br><b>${T(S.formatLabel)}</b> ${T(t.format)}</p></div>
-    </div>`).join('');
-  $('#bioList').innerHTML = S.bio.map((b, k) => `
-    <div class="topic" data-reveal style="--d:${(k * 0.05).toFixed(2)}s">
-      <h3>${T(b.name)}</h3>
-      <div><p class="bio-text">${T(b.text)}</p>
-        <button class="btn btn-line copy" data-k="${k}"><span class="spell">${T(S.copy)}</span></button></div>
-    </div>`).join('');
-  $('#showList').innerHTML = S.shows.map(sh => `
-    <div class="show" data-reveal>
-      <div class="show-head"><h3>${T(sh.title)}</h3><a class="link" href="${sh.link}">${T(SITE.works.more)}</a></div>
-      <div class="photo-strip">${sh.images.map(src => `<figure class="photo"><img src="${src}" alt="" loading="lazy"></figure>`).join('')}</div>
-    </div>`).join('');
+  if (!SITE.speaker || !isSpeakerPage || speakerDone) return;
+  speakerDone = true;
+  caseImport('speaker')
+    .then(m => m.mountSpeaker(SITE.speaker, { T, pick, openViewer, watchReveals, base: SCRIPT_BASE }))
+    .catch(err => console.warn('страница спикера не загрузилась', err));
 }
-// копировать био одним нажатием — организаторам удобно вставить в анонс
-$('#bioList').addEventListener('click', e => {
-  const b = e.target.closest('.copy');
-  if (!b) return;
-  const text = SITE.speaker.bio[+b.dataset.k].text;
-  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).catch(() => {
-    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-  }).finally(() => {
-    b.innerHTML = `<span>${T(SITE.speaker.copied)}</span>`;
-    setTimeout(() => { b.innerHTML = `<span class="spell">${T(SITE.speaker.copy)}</span>`; spellOut(b); }, 1800);
-  });
-});
 
 
 /* ================================================================
@@ -718,6 +690,7 @@ const sw = $('#switch');
 let switchCount = 0;
 
 function setMode(mode, toTop){
+  if (isSpeakerPage) return;   // у страницы спикера одна версия
   const apply = () => {
     root.classList.add('switching');   // без плавных переходов: фон сразу нужной версии
     root.dataset.theme = mode;
@@ -3349,6 +3322,8 @@ const OIL = {
    ================================================================ */
 let saved = 'light';
 try { saved = localStorage.getItem('kd-mode') || 'light'; } catch (e) {}
+/* страница спикера только серьезная: из дружеской версии остаются черный фон и белый текст (data-ink, цвета — в style.css) */
+if (isSpeakerPage) { root.dataset.ink = saved === 'dark' ? 'black' : 'white'; saved = 'light'; }
 root.dataset.theme = saved;
 document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', saved === 'dark'));
 renderTexts();

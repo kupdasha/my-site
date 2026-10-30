@@ -3,17 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Позвать спикером — Дарья Купцова</title>
+<title>Профиль спикера — Дарья Купцова</title>
 <link rel="stylesheet" href="style.css">
-<!-- версия (светлая или темная) выставляется сразу, чтобы страница не мигала -->
-<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>
+<!-- одна версия: из дружеской остаются черный фон и белый текст -->
+<script>try{var r=document.documentElement;r.dataset.ink=localStorage.getItem('kd-mode')==='dark'?'black':'white';r.dataset.theme='light'}catch(e){}</script>
 </head>
 <body class="page-speaker">
 <!--
   КАРКАС СТРАНИЦЫ
-  Тексты здесь не пишутся: атрибут data-text="hero.title" значит
-  «взять текст hero.title из content.js». Править тексты — в content.js,
-  оформление — в style.css.
+  Тексты — в content.js (SITE.speaker), живые блоки — speaker.js, оформление — speaker.css.
 -->
 
 <!-- Шапка -->
@@ -21,56 +19,86 @@
   <div class="wrap">
     <a class="logo" href="index.html" data-text="name"></a>
     <nav class="nav" id="nav"></nav>
-    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
-      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
-    </button>
   </div>
 </header>
 
 <main>
-  <!-- Позвать спикером -->
-  <section class="about-page speaker" id="speaker">
-    <div class="wrap">
-      <h1 class="h1 split" data-text="speaker.title"></h1>
-      <div class="about">
-        <div class="portrait" data-reveal><img id="speakerPhoto" alt="Дарья Купцова на сцене" loading="lazy"></div>
-        <div>
-          <p class="big" data-reveal data-text="speaker.lead"></p>
-          <p class="txt" data-reveal data-text="speaker.podcast"></p>
-          <div class="ctas about-cta" data-reveal>
-            <a class="btn btn-accent" data-href="telegram"><span data-text="contactButton"></span><span class="arr">→</span></a>
-            <a class="btn btn-line" id="speakerMail"><span id="speakerMailText"></span></a>
-          </div>
+  <!-- Профиль спикера -->
+  <section class="sp-hero" id="speaker">
+    <div class="wrap sp-top">
+      <h1 class="sp-title split" data-text="speaker.title"></h1>
+      <div class="sp-intro">
+        <p class="sp-lead" data-reveal data-text="speaker.lead"></p>
+        <div class="ctas" data-reveal style="--d:.1s">
+          <a class="btn btn-line" href="#contact"><span data-text="speaker.call"></span><span class="arr">↓</span></a>
+          <a class="btn btn-line sp-btn-quiet" id="speakerMail"><span id="speakerMailText"></span></a>
         </div>
       </div>
+    </div>
+    <div class="sp-stage" id="spStage"></div>
+    <div class="wrap"><div class="sp-frames" id="spFrames"></div></div>
+  </section>
+
+  <!-- Коротко: цифры и премии -->
+  <section class="sp-sec sp-sec-tight">
+    <div class="wrap">
+      <div class="sp-facts" id="spFacts"></div>
+      <p class="sp-pod-line" data-reveal data-text="speaker.podcast"></p>
     </div>
   </section>
 
   <!-- Темы выступлений -->
-  <section class="sec" id="topics">
+  <section class="sp-sec" id="topics">
     <div class="wrap">
-      <div class="sec-head"><h2 class="h2" data-reveal data-text="speaker.topicsTitle"></h2></div>
-      <div class="topics" id="topicList"></div>
+      <h2 class="h2 sp-h2" data-reveal data-text="speaker.topicsTitle"></h2>
+      <div class="sp-topics" id="topicList"></div>
     </div>
   </section>
 
   <!-- Био разной длины -->
-  <section class="sec" id="bio">
-    <div class="wrap">
-      <div class="sec-head"><h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2></div>
-      <div class="topics" id="bioList"></div>
+  <section class="sp-sec" id="bio">
+    <div class="wrap sp-bio">
+      <div class="sp-bio-side">
+        <h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2>
+        <p class="sp-note" data-reveal data-text="speaker.bioNote"></p>
+      </div>
+      <div class="sp-bio-main" id="bioBox" data-reveal></div>
     </div>
   </section>
 
-  <!-- Записи выступлений -->
-  <section class="sec" id="shows">
+  <!-- На сцене: лента кадров и события -->
+  <section class="sp-sec" id="stage">
     <div class="wrap">
-      <div class="sec-head"><h2 class="h2" data-reveal data-text="speaker.showsTitle"></h2></div>
-      <div id="showList"></div>
-      <div class="channel" data-reveal>
-        <p class="lead" data-text="speaker.photosText"></p>
-        <div class="ctas"><a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a></div>
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="speaker.stageTitle"></h2>
+        <p class="sec-note" data-reveal data-text="speaker.stageNote"></p>
+      </div>
+    </div>
+    <div class="sp-ribbon" id="spRibbon"></div>
+    <div class="wrap"><div class="sp-events" id="spEvents"></div></div>
+  </section>
+
+  <!-- Записи выступлений и подкаст -->
+  <section class="sp-sec" id="shows">
+    <div class="wrap">
+      <h2 class="h2 sp-h2" data-reveal data-text="speaker.showsTitle"></h2>
+      <div class="sp-shows" id="showList"></div>
+      <h3 class="sp-h3" data-reveal data-text="speaker.podTitle"></h3>
+      <div class="sp-pod" data-reveal>
+        <div class="pod-player" id="podPlayer"></div>
+        <div class="pod-list" id="podList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Фотографии для анонса -->
+  <section class="sp-sec" id="press">
+    <div class="wrap sp-press">
+      <div class="sp-fan" id="spFan" data-reveal></div>
+      <div>
+        <h2 class="h2" data-reveal data-text="speaker.photosTitle"></h2>
+        <p class="sp-note" data-reveal data-text="speaker.photosText"></p>
+        <div class="ctas" data-reveal><a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a></div>
       </div>
     </div>
   </section>
@@ -78,10 +106,9 @@
   <!-- Контакт -->
   <section class="contact" id="contact">
     <div class="wrap">
-      <h2 class="h2 center" data-reveal data-text="contact.title"></h2>
-      <p class="lead" data-reveal data-text="contact.lead"></p>
+      <h2 class="h2 center" data-reveal data-text="speaker.contactTitle"></h2>
+      <p class="lead" data-reveal data-text="speaker.contactLead"></p>
       <div class="ctas contact-links" id="contactLinks" data-reveal></div>
-      <div class="ttt" id="ttt" data-reveal></div>
       <footer class="foot">
         <span data-text="footer.left"></span>
       </footer>
@@ -98,7 +125,5 @@
 
 <script src="content.js"></script>
 <script src="app.js"></script>
-<script src="waves.js"></script>
-<script src="fun.js"></script>
 </body>
 </html>

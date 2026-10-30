@@ -45,6 +45,19 @@
   color-scheme: dark;
 }
 
+/* ---------- Страница спикера, зашли из дружеской версии: только черный фон и белый текст ---------- */
+:root[data-ink="black"]{
+  --bg:          #000000;
+  --ink:         #FFFFFF;
+  --line:        #2B2B2B;
+  --soft:        #161616;
+  --accent-glow: transparent;
+  --link-hover:  #FFFFFF;
+  color-scheme: dark;
+}
+:root[data-ink] .switch{display:none}   /* у страницы спикера одна версия */
+:root[data-ink] .head .wrap{justify-content:space-between}
+
 /* ================================================================
    ОСНОВА
    ================================================================ */

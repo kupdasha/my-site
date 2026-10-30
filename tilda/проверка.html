@@ -379,6 +379,132 @@ setTimeout(function(){if(!got&&c&&c.h)show(c.h)},1200)})()</script>
 <!-- КОД САЙТА. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
 <script>KUP.js(['app.js','waves.js','fun.js'])</script>
 </div>
+<div class="r t-rec" data-record-type="131"><!-- 7 страница спикера / 1 страница спикера целиком -->
+<!-- ОФОРМЛЕНИЕ САЙТА: стили, шрифты и загрузчик файлов с GitHub. Это код, тексты здесь не правятся. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->
+<script>try{var r=document.documentElement;r.dataset.ink=localStorage.getItem('kd-mode')==='dark'?'black':'white';r.dataset.theme='light'}catch(e){}</script>
+<script>(function(){if(window.KUP)return;var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',V='https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t=',N='kup-sha',c=null,q=[],done=0,now=Date.now();try{c=JSON.parse(localStorage.getItem(N))}catch(e){}var base=window.KUP_BASE||(c&&c.s?R+c.s+'/':R+'main/');function keep(s){try{localStorage.setItem(N,JSON.stringify({s:s,t:Date.now()}))}catch(e){}}function get(u,h,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=ms;x.onload=function(){var s=(x.status==200&&x.responseText||'').trim();cb(/^[0-9a-f]{40}$/.test(s)?s:null)};x.onerror=x.ontimeout=function(){cb(null)};x.send()}function ask(ms,cb){get(W,0,ms,function(s){s?cb(s):get('https://api.github.com/repos/kupdasha/my-site/commits/main','application/vnd.github.sha',ms,function(s){s?cb(s):get(V+now,0,ms,cb)})})}function put(f){var s=document.createElement('script');s.src=base+f;s.async=false;document.head.appendChild(s)}function go(s){if(done)return;done=1;if(s){keep(s);if(!(c&&c.s===s)){var old=base;base=K.base=R+s+'/';var o=document.getElementById('kup-css');if(o){var n=document.createElement('link');n.rel='stylesheet';n.href=o.href.replace(old,base);n.onload=function(){o.parentNode&&o.parentNode.removeChild(o);n.id='kup-css'};o.parentNode.insertBefore(n,o.nextSibling)}}}q.forEach(put);q=[]}var K=window.KUP={L:{},css:function(f){if(!document.getElementById('kup-css'))document.write('<link rel="stylesheet" id="kup-css" href="'+base+f+'">')},js:function(fs){fs.forEach(function(f){if(K.L[f])return;K.L[f]=1;done?put(f):q.push(f)})}};K.base=base;if(window.KUP_BASE)go();else if(c&&c.s&&now-c.t<3e4){go();ask(8000,function(s){if(s)keep(s)})}else ask(2500,go)})()</script>
+<script>KUP.css('style.css')</script>
+
+<!-- Шапка -->
+<header class="head" id="head">
+  <div class="wrap">
+    <span class="logo" data-text="name"></span>
+    <nav class="nav" id="nav"></nav>
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    </button>
+  </div>
+</header>
+
+<!-- ТЕКСТЫ И ПРОЕКТЫ сайта лежат на GitHub в content.js и подключаются отсюда. -->
+<script>KUP.js(['content.js'])</script>
+
+<!-- Профиль спикера -->
+  <section class="sp-hero" id="speaker" data-page="speaker">
+    <div class="wrap sp-top">
+      <h1 class="sp-title split" data-text="speaker.title"></h1>
+      <div class="sp-intro">
+        <p class="sp-lead" data-reveal data-text="speaker.lead"></p>
+        <div class="ctas" data-reveal style="--d:.1s">
+          <a class="btn btn-line" href="#contact"><span data-text="speaker.call"></span><span class="arr">↓</span></a>
+          <a class="btn btn-line sp-btn-quiet" id="speakerMail"><span id="speakerMailText"></span></a>
+        </div>
+      </div>
+    </div>
+    <div class="sp-stage" id="spStage"></div>
+    <div class="wrap"><div class="sp-frames" id="spFrames"></div></div>
+  </section>
+
+  <!-- Коротко: цифры и премии -->
+  <section class="sp-sec sp-sec-tight">
+    <div class="wrap">
+      <div class="sp-facts" id="spFacts"></div>
+      <p class="sp-pod-line" data-reveal data-text="speaker.podcast"></p>
+    </div>
+  </section>
+
+  <!-- Темы выступлений -->
+  <section class="sp-sec" id="topics">
+    <div class="wrap">
+      <h2 class="h2 sp-h2" data-reveal data-text="speaker.topicsTitle"></h2>
+      <div class="sp-topics" id="topicList"></div>
+    </div>
+  </section>
+
+  <!-- Био разной длины -->
+  <section class="sp-sec" id="bio">
+    <div class="wrap sp-bio">
+      <div class="sp-bio-side">
+        <h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2>
+        <p class="sp-note" data-reveal data-text="speaker.bioNote"></p>
+      </div>
+      <div class="sp-bio-main" id="bioBox" data-reveal></div>
+    </div>
+  </section>
+
+  <!-- На сцене: лента кадров и события -->
+  <section class="sp-sec" id="stage">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h2" data-reveal data-text="speaker.stageTitle"></h2>
+        <p class="sec-note" data-reveal data-text="speaker.stageNote"></p>
+      </div>
+    </div>
+    <div class="sp-ribbon" id="spRibbon"></div>
+    <div class="wrap"><div class="sp-events" id="spEvents"></div></div>
+  </section>
+
+  <!-- Записи выступлений и подкаст -->
+  <section class="sp-sec" id="shows">
+    <div class="wrap">
+      <h2 class="h2 sp-h2" data-reveal data-text="speaker.showsTitle"></h2>
+      <div class="sp-shows" id="showList"></div>
+      <h3 class="sp-h3" data-reveal data-text="speaker.podTitle"></h3>
+      <div class="sp-pod" data-reveal>
+        <div class="pod-player" id="podPlayer"></div>
+        <div class="pod-list" id="podList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Фотографии для анонса -->
+  <section class="sp-sec" id="press">
+    <div class="wrap sp-press">
+      <div class="sp-fan" id="spFan" data-reveal></div>
+      <div>
+        <h2 class="h2" data-reveal data-text="speaker.photosTitle"></h2>
+        <p class="sp-note" data-reveal data-text="speaker.photosText"></p>
+        <div class="ctas" data-reveal><a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Контакт -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <h2 class="h2 center" data-reveal data-text="speaker.contactTitle"></h2>
+      <p class="lead" data-reveal data-text="speaker.contactLead"></p>
+      <div class="ctas contact-links" id="contactLinks" data-reveal></div>
+      <footer class="foot">
+        <span data-text="footer.left"></span>
+      </footer>
+    </div>
+  </section>
+
+<!-- Кнопки «связаться» и «наверх», сообщения -->
+<!-- Кнопка «Связаться», всегда на экране -->
+<!-- Маленькая кнопка «наверх» -->
+<button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
+<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- КОД САЙТА. Это код, тексты здесь не правятся: сам код лежит на GitHub. -->
+<script>KUP.js(['app.js'])</script>
+</div>
 <div class="r t-rec" data-record-type="131"><!-- 9 подвал / 1 служебные кнопки и окно кейса -->
 <!-- Кнопки «связаться» и «наверх», окно кейса и сообщения. Тексты для них — в общих текстах. -->
 <script>(function(){if(document.getElementById('case'))return;document.write("<!-- Кнопка «Связаться», всегда на экране -->\n<!-- Маленькая кнопка «наверх» -->\n<button class=\"to-top\" id=\"toTop\" aria-label=\"Наверх\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 16V4M5 9l5-5 5 5\"/><\/svg><\/button>\n<a class=\"fab tease\" id=\"fab\" data-href=\"telegram\"><span data-text=\"contactButton\" class=\"spell\"><\/span><\/a>\n\n<!-- Страница кейса: заполняется при клике на проект -->\n<div class=\"case\" id=\"case\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"caseTitle\">\n  <div class=\"case-bar\"><div class=\"wrap\">\n    <button class=\"case-back\" id=\"caseBack\">\n      <svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M16 10H4M9 5l-5 5 5 5\"/><\/svg>\n      <span data-text=\"works.back\"><\/span>\n    <\/button>\n  <\/div><\/div>\n  <div id=\"caseContent\"><\/div>\n<\/div>\n<!-- Кейс открыт по ссылке (#case-N): пока грузятся тексты и код, сразу видна страница-скелет -->\n<script>(function(){if(!/^#case-\\d+$/.test(location.hash))return;var c=document.getElementById('case'),b=document.getElementById('caseContent');if(!c||!b||b.firstChild)return;c.classList.add('open','boot');document.documentElement.classList.add('case-boot');var l='';for(var i=0;i<4;i++)l+='<i class=\"sk sk-l\"><\/i>';var w=document.createElement('div');w.id='caseWait';w.className='case-wait show';w.setAttribute('role','status');w.innerHTML='<b>Загружаем кейс<\/b><span>Внутри живые главы и большие картинки, стоит подождать<\/span><i><\/i>';c.appendChild(w);b.innerHTML='<div class=\"case-skel\" aria-hidden=\"true\"><div class=\"wrap case-head\"><i class=\"sk sk-t\"><\/i><i class=\"sk sk-t sk-t2\"><\/i><\/div><i class=\"sk sk-hero\"><\/i><div class=\"wrap sk-body\"><div class=\"sk-col\"><i class=\"sk sk-l sk-s\"><\/i><\/div><div class=\"sk-col\">'+l+'<\/div><\/div><\/div>'})()<\/script>\n\n<div class=\"toasts\" id=\"toasts\" aria-live=\"polite\"><\/div>")})()</script>
