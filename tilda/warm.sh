@@ -10,6 +10,15 @@ cd "$(dirname "$0")/.." || exit 1
 git fetch -q origin main 2>/dev/null
 sha=$(git rev-parse origin/main) || exit 1
 
+# главные файлы — первыми и с повторами: без них не открывается ни одна страница, а сайт берет новый номер сразу после push
+for f in content.js app.js style.css; do
+  for i in 1 2 3 4; do
+    [ "$(curl -s -o /dev/null -w '%{http_code}' --max-time 40 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/$f")" = 200 ] && break
+    curl -s -o /dev/null --max-time 20 "https://purge.jsdelivr.net/gh/kupdasha/my-site@$sha/$f"; sleep 5
+    [ $i = 4 ] && echo "ВНИМАНИЕ, сайт не откроется: jsDelivr не отдает $f"
+  done
+done
+
 # все скрипты и стили из корня, таплинк и кейс «Новый век» со страницы NDA (он открывается в окне целиком) (его блок тоже берет файл по номеру версии), в том числе живые главы кейсов (office.js, anon.css…): иначе первый посетитель
 # кейса ждет, пока jsDelivr соберет их по новому номеру (~2 с на файл, скрипт и стили по очереди). Параллельно, по 8
 { git ls-files -- '*.js' '*.css' 'taplink.html' | grep -v /; git ls-files -- 'nda/*.js' 'nda/*.css' 'nda/novyi-vek/*.html' 'nda/novyi-vek/case/*.js' 'nda/novyi-vek/case/*.css'; } | xargs -P 8 -I{} curl -s -o /dev/null --max-time 60 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/{}"
