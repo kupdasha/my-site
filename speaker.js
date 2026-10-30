@@ -27,13 +27,25 @@ export function mountSpeaker(S, helpers){
     };
     document.head.appendChild(l);
   }
-  $('#speakerPhoto').src = S.photo;
+  photos(S);
   $('#speakerMail').href = 'mailto:' + S.email;
   $('#speakerMailText').textContent = S.email;
   topics(S);
   bio(S);
   shows(S);
   H.watchReveals(document, true);
+}
+
+/* ---------- Фото в начале: кадры с Росконгресса сменяются сами ---------- */
+function photos(S){
+  const box = $('#spPhoto');
+  box.innerHTML = S.photos.map((src, k) => `<img class="${k ? '' : 'on'}" src="${src}" alt="Дарья Купцова на сцене">`).join('');
+  if (reduced || S.photos.length < 2) return;
+  const imgs = [...box.children]; let at = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    imgs[at].classList.remove('on'); at = (at + 1) % imgs.length; imgs[at].classList.add('on');
+  }, 4000);
 }
 
 /* ---------- Темы: живые иконки — простые формы, только цвет текста ---------- */
@@ -115,7 +127,7 @@ function bio(S){
   });
 }
 
-/* ---------- Записи выступлений ---------- */
+/* ---------- Сайты мероприятий ---------- */
 function shows(S){
   const box = $('#showList');
   box.innerHTML = S.shows.map(sh => `

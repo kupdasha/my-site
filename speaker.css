@@ -15,8 +15,9 @@
 .sp-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px clamp(32px,5vw,88px);align-items:start}
 .sp-lead{font-size:clamp(18px,1.5vw,21px);line-height:1.4;margin-bottom:18px}
 .sp-top .ctas{margin-top:28px}
-.sp-photo{border-radius:var(--r-img);overflow:hidden;aspect-ratio:3/2;background:var(--soft)}
-.sp-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.sp-photo{position:relative;border-radius:var(--r-img);overflow:hidden;aspect-ratio:3/2;background:var(--soft)}
+.sp-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%;opacity:0;transform:scale(1.06);transition:opacity 1.2s var(--ease),transform 5s linear}
+.sp-photo img.on{opacity:1;transform:none}
 
 /* разделы */
 .sp-sec{padding-top:clamp(88px,11vw,160px)}
@@ -76,8 +77,8 @@
 .sp-bio-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:24px;padding-top:20px;border-top:2px solid var(--line)}
 .sp-count{font-size:18px;opacity:.62;font-variant-numeric:tabular-nums}
 
-/* записи */
-.sp-shows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,24px)}
+/* сайты мероприятий */
+.sp-shows{margin-top:clamp(40px,5vw,64px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,24px)}
 .sp-show{display:block}
 .sp-show-img{display:block;position:relative;aspect-ratio:16/9;border-radius:var(--r-img);overflow:hidden;background:var(--soft)}
 .sp-show-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s var(--ease),transform 1.2s var(--ease)}
@@ -87,9 +88,8 @@
 .sp-show .arr{transition:transform .45s var(--ease)}
 .sp-show:hover .arr{transform:translateX(5px)}
 
-.sp-press{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;padding-top:20px;border-top:2px solid var(--line)}
-.sp-press-text{font-size:18px}
-.sp-org-text{font-size:clamp(20px,1.8vw,26px);line-height:1.38;margin-bottom:28px;max-width:34ch}
+.sp-photos-btn{margin-top:28px}
+.sp-org-text{font-size:clamp(20px,1.8vw,26px);line-height:1.38;max-width:34ch}
 .sp-mail{margin-top:28px;font-size:18px}
 
 @media (max-width:1024px){

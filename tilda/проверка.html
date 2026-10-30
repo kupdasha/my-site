@@ -413,16 +413,8 @@ setTimeout(function(){if(!got&&c&&c.h)show(c.h)},1200)})()</script>
           <p class="sp-lead" data-reveal data-text="speaker.jury"></p>
           <div class="ctas" data-reveal><a class="btn btn-line" href="#contact"><span data-text="speaker.call"></span><span class="arr">↓</span></a></div>
         </div>
-        <div class="sp-photo" data-reveal><img id="speakerPhoto" alt="Дарья Купцова на сцене"></div>
+        <div class="sp-photo" id="spPhoto" data-reveal></div>
       </div>
-    </div>
-  </section>
-
-  <!-- Записи выступлений -->
-  <section class="sp-sec" id="shows">
-    <div class="wrap">
-      <h2 class="h2 sp-h2" data-reveal data-text="speaker.showsTitle"></h2>
-      <div class="sp-shows" id="showList"></div>
     </div>
   </section>
 
@@ -440,26 +432,21 @@ setTimeout(function(){if(!got&&c&&c.h)show(c.h)},1200)})()</script>
       <div class="sp-bio-side">
         <h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2>
         <p class="sp-note" data-reveal data-text="speaker.bioNote"></p>
+        <div class="ctas sp-photos-btn" data-reveal><a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a></div>
       </div>
-      <div class="sp-bio-main" data-reveal>
-        <div id="bioBox"></div>
-        <div class="sp-press">
-          <span class="sp-press-text" data-text="speaker.photosText"></span>
-          <a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a>
-        </div>
-      </div>
+      <div class="sp-bio-main" id="bioBox" data-reveal></div>
     </div>
   </section>
 
-  <!-- Организую мероприятия -->
+  <!-- Организую мероприятия: текст и сайты событий -->
   <section class="sp-sec" id="org">
     <div class="wrap sp-bio">
       <h2 class="h2" data-reveal data-text="speaker.orgTitle"></h2>
       <div data-reveal>
         <p class="sp-org-text" data-text="speaker.orgText"></p>
-        <div class="ctas"><a class="btn btn-line" data-href="telegram"><span data-text="speaker.orgButton"></span><span class="arr">→</span></a></div>
       </div>
     </div>
+    <div class="wrap"><div class="sp-shows" id="showList"></div></div>
   </section>
 
   <!-- Контакт -->
