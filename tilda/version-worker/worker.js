@@ -45,16 +45,35 @@ async function rangeAsset(req, env) {
   return new Response(buf.slice(a, b + 1), { status: 206, headers: { ...h, 'Content-Range': `bytes ${a}-${b}/${size}`, 'Content-Length': b - a + 1 } });
 }
 
-// последний коммит main репозитория kupdasha/<repo>: читается из git на GitHub, держится в кеше узла 5 секунд
+// последний коммит main репозитория kupdasha/<repo>: читается из git на GitHub, держится в кеше узла 5 секунд.
+// GitHub иногда не отвечает узлу Cloudflare — тогда второй путь (GitHub API), а если и он молчит — последний удачный номер
+// (хранится в кеше узла год). Без этого страница уходила на jsDelivr @main, а там застряла старая копия (репозиторий > 50 МБ),
+// и открывалась давняя версия. null — номера не знает никто.
 async function latestSha(repo, ctx) {
-  const cache = caches.default, key = new Request('https://kup-version.cache/' + repo);
+  const cache = caches.default, key = new Request('https://kup-version.cache/' + repo), last = new Request('https://kup-version.cache/last/' + repo);
   const hit = await cache.match(key);
   if (hit) return hit.text();
-  const r = await fetch(`https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
-  const m = r.ok && (await r.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/);
-  if (!m) return 'main';
-  ctx.waitUntil(cache.put(key, new Response(m[1], { headers: { 'Cache-Control': 'max-age=5' } })));
-  return m[1];
+  let sha = null;
+  for (let i = 0; i < 2 && !sha; i++) {
+    try {
+      const r = await fetch(`https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
+      const m = r.ok && (await r.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/);
+      if (m) sha = m[1];
+    } catch (e) {}
+  }
+  if (!sha) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/kupdasha/${repo}/commits/main`, { headers: { 'User-Agent': 'kup-version', 'Accept': 'application/vnd.github.sha' } });
+      const t = r.ok ? (await r.text()).trim() : '';
+      if (/^[0-9a-f]{40}$/.test(t)) sha = t;
+    } catch (e) {}
+  }
+  if (!sha) { const old = await cache.match(last); return old ? old.text() : null; }
+  ctx.waitUntil(Promise.all([
+    cache.put(key, new Response(sha, { headers: { 'Cache-Control': 'max-age=5' } })),
+    cache.put(last, new Response(sha, { headers: { 'Cache-Control': 'max-age=31536000' } }))
+  ]));
+  return sha;
 }
 
 export default {
@@ -74,7 +93,7 @@ export default {
       const [repo, file] = pg;
       // номер коммита — из кеша узла (5 с), HTML по номеру коммита не меняется — кеш на год:
       // без этого каждое открытие страницы ходило на GitHub дважды, с узла в России это секунды
-      const sha = await latestSha(repo, ctx);
+      const sha = (await latestSha(repo, ctx)) || 'main';
       const page = await fetch(`https://raw.githubusercontent.com/kupdasha/${repo}/${sha}/${file}`, { cf: { cacheEverything: true, cacheTtl: sha === 'main' ? 30 : 31536000 } });
       // репозитория (пока) нет — страница отдается из статики воркера (public/alfa), как раньше
       if (!page.ok) return env.ASSETS ? env.ASSETS.fetch(new Request(new URL('/alfa/index.html', req.url))) : new Response('нет страницы', { status: 502, headers: CORS });
@@ -85,14 +104,8 @@ export default {
     if (f) return file(req, f[1], decodeURIComponent(f[2]));
     // ?repo=army-sport — номер версии другого репозитория kupdasha (презентация «Армия спорта»)
     const repo = (u.searchParams.get('repo') || 'my-site').replace(/[^a-z0-9-]/gi, '');
-    const refs = `https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`;
-    const cache = caches.default, key = new Request('https://kup-version.cache/' + repo);
-    const hit = await cache.match(key);
-    if (hit) return new Response(await hit.text(), { headers: { ...CORS, 'Cache-Control': 'no-store' } });
-    const r = await fetch(refs, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
-    const m = r.ok && (await r.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/);
-    if (!m) return new Response('', { status: 502, headers: CORS });
-    ctx.waitUntil(cache.put(key, new Response(m[1], { headers: { 'Cache-Control': 'max-age=5' } })));
-    return new Response(m[1], { headers: { ...CORS, 'Cache-Control': 'no-store' } });
+    const sha = await latestSha(repo, ctx);
+    if (!sha) return new Response('', { status: 502, headers: CORS });
+    return new Response(sha, { headers: { ...CORS, 'Cache-Control': 'no-store' } });
   },
 };
