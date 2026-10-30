@@ -1,20 +1,14 @@
 /* ================================================================
    СТРАНИЦА «ПРОФИЛЬ СПИКЕРА» (kupdasha.ru/profile)
-   Одна версия, серьезная. Тексты — SITE.speaker в content.js, фото —
-   SITE.photos.events, оформление — speaker.css.
-   stage   — кадр со сцены раскрывается на всю ширину при прокрутке,
-             кадры сменяются сами, строка событий с полоской таймера;
-   topics  — темы списком, у каждой живая иконка, нажатие раскрывает;
-   bio     — переключатель длины, счетчик знаков, копирование;
-   ribbon  — лента кадров едет сама, на тач-устройствах листается;
-   events  — названия событий, нажатие открывает их кадры.
+   Одна версия, серьезная. Тексты — SITE.speaker в content.js,
+   оформление — speaker.css.
+   topics — темы списком, у каждой живая черно-белая иконка, нажатие раскрывает;
+   bio    — переключатель длины, счетчик знаков, копирование.
    ================================================================ */
 let H;   // помощники из app.js: T (типограф), pick, openViewer, watchReveals, base
 
 const $ = s => document.querySelector(s);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const touch = matchMedia('(hover: none)').matches;
-const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const plural = (n, a, b, c) => { const m = n % 100, k = n % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; };
 
 export function mountSpeaker(S, helpers){
@@ -33,62 +27,16 @@ export function mountSpeaker(S, helpers){
     };
     document.head.appendChild(l);
   }
-  const E = SITE.photos.events;
+  $('#speakerPhoto').src = S.photo;
   $('#speakerMail').href = 'mailto:' + S.email;
   $('#speakerMailText').textContent = S.email;
-  stage(S, E);
-  facts(S);
   topics(S);
   bio(S);
-  ribbon(E);
-  events(E);
   shows(S);
-  fan(S);
   H.watchReveals(document, true);
 }
 
-/* ---------- Кадр со сцены ---------- */
-function stage(S, E){
-  const box = $('#spStage'), line = $('#spFrames');
-  const frames = S.hero.map(f => ({ ...f, item: E.items.find(i => i.src.includes(f.ev + '.jpg')) })).filter(f => f.item);
-  box.innerHTML = frames.map((f, k) =>
-    `<img class="${k ? '' : 'on'}" ${k ? 'loading="lazy"' : 'fetchpriority="high"'} src="${f.item.src}" alt="${esc(H.pick(f.item.caption))}" style="object-position:${f.pos}">`).join('');
-  line.innerHTML = frames.map((f, k) =>
-    `<button class="sp-frame${k ? '' : ' on'}" data-k="${k}"><i></i><span>${H.T(E.labels[H.pick(f.item.caption)] || f.item.caption)}</span></button>`).join('');
-  const imgs = [...box.children], tabs = [...line.children];
-  let at = 0, seen = true, timer;
-  const go = k => {
-    if (k === at) return;
-    imgs[at].classList.remove('on'); imgs[at].classList.add('off');
-    const old = imgs[at]; setTimeout(() => old.classList.remove('off'), 1200);
-    box.append(imgs[k]);   // новый кадр проявляется поверх прежнего
-    imgs[k].getBoundingClientRect(); imgs[k].classList.add('on');
-    tabs[at].classList.remove('on'); tabs[k].getBoundingClientRect(); tabs[k].classList.add('on');
-    at = k;
-  };
-  const tick = () => { clearTimeout(timer); timer = setTimeout(() => { if (seen && !document.hidden) go((at + 1) % frames.length); tick(); }, 5000); };
-  if (!reduced) tick();
-  line.addEventListener('click', e => { const b = e.target.closest('.sp-frame'); if (b) { go(+b.dataset.k); tick(); } });
-  new IntersectionObserver(es => { seen = es[0].isIntersecting; }).observe(box);
-  // кадр раскрывается от колонки сайта до краев экрана
-  if (reduced) return;
-  let queued = false;
-  const open = () => {
-    queued = false;
-    const start = box.offsetTop;   // где кадр стоит до прокрутки
-    box.style.setProperty('--open', Math.min(1, Math.max(0, scrollY / Math.max(1, Math.min(start, innerHeight * .55)))).toFixed(3));
-  };
-  const ask = () => { if (!queued) { queued = true; requestAnimationFrame(open); } };
-  addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); open();
-}
-
-/* ---------- Цифры и премии ---------- */
-function facts(S){
-  $('#spFacts').innerHTML = S.facts.map((f, k) =>
-    `<div class="sp-fact" data-reveal style="--d:${(k * .06).toFixed(2)}s"><b>${H.T(f.big)}</b><span>${H.T(f.text)}</span></div>`).join('');
-}
-
-/* ---------- Темы: живые иконки — простые формы, лаймовое пятно одно на иконку ---------- */
+/* ---------- Темы: живые иконки — простые формы, только цвет текста ---------- */
 const ICONS = [
   // ИИ в продакшене: много вариантов мерцают, один отобран
   `<svg viewBox="0 0 96 96">${[...Array(16)].map((_, k) => { const x = 6 + (k % 4) * 22, y = 6 + (k >> 2) * 22, on = k === 6;
@@ -100,7 +48,7 @@ const ICONS = [
   `<svg viewBox="0 0 96 96"><g class="orbit">${[0, 72, 144, 216, 288].map(a => { const r = a * Math.PI / 180;
     return `<circle class="ink" cx="${(48 + 36 * Math.cos(r)).toFixed(1)}" cy="${(48 + 36 * Math.sin(r)).toFixed(1)}" r="8"/>`; }).join('')}</g><circle class="pick pulse" cx="48" cy="48" r="13"/></svg>`,
   // российские платформы: калька отходит и становится своей формой
-  `<svg viewBox="0 0 96 96"><rect class="ink" x="10" y="14" width="50" height="50" rx="4"/><rect class="pick morph" x="10" y="14" width="50" height="50" rx="4"/></svg>`,
+  `<svg viewBox="0 0 96 96"><rect class="line" x="10" y="14" width="50" height="50" rx="4"/><rect class="pick morph" x="10" y="14" width="50" height="50" rx="4"/></svg>`,
   // стендап: микрофон и волны от него
   `<svg viewBox="0 0 96 96"><circle class="wave" cx="38" cy="38" r="20"/><circle class="wave" cx="38" cy="38" r="20" style="--k:1"/><circle class="wave" cx="38" cy="38" r="20" style="--k:2"/><circle class="pick" cx="38" cy="38" r="15"/><path class="stick" d="M48 49 L80 84"/></svg>`,
 ];
@@ -167,35 +115,6 @@ function bio(S){
   });
 }
 
-/* ---------- Лента кадров ---------- */
-function ribbon(E){
-  const box = $('#spRibbon');
-  const rows = [E.items.filter((_, k) => k % 2 === 0), E.items.filter((_, k) => k % 2)];
-  const all = E.items, cap = i => H.pick(i.caption);
-  const fig = i => `<figure data-i="${all.indexOf(i)}" style="--ar:${i.ratio || 1.5}"><img src="${i.thumb || i.src}" alt="${esc(cap(i))}" loading="lazy" draggable="false"></figure>`;
-  box.innerHTML = rows.map((r, n) => `<div class="sp-row${n ? ' back' : ''}"><div class="sp-run">${r.map(fig).join('')}${touch ? '' : r.map(fig).join('')}</div></div>`).join('');
-  box.addEventListener('click', e => {
-    const f = e.target.closest('figure'); if (!f) return;
-    H.openViewer(all.map(i => i.src), +f.dataset.i, [], all.map(cap));
-  });
-}
-
-/* ---------- События ---------- */
-function events(E){
-  const caps = [...new Set(E.items.map(i => H.pick(i.caption)))];
-  const order = [...E.order.filter(c => caps.includes(c)), ...caps.filter(c => !E.order.includes(c))];
-  const box = $('#spEvents');
-  box.innerHTML = order.map((c, k) => {
-    const n = E.items.filter(i => H.pick(i.caption) === c).length;
-    return `<button class="sp-ev" data-c="${esc(c)}" data-reveal style="--d:${(k * .02).toFixed(2)}s"><span>${H.T(E.labels[c] || c)}</span><sup class="yr">${n}</sup></button>`;
-  }).join('');
-  box.addEventListener('click', e => {
-    const b = e.target.closest('.sp-ev'); if (!b) return;
-    const list = E.items.filter(i => H.pick(i.caption) === b.dataset.c);
-    H.openViewer(list.map(i => i.src), 0, [], list.map(i => H.pick(i.caption)));
-  });
-}
-
 /* ---------- Записи выступлений ---------- */
 function shows(S){
   const box = $('#showList');
@@ -212,9 +131,4 @@ function shows(S){
       imgs[at].classList.remove('on'); at = (at + 1) % imgs.length; imgs[at].classList.add('on');
     }, 3400 + n * 900);
   });
-}
-
-/* ---------- Фотографии веером ---------- */
-function fan(S){
-  $('#spFan').innerHTML = S.press.map(src => `<img src="${src}" alt="Дарья Купцова" loading="lazy">`).join('');
 }

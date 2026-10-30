@@ -25,33 +25,17 @@
 <main>
   <!-- Профиль спикера -->
   <section class="sp-hero" id="speaker">
-    <div class="wrap sp-top">
+    <div class="wrap">
       <h1 class="sp-title split" data-text="speaker.title"></h1>
-      <div class="sp-intro">
-        <p class="sp-lead" data-reveal data-text="speaker.lead"></p>
-        <div class="ctas" data-reveal style="--d:.1s">
-          <a class="btn btn-line" href="#contact"><span data-text="speaker.call"></span><span class="arr">↓</span></a>
-          <a class="btn btn-line sp-btn-quiet" id="speakerMail"><span id="speakerMailText"></span></a>
+      <div class="sp-top">
+        <div>
+          <p class="sp-lead" data-reveal data-text="speaker.lead"></p>
+          <p class="sp-lead" data-reveal data-text="speaker.podcast"></p>
+          <p class="sp-lead" data-reveal data-text="speaker.jury"></p>
+          <div class="ctas" data-reveal><a class="btn btn-line" href="#contact"><span data-text="speaker.call"></span><span class="arr">↓</span></a></div>
         </div>
+        <div class="sp-photo" data-reveal><img id="speakerPhoto" alt="Дарья Купцова на сцене"></div>
       </div>
-    </div>
-    <div class="sp-stage" id="spStage"></div>
-    <div class="wrap"><div class="sp-frames" id="spFrames"></div></div>
-  </section>
-
-  <!-- Коротко: цифры и премии -->
-  <section class="sp-sec sp-sec-tight">
-    <div class="wrap">
-      <div class="sp-facts" id="spFacts"></div>
-      <p class="sp-pod-line" data-reveal data-text="speaker.podcast"></p>
-    </div>
-  </section>
-
-  <!-- Темы выступлений -->
-  <section class="sp-sec" id="topics">
-    <div class="wrap">
-      <h2 class="h2 sp-h2" data-reveal data-text="speaker.topicsTitle"></h2>
-      <div class="sp-topics" id="topicList"></div>
     </div>
   </section>
 
@@ -66,40 +50,27 @@
     </div>
   </section>
 
-  <!-- На сцене: лента кадров и события -->
-  <section class="sp-sec" id="stage">
+  <!-- Темы выступлений -->
+  <section class="sp-sec" id="topics">
     <div class="wrap">
-      <div class="sec-head">
-        <h2 class="h2" data-reveal data-text="speaker.stageTitle"></h2>
-        <p class="sec-note" data-reveal data-text="speaker.stageNote"></p>
-      </div>
+      <h2 class="h2 sp-h2" data-reveal data-text="speaker.topicsTitle"></h2>
+      <div class="sp-topics" id="topicList"></div>
     </div>
-    <div class="sp-ribbon" id="spRibbon"></div>
-    <div class="wrap"><div class="sp-events" id="spEvents"></div></div>
   </section>
 
-  <!-- Записи выступлений и подкаст -->
+  <!-- Записи выступлений -->
   <section class="sp-sec" id="shows">
     <div class="wrap">
       <h2 class="h2 sp-h2" data-reveal data-text="speaker.showsTitle"></h2>
       <div class="sp-shows" id="showList"></div>
-      <h3 class="sp-h3" data-reveal data-text="speaker.podTitle"></h3>
-      <div class="sp-pod" data-reveal>
-        <div class="pod-player" id="podPlayer"></div>
-        <div class="pod-list" id="podList"></div>
-      </div>
     </div>
   </section>
 
   <!-- Фотографии для анонса -->
   <section class="sp-sec" id="press">
-    <div class="wrap sp-press">
-      <div class="sp-fan" id="spFan" data-reveal></div>
-      <div>
-        <h2 class="h2" data-reveal data-text="speaker.photosTitle"></h2>
-        <p class="sp-note" data-reveal data-text="speaker.photosText"></p>
-        <div class="ctas" data-reveal><a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a></div>
-      </div>
+    <div class="wrap sp-press" data-reveal>
+      <p class="sp-press-text" data-text="speaker.photosText"></p>
+      <a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a>
     </div>
   </section>
 
@@ -109,6 +80,7 @@
       <h2 class="h2 center" data-reveal data-text="speaker.contactTitle"></h2>
       <p class="lead" data-reveal data-text="speaker.contactLead"></p>
       <div class="ctas contact-links" id="contactLinks" data-reveal></div>
+      <p class="sp-mail" data-reveal><a class="link" id="speakerMail"><span id="speakerMailText"></span></a></p>
       <footer class="foot">
         <span data-text="footer.left"></span>
       </footer>
