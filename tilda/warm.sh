@@ -16,7 +16,12 @@ sha=$(git rev-parse origin/main) || exit 1
 
 # jsDelivr иногда запоминает ошибку на файл нового номера («Package size exceeded», репозиторий больше 50 МБ): без content.js сайт пустой.
 # Такой файл сбрасывается один раз и проверяется снова (30.10 страницы сайта пустели именно так)
-{ git ls-files -- '*.js' '*.css' 'taplink.html' | grep -v /; } | xargs -P 8 -I{} zsh -c 'u="gh/kupdasha/my-site@'$sha'/{}"; c=$(curl -s -o /dev/null -w "%{http_code}" --max-time 40 "https://cdn.jsdelivr.net/$u"); [ "$c" = 200 ] && exit 0; curl -s -o /dev/null --max-time 20 "https://purge.jsdelivr.net/$u"; sleep 4; c=$(curl -s -o /dev/null -w "%{http_code}" --max-time 40 "https://cdn.jsdelivr.net/$u"); [ "$c" = 200 ] && echo "исправлен сбросом: {}" || echo "ВНИМАНИЕ, jsDelivr не отдает {} ($c)"'
+cdn() { curl -s -o /dev/null -w "%{http_code}" --max-time 40 "https://cdn.jsdelivr.net/gh/kupdasha/my-site@$sha/$1"; }
+for f in $(git ls-files -- '*.js' '*.css' 'taplink.html' | grep -v /); do
+  [ "$(cdn "$f")" = 200 ] && continue
+  curl -s -o /dev/null --max-time 20 "https://purge.jsdelivr.net/gh/kupdasha/my-site@$sha/$f"; sleep 4
+  [ "$(cdn "$f")" = 200 ] && echo "исправлен сбросом: $f" || echo "ВНИМАНИЕ, jsDelivr не отдает $f"
+done
 
 # шрифты и всё, что видно на главной без кликов: обложки карточек (thumb, image), превью-ролики, картинки «других работ».
 # Адрес картинки меняется с каждой версией, и холодный файл jsDelivr отдает 1–5 с, а бывает и не отдает вовсе —
