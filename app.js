@@ -678,7 +678,7 @@ function renderSpeaker(){
   if (!SITE.speaker || !isSpeakerPage || speakerDone) return;
   speakerDone = true;
   caseImport('speaker')
-    .then(m => m.mountSpeaker(SITE.speaker, { T, pick, openViewer, watchReveals, base: SCRIPT_BASE }))
+    .then(m => m.mountSpeaker(SITE.speaker, { T, pick, openViewer, watchReveals, base: SCRIPT_BASE, refresh: () => { renderTexts(); renderLists(); } }))
     .catch(err => console.warn('страница спикера не загрузилась', err));
 }
 

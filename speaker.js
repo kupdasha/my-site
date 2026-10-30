@@ -11,8 +11,28 @@ const $ = s => document.querySelector(s);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const plural = (n, a, b, c) => { const m = n % 100, k = n % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; };
 
-export function mountSpeaker(S, helpers){
+/* Разметка страницы тоже живет в репозитории: если блок на Тильде устарел (нет #spPhoto), разделы берутся из свежего
+   speaker.html, поэтому менять блок при правках страницы не нужно */
+async function freshMarkup(){
+  if ($('#spPhoto')) return;
+  const m = /my-site@([0-9a-f]{40})\//.exec(H.base);
+  const urls = [H.base + 'speaker.html', `https://raw.githubusercontent.com/kupdasha/my-site/${m ? m[1] : 'main'}/speaker.html`];
+  let html = '';
+  for (const u of urls) {
+    try { const r = await fetch(u); if (r.ok) { html = await r.text(); break; } } catch (e) {}
+  }
+  const a = html.indexOf('<!-- Профиль спикера -->'), b = html.indexOf('</main>');
+  const first = $('#speaker');
+  if (a < 0 || b < 0 || !first) return;
+  const old = [...first.parentNode.children].filter(e => e.tagName === 'SECTION');
+  first.insertAdjacentHTML('beforebegin', html.slice(a, b));
+  old.forEach(e => e.remove());
+  H.refresh();
+}
+
+export async function mountSpeaker(S, helpers){
   H = helpers;
+  await freshMarkup();
   if (!document.querySelector('link[rel="stylesheet"][href*="speaker.css"]')) {
     // app.js мог заранее поставить preload: адрес берем у него, браузер возьмет файл из кеша
     const pre = document.querySelector('link[rel="preload"][href*="speaker.css"]');
