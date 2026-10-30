@@ -87,9 +87,9 @@
 .sp-show .arr{transition:transform .45s var(--ease)}
 .sp-show:hover .arr{transform:translateX(5px)}
 
-/* фотографии для анонса */
-.sp-press{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
-.sp-press-text{font-weight:500;font-size:clamp(26px,3.4vw,48px);line-height:1.1;max-width:20ch}
+.sp-press{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;padding-top:20px;border-top:2px solid var(--line)}
+.sp-press-text{font-size:18px}
+.sp-org-text{font-size:clamp(20px,1.8vw,26px);line-height:1.38;margin-bottom:28px;max-width:34ch}
 .sp-mail{margin-top:28px;font-size:18px}
 
 @media (max-width:1024px){

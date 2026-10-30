@@ -36,14 +36,11 @@
     </div>
   </section>
 
-  <!-- Био разной длины -->
-  <section class="sp-sec" id="bio">
-    <div class="wrap sp-bio">
-      <div class="sp-bio-side">
-        <h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2>
-        <p class="sp-note" data-reveal data-text="speaker.bioNote"></p>
-      </div>
-      <div class="sp-bio-main" id="bioBox" data-reveal></div>
+  <!-- Записи выступлений -->
+  <section class="sp-sec" id="shows">
+    <div class="wrap">
+      <h2 class="h2 sp-h2" data-reveal data-text="speaker.showsTitle"></h2>
+      <div class="sp-shows" id="showList"></div>
     </div>
   </section>
 
@@ -55,19 +52,31 @@
     </div>
   </section>
 
-  <!-- Записи выступлений -->
-  <section class="sp-sec" id="shows">
-    <div class="wrap">
-      <h2 class="h2 sp-h2" data-reveal data-text="speaker.showsTitle"></h2>
-      <div class="sp-shows" id="showList"></div>
+  <!-- Для анонса: био разной длины и фотографии -->
+  <section class="sp-sec" id="bio">
+    <div class="wrap sp-bio">
+      <div class="sp-bio-side">
+        <h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2>
+        <p class="sp-note" data-reveal data-text="speaker.bioNote"></p>
+      </div>
+      <div class="sp-bio-main" data-reveal>
+        <div id="bioBox"></div>
+        <div class="sp-press">
+          <span class="sp-press-text" data-text="speaker.photosText"></span>
+          <a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Фотографии для анонса -->
-  <section class="sp-sec" id="press">
-    <div class="wrap sp-press" data-reveal>
-      <p class="sp-press-text" data-text="speaker.photosText"></p>
-      <a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a>
+  <!-- Организую мероприятия -->
+  <section class="sp-sec" id="org">
+    <div class="wrap sp-bio">
+      <h2 class="h2" data-reveal data-text="speaker.orgTitle"></h2>
+      <div data-reveal>
+        <p class="sp-org-text" data-text="speaker.orgText"></p>
+        <div class="ctas"><a class="btn btn-line" data-href="telegram"><span data-text="speaker.orgButton"></span><span class="arr">→</span></a></div>
+      </div>
     </div>
   </section>
 
