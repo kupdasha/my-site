@@ -22,7 +22,7 @@ if (window.__kdAppOK || typeof SITE === 'undefined') return; window.__kdAppOK = 
   const onTilda = !document.querySelector('script[src="content.js"]');
   const base = src.replace(/app\.js(\?.*)?$/, '');
   if (onTilda && typeof SITE !== 'undefined') {
-    const PAGES = [[/^index\.html/, '/full'], [/^about\.html/, '/i'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/n_d_a']];
+    const PAGES = [[/^index\.html/, '/'], [/^about\.html/, '/i'], [/^speaker\.html/, '/speaker'], [/^nda\.html/, '/n_d_a']];
     const fix = s => {
       if (s.startsWith('img/')) return base + s;
       for (const [re, to] of PAGES) if (re.test(s)) return s.replace(re, to).replace('/#', '/#').replace(/^\/\/+/, '/');
@@ -30,7 +30,7 @@ if (window.__kdAppOK || typeof SITE === 'undefined') return; window.__kdAppOK = 
     };
     const walk = o => { for (const k in o) { const v = o[k]; if (typeof v === 'string') o[k] = fix(v); else if (v && typeof v === 'object') walk(v); } };
     walk(SITE);
-    SITE.homePage = SITE.homePage || '/full';   // главная на Тильде — kupdasha.ru/full
+    SITE.homePage = '/';   // главная на Тильде — kupdasha.ru (не SITE.homePage ||: в старых блоках Тильды мог остаться /full)
   }
 }
 

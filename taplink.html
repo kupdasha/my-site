@@ -161,7 +161,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
     </div>
 
     <nav class="actions" aria-label="Главное">
-      <a class="btn" href="https://kupdasha.ru/full" target="_blank" rel="noopener" data-serious="заказать дизайн-проект" data-fun="что умею?"><span class="t">заказать дизайн-проект</span></a>
+      <a class="btn" href="https://kupdasha.ru/" target="_blank" rel="noopener" data-serious="заказать дизайн-проект" data-fun="что умею?"><span class="t">заказать дизайн-проект</span></a>
       <a class="btn" href="https://kupdasha.ru/ai" target="_blank" rel="noopener" data-serious="ИИ-воркшоп для вашей команды" data-fun="ИИшнуться"><span class="t">ИИ-воркшоп для вашей команды</span></a>
     </nav>
 
@@ -182,6 +182,8 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 </main>
 
 <script>
+  // главная переехала на kupdasha.ru: блок на Тильде мог сохранить старый адрес в настройках
+  document.querySelectorAll('a[href="https://kupdasha.ru/full"]').forEach(a => { a.href = 'https://kupdasha.ru/'; });
 (() => {
   const root = document.documentElement, sw = document.getElementById('switch');
   const page = document.getElementById('tl');
