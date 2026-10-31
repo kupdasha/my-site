@@ -408,11 +408,11 @@ document.addEventListener('pointerover', e => {
   showPreviewImage(it.thumb, it.focus);   // focus — кадрирование, чтобы лица были в центре превью
 });
 document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.ev-link')) showPreviewImage(''); });
-/* Фото в ленте выступлений сами сменяются: раз в несколько секунд одно окошко плавно проявляет новый кадр,
-   окошки идут вразнобой. Кадры берутся из перемешанной колоды своего формата (вертикальное окошко — только
+/* Фото в ленте выступлений сами сменяются: раз в несколько секунд весь ряд разом плавно проявляет новые кадры.
+   Кадры берутся из перемешанной колоды своего формата (вертикальное окошко — только
    вертикальные): за круг показываются все, события из often — по два раза, в разных половинах круга.
    В четверке все события разные. Пока лента не на экране или включено «уменьшить движение» — стоит */
-const EV_ROTATE = 3200;   // как часто меняется одно окошко, мс
+const EV_ROTATE = 5000;   // как часто меняется ряд, мс
 const EV_FADE = 1500;     // проявление нового кадра, мс (как в style.css)
 let evTimer = null;
 function evShuffle(a){ for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -430,16 +430,17 @@ function rotateEvents(strip){
       list.splice(Math.floor(list.length / 2 + Math.random() * (list.length / 2 + 1)), 0, i); });
     return list;
   };
-  let order = [];
   evTimer = setInterval(() => {
     const r = strip.getBoundingClientRect();
     if (document.hidden || !strip.isConnected || r.bottom < 0 || r.top > innerHeight) return;   // лента не на экране — стоим
-    if (!order.length) order = evShuffle(slots.slice());
-    const slot = order.pop(), cur = +slot.dataset.i, t = tall(cur);
-    const others = slots.filter(s => s !== slot).map(s => ev(+s.dataset.i));
-    if (!deck[t] || !deck[t].length) deck[t] = fresh(t);
-    const at = deck[t].findIndex(i => i !== cur && ev(i) !== ev(cur) && !others.includes(ev(i)));
-    if (at >= 0) swapEvent(slot, deck[t].splice(at, 1)[0]);
+    const next = [];
+    slots.forEach(slot => {
+      const cur = +slot.dataset.i, t = tall(cur), taken = next.map(ev);
+      if (!deck[t] || !deck[t].length) deck[t] = fresh(t);
+      const at = deck[t].findIndex(i => ev(i) !== ev(cur) && !taken.includes(ev(i)));
+      next.push(at >= 0 ? deck[t].splice(at, 1)[0] : cur);
+    });
+    slots.forEach((slot, k) => swapEvent(slot, next[k]));
   }, EV_ROTATE);
 }
 function swapEvent(slot, next){
