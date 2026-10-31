@@ -331,8 +331,11 @@ function renderAboutExtras(){
     if (!isFun() && E && E.items && E.items.length) {
       // серьезная версия: хроника выступлений — несколько фото в ряд, остальные в просмотре
       strip.className = 'photo-strip ev-strip';
-      strip.innerHTML = E.items.slice(0, E.first || 4).map((e, k) =>
-        `<figure class="ev" data-i="${k}" data-reveal style="--d:${(k * 0.08).toFixed(2)}s;--ar:${e.ratio || 1.5}"><img src="${e.thumb || e.src}" alt="${uesc(pick(e.caption))}" loading="lazy"><figcaption>${T(e.caption)}</figcaption></figure>`).join('')
+      // в вертикальном окошке сначала идет вертикальный кадр из often (форма окошка остается от исходного фото)
+      const oftenTall = E.items.findIndex(x => (x.ratio || 1.5) < 1 && (E.often || []).map(pick).includes(pick(x.caption)));
+      strip.innerHTML = E.items.slice(0, E.first || 4).map((slot, k) => {
+        const i = oftenTall >= 0 && (slot.ratio || 1.5) < 1 ? oftenTall : k, e = E.items[i];
+        return `<figure class="ev" data-i="${i}" data-reveal style="--d:${(k * 0.08).toFixed(2)}s;--ar:${slot.ratio || 1.5}"><img src="${e.thumb || e.src}" alt="${uesc(pick(e.caption))}" loading="lazy"><figcaption>${T(e.caption)}</figcaption></figure>`; }).join('')
         + `<p class="ev-more" data-reveal><button type="button" class="link ev-all">${T(E.more)}</button><sup class="yr">${E.items.length}</sup></p>`;
       rotateEvents(strip);
     } else if (isFun() && SITE.photos.dating) {
@@ -405,50 +408,41 @@ document.addEventListener('pointerover', e => {
   showPreviewImage(it.thumb, it.focus);   // focus — кадрирование, чтобы лица были в центре превью
 });
 document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.ev-link')) showPreviewImage(''); });
-/* Фото в ленте выступлений сами сменяются: раз в несколько секунд все окошки разом показывают
-   новые кадры. Кадры не повторяются, пока не покажутся все; в окошке не бывает два раза подряд одно и то же
-   событие, и в одной четверке все события разные. Вертикальное окошко получает только вертикальные фото.
-   Пока лента не на экране или включено «уменьшить движение» — стоит */
-const EV_ROTATE = 3200;   // как часто меняется четверка, мс
+/* Фото в ленте выступлений сами сменяются: раз в несколько секунд одно окошко плавно проявляет новый кадр,
+   окошки идут вразнобой. Кадры берутся из перемешанной колоды своего формата (вертикальное окошко — только
+   вертикальные): за круг показываются все, события из often — по два раза, в разных половинах круга.
+   В четверке все события разные. Пока лента не на экране или включено «уменьшить движение» — стоит */
+const EV_ROTATE = 3200;   // как часто меняется одно окошко, мс
+const EV_FADE = 1500;     // проявление нового кадра, мс (как в style.css)
 let evTimer = null;
+function evShuffle(a){ for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function rotateEvents(strip){
   clearInterval(evTimer);
   const E = SITE.photos.events, slots = [...strip.querySelectorAll('.ev')];
   if (!slots.length || reduced) return;
   const ev = i => pick(E.items[i].caption), tall = i => (E.items[i].ratio || 1.5) < 1;
   const OFTEN = (E.often || []).map(pick), often = i => OFTEN.includes(ev(i));
-  let used = new Set(slots.map(s => +s.dataset.i));
-  // когда кадр показывали последний раз (номер смены): любой кадр возвращается не раньше чем через 4 смены
-  // (вертикальных мало — им хотя бы 3), иначе одно и то же фото мелькает почти подряд, в соседних окошках
-  let tick = 0; const shownAt = {};
-  slots.forEach(s => { shownAt[+s.dataset.i] = 0; });
-  const rested = i => tick - (shownAt[i] ?? -99) >= 4;
+  const deck = {};
+  const fresh = t => {
+    const list = evShuffle(E.items.map((x, i) => i).filter(i => tall(i) === t && !often(i)));
+    E.items.forEach((x, i) => { if (tall(i) !== t || !often(i)) return;
+      list.splice(Math.floor(Math.random() * (list.length / 2 + 1)), 0, i);
+      list.splice(Math.floor(list.length / 2 + Math.random() * (list.length / 2 + 1)), 0, i); });
+    return list;
+  };
+  let order = [];
   evTimer = setInterval(() => {
     const r = strip.getBoundingClientRect();
     if (document.hidden || !strip.isConnected || r.bottom < 0 || r.top > innerHeight) return;   // лента не на экране — стоим
-    tick++;
-    const now = slots.map(s => +s.dataset.i), picked = [];
-    for (const slot of slots) {
-      const cur = +slot.dataset.i;
-      const ok = i => tall(i) === tall(cur) && !now.includes(i) && !picked.includes(i)
-        && ev(i) !== ev(cur) && !picked.some(j => ev(j) === ev(i));
-      // события из often показываются чаще: им можно повторяться и у них четыре шанса вместо одного
-      let pool = E.items.map((x, i) => i).filter(i => ok(i) && rested(i) && (!used.has(i) || often(i)));
-      if (!pool.some(i => !often(i))) {   // все обычные кадры этого формата показаны — начинаем круг заново
-        E.items.forEach((x, i) => { if (tall(i) === tall(cur)) used.delete(i); });
-        pool = E.items.map((x, i) => i).filter(i => ok(i) && rested(i));
-        // вертикальных кадров мало — если отдохнувших нет, берем хотя бы те, что не показывались 3 смены
-        if (!pool.length) pool = E.items.map((x, i) => i).filter(i => ok(i) && tick - (shownAt[i] ?? -99) >= 3);
-        if (!pool.length) pool = E.items.map((x, i) => i).filter(ok);
-      }
-      pool = pool.flatMap(i => often(i) ? [i, i, i, i] : [i]);
-      const next = pool.length ? pool[Math.floor(Math.random() * pool.length)] : cur;
-      picked.push(next); used.add(next); shownAt[next] = tick;
-    }
-    slots.forEach((slot, k) => swapEvent(slot, picked[k], k));
+    if (!order.length) order = evShuffle(slots.slice());
+    const slot = order.pop(), cur = +slot.dataset.i, t = tall(cur);
+    const others = slots.filter(s => s !== slot).map(s => ev(+s.dataset.i));
+    if (!deck[t] || !deck[t].length) deck[t] = fresh(t);
+    const at = deck[t].findIndex(i => i !== cur && ev(i) !== ev(cur) && !others.includes(ev(i)));
+    if (at >= 0) swapEvent(slot, deck[t].splice(at, 1)[0]);
   }, EV_ROTATE);
 }
-function swapEvent(slot, next, k){
+function swapEvent(slot, next){
   const item = SITE.photos.events.items[next];
   // окошко еще меняет прошлую картинку (новая долго грузилась) — новую смену не начинаем, иначе картинки встают друг под другом
   if (+slot.dataset.i === next || slot.dataset.busy) return;
@@ -456,16 +450,15 @@ function swapEvent(slot, next, k){
   const old = slot.querySelector('img'), img = new Image();
   img.onerror = () => { delete slot.dataset.busy; };
   img.alt = pick(item.caption); img.className = 'ev-next';
-  img.style.setProperty('--k', k);
   img.onload = () => {
-    old.after(img); old.classList.add('ev-out'); old.style.setProperty('--k', k);
+    old.after(img);
     requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('on')));
-    const cap = slot.querySelector('figcaption'); cap.style.setProperty('--k', k); cap.classList.add('swap');
-    setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, 420 + k * 70);
+    const cap = slot.querySelector('figcaption'); cap.classList.add('swap');
+    setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, EV_FADE / 2);
     setTimeout(() => {
       slot.querySelectorAll('img').forEach(x => { if (x !== img) x.remove(); });
-      img.className = ''; img.style.removeProperty('--k'); slot.dataset.i = next; delete slot.dataset.busy;
-    }, 1100 + k * 70);
+      img.className = ''; slot.dataset.i = next; delete slot.dataset.busy;
+    }, EV_FADE + 50);
   };
   img.src = item.thumb || item.src;
 }
