@@ -2981,16 +2981,22 @@ function joke(key){
   if (!isFun() || shownJokes.has(key) || !SITE.jokes[key]) return;
   if (scrollY < innerHeight * 0.6 && !document.body.classList.contains('locked')) { pendingJoke = key; return; }
   shownJokes.add(key);
-  // одновременно на экране только одно сообщение: остальные ждут своей очереди
-  jokeQueue.push(key);
+  // одновременно на экране только одно сообщение: остальные ждут своей очереди.
+  // ответ на клик по многоножке и НЛО идет первым, остальным не мешаем другим анимациям
+  if (JOKE_REPLY.has(key)) jokeQueue.unshift(key); else jokeQueue.push(key);
   if (!jokeShowing) nextJoke();
 }
 const jokeQueue = [];
+const JOKE_REPLY = new Set(['bug', 'bugRun', 'ufo']);
+const JOKE_GAP = 5000;   // пауза между сообщениями, мс
 let jokeShowing = false;
 function nextJoke(){
-  const key = jokeQueue.shift();
+  const key = jokeQueue[0];
   if (!key || !isFun()) { jokeShowing = false; jokeQueue.length = 0; return; }
   jokeShowing = true;
+  // пока на экране многоножка или НЛО, сообщение ждет
+  if (!JOKE_REPLY.has(key) && window.__funBusy?.()) { setTimeout(nextJoke, 500); return; }
+  jokeQueue.shift();
   const box = $('#toasts'), el = document.createElement('div');
   // выглядит как сообщение в Telegram: аватарка, имя, пузырь, время и галочки
   el.className = 'toast';
@@ -3002,7 +3008,7 @@ function nextJoke(){
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
   // сообщение висит, пока его можно спокойно дочитать: 6 секунд плюс время на каждую букву
   const stay = 6000 + SITE.jokes[key].length * 70;
-  setTimeout(() => { el.classList.remove('show'); setTimeout(() => { el.remove(); setTimeout(nextJoke, 800); }, 600); }, stay);
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => { el.remove(); setTimeout(nextJoke, JOKE_GAP); }, 600); }, stay);
 }
 
 let leechTimer = setTimeout(function tell(){ if (isFun()) joke('leech'); else leechTimer = setTimeout(tell, 40000); }, 40000);

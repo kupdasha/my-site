@@ -25,6 +25,11 @@
       курсор становится монеткой, полосу можно стереть.
   10. При прокрутке на фоне мягко вспыхивают и гаснут цветные пятна.
 
+   На странице с кейсами всё идет по очереди, а не разом:
+   многоножка живет только наверху страницы (до первых кейсов, FUN.centipede.zone),
+   НЛО прилетает только туда, где на экране нет инея, а сообщения
+   ждут, пока нет многоножки и НЛО (fun.js отдает это через window.__funBusy).
+
    Работает только в темной (дружеской) версии, на экранах шире 900 px
    и с мышью. При «уменьшении движения» в системе — выключено.
    Ниже — всё, что можно спокойно менять.
@@ -49,6 +54,7 @@ const FUN = {
     inset:    14,      // отступ дорожки от края окна, px
     corner:   60,      // скругление дорожки в углах, px
     visitEvery: [12, 22], // раз в сколько секунд спрыгивает на кейсы (от, до)
+    zone:     0.6,     // на сколько экранов ниже начала списка кейсов еще живет (дальше исчезает)
     // расцветки по кругу (меняются по клику)
     colors: [
       { body: ['#E2FB5A', '#C6E244'], head: '#E2FB5A', legs: '#C9CDD6', boots: '#F4F4F6' },
@@ -502,6 +508,7 @@ function stepHeadings(now){
 const C = FUN.centipede;
 const cv = document.createElement('canvas');
 cv.className = 'centipede'; cv.setAttribute('aria-hidden', 'true');
+cv.style.transition = 'opacity .5s';
 document.body.appendChild(cv);
 const ctx = cv.getContext('2d');
 let W = 0, H = 0, L = 0;
@@ -567,9 +574,15 @@ function sample(d){
   return tr[tr.length - 1];
 }
 
-/* кейсы, на которые можно спрыгнуть: верхний край превью в координатах страницы */
+/* верх страницы с кейсами — зона многоножки; на страницах без кейсов она не ограничена */
+function bugZone(){
+  const list = document.getElementById('workList');
+  return !list || list.getBoundingClientRect().top + C.zone * innerHeight > 0;
+}
+const onCasesPage = () => !!document.getElementById('workList');
+/* кейсы, на которые можно спрыгнуть: верхний край превью в координатах страницы (кроме тех, что под инеем) */
 function cards(){
-  return [...document.querySelectorAll('.work .media, .nda-media')].map(el => {
+  return [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
     const r = el.getBoundingClientRect();
     return { el, left: r.left + 12, right: r.right - 12, top: r.top + scrollY, vtop: r.top };
   }).filter(c => c.right - c.left > 80);
@@ -580,6 +593,10 @@ function updateBug(dt, now){
   // прокрутка: на рамке многоножка остается на месте экрана, на кейсе — едет со страницей
   const ds = scrollY - lastScroll; lastScroll = scrollY;
   if (bug.mode === 'frame' && ds) bug.trail.forEach(p => p[1] += ds);
+  // ниже своей зоны многоножка гаснет и возвращается на рамку
+  const inZone = bugZone();
+  cv.style.opacity = inZone ? 1 : 0;
+  if (!inZone && bug.mode !== 'frame') { bug.mode = 'frame'; bug.card = null; resetTrail(); }
 
   bug.speed += (C.speed - bug.speed) * 0.02;
   const moving = now > bug.pauseUntil;
@@ -696,7 +713,7 @@ function drawBug(){
 
 /* клик по многоножке: первый — перекрашивается, второй — убегает */
 addEventListener('click', e => {
-  if (!on) return;
+  if (!on || !bugZone()) return;
   for (let k = 0; k < C.segments; k++) {
     const [x, y] = sample(k * C.spacing);
     if (Math.hypot(x - e.clientX, y - scrollY - e.clientY) < 18) {
@@ -771,9 +788,18 @@ const STEAL = '.h2 .wd, .work h3, .work .tag, .nda-item h3, .nda-item .tag, .dir
 const ufo = { el: null, beam: null, x: -200, y: 120, loot: [], state: 'fly', until: 0, target: null, back: 0 };
 const UFO_HTML = `
 <svg viewBox="0 0 120 60" width="120" height="60">
-  <circle cx="60" cy="26" r="17" fill="#ECE9FC"/>
+  <defs>
+    <linearGradient id="ufoMetal" x1="0" y1="0" x2="1" y2="0.35">
+      <stop offset="0" stop-color="#4C525E"/><stop offset=".22" stop-color="#C9CED6"/><stop offset=".42" stop-color="#6B727F"/>
+      <stop offset=".62" stop-color="#E4E7EC"/><stop offset=".82" stop-color="#5C636F"/><stop offset="1" stop-color="#8E95A1"/>
+    </linearGradient>
+    <linearGradient id="ufoGlass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8FA3C4"/><stop offset="1" stop-color="#3A4358"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="26" r="17" fill="url(#ufoGlass)" stroke="#2A2F3A" stroke-width="1.5"/>
   <circle cx="54" cy="21" r="4" fill="#FFFFFF"/>
-  <ellipse cx="60" cy="36" rx="54" ry="12" fill="#F4F4F6"/>
+  <ellipse cx="60" cy="36" rx="54" ry="12" fill="url(#ufoMetal)" stroke="#2A2F3A" stroke-width="1.5"/>
   <rect x="10" y="33" width="100" height="6" rx="3" fill="#E2FB5A"/>
   <g class="ufo-lights">${[22, 38, 54, 70, 86].map((x, i) => `<circle cx="${x + 6}" cy="45" r="3.2" fill="#1D222A" style="--i:${i}"/>`).join('')}</g>
 </svg>`;
@@ -787,6 +813,11 @@ function setupUfo(){
   document.body.append(ufo.beam, ufo.el);
   ufo.el.addEventListener('click', () => { joke('ufo'); ufo.state = 'leave'; });
   ufo.state = 'wait'; ufo.until = performance.now() + rand(6000, 10000);
+}
+/* иней на экране или рядом (margin — запас в экранах): там НЛО не место */
+function frostNear(margin){
+  const m = margin * innerHeight;
+  return fogs.some(f => { if (f.done) return false; const r = f.media.getBoundingClientRect(); return r.bottom > -m && r.top < innerHeight + m; });
 }
 /* что можно украсть: видно на экране, не в шапке, еще не украдено */
 function pickTarget(){
@@ -819,14 +850,16 @@ function updateUfo(dt, now){
   if (hidden) return;
   let tx = ufo.x, ty = ufo.y, k = 0.03;
   // вернулись на первый экран — НЛО улетает: оно живет только со второго блока
-  if (ufo.state !== 'wait' && ufo.state !== 'leave' && scrollY < innerHeight * 0.8) ufo.state = 'leave';
+  // и в зону многоножки или к инею тоже не суется: вернется, когда там освободится
+  if (ufo.state !== 'wait' && ufo.state !== 'leave' && (scrollY < innerHeight * 0.8 || (onCasesPage() && bugZone()) || frostNear(0))) { ufo.state = 'leave'; ufo.shooed = true; }
   if (ufo.state === 'wait') {
     tx = -260; ty = 120;
-    if (now > ufo.until && scrollY > innerHeight * 0.8) { ufo.state = 'fly';   // на первом экране НЛО не появляется
+    // на первом экране НЛО не появляется; не появляется и у многоножки, у инея и поверх сообщения
+    if (now > ufo.until && scrollY > innerHeight * 0.8 && !(onCasesPage() && bugZone()) && !frostNear(0.5) && !document.querySelector('.toast')) { ufo.state = 'fly';
       ufo.target = pickTarget(); ufo.x = Math.random() < 0.5 ? -200 : innerWidth + 80; ufo.y = rand(90, 200); }
   } else if (ufo.state === 'leave') {
     tx = ufo.x > innerWidth / 2 ? innerWidth + 300 : -300; ty = -140; k = 0.05;
-    if (ufo.x < -240 || ufo.x > innerWidth + 240) { giveBack(); ufo.state = 'wait'; ufo.until = now + rand(25000, 40000); }
+    if (ufo.x < -240 || ufo.x > innerWidth + 240) { giveBack(); ufo.state = 'wait'; ufo.until = now + (ufo.shooed ? rand(4000, 8000) : rand(25000, 40000)); ufo.shooed = false; }
   } else {
     const t = ufo.target;
     const r = t && t.getBoundingClientRect();
@@ -1071,6 +1104,8 @@ function stepGlow(){
    ОБЩИЙ ЦИКЛ И ВКЛЮЧЕНИЕ
    ================================================================ */
 let prev = performance.now();
+/* заняты ли многоножка или НЛО: сообщения (шутки в app.js) ждут, пока сцена освободится */
+window.__funBusy = () => on && !document.body.classList.contains('locked') && (ufo.state !== 'wait' || (onCasesPage() && bugZone()));
 function frame(now){
   requestAnimationFrame(frame);
   const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
