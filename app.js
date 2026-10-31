@@ -690,7 +690,7 @@ function setMode(mode, toTop){
     root.dataset.theme = mode;
     document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', mode === 'dark'));
     if (toTop) scrollTo({ top: 0, behavior: 'instant' });
-    if (mode !== 'dark') { $('#toasts').innerHTML = ''; pendingJoke = null; }   // шутки остаются в дружеской версии
+    if (mode !== 'dark') { $('#toasts').innerHTML = ''; pendingJokes.length = 0; }   // шутки остаются в дружеской версии
     renderTexts(); renderLists();
     if (caseIndex != null) renderCase(caseIndex, true);
     try { localStorage.setItem('kd-mode', mode); } catch (e) {}
@@ -2968,32 +2968,30 @@ function parallax(){
    ШУТКИ (только в дружеской версии, каждая — один раз)
    ================================================================ */
 const shownJokes = new Set();
-let pendingJoke = isAboutPage ? 'sound' : null;   // на «Обо мне» первое сообщение ждет, пока пролистают первый экран
+const pendingJokes = isAboutPage ? ['sound', 'enter'] : [];   // сообщения ждут, пока пролистают первый экран; первое — про струны
 /* на первом экране сообщения не показываем — ждем, пока его пролистают */
-addEventListener('scroll', () => { if (pendingJoke && scrollY > innerHeight * 0.6) { const k = pendingJoke; pendingJoke = null; joke(k); } }, { passive: true });
+addEventListener('scroll', () => { if (pendingJokes.length && scrollY > innerHeight * 0.6) pendingJokes.splice(0).forEach(joke); }, { passive: true });
 function joke(key){
   if (!isAboutPage || !isFun() || shownJokes.has(key) || !SITE.jokes[key]) return;   // сообщения только на странице «Обо мне»
   // первое сообщение на странице — про струны, остальные за ним
   const first = !shownJokes.has('sound') && SITE.jokes.sound;
-  if (scrollY < innerHeight * 0.6 && !document.body.classList.contains('locked')) { pendingJoke = first ? 'sound' : key; return; }
+  if (scrollY < innerHeight * 0.6 && !document.body.classList.contains('locked')) {
+    [first && 'sound', key].forEach(k => { if (k && !pendingJokes.includes(k)) pendingJokes.push(k); });
+    return;
+  }
   if (first && key !== 'sound') { shownJokes.add('sound'); jokeQueue.push('sound'); }
   shownJokes.add(key);
-  // одновременно на экране только одно сообщение: остальные ждут своей очереди.
-  // ответ на клик по многоножке и НЛО идет первым, остальным не мешаем другим анимациям
-  if (JOKE_REPLY.has(key)) jokeQueue.unshift(key); else jokeQueue.push(key);
+  // одновременно на экране только одно сообщение: остальные ждут своей очереди
+  jokeQueue.push(key);
   if (!jokeShowing) nextJoke();
 }
 const jokeQueue = [];
-const JOKE_REPLY = new Set(['bug', 'bugRun', 'ufo']);
 const JOKE_GAP = 5000;   // пауза между сообщениями, мс
 let jokeShowing = false;
 function nextJoke(){
-  const key = jokeQueue[0];
+  const key = jokeQueue.shift();
   if (!key || !isFun()) { jokeShowing = false; jokeQueue.length = 0; return; }
   jokeShowing = true;
-  // пока на экране многоножка или НЛО, сообщение ждет
-  if (!JOKE_REPLY.has(key) && window.__funBusy?.()) { setTimeout(nextJoke, 500); return; }
-  jokeQueue.shift();
   const box = $('#toasts'), el = document.createElement('div');
   // выглядит как сообщение в Telegram: аватарка, имя, пузырь, время и галочки
   el.className = 'toast';
