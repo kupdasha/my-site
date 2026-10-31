@@ -2968,12 +2968,15 @@ function parallax(){
    ШУТКИ (только в дружеской версии, каждая — один раз)
    ================================================================ */
 const shownJokes = new Set();
-let pendingJoke = null;
+let pendingJoke = isAboutPage ? 'sound' : null;   // на «Обо мне» первое сообщение ждет, пока пролистают первый экран
 /* на первом экране сообщения не показываем — ждем, пока его пролистают */
 addEventListener('scroll', () => { if (pendingJoke && scrollY > innerHeight * 0.6) { const k = pendingJoke; pendingJoke = null; joke(k); } }, { passive: true });
 function joke(key){
   if (!isAboutPage || !isFun() || shownJokes.has(key) || !SITE.jokes[key]) return;   // сообщения только на странице «Обо мне»
-  if (scrollY < innerHeight * 0.6 && !document.body.classList.contains('locked')) { pendingJoke = key; return; }
+  // первое сообщение на странице — про струны, остальные за ним
+  const first = !shownJokes.has('sound') && SITE.jokes.sound;
+  if (scrollY < innerHeight * 0.6 && !document.body.classList.contains('locked')) { pendingJoke = first ? 'sound' : key; return; }
+  if (first && key !== 'sound') { shownJokes.add('sound'); jokeQueue.push('sound'); }
   shownJokes.add(key);
   // одновременно на экране только одно сообщение: остальные ждут своей очереди.
   // ответ на клик по многоножке и НЛО идет первым, остальным не мешаем другим анимациям
