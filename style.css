@@ -128,7 +128,7 @@ img,video{display:block;max-width:100%}
 .big-btn{height:72px;padding:0 40px 5px;font-size:20px}
 
 /* Маленькая кнопка «наверх» над кнопкой «связаться»: появляется, когда пролистали */
-.to-top{position:fixed;right:var(--pad);bottom:92px;z-index:90;width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;
+.to-top{position:fixed;right:var(--pad);bottom:24px;z-index:90;width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;
   opacity:0;translate:0 12px;pointer-events:none;transition:opacity .4s var(--ease),translate .5s var(--ease),background .4s,color .4s}
 .to-top.show{opacity:1;translate:0 0;pointer-events:auto}
 .to-top:hover{background:var(--accent);color:var(--accent-text)}
@@ -136,11 +136,8 @@ img,video{display:block;max-width:100%}
 .to-top:hover svg{transform:translateY(-3px)}
 
 /* Кнопка «Связаться», которая всегда на экране */
-.fab{position:fixed;right:var(--pad);bottom:24px;z-index:90;height:56px;padding:0 28px 4px;border-radius:99px;background:var(--ink);color:var(--bg);display:inline-flex;align-items:center;font-size:18px;font-weight:500;box-shadow:0 10px 30px rgba(14,15,18,.18);transition:transform .35s var(--ease),background .5s,color .5s}
-.fab:hover{transform:translateY(-2px)}
+.fab{display:none!important}   /* кнопки «связаться» нет, но в блоках Тильды она еще в разметке */
 /* на первом экране кнопки «связаться» нет: она выезжает, когда начинают листать (app.js) */
-.fab.away{opacity:0;transform:translateY(24px);pointer-events:none}
-.fab{transition:transform .5s var(--ease),opacity .4s var(--ease),background .5s,color .5s}
 /* серьезная версия: на первом экране без кнопок — только заголовок и текст */
 :root:not([data-theme="dark"]) .hero .ctas{display:none}
 
@@ -1118,8 +1115,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .switch{font-size:15px;height:40px;gap:8px}
   .btn{height:52px;padding:0 22px 4px;font-size:17px}
   .big-btn{height:60px;padding:0 28px 4px;font-size:18px}
-  .fab{height:48px;padding:0 20px 3px;font-size:17px;bottom:16px}
-  .to-top{bottom:74px;width:44px;height:44px}
+  .to-top{bottom:16px;width:44px;height:44px}
   .toasts{left:16px;right:16px;bottom:80px;max-width:none}
   .fact{grid-template-columns:1fr}.fact span:last-child{text-align:left}
 }
@@ -2238,7 +2234,6 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .kd-sending .t-form-success-popup{visibility:hidden!important}
 
 /* значок Telegram в кнопке «связаться» */
-.fab .fab-tg{flex:none;width:22px;height:22px;margin:2px 10px 0 -6px}
 
 /* игра: три поля контакта — в ряд на компьютере, столбиком на телефоне */
 .ttt-fields{display:flex;flex-direction:column;gap:12px;flex-basis:100%;max-width:420px;margin-inline:auto}

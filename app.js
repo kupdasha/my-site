@@ -2887,7 +2887,7 @@ function openCase(k){
   trackMounts();
   caseLoad.draw();
   caseEl.classList.add('open');
-  placeFab(); setTimeout(placeToTop, 100);
+  setTimeout(placeToTop, 100);
   document.body.classList.add('locked');
   caseEl.focus?.();
 }
@@ -2896,7 +2896,7 @@ function closeCase(){
   if (caseIndex == null) return;
   caseIndex = null;
   caseEl.classList.remove('open');
-  placeFab(); setTimeout(placeToTop, 100);
+  setTimeout(placeToTop, 100);
   document.body.classList.remove('locked');
   setTimeout(() => { if (caseIndex == null) caseContent.innerHTML = ''; }, 900);
 }
@@ -3334,17 +3334,8 @@ root.dataset.theme = saved;
 document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', saved === 'dark'));
 renderTexts();
 renderLists();
-/* на страницах NDA кнопки «связаться» нет */
-if (isNdaPage) document.querySelector('#fab')?.remove();
-setTimeout(() => $('#fab').classList.add('in'), 700);   // «связаться» проявляется по буквам
-/* «связаться» прячется на первом экране; в дружеской версии «поболтать» появляется ближе к середине страницы */
-function placeFab(){
-  const far = isFun() ? (document.documentElement.scrollHeight - innerHeight) * 0.4 : innerHeight * 0.8;
-  $('#fab').classList.toggle('away', caseIndex == null && scrollY < far);
-}
-addEventListener('scroll', placeFab, { passive: true });
-addEventListener('resize', placeFab);
-addEventListener('theme:apply', placeFab);
+/* плавающей кнопки «связаться» нет: для этого есть пункт меню. В блоках Тильды она еще в разметке */
+document.querySelector('#fab')?.remove();
 
 /* ================================================================
    ОБЯЗАТЕЛЬНОЕ ПО ЗАКОНУ: ссылки на политику и согласие в подвале и окно про cookie.
@@ -3368,10 +3359,10 @@ function renderLegal(){
       try { localStorage.setItem('kd-cookie', '1'); } catch (er) {}
       bar.classList.remove('show'); root.classList.remove('cookie-on'); setTimeout(() => bar.remove(), 400);
     });
-    // кнопки «связаться» и «наверх» поднимаются над плашкой на ее высоту (только на телефоне, см. style.css)
+    // кнопка «наверх» поднимается над плашкой на ее высоту (только на телефоне, см. style.css)
     // насколько поднять: низ кнопки (без текущего подъема) должен оказаться на 8 px выше верха плашки
     const lift = () => {
-      const fab = document.getElementById('fab'); if (!fab) return;
+      const fab = document.getElementById('toTop'); if (!fab) return;
       // низ кнопки без подъема — из ее bottom в стилях (не зависит от анимации); верх плашки — тоже из стилей
       const fabBottom = innerHeight - (parseFloat(getComputedStyle(fab).bottom) || 0);
       const barTop = innerHeight - (parseFloat(getComputedStyle(bar).bottom) || 0) - bar.offsetHeight;
@@ -3389,13 +3380,6 @@ function renderLegal(){
 renderLegal();
 addEventListener('theme:apply', renderLegal);
 
-/* у кнопки «связаться» — значок Telegram, чтобы было понятно, куда она ведет (разметку Тильды не трогаем) */
-{
-  const fab = document.getElementById('fab');
-  if (fab && !fab.querySelector('.fab-tg')) fab.insertAdjacentHTML('afterbegin',
-    '<svg class="fab-tg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.4 4.3 2.9 11.4c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.8.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.3-1.9Zm-3.3 4-8 7.2-.3 3.3-1.5-4.6 9.4-5.9c.4-.3.8 0 .4 0Z"/></svg>');
-}
-placeFab();
 requestAnimationFrame(() => requestAnimationFrame(() => watchReveals(document, true)));
 if (document.fonts) document.fonts.ready.then(layoutStrings);
 readHash();

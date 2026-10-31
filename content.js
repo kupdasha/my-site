@@ -5094,21 +5094,21 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     ],
     episodes: [
       { id: '456239886', time: '54:04',   title: 'Проектирование выставок и музеев. В гостях Metapole',
-        cover: 'https://sun9-42.vkuserphoto.ru/s/v1/ig2/idEHv4WABN8Cwz09DvAFl9RKsweSAbGwy5gX453104qGxyO5DlvZ1gT3Xk3Vj4CyDbApewtSTsnx04qGCus_Zt-d.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239886.jpg' },
       { id: '456239840', time: '46:53',   title: 'Невидимая работа арт-директора. В гостях REDKEDS',
-        cover: 'https://sun9-69.vkuserphoto.ru/s/v1/ig2/63eUf04atlM1O8wpLlsCWnuX7b1HM4Rg4lLxqO1VuRuS5pk-R-bLRrvRgMlbg31DcKDd1oj9onoYKktyHyds2qL7.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239840.jpg' },
       { id: '456239727', time: '48:20',   title: 'Как кризис влияет на дизайн? В гостях Depot',
-        cover: 'https://sun9-84.vkuserphoto.ru/s/v1/ig2/aUaff1sumMSkJt-xC--LyVFtb0-dv9_dvjlSX9FXsIHsLfQtywZih4lJKdJn6LIsKD4pjzyEjkCwGFibleBJruNs.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239727.jpg' },
       { id: '456239651', time: '27:26',   title: 'Зачем дизайнеру свой подкаст? В гостях «Дизайн Прост.»',
-        cover: 'https://sun9-4.vkuserphoto.ru/s/v1/ig2/sV_dHxZ737K19smhHU1K5cn79piCc00PgGGBx3LLs9k7W-NOEtMcm-kbxppnjCsv4jenDq2f-J1K9vSp-uwGchhy.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239651.jpg' },
       { id: '456239627', time: '1:08:30', title: 'Как устроиться на работу к лидерам рынка?',
-        cover: 'https://sun9-60.vkuserphoto.ru/s/v1/ig2/JxyNqMlPnHvleRyRCFqs_fhFC4bAWAnLamT0OHDXqd_FL-sol_34MdkmLWtFbo1-Q18-n_SveBxJzUuaxuSVtouQ.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239627.jpg' },
       { id: '456239531', time: '58:23',   title: 'Underdog — философия аутсайдера. В гостях Дима Карпов',
-        cover: 'https://sun9-35.vkuserphoto.ru/s/v1/ig2/3ZUfq9VnOyPUGEg4zbtWBTBwsH3Wdolebo0I7uJnwlarUK6YurXa7_Fu4EtO45LTnNmnrSDM6hew4w37HHYZGMcj.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239531.jpg' },
       { id: '456239502', time: '1:04:09', title: 'Коммуникационный дизайн или продуктовый? В гостях Леша Чупин',
-        cover: 'https://sun9-67.vkuserphoto.ru/s/v1/ig2/YipjUNCu7BEP1qtYleZVQKtY9ixIGBVDuOg9QXGMVNDsRuFGGEA2UdA-Obd93kAOpIF5Smz9P4KgAsU-Z0eyBj1p.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239502.jpg' },
       { id: '456239298', time: '1:50:15', title: 'ИИ — друг или враг? В гостях ЦЕХ и Skillbox',
-        cover: 'https://sun9-29.vkuserphoto.ru/s/v1/ig2/_MTbhljUTkP7Y21yCfaItSETv37Wa9DsU-0Xt9Bv5HZokMPcSN4IwwbjmdjeVzfwDwJzOWq9BPtXiQSoNZ05J2XR.jpg?quality=95&size=720x405' },
+        cover: 'img/podcast/456239298.jpg' },
     ],
   },
 
@@ -5274,7 +5274,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     bug:     'Ой, Галя перекрасилась. Нажми еще раз, если не боишься.',          // первый клик по многоножке
     bugRun:  'Галя убежала. Она стеснительная.',                                 // второй клик по многоножке
     leech:   'Рассказываю прикол. Одна пиявка звонит другой пиявке, говорит: "Привет, я тебя не отрываю?"', // через 40 секунд на сайте
-    sound:   'Кликни где-нибудь на странице, и струны зазвучат.',                 // задели струну, а звук еще не включен
+    sound:   'Подвигай по струнам, и они зазвучат.',                 // задели струну, а звук еще не включен
     match:   'Это мэтч! Теперь твой ход — пиши в телеграм.',                    // смахнули фото вправо на «Обо мне»
     ufo:     'Секретные материалы засекречены даже от тебя. Инопланетяне в курсе.',// клик по НЛО
   },

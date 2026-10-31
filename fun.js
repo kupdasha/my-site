@@ -508,7 +508,7 @@ function stepHeadings(now){
 const C = FUN.centipede;
 const cv = document.createElement('canvas');
 cv.className = 'centipede'; cv.setAttribute('aria-hidden', 'true');
-cv.style.transition = 'opacity .5s';
+cv.style.transition = 'opacity .5s'; cv.style.opacity = 0;
 document.body.appendChild(cv);
 const ctx = cv.getContext('2d');
 let W = 0, H = 0, L = 0;
@@ -576,6 +576,7 @@ function sample(d){
 
 /* верх страницы с кейсами — зона многоножки; на страницах без кейсов она не ограничена */
 function bugZone(){
+  if (document.getElementById('clients')) return false;   // на странице «Обо мне» многоножки нет
   const list = document.getElementById('workList');
   return !list || list.getBoundingClientRect().top + C.zone * innerHeight > 0;
 }
@@ -814,10 +815,11 @@ function setupUfo(){
   ufo.el.addEventListener('click', () => { joke('ufo'); ufo.state = 'leave'; });
   ufo.state = 'wait'; ufo.until = performance.now() + rand(6000, 10000);
 }
-/* иней на экране или рядом (margin — запас в экранах): там НЛО не место */
+/* иней или листалка фото на экране или рядом (margin — запас в экранах): там НЛО не место */
 function frostNear(margin){
-  const m = margin * innerHeight;
-  return fogs.some(f => { if (f.done) return false; const r = f.media.getBoundingClientRect(); return r.bottom > -m && r.top < innerHeight + m; });
+  const m = margin * innerHeight, near = el => { const r = el.getBoundingClientRect(); return r.bottom > -m && r.top < innerHeight + m; };
+  const deck = document.getElementById('deck');
+  return (deck && near(deck)) || fogs.some(f => !f.done && near(f.media));
 }
 /* что можно украсть: видно на экране, не в шапке, еще не украдено */
 function pickTarget(){
@@ -850,7 +852,7 @@ function updateUfo(dt, now){
   if (hidden) return;
   let tx = ufo.x, ty = ufo.y, k = 0.03;
   // вернулись на первый экран — НЛО улетает: оно живет только со второго блока
-  // и в зону многоножки или к инею тоже не суется: вернется, когда там освободится
+  // и в зону многоножки, к инею и к листалке фото тоже не суется: вернется, когда там освободится
   if (ufo.state !== 'wait' && ufo.state !== 'leave' && (scrollY < innerHeight * 0.8 || (onCasesPage() && bugZone()) || frostNear(0))) { ufo.state = 'leave'; ufo.shooed = true; }
   if (ufo.state === 'wait') {
     tx = -260; ty = 120;
