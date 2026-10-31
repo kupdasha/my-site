@@ -423,6 +423,7 @@ function rotateEvents(strip){
   const ev = i => pick(E.items[i].caption), tall = i => (E.items[i].ratio || 1.5) < 1;
   const OFTEN = (E.often || []).map(pick), often = i => OFTEN.includes(ev(i));
   const deck = {};
+  let loading = false;
   const fresh = t => {
     const list = evShuffle(E.items.map((x, i) => i).filter(i => tall(i) === t && !often(i)));
     E.items.forEach((x, i) => { if (tall(i) !== t || !often(i)) return;
@@ -432,7 +433,7 @@ function rotateEvents(strip){
   };
   evTimer = setInterval(() => {
     const r = strip.getBoundingClientRect();
-    if (document.hidden || !strip.isConnected || r.bottom < 0 || r.top > innerHeight) return;   // лента не на экране — стоим
+    if (loading || document.hidden || !strip.isConnected || r.bottom < 0 || r.top > innerHeight) return;   // лента не на экране — стоим
     const next = [];
     slots.forEach(slot => {
       const cur = +slot.dataset.i, t = tall(cur), taken = next.map(ev);
@@ -440,28 +441,27 @@ function rotateEvents(strip){
       const at = deck[t].findIndex(i => ev(i) !== ev(cur) && !taken.includes(ev(i)));
       next.push(at >= 0 ? deck[t].splice(at, 1)[0] : cur);
     });
-    slots.forEach((slot, k) => swapEvent(slot, next[k]));
+    // ряд меняется разом: ждем, пока загрузятся все новые кадры (пока грузятся, новую смену не начинаем)
+    loading = true;
+    Promise.all(next.map(loadEvent)).then(imgs => { loading = false; slots.forEach((slot, k) => swapEvent(slot, next[k], imgs[k])); });
   }, EV_ROTATE);
 }
-function swapEvent(slot, next){
+function loadEvent(i){
+  const item = SITE.photos.events.items[i];
+  return new Promise(done => { const img = new Image(); img.onload = () => done(img); img.onerror = () => done(null); img.alt = pick(item.caption); img.src = item.thumb || item.src; });
+}
+function swapEvent(slot, next, img){
   const item = SITE.photos.events.items[next];
-  // окошко еще меняет прошлую картинку (новая долго грузилась) — новую смену не начинаем, иначе картинки встают друг под другом
-  if (+slot.dataset.i === next || slot.dataset.busy) return;
-  slot.dataset.busy = '1';
-  const old = slot.querySelector('img'), img = new Image();
-  img.onerror = () => { delete slot.dataset.busy; };
-  img.alt = pick(item.caption); img.className = 'ev-next';
-  img.onload = () => {
-    old.after(img);
-    requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('on')));
-    const cap = slot.querySelector('figcaption'); cap.classList.add('swap');
-    setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, EV_FADE / 2);
-    setTimeout(() => {
-      slot.querySelectorAll('img').forEach(x => { if (x !== img) x.remove(); });
-      img.className = ''; slot.dataset.i = next; delete slot.dataset.busy;
-    }, EV_FADE + 50);
-  };
-  img.src = item.thumb || item.src;
+  if (!img || +slot.dataset.i === next) return;
+  img.className = 'ev-next';
+  slot.querySelector('img').after(img);
+  requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('on')));
+  const cap = slot.querySelector('figcaption'); cap.classList.add('swap');
+  setTimeout(() => { cap.innerHTML = T(item.caption); cap.classList.remove('swap'); }, EV_FADE / 2);
+  setTimeout(() => {
+    slot.querySelectorAll('img').forEach(x => { if (x !== img) x.remove(); });
+    img.className = ''; slot.dataset.i = next;
+  }, EV_FADE + 50);
 }
 /* хроника выступлений: фото в ленте — сразу увеличивается; «все выступления» — плитка всех фото по событиям,
    нажатие на плитку увеличивает фото (листать можно по всем) */
