@@ -2978,7 +2978,7 @@ let pendingJoke = null;
 /* на первом экране сообщения не показываем — ждем, пока его пролистают */
 addEventListener('scroll', () => { if (pendingJoke && scrollY > innerHeight * 0.6) { const k = pendingJoke; pendingJoke = null; joke(k); } }, { passive: true });
 function joke(key){
-  if (!isFun() || shownJokes.has(key) || !SITE.jokes[key]) return;
+  if (!isAboutPage || !isFun() || shownJokes.has(key) || !SITE.jokes[key]) return;   // сообщения только на странице «Обо мне»
   if (scrollY < innerHeight * 0.6 && !document.body.classList.contains('locked')) { pendingJoke = key; return; }
   shownJokes.add(key);
   // одновременно на экране только одно сообщение: остальные ждут своей очереди.
