@@ -6,6 +6,7 @@
         спит     — лежит на сложенных ножках, над ней «з-з-з»,
                    просыпается, если подвести курсор;
         обнимашки — две кнопки в строке сходятся и обнимаются;
+        разные стороны — кнопки друг под другом (телефон) расходятся к разным краям;
         столкновение — на первом экране: бегают туда-сюда, потом
                    разгоняются навстречу и сталкиваются;
         толкучка — кнопки в строке толкают друг друга.
@@ -161,8 +162,11 @@ function setupRunners(){
     const manual = list[0].el.dataset.mood;
     let mood = manual || (list.length >= 3 ? 'push' : list.length === 2 ? (list[0].el.closest('#hero') ? 'clash' : list[0].el.closest('#contact') ? 'part' : 'hug') : list[0].el.closest('#nda') ? 'sleep' : 'run');
     if (list.length < 2 && (mood === 'push' || mood === 'hug' || mood === 'clash' || mood === 'part')) mood = 'run';
+    // кнопки друг под другом (телефон): вместе не ходят, расходятся в разные стороны
+    const top0 = list[0].el.getBoundingClientRect().top;
+    if (list.some(r => Math.abs(r.el.getBoundingClientRect().top - top0) > r.el.offsetHeight / 2)) mood = 'cross';
     list.forEach(r => r.mood = mood);
-    if (mood === 'hug' || mood === 'push' || mood === 'clash' || mood === 'part') {
+    if (mood === 'hug' || mood === 'push' || mood === 'clash' || mood === 'part' || mood === 'cross') {
       const g = { mood, list, state: 'rest', until: performance.now() + rand(1200, 2500), off: 0, trip: null, next: performance.now() + rand(1500, 3500) };
       list.forEach(r => r.g = g);
       groupRange(g);
@@ -193,7 +197,7 @@ function groupRange(g){
 }
 /* компания идет вместе на новое место, а там снова обнимается, толкается или сталкивается */
 function stepTrip(g, dt, now){
-  if (g.mood === 'part') return false;      // у этих свой маршрут: от центра к краям и обратно
+  if (g.mood === 'part' || g.mood === 'cross') return false;      // у этих свой маршрут
   const free = g.state === 'rest' || (g.mood === 'clash' && g.state === 'roam');
   if (g.trip == null) {
     if (!free || g.max - g.min < 60 || g.list.some(r => r.caught)) return false;
@@ -313,6 +317,25 @@ function stepSleep(r, dt, now){
 function stepGroup(g, dt, now){
   if (stepTrip(g, dt, now)) return;
   const [A, B] = g.list;
+  if (g.mood === 'cross') {
+    // соседние кнопки идут к противоположным краям, стоят и меняются сторонами
+    if (g.state === 'rest') {
+      g.list.forEach(r => { if (r.caught) return; r.rot *= 0.85; idle(r, dt); });
+      if (now > g.until) { g.state = 'walk'; g.side = -(g.side || 1); }
+    } else {
+      const W = document.documentElement.clientWidth;
+      let done = true;
+      g.list.forEach((r, i) => {
+        if (r.caught) return;
+        const toRight = (i % 2 ? -1 : 1) * g.side > 0;
+        const lo = Math.min(-14, 16 - r.base), hi = Math.max(14, W - 16 - r.base - r.width);
+        if (!walkTo(r, toRight ? hi : lo, FUN.runners.speed, dt)) done = false;
+        r.rot += ((toRight ? 4 : -4) - r.rot) * 0.15;
+      });
+      if (done) { g.state = 'rest'; g.until = now + rand(700, 1500); }
+    }
+    return;
+  }
   if (g.mood === 'part') {
     // «ну что, пишем?»: стоят по центру, расходятся к краям страницы, сбегаются обратно и сталкиваются
     const spring = r => { r.v += (-r.x * 40 - r.v * 6) * dt; r.x += r.v * dt; };
