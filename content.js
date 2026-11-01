@@ -250,20 +250,20 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'key visual',
         short: ['Почти три года вела визуальное оформление ключевых рекламных кампаний VK - от идеи до тиража.',
                 'Ты их по-любому видел по дороге на работу на наружке'],
-        image: 'https://static.tildacdn.com/tild3366-3465-4065-a436-623434666535/1920x1080_boy_1.png',
+        image: 'img/tilda/3366-3465-1920x1080_boy_1.png',
         thumb: 'img/thumbs/w01.webp',   // легкая копия обложки для сетки (1533 КБ → 55 КБ)
         cardRatio: '16/9',   // в сетке обложка целиком, без обрезки
         frost: true,
         /* Старая галерея с Тильды. Сейчас макеты показаны внутри каждой кампании (поле campaigns ниже),
            поэтому галерея выключена. Чтобы вернуть — уберите // в начале строки.
         gallery: [
-          'https://static.tildacdn.com/tild3039-3137-4262-a561-306533633232/1920x1080_boy_2.png',
-          'https://static.tildacdn.com/tild3561-3661-4066-a534-383638623638/1920x1080_boy_3.png',
-          'https://static.tildacdn.com/tild3264-6135-4635-a532-376462643230/1920x1080_boy_4.png',
-          'https://static.tildacdn.com/tild3435-3464-4834-a530-653339306636/1.jpg',
-          'https://static.tildacdn.com/tild6266-3732-4661-a466-343265386436/2.jpg',
-          'https://static.tildacdn.com/tild6539-3163-4434-b634-616335636266/14_1745320083.webp',
-          'https://static.tildacdn.com/tild3765-3662-4032-b861-343635366634/13_1745320036.webp',
+          'img/tilda/3039-3137-1920x1080_boy_2.png',
+          'img/tilda/3561-3661-1920x1080_boy_3.png',
+          'img/tilda/3264-6135-1920x1080_boy_4.png',
+          'img/tilda/3435-3464-1.jpg',
+          'img/tilda/6266-3732-2.jpg',
+          'img/tilda/6539-3163-14_1745320083.webp',
+          'img/tilda/3765-3662-13_1745320036.webp',
         ], */
         /* campaigns — кампании внутри кейса, по порядку; над ними меню со всеми названиями.
            У каждой: title (заголовок), task (задача), solution (решение), note (приписка, необязательно),
@@ -271,7 +271,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
            gallery: картинки по одной строке; сами встают рядами по cols штук (по умолчанию три).
              Свой ряд — { row: [ ... ], caption: 'подпись над рядом' }: всё из row встает в одну полоску.
              Ролики Kinescope играют сами без звука, ролики VK — по кнопке.
-           Картинки увеличиваются по нажатию. Макеты с Behance лежат на mir-s3-cdn-cf.behance.net,
+           Картинки увеличиваются по нажатию. Макеты с Behance скопированы в img/behance (раньше лежали на mir-s3-cdn-cf.behance.net),
            свои — в img/vk. */
         campaigns: [
           {
@@ -279,12 +279,12 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Напомнить, как давно ВКонтакте в жизни людей, и показать это на примере звезд: INSTASAMKA, Клавы Коки, DENIMANI, Влада Бумаги А4, Миланы Хаметовой и Вали Карнавал.',
             solution: 'Взяли старые фотографии селебрити: по ним сразу видно, сколько лет звезды уже на платформе. На каждом макете — чье-то «первое»: лайк, трек, друг, тренд, хайп — и вопрос «А что для тебя было первым ВКонтакте?». Макеты продолжали видеоролик о том, как звезды менялись вместе с соцсетью. Ностальгия привлекла внимание к долгой истории ВКонтакте и показала, что он по-прежнему актуален.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/08d701205231597.66b72a586d323.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/caf39a205231597.66b72a586e917.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/c6e946205231597.66b72a586edc2.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/117303205231597.66b72a591c635.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/cd82e9205231597.66b72a591ba9d.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/f60295205231597.66b72a591bf90.jpg',
+              'img/behance/08d701205231597.66b72a586d323.jpg',
+              'img/behance/caf39a205231597.66b72a586e917.jpg',
+              'img/behance/c6e946205231597.66b72a586edc2.jpg',
+              'img/behance/117303205231597.66b72a591c635.jpg',
+              'img/behance/cd82e9205231597.66b72a591ba9d.jpg',
+              'img/behance/f60295205231597.66b72a591bf90.jpg',
               'vk:-22822305_456242693',
               /* collage — коллаж: areas — схема раскладки (буквы — ячейки, как в CSS grid-template-areas),
                  cols — ширины колонок, rows — высоты строк. У ячейки: area (буква), text (подпись над фото), img */
@@ -348,8 +348,8 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             solution: 'Оформили новогоднюю кампанию VK Видео вместе с Никитой Кологривым и помогали продакшену в разработке аниматика рекламного ролика.',
             note:     'В этом проекте я была второстепенным дизайнером, не лидером.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/d22ef3205231597.674edb6fdb87c.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/df7ca7205231597.67515f4a65a33.jpg',
+              'img/behance/d22ef3205231597.674edb6fdb87c.jpg',
+              'img/behance/df7ca7205231597.67515f4a65a33.jpg',
               { caption: ['анимация для цифровой наружной рекламы', 'Дед Мороз в движении — на городских экранах'], row: [
                 { video: 'img/vk/vk-newcontent-dooh-1.mp4', ratio: 2 },
                 { video: 'img/vk/vk-newcontent-dooh-2.mp4', ratio: 2 },
@@ -363,15 +363,15 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             solution: 'В основе концепции — «осень как альтернативное начало года»: учеба, возвращение в рутину и поиск занятий, когда за окном дождь. Key visual построили на идее «смотреть и делать». Кампания стартовала 1 сентября и вышла на ТВ, в digital и на наружке в крупнейших городах России.',
             gallery: [
               { row: [
-                'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/f2ae4e205231597.696101e35540d.jpg',
-                'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/f0d138205231597.696101e3558ba.jpg',
-                'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/ad9e48205231597.696101e354d2d.jpg',
-                'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/cb4de1205231597.696101e354500.jpg',
+                'img/behance/f2ae4e205231597.696101e35540d.jpg',
+                'img/behance/f0d138205231597.696101e3558ba.jpg',
+                'img/behance/ad9e48205231597.696101e354d2d.jpg',
+                'img/behance/cb4de1205231597.696101e354500.jpg',
               ] },
               { caption: ['макеты на улицах', 'а вот так это висело в городе'], row: [
-                'https://mir-s3-cdn-cf.behance.net/project_modules/max_3840_webp/f24eb1205231597.6960f0ae0554a.jpg',
-                'https://mir-s3-cdn-cf.behance.net/project_modules/max_3840_webp/e13b6e205231597.6960f0ae05eb0.jpg',
-                'https://mir-s3-cdn-cf.behance.net/project_modules/1400/69911a205231597.696101e5953af.jpg',
+                'img/behance/f24eb1205231597.6960f0ae0554a.jpg',
+                'img/behance/e13b6e205231597.6960f0ae05eb0.jpg',
+                'img/behance/69911a205231597.696101e5953af.jpg',
               ] },
             ],
           },
@@ -380,9 +380,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Каждый год 11 ноября VK проводит «День борьбы с кибербуллингом». Но одного дня мало для проблемы такого масштаба: жертвой травли в сети становился каждый третий пользователь интернета.',
             solution: 'Сделали серию из трех key visuals. В каждом три человека, и жертва одета в белое, чтобы на ней сразу задерживался взгляд. Ситуации охватывают разные группы — школьников, спортсменов, студентов и взрослых, уставших после рабочего дня: столкнуться с грубостью и недоброжелательными комментариями в сети может каждый, независимо от возраста и сферы деятельности. Я руководила дизайнером, который собрал тулкит для партнеров акции.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/ff581b205231597.672489274ac9a.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/674b42205231597.672489274a5d4.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/822882205231597.672489274b333.jpg',
+              'img/behance/ff581b205231597.672489274ac9a.jpg',
+              'img/behance/674b42205231597.672489274a5d4.jpg',
+              'img/behance/822882205231597.672489274b333.jpg',
               /* ресайзы: в каждом ряду сцены в одном порядке — школьники, взрослые, студенты */
               { caption: ['ресайзы под соцсети и digital. Самым сложным были ретушь и подготовка к печати: тогда мы делали их еще вручную — со Stable Diffusion и ретушером. Команда — три человека: я как лид, дизайнер и ретушер',
                            'ресайзы. Самое сложное — ретушь и подготовка к печати: тогда всё еще делали вручную, со Stable Diffusion и ретушером. Нас было трое: я как лид, дизайнер и ретушер'], row: [
@@ -405,7 +405,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Показать разнообразие контента на платформе в кампании «Открой вселенную интересов» и связать наружную рекламу с видеороликом.',
             solution: 'Разработали динамичный визуальный образ: пространство из ролика продолжается на щитах. Это первая кампания VK, созданная с помощью нейросети.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/c2a56c205231597.66b72b607b68a.jpg',
+              'img/behance/c2a56c205231597.66b72b607b68a.jpg',
               { caption: ['процесс разработки key visual', 'а так все начиналось'], row: [
                 'img/vk/vk-dzen-process-1.jpg', 'img/vk/vk-dzen-process-2.jpg', 'img/vk/vk-dzen-process-3.jpg',
               ] },
@@ -417,9 +417,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Привлечь внимание к новой функции VK Видео — офлайн-режиму, который позволяет смотреть контент в любых условиях.',
             solution: 'Кампания показывает разные ситуации: дети смотрят мультики, кардио в спортзале, обед, полет в самолете. Она запускалась параллельно с видеороликом, поэтому макеты и ролик воспринимаются как одно целое. Для каждого героя сделали ресайзы под наружную рекламу — сити-форматы, пиллары и билборды — и под digital.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/665f46205231597.66b73481b1a75.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4d11c9205231597.66b73481b12b0.jpg',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/4f1dbc205231597.66b73481b0c49.jpg',
+              'img/behance/665f46205231597.66b73481b1a75.jpg',
+              'img/behance/4d11c9205231597.66b73481b12b0.jpg',
+              'img/behance/4f1dbc205231597.66b73481b0c49.jpg',
               /* наружка по героям: в каждом ряду сити-формат 1,2 × 1,8, пиллар 1,4 × 3 и билборд 3,7 × 2,7 */
               { caption: ['наружная реклама: сити-формат 1,2 × 1,8, пиллар 1,4 × 3, билборд 3,7 × 2,7', 'наружка: сити-формат, пиллар, билборд'], row: [
                 'img/vk/vk-video-boy-city.jpg', 'img/vk/vk-video-boy-pillar.jpg', 'img/vk/vk-video-boy-billboard.jpg' ] },
@@ -442,8 +442,8 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Поддержать выход новой функции в приложении — раздела с мастер-классами — и связать обучающие видео с рекламным роликом.',
             solution: 'Главное в макете — гармонично разместить трех персонажей и не перегрузить композицию. Получился стильный визуал, который привлекает внимание к новому разделу и вдохновляет учиться.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/58de95205231597.67c8520d2fc47.png',
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/dbdec2205231597.67c8520d30324.png',
+              'img/behance/58de95205231597.67c8520d2fc47.png',
+              'img/behance/dbdec2205231597.67c8520d30324.png',
             ],
             links: [
               { text: 'рекламный ролик', link: 'https://ok.ru/video/6903056763554' },
@@ -455,7 +455,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Показать главное в приложении: люди находят друг друга благодаря совпадению интересов.',
             solution: 'В основе — идея притяжения: люди с общими увлечениями тянутся друг к другу, как магниты. В композицию органично встроены ключевые элементы интерфейса. Кампания выходила вместе с динамичным роликом, где пару сближает любовь к одной и той же музыке.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/ac9008205231597.66b72e32c40cc.jpg',
+              'img/behance/ac9008205231597.66b72e32c40cc.jpg',
               { caption: ['ресайзы под разные площадки', 'один визуал — много размеров'], row: [
                 'img/vk/vk-dating-master.jpg', 'img/vk/vk-dating-square.jpg', 'img/vk/vk-dating-vertical.jpg', 'img/vk/vk-dating-wide.jpg',
               ] },
@@ -477,7 +477,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Создать новогодний визуал VK для молодежной аудитории: передать радость и показать, как много сервисов в суперапе, — но без прямых и очевидных отсылок к празднику.',
             solution: 'На фоне — эффект боке и теплая праздничная атмосфера, а логотипы сервисов заморожены в ледяных кубиках — элемент зимней магии. Анимацию кубиков для наружной рекламы я сделала сама в Blender. Для вертикальных версий баннеров сфотографировали мою руку, чтобы продлить тело девушки. Еще курировала ретушь для печати и для электронных носителей — подробности в статье.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/max_3840_webp/5a9427205231597.66b72e32c4672.png',
+              'img/behance/5a9427205231597.66b72e32c4672.png',
               /* коллаж ресайзов: в ячейке может быть несколько картинок — img: [ ... ];
                  dir: 'column' ставит их столбиком, иначе — в ряд */
               { caption: ['ресайзы под разные носители', 'один кубик — сто размеров'],
@@ -510,7 +510,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             task:     'Оформить новогодний праздник для коллег и передать атмосферу веселья и свободы внутренних мероприятий.',
             solution: 'Переосмыслили мем с котом Степаном: заменили его на маскота Персика и добавили третьего персонажа — Ипполита. Получился комичный новогодний «сплит». Key visual адаптировали под активности на зонах и форматы — от экранов и LED-лент до интранета. Для экранов вышли мультипликационные анимации: я готовила раскадровки и курировала моушн-дизайнеров.',
             gallery: [
-              'https://mir-s3-cdn-cf.behance.net/project_modules/fs_webp/bd4e16205231597.66b72ff715782.png',
+              'img/behance/bd4e16205231597.66b72ff715782.png',
               /* ролик не 16:9 — объектом: { video: 'kinescope:ID', ratio: ширина / высота } */
               { caption: ['анимации для экранов', 'Персик в движении'], row: [ 'kinescope:vKXcDJ9RFA6x2SnWCW7PwL', 'kinescope:otRxgzFCKqoNGiFvq59hP3', 'kinescope:6VBLbUMmkiQTKoNatgS9WS' ] },
               { row: [ { video: 'kinescope:t3knnieArqzGQcd2imZGx9', ratio: 400 / 56 } ] },
@@ -1047,7 +1047,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'ребрендинг',
         short: ['Новое лицо для школы, которая хотела привлечь более молодую аудиторию.',
                 'Оказывается, у блогеров уже есть свои школы, а не только TikTok House'],
-        image: 'https://static.tildacdn.com/tild6439-3864-4732-b032-653632383538/Slide_16_9_-_21.jpg',
+        image: 'img/tilda/6439-3864-Slide_16_9_-_21.jpg',
         thumb: 'img/thumbs/w05.webp',   // легкая копия обложки для сетки (210 КБ → 68 КБ)
         /* gallery: первый элемент встает после задачи, второй — после решения (и тепловизора).
            Список в квадратных скобках — несколько блоков подряд. Свои блоки этого кейса:
@@ -1378,7 +1378,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'сайт',
         short: ['Новый сайт банка после ребрендинга: сложная аналитика превратилась в понятные графики, адаптированные под десктоп и мобильную версию.',
                 'Перевела банковский язык на человеческий — с графиками, которые удобно смотреть и с компьютера, и с телефона'],
-        image: 'https://mir-s3-cdn-cf.behance.net/project_modules/2800_webp/b74692161050243.63becbe41f493.jpg',   // та же обложка, что на главной
+        image: 'img/behance/b74692161050243.63becbe41f493.jpg',   // та же обложка, что на главной
         thumb: 'img/thumbs/w08.webp',   // легкая копия обложки для сетки (479 КБ → 101 КБ)
         pos:   'center 78%',
         ratio: '16/10',   // шапка кейса — та же обложка, что на главной, целиком
@@ -1542,11 +1542,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             text:  'Нажмите, чтобы открыть целиком.',
             /* коллаж: снимки кейса с Behance (shot) и страницы сайта целиком (page) */
             collage: [
-              { shot: 'https://mir-s3-cdn-cf.behance.net/project_modules/2800_webp/7133cc161050243.63becbe41bd32.jpg', scroll: true },   // длинный снимок прокручивается при наведении
+              { shot: 'img/behance/7133cc161050243.63becbe41bd32.jpg', scroll: true },   // длинный снимок прокручивается при наведении
               { page: 'img/eabr/page-review.jpg' },
-              { shot: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/007cb7161050243.63bfd095838b5.jpg' },
+              { shot: 'img/behance/007cb7161050243.63bfd095838b5.jpg' },
               { page: 'img/eabr/page-list.jpg' },
-              { shot: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400_webp/f47c5e161050243.63bfd0fef0b0f.jpg' },
+              { shot: 'img/behance/f47c5e161050243.63bfd0fef0b0f.jpg' },
             ],
           },
         ],
@@ -1772,7 +1772,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'вайб-кодинг',
         short: ['Прячет из документа всё секретное, прежде чем его прочитает нейросеть.',
                 'Нейросеть читает договор, но так и не узнаёт, чей он'],
-        image: 'https://static.tildacdn.com/tild6362-3133-4464-a533-656565663638/Frame_3.jpg',
+        image: 'img/tilda/6362-3133-Frame_3.jpg',
         thumb: 'img/thumbs/anonymizer.jpg',   // обложка в сетке — первый кадр ролика, чтобы не было скачка
         video: 'img/anonymizer.mp4',   // зациклено, играет само без звука
         preview: 'img/anonymizer-preview.mp4',   // легкий ролик для сетки (44 КБ)
@@ -2035,7 +2035,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'вайб-кодинг',
         short: ['Проблема: инфоповоды публиковать надо, выделенного дизайнера нет.',
                 'Выйти за брендбук нельзя технически. Я проверяла.'],
-        image: 'https://static.tildacdn.com/tild3936-3832-4664-b035-646365313863/__2026-08-02_153214.png',
+        image: 'img/tilda/3936-3832-__2026-08-02_153214.png',
         thumb: 'img/thumbs/w13.webp',   // легкая копия обложки для сетки (220 КБ → 29 КБ)
         noHero: true,      // в кейсе без обложки: сразу текст и живые главы
         schemeCols: true,  // задача, роль, решение и результат — колонками в одну строку
@@ -2848,7 +2848,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'мерч',
         short: ['Худи из асфальта — мерч для Nέofleet.',
                 'Худи из асфальта для Nέofleet. Носится мягче, чем звучит'],
-        image: 'https://static.tildacdn.com/tild6665-3565-4833-b665-393432626261/Group_12.jpg',
+        image: 'img/tilda/6665-3565-Group_12.jpg',
         thumb: 'img/thumbs/w25.webp',   // легкая копия обложки для сетки (478 КБ → 160 КБ)
         link:  'https://kupdasha.ru/merch',
         labels: ['задача'],   // подпись первого абзаца вместо тега «мерч»
@@ -2924,7 +2924,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'мерч',
         short: ['Не только мерч.',
                 'Одежда, задача которой буквально выжить'],
-        image: 'https://static.tildacdn.com/tild3939-3461-4238-b934-313239346230/hf_20260707_195803_e.png',
+        image: 'img/tilda/3939-3461-hf_20260707_195803_e.png',
         thumb: 'img/thumbs/w26.webp',   // легкая копия обложки для сетки (1796 КБ → 46 КБ)
         links: [],   // ссылку на старую страницу проекта не показываем
         labels: ['задача', 'роль'],
@@ -2947,7 +2947,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             title: ['три идеи на старте', 'три идеи на старте'],
             text: ['Цветные блоки по крою, фирменная графика по всему костюму или только полосами на рукавах и ногах.',
                    'Цветные блоки, графика целиком или полосками на рукавах и ногах'],
-            shot: { img: 'https://static.tildacdn.com/tild3231-6433-4336-b333-343263646361/hf_20260707_194202_f.png', ratio: '1680/950' } },
+            shot: { img: 'img/tilda/3231-6433-hf_20260707_194202_f.png', ratio: '1680/950' } },
           { label: ['как делали', 'как делали'],
             title: ['от брендбука до неба', 'от брендбука до неба'],
             steps: [
@@ -2962,12 +2962,12 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             title: ['черная основа, цвет по месту', 'черный костюм, цвет по делу'],
             text: ['Знак на груди и мелкие цветные вставки по всему костюму: перекликаются с полосами, но в глаза не лезут.',
                    'Знак на груди и мелкие цветные штрихи по костюму, чтобы не скучно'],
-            shot: { img: 'https://static.tildacdn.com/tild6130-3863-4135-a265-353231316662/hf_20260707_194730_c.png', ratio: '1680/950' } },
+            shot: { img: 'img/tilda/6130-3863-hf_20260707_194730_c.png', ratio: '1680/950' } },
           { label: ['отделка', 'отделка'],
             title: ['вариант с синим воротом', 'вариант с синим воротом'],
             text: ['Тот же крой: синий ворот, красные манжеты и пояс.',
                    'Тот же костюм: синий ворот, красные манжеты и пояс'],
-            shot: { img: 'https://static.tildacdn.com/tild3330-6562-4564-b935-353863396361/hf_20260707_194523_5.png', ratio: '1680/950' } },
+            shot: { img: 'img/tilda/3330-6562-hf_20260707_194523_5.png', ratio: '1680/950' } },
         ],
       },
       {
@@ -2978,7 +2978,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'мерч',
         short: ['Мерч на булавках для моего медиа о дизайне: стикеры, бейдж и брелок можно менять и перевешивать.',
                 'Мимимерч для своего медиа. Всё на булавках, а брелок мягкий — в него можно потыкать'],
-        image: 'https://static.tildacdn.com/tild3433-6265-4532-b634-353335613337/bb3c1924-7865-4e8e-9.jpg',
+        image: 'img/tilda/3433-6265-bb3c1924-7865-4e8e-9.jpg',
         thumb: 'img/thumbs/w27.webp',   // легкая копия обложки для сетки (579 КБ → 161 КБ)
         link:  'https://kupdasha.ru/merch',
         labels: ['идея', 'роль'],
@@ -3083,7 +3083,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   'мерч',
         short: ['Футболки с полной запечаткой для международного конкурса стартапов в Токио.',
                 'Залила целиком японские стартапы'],
-        image: 'https://static.tildacdn.com/tild3464-6666-4261-b566-373539373039/make_realistic_beaut.jpg',
+        image: 'img/tilda/3464-6666-make_realistic_beaut.jpg',
         thumb: 'img/thumbs/w28.webp',   // легкая копия обложки для сетки (457 КБ → 163 КБ)
         heroImage: 'img/ventures/hold-front.jpg',   // видна, пока грузится живой принт
         links: [],   // ссылку на старую страницу проекта не показываем
@@ -3765,7 +3765,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   '3D',
         short: ['Мы сделали этот проект, чтобы участники Пушкинского бала со всей страны могли показать свои конкурсные работы, не привязываясь к месту.',
                 'Работы Пушкинского бала переехали в метавселенную — смотреть можно из любого региона'],
-        image: 'https://static.tildacdn.com/tild6539-3730-4632-a164-326161313632/__2024-06-13_185416.png',
+        image: 'img/tilda/6539-3730-__2024-06-13_185416.png',
         thumb: 'img/thumbs/w32.webp',   // легкая копия обложки для сетки (1481 КБ → 73 КБ)
         heroImage: 'img/pushkin/podium.webp',   // в шапке кейса — бальный зал с подиумом; в сетке — золотая рыбка
         link:  'https://kupdasha.ru/stands',
@@ -3955,7 +3955,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         n:     35,
         title: 'Разное',
         tag:   '3D',
-        image: 'https://static.tildacdn.com/tild3837-3762-4131-b332-306438306566/2.png',
+        image: 'img/tilda/3837-3762-2.png',
         cardTint: 'rgba(0,0,0,.03)',   // на обложке в сетке — легкая черная заливка 3%, чтобы белая картинка не сливалась с фоном
         thumb: 'img/thumbs/w37.webp',   // легкая копия обложки для сетки (1208 КБ → 80 КБ)
         /* каждый проект — блок { screen }: коллаж не выше экрана, название и подпись в ячейке head или над коллажем,
@@ -4029,7 +4029,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         tag:   '3D + AI',
         short: ['Остров-город к юбилею компании «Галсэр» я смоделировала в 3D, а спустя годы доработала тот же рендер нейросетью. Планировка, здания и ракурс остались прежними — поменялись свет, вода и фактуры.',
                 'Слепила остров в 3D, а через несколько лет показала его нейросети. Остров тот же, просто наконец выспался'],
-        image: 'https://static.tildacdn.com/tild6638-6237-4937-b064-373666663038/9.jpg',
+        image: 'img/tilda/6638-6237-9.jpg',
         listPreview: 'img/thumbs/ai-island-hover.webp',   // при наведении на строку в «других работах» — остров-город (прислан 09.10)
         thumb: 'img/thumbs/w34.webp',   // легкая копия обложки для сетки (376 КБ → 165 КБ)
         heroImage: 'img/isle/island-ai.webp',   // в шапке — остров после нейросети в полном размере
@@ -4880,7 +4880,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
   about: {
     pageTitle: ['Обо мне — Дарья Купцова', 'кто такая Купяша'],
     title: ['обо мне', 'кто я вообще'],
-    photo: ['img/portrait.jpg', 'https://static.tildacdn.com/tild6564-6334-4138-b238-613362666233/photo.png'],   // серьезная (портрет 14.10) / дружеская
+    photo: ['img/portrait.jpg', 'img/tilda/6564-6334-photo.png'],   // серьезная (портрет 14.10) / дружеская
     big:   ['Арт-директор с десятилетним опытом. Айдентика и ключевые визуалы для аудитории 97M+.',
             'Та, кого зовут, когда нужно "красиво, понятно и желательно вчера".'],
     text:  ['Бывший лид дизайн-команды в центральном маркетинге VK, автор первой нейрогенеративной федеральной рекламной кампании мегабренда. Работала с LEGO, T2, МТС, Armani Casa и Росатомом. Член жюри премий Russian Design Cup, WDA, Айда, Основа, Таврида х Dprofile и других. Выступаю на конференциях.',
@@ -4995,16 +4995,16 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     /* src — фото; pos — какая часть кадра видна (0% — левый край, 100% — правый);
        caption — подпись на карточке в дружеской версии */
     items: [
-      { src: 'https://static.tildacdn.com/tild6138-3934-4235-a530-353063346533/sdcsdc.jpg',  pos: '14% 50%',
+      { src: 'img/tilda/6138-3934-sdcsdc.jpg',  pos: '14% 50%',
         caption: 'Выступаю на «Кайференции»: полный зал, я — слева.' },
-      { src: 'https://static.tildacdn.com/tild3130-3037-4865-b134-366262323939/231A8190.jpg', pos: '46% 40%',
+      { src: 'img/tilda/3130-3037-231A8190.jpg', pos: '46% 40%',
         caption: 'Стою на красном фоне и рассказываю дизайн-стендап.' },
-      { src: 'https://static.tildacdn.com/tild6133-3130-4566-a332-303931333166/IROD8764.jpg', pos: '58% 40%',
+      { src: 'img/tilda/6133-3130-IROD8764.jpg', pos: '58% 40%',
         funSrc: 'img/photo-stage-mic.jpg', funPos: '52% 30%',   // в веселой версии (колода «как в Тиндере») — другое фото
         caption: 'Российский форум индустрии дизайна: говорю серьезные вещи с серьезным лицом.' },
-      { src: 'https://static.tildacdn.com/tild3565-6162-4964-b536-653533393934/dg4vId6BZtP47oIDwRUQ.jpg', pos: '50% 30%',
+      { src: 'img/tilda/3565-6162-dg4vId6BZtP47oIDwRUQ.jpg', pos: '50% 30%',
         caption: 'Выступаем на Telling Stories.' },
-      { src: 'https://static.tildacdn.com/tild6433-3666-4130-b233-353932303233/_C6A1741.jpg', pos: '35% 40%',
+      { src: 'img/tilda/6433-3666-_C6A1741.jpg', pos: '35% 40%',
         caption: 'Плывем на теплоходе со «Средой».' },
     ],
   },
@@ -5152,9 +5152,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
     ],
     shows: [
       { title: 'конференции', link: 'https://kupdasha.ru/comdesign',
-        images: ['https://static.tildacdn.com/tild3336-3132-4665-b839-393033346262/Slide_16_9_-_148.jpg', 'https://static.tildacdn.com/tild3365-3864-4433-a432-323565643264/Untitled-1.png', 'https://static.tildacdn.com/tild3439-3265-4130-b235-663862633331/erfer.png', 'https://static.tildacdn.com/tild3964-3066-4336-b965-646635386163/fvdv.png'] },
+        images: ['img/tilda/3336-3132-Slide_16_9_-_148.jpg', 'img/tilda/3365-3864-Untitled-1.png', 'img/tilda/3439-3265-erfer.png', 'img/tilda/3964-3066-fvdv.png'] },
       { title: 'митапы', link: 'https://kupdasha.ru/love14',
-        images: ['https://static.tildacdn.com/tild3634-3761-4664-a438-633737356564/Slide_16_9_-_136.jpg', 'https://static.tildacdn.com/tild3638-3062-4131-b961-363532623033/Slide_16_9_-_134.jpg', 'https://static.tildacdn.com/tild3964-6233-4330-a264-326139653666/fdfdf.png', 'https://static.tildacdn.com/tild3634-3938-4132-b766-636565666561/rIhWdLJPUYp_vnDyRGCY.jpg'] },
+        images: ['img/tilda/3634-3761-Slide_16_9_-_136.jpg', 'img/tilda/3638-3062-Slide_16_9_-_134.jpg', 'img/tilda/3964-6233-fdfdf.png', 'img/tilda/3634-3938-rIhWdLJPUYp_vnDyRGCY.jpg'] },
       { title: 'дизайн-стендап', link: 'https://kupdasha.ru/dsnstand',
         images: ['img/events/ev-20.jpg', 'img/events/ev-21.jpg'] },
     ],
