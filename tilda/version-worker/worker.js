@@ -102,7 +102,17 @@ const test=(kind,url)=>new Promise(r=>{const t0=performance.now(),done=ok=>r([ok
  if(kind==='script'||kind==='img'){const e=document.createElement(kind);e.onload=()=>{clearTimeout(to);done(true)};e.onerror=()=>{clearTimeout(to);done(false)};e.src=url;if(kind==='script')document.head.appendChild(e);}
  else fetch(url,{cache:'reload',mode:kind==='nocors'?'no-cors':'cors'}).then(x=>{clearTimeout(to);done(kind==='nocors'||x.ok)}).catch(()=>{clearTimeout(to);done(false)});});
 (async()=>{for(const [n,k,u] of T){const c=row(n);const [ok,ms]=await test(k,u);c.className=ok?'ok':'fail';c.textContent=(ok?'ок ':'НЕТ ')+ms+' мс';res.push(n+': '+(ok?'ок':'НЕТ')+' '+ms+'мс');log.value=res.join('\\n');}
- log.value+='\\n'+${JSON.stringify(info)}+'\\n'+navigator.userAgent;})();
+ 
+ // первое подключение к сайту: этой страницы (с нуля, с рукопожатием), потом вся страница тестового в рамке
+ const nav=performance.getEntriesByType('navigation')[0]||{};const c0=row('первое подключение к сайту');const nt=Math.round(nav.responseStart||0);c0.className=nt>1500?'fail':'ok';c0.textContent=nt+' мс (dns '+Math.round(nav.domainLookupEnd-nav.domainLookupStart)+', tls '+Math.round(nav.connectEnd-nav.connectStart)+')';res.push('первое подключение: '+c0.textContent);
+ const c1=row('страница тестового целиком'),c2=row('самые долгие файлы'),c3=row('зависания страницы');
+ const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:'+innerWidth+'px;height:'+innerHeight+'px;opacity:0;pointer-events:none;border:0';const t0=performance.now();f.src='/alfa/?frame='+Date.now();document.body.appendChild(f);
+ const done=new Promise(r=>{const i=setInterval(()=>{let d;try{d=f.contentDocument}catch(e){}if(d&&d.documentElement.classList.contains('al-ready')){clearInterval(i);r(Math.round(performance.now()-t0))}},50);setTimeout(()=>{clearInterval(i);r(0)},30000)});
+ const ms=await done;c1.className=ms&&ms<3000?'ok':'fail';c1.textContent=ms?ms+' мс':'нет за 30 с';res.push('страница целиком: '+c1.textContent);
+ await new Promise(r=>setTimeout(r,5000));
+ try{const w=f.contentWindow,es=w.performance.getEntriesByType('resource');const top=es.slice().sort((a,b)=>b.responseEnd-a.responseEnd).slice(0,4).map(e=>e.name.split('/').pop().split('?')[0]+' '+Math.round(e.responseEnd));c2.className='wait';c2.textContent=top.join(', ');res.push('файлы: '+es.length+'; поздние: '+top.join(', '));
+ const t1=w.performance.now();let frames=0,worst=0,last=t1;await new Promise(r=>{const tick=n=>{frames++;worst=Math.max(worst,n-last);last=n;n-t1<3000?w.requestAnimationFrame(tick):r()};w.requestAnimationFrame(tick)});c3.className=worst>300?'fail':'ok';c3.textContent=Math.round(frames/3)+' кадр/с, худший '+Math.round(worst)+' мс';res.push('плавность: '+c3.textContent);}catch(e){c2.textContent='ошибка '+e.message}
+ f.remove();log.value=res.join('\\n')+'\\n'+${JSON.stringify(info)}+'\\n'+navigator.userAgent;})();
 </script>`;
   return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
