@@ -320,11 +320,20 @@ function spellOut(scope = document){
             word.appendChild(letter);
           }
           frag.appendChild(word);
+          // слово начинается с неразрывного пробела (типограф выделил предыдущее слово, например LIFE, в свой span):
+          // склеиваем его с предыдущим, иначе между словами-блоками браузер перенесет строку и разорвет название
+          if (part[0] === '\u00A0') word.dataset.glue = '';
         });
         ch.replaceWith(frag);
       } else if (ch.nodeType === 1) walk(ch);
     });
     walk(el);
+    el.querySelectorAll('.wd[data-glue]').forEach(w => {
+      const prev = w.previousSibling;
+      if (!prev || prev.nodeType !== 1) return;
+      const glue = document.createElement('span'); glue.className = 'wd-glue';
+      prev.before(glue); glue.append(prev, w);
+    });
     el.setAttribute('aria-label', label);
   });
 }

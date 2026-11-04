@@ -88,6 +88,7 @@ img,video{display:block;max-width:100%}
 
 /* Текст по буквам: слово не рвется, буква живет отдельно */
 .wd{display:inline-block;white-space:nowrap}
+.wd-glue{white-space:nowrap}   /* слова через неразрывный пробел (LIFE Варшавская) не разрываются на две строки */
 .ch{display:inline-block}
 /* кнопки проявляются буква за буквой, когда до них долистали */
 [data-reveal] .btn .ch,.fab .ch{opacity:0;translate:0 .5em;transition:opacity .45s var(--ease),translate .6s var(--ease);transition-delay:calc(var(--d,0s) + .15s + var(--i) * 24ms)}
