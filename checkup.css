@@ -1,0 +1,375 @@
+/* ================================================================
+   КЕЙС «АУДИТ ВНУТРЕННИХ СИСТЕМ РОСАТОМА» (checkup.js, поле checkup у проекта)
+   Рабочий стол, кабинет и чаты — интерфейс заказчика в его цветах в обеих
+   версиях сайта (оранжевые иконки и баннер — их цвета, исключение).
+   Свое оформление — серое и черно-белое, акцент — цвет выделения сайта.
+   ================================================================ */
+.ck{overflow-x:clip;--ck-gap:clamp(72px,9vw,144px);--ck-desk:#F4F4F5;--ck-soft:color-mix(in srgb,currentColor 6%,transparent);--ck-line:color-mix(in srgb,currentColor 14%,transparent)}
+.ck-ch{margin-bottom:var(--ck-gap)}
+
+/* ---------- раскладка: картинка 7 колонок, текст 4; wide — картинка 8; rev — картинка справа ---------- */
+.ck-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
+.ck-split > .ck-viz{grid-column:1 / span 7}
+.ck-split > .ck-col{grid-column:9 / -1}
+.ck-split.rev > .ck-viz{grid-column:6 / -1;order:2}
+.ck-split.rev > .ck-col{grid-column:1 / span 4;order:1}
+.ck-split.wide > .ck-viz{grid-column:1 / span 8}
+.ck-split.wide > .ck-col{grid-column:9 / -1}
+.ck-split.wide.rev > .ck-viz{grid-column:5 / -1}
+.ck-split.wide.rev > .ck-col{grid-column:1 / span 4}
+@media (max-width:1100px){
+  .ck-split.wide > .ck-viz,.ck-split.wide > .ck-col,.ck-split.wide.rev > .ck-viz,.ck-split.wide.rev > .ck-col{grid-column:1 / -1}
+  .ck-split.wide > .ck-col{order:-1}
+}
+@media (max-width:900px){
+  .ck-split > .ck-viz,.ck-split > .ck-col,.ck-split.rev > .ck-viz,.ck-split.rev > .ck-col{grid-column:1 / -1}
+  .ck-split > .ck-col,.ck-split.rev > .ck-col{order:-1}
+  .ck-split{row-gap:28px}
+}
+.ck-col{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.ck-title{font-weight:500;font-size:clamp(30px,3.2vw,48px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
+.ck-text{font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;max-width:40ch}
+.ck-head{margin-bottom:clamp(28px,3.5vw,48px)}
+.ck-head .ck-col{max-width:760px}
+.ck-head .ck-text{max-width:52ch}
+
+/* появление */
+.ck-col > *{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.ck-col > :nth-child(2){transition-delay:.08s}.ck-col > :nth-child(n+3){transition-delay:.16s}
+.ck-viz,.ck-head + .wrap{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .1s,transform 1.1s var(--ease) .1s}
+.ck-ch.in .ck-col > *,.ck-ch.in .ck-viz,.ck-ch.in .ck-head + .wrap{opacity:1;transform:none}
+
+/* ---------- строка надписей: текущая темная, под ней — полоска таймера ---------- */
+.ck-tabs{display:flex;flex-wrap:wrap;column-gap:clamp(18px,2.4vw,36px);row-gap:4px;border-bottom:1.5px solid var(--ck-line);margin-bottom:clamp(16px,2vw,28px)}
+.ck-tab{position:relative;padding:0 0 14px;margin-bottom:-1.5px;font-size:clamp(18px,1.5vw,24px);font-weight:500;line-height:1.15;white-space:nowrap;color:inherit;
+  background:none;border:0;opacity:.38;cursor:pointer;transition:opacity .35s}
+.ck-tab:hover{opacity:.75}
+.ck-tab[aria-selected="true"]{opacity:1}
+.ck-tick{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;transition:opacity .3s}
+.ck-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%}
+.ck-tab[aria-selected="true"] .ck-tick{opacity:1}
+.ck-tab.run .ck-tick::after,.ck-pain.run .ck-tick::after{animation:ckTick var(--ms) linear both}
+@keyframes ckTick{from{transform:scaleX(0)}to{transform:none}}
+@media (max-width:760px){
+  .ck-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad)}
+  .ck-tabs::-webkit-scrollbar{display:none}
+  .ck-tab{flex:none}
+}
+.ck-note{font-size:clamp(18px,1.4vw,21px);line-height:1.4;min-height:2.8em;max-width:62ch;margin-bottom:clamp(16px,2vw,24px);text-wrap:balance}
+.ck-note.on{animation:ckFade .6s var(--ease) both}
+@keyframes ckFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ================================================================
+   scope — коллаж: основное крупно слева, беклог мельче справа
+   ================================================================ */
+.ck-sc{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:clamp(24px,3vw,48px);align-items:start}
+.ck-sc-h{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid var(--ck-line)}
+.ck-sc-h b{font-size:clamp(36px,3.4vw,52px);font-weight:500;line-height:1}
+.ck-sc-h span{font-size:clamp(18px,1.4vw,21px);opacity:.55}
+.ck-sc-row{display:flex;gap:clamp(10px,1.2vw,16px);margin-bottom:clamp(14px,1.6vw,22px)}
+.ck-sc-f{margin:0;flex:var(--r) 1 0;min-width:0}
+.ck-sc-p{all:unset;display:block;width:100%;cursor:zoom-in;border-radius:var(--r-img);overflow:hidden;box-shadow:0 0 0 1px var(--ck-line)}
+.ck-sc-p img{display:block;width:100%;height:auto;transition:transform .8s var(--ease)}
+.ck-sc-p:hover img{transform:scale(1.03)}
+.ck-sc-p:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.ck-sc-f figcaption{font-size:16px;line-height:1.3;margin-top:8px;opacity:.6}
+.ck-sc-f{opacity:0;transform:translateY(18px);transition:opacity .8s var(--ease),transform 1s var(--ease)}
+.ck-ch.in .ck-sc-f{opacity:1;transform:none}
+.ck-sc-g.bl .ck-sc-f{transition-delay:.2s}
+@media (max-width:900px){.ck-sc{grid-template-columns:1fr}}
+
+/* ================================================================
+   pattern — таблица «болезнь × система»
+   ================================================================ */
+.ck-mx{--c:minmax(0,1fr);--t:minmax(200px,3.2fr)}
+.ck-mx-r{display:grid;grid-template-columns:var(--t) repeat(5,var(--c)) 14px repeat(6,var(--c));align-items:center;column-gap:4px}
+.ck-mx-r > .bl.gap{grid-column:8}
+.ck-mx-t{font-size:clamp(18px,1.4vw,21px);font-weight:500;line-height:1.2;padding:14px 16px 14px 0;text-wrap:balance}
+.ck-mx-r:not(.ck-mx-head){border-top:1.5px solid var(--ck-line)}
+/* шапка: имена систем вертикально */
+.ck-mx-head{align-items:end;padding-bottom:12px}
+.ck-mx-h{display:flex;justify-content:center}
+.ck-mx-h span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:16px;line-height:1.1;white-space:nowrap;opacity:.6;transition:opacity .3s}
+.ck-mx-h.bl span{opacity:.38}
+/* точки */
+.ck-mx-d{justify-self:center;width:8px;height:8px;border-radius:50%;background:var(--ck-line);transition:background .3s}
+.ck-mx-d.on{width:clamp(16px,1.5vw,22px);height:clamp(16px,1.5vw,22px);background:var(--ink);transform:scale(0);
+  transition:transform .55s cubic-bezier(.3,1.6,.5,1) calc(var(--ri) * .16s + var(--j) * .04s + .3s),background .3s}
+.ck-ch.in .ck-mx-d.on{transform:none}
+.ck-mx-d.on.hl{background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.ck-mx-d.hl:not(.on){background:color-mix(in srgb,currentColor 30%,transparent)}
+.ck-mx-h.hl span{opacity:1}
+/* столбики: сколько болезней у системы */
+.ck-mx-tot{align-items:end;padding-top:16px;border-top:1.5px solid currentColor!important}
+.ck-mx-tot .ck-mx-t{font-weight:400;font-size:16px;opacity:.6;align-self:end;padding:0 16px 0 0}
+.ck-mx-b{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:clamp(90px,9vw,130px)}
+.ck-mx-b i{width:clamp(16px,1.5vw,22px);height:calc(var(--v) * (100% - 30px));min-height:6px;border-radius:6px;background:var(--ck-line);transform-origin:50% 100%;transform:scaleY(0);transition:transform .9s var(--ease) 1.2s,background .3s}
+.ck-ch.in .ck-mx-b i{transform:none}
+.ck-mx-b.max i{background:var(--ink)}
+.ck-mx-b.hl i{background:var(--accent)}
+.ck-mx-b b{font-size:clamp(18px,1.4vw,22px);font-weight:500;line-height:1}
+@media (max-width:760px){
+  .ck-mx{--t:0}
+  .ck-mx-r{grid-template-columns:repeat(5,var(--c)) 8px repeat(6,var(--c));column-gap:2px}
+  .ck-mx-r > .bl.gap{grid-column:7}
+  .ck-mx-head > span:first-child{display:none}
+  .ck-mx-r .ck-mx-t{grid-column:1 / -1;padding:12px 0 8px}
+  .ck-mx-r:not(.ck-mx-head):not(.ck-mx-tot){padding-bottom:12px}
+  .ck-mx-tot .ck-mx-t{padding:0 0 10px}
+}
+@media (prefers-reduced-motion:reduce){.ck-mx-d.on,.ck-mx-b i{transition:none;transform:none}}
+
+/* ================================================================
+   рабочий стол HR-сервисов — 1920 × 1000, масштаб --k
+   ================================================================ */
+.ck-desk{--k:.5;position:relative;aspect-ratio:1920/1000;border-radius:var(--r-img);overflow:hidden;background:var(--ck-desk);box-shadow:0 0 0 1px var(--ck-line);color:#1D1D1F;
+  font-family:"Golos Text","Manrope",system-ui,sans-serif;user-select:none}
+.ck-d-in{position:absolute;left:0;top:0;width:1920px;height:1000px;transform:scale(var(--k)) translateX(calc(var(--cx) * -1px));transform-origin:0 0}
+/* на телефоне — без бокового меню: плитки, поиск и баннер крупнее */
+.ck-desk{--cw:1920;--cx:0}
+@media (max-width:700px){.ck-desk{--cw:1290;--cx:510;aspect-ratio:1290/1000}}
+.ck-d-in > *{position:absolute}
+.ck-d-side{left:0;top:0;width:388px;height:1000px}
+.ck-d-side > *{position:absolute}
+.ck-d-logo{left:32px;top:38px;width:123px}
+.ck-d-cap{left:32px;width:70px;height:12px;border-radius:6px;background:#E2E2E5}
+.ck-d-nav{left:60px;height:16px;border-radius:8px;background:#E7E7EA}
+.ck-d-btns{left:32px;top:757px;width:324px;height:44px;border-radius:10px;background:repeating-linear-gradient(90deg,#E7E7EA 0 103px,transparent 103px 110px)}
+.ck-d-title{left:538px;top:30px;font-size:40px;font-weight:700;letter-spacing:-.01em}
+.ck-d-user{left:1500px;top:30px;width:270px;height:46px}
+.ck-d-user b{position:absolute;left:0;top:16px;width:200px;height:16px;border-radius:8px;background:#E7E7EA}
+.ck-d-user i{position:absolute;right:0;top:0;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#DADADF,#C9C9CF)}
+.ck-d-tiles{left:538px;top:108px;width:1232px;height:368px;transition:transform 1s cubic-bezier(.65,0,.35,1)}
+.ck-d-tile{position:absolute;width:182px;height:176px;border-radius:14px;background:#E9E9EB}
+.ck-d-tile img{position:absolute;left:24px;top:24px;width:56px;height:56px;border-radius:12px}
+.ck-d-tile span{position:absolute;left:24px;right:20px;bottom:20px;font-size:16px;font-weight:500;line-height:24px}
+.ck-d-mini{position:absolute;left:1188px;width:44px;height:48px;border-radius:10px;background:#E9E9EB}
+.ck-d-ask{left:538px;top:500px;font-size:32px;font-weight:700;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .8s var(--ease)}
+.ck-d-sg{left:538px;top:541px;width:1232px;height:120px;transition:transform 1s cubic-bezier(.65,0,.35,1)}
+.ck-d-sg > *{position:absolute}
+.ck-d-blk{left:-24px;top:-20px;right:-24px;bottom:-20px;border-radius:22px;background:#E1EBFB;opacity:0;transform:scale(.97);transition:opacity .6s,transform .8s var(--ease)}
+.ck-d-mark{left:0;top:-6px;width:100px;height:120px}
+.ck-d-mark > *{position:absolute;inset:0}
+.ck-d-mark svg{width:100%;height:100%;overflow:visible}
+.ck-d-field{left:116px;top:0;width:1116px;height:60px;border-radius:14px;background:#fff;display:flex;align-items:center;gap:14px;padding:0 28px;font-size:18px;transition:box-shadow .5s}
+.ck-d-mag{width:24px;height:24px;flex:none;fill:none;stroke:#8E8E93;stroke-width:2;stroke-linecap:round;transition:transform .5s var(--ease),stroke .4s}
+.ck-d-ph{color:#8E8E93}
+.ck-d-type{color:#1D1D1F;font-weight:500;white-space:pre}
+.ck-d-type:not(:empty) + .ck-d-role{margin-left:auto}
+.ck-d-type:not(:empty){border-right:2px solid #1D1D1F;padding-right:2px;animation:ckCaret 1s steps(1) infinite}
+.m-role .ck-d-ph{display:none}
+@keyframes ckCaret{50%{border-color:transparent}}
+.ck-d-role{margin-left:auto;font-size:15px;font-weight:500;padding:6px 14px;border-radius:999px;background:#EEF2FA;color:#3D63B8;opacity:0;transform:translateY(4px);transition:opacity .4s,transform .4s}
+.ck-d-role.on{opacity:1;transform:none}
+.ck-d-tags{left:116px;top:76px;display:flex;gap:16px}
+.ck-d-tag{position:relative;overflow:hidden;height:44px;min-width:150px;padding:0 18px;border-radius:10px;background:#E9E9EB;display:flex;align-items:center;font-size:16px;font-weight:500;transition:background .5s,color .5s}
+.ck-d-bn{left:538px;top:693px;width:1232px;height:164px;border-radius:14px;overflow:hidden;background:#fff;transition:transform 1s cubic-bezier(.65,0,.35,1)}
+.ck-d-bn img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s}
+.ck-desk[data-banner="orange"] .ck-d-bn img[data-b="orange"],.ck-desk[data-banner="white-photo"] .ck-d-bn img[data-b="white-photo"],
+.ck-desk[data-banner="white-ui"] .ck-d-bn img[data-b="white-ui"],.ck-desk[data-banner="soft-photo"] .ck-d-bn img[data-b="soft-photo"],
+.ck-desk[data-banner="soft-ui"] .ck-d-bn img[data-b="soft-ui"]{opacity:1}
+.ck-d-dots{position:absolute;left:50%;bottom:14px;display:flex;gap:8px;transform:translateX(-50%);opacity:0;transition:opacity .4s}
+.ck-desk[data-banner="orange"] .ck-d-dots{opacity:1}
+.ck-d-dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.55)}
+.ck-d-dots i:first-child{animation:ckDot 3.2s infinite}
+.ck-d-dots i:nth-child(2){animation:ckDot 3.2s .8s infinite}.ck-d-dots i:nth-child(3){animation:ckDot 3.2s 1.6s infinite}.ck-d-dots i:nth-child(4){animation:ckDot 3.2s 2.4s infinite}
+@keyframes ckDot{0%,25%{background:#fff;width:28px;border-radius:5px}26%,100%{background:rgba(255,255,255,.55);width:10px}}
+.ck-d-tasks{left:538px;top:922px;width:1232px;height:200px;border-radius:16px;background:#fff;padding:24px}
+.ck-d-tasks b{display:block;font-size:24px;font-weight:600}
+.ck-d-tasks em{font-style:normal;color:#A1A1A6;margin-left:6px}
+.ck-d-tasks i{display:block;width:260px;height:14px;border-radius:7px;background:#EEEEF0;margin-top:14px}
+
+/* подсветка: все вокруг темнее, рамка — на месте проблемы */
+.ck-d-spot{left:0;top:0;width:0;height:0;border-radius:18px;opacity:0;pointer-events:none;box-shadow:0 0 0 3000px rgba(18,20,26,.42),0 0 0 4px #fff;
+  transition:left .9s cubic-bezier(.65,0,.35,1),top .9s cubic-bezier(.65,0,.35,1),width .9s cubic-bezier(.65,0,.35,1),height .9s cubic-bezier(.65,0,.35,1),opacity .5s}
+.ck-desk.spot .ck-d-spot{opacity:1}
+.ck-desk[data-pain="carousel"] .ck-d-spot{border-radius:999px}
+.ck-desk[data-pain="mark"] .ck-d-mark{animation:ckIdle 2.6s ease-in-out infinite}
+@keyframes ckIdle{50%{transform:translateY(-3px)}}
+
+/* список болей рядом со столом */
+.ck-pains{list-style:none;margin:6px 0 0;padding:0;width:100%;border-top:1.5px solid var(--ck-line)}
+.ck-pain{all:unset;box-sizing:border-box;position:relative;display:block;width:100%;cursor:pointer;padding:14px 0 16px;font-size:clamp(17px,1.25vw,19px);line-height:1.38;border-bottom:1.5px solid var(--ck-line);opacity:.4;transition:opacity .35s}
+.ck-pain:hover,.ck-pain.on{opacity:1}
+.ck-pain .ck-tick{bottom:-1.5px}
+.ck-pain.on .ck-tick{opacity:1}
+.ck-pain:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+
+/* ---------- решения по поиску: режимы стола ---------- */
+/* спросить: заголовок, голубые теги, контрастная иконка */
+.m-ask .ck-d-ask{opacity:1;transform:none}
+.m-ask .ck-d-sg{transform:translateY(46px)}.m-ask .ck-d-bn{transform:translateY(40px)}
+.m-ask .ck-d-tag{background:#DFE8F8;color:#24539E}
+.m-ask .ck-d-mag{stroke:#1D1D1F;stroke-width:2.6}
+/* по ролям: цветные теги, запрос печатается */
+.m-role .ck-d-tag:nth-child(1){background:#DCE7FB}.m-role .ck-d-tag:nth-child(2){background:#DDF1E4}
+.m-role .ck-d-tag:nth-child(3){background:#F6DDEA}.m-role .ck-d-tag:nth-child(4){background:#E7E0F8}.m-role .ck-d-tag:nth-child(5){background:#F4EED3}
+.m-role .ck-d-field{box-shadow:0 0 0 2px #C9D8F5}
+/* поиск над плитками */
+.m-top .ck-d-sg{transform:translateY(-433px)}
+.m-top .ck-d-tiles{transform:translateY(160px)}
+.m-top .ck-d-bn{transform:translateY(30px)}
+/* живой Марк: моргает, по кнопкам — блик, иконка подрастает */
+.ck-d-anim{position:absolute;inset:0;visibility:hidden}
+.ck-d-anim > div{position:absolute;inset:0;display:none}
+.ck-d-anim svg{width:100%;height:100%;overflow:visible}
+.ck-d-anim[data-on="a"] > .a,.ck-d-anim[data-on="b"] > .b{display:block}
+.m-live .ck-d-anim[data-on="a"],.m-live .ck-d-anim[data-on="b"]{visibility:visible}
+.m-live .ck-d-mark:has(.ck-d-anim[data-on="a"],.ck-d-anim[data-on="b"]) > .ck-d-mk{visibility:hidden}
+.m-live .ck-d-tag::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.95),transparent);animation:ckShine 2.8s calc(var(--c) * .14s) infinite}
+@keyframes ckShine{0%{left:-60%}45%,100%{left:130%}}
+.m-live .ck-d-mag{animation:ckMag 2.8s infinite}
+@keyframes ckMag{0%,70%,100%{transform:none}80%{transform:scale(1.25)}}
+/* в цвете: Марк и поиск в голубом блоке */
+.m-block .ck-d-blk{opacity:1;transform:none}
+.m-block .ck-d-tag{background:#EEF3FC}
+@media (prefers-reduced-motion:reduce){.ck-d-tiles,.ck-d-sg,.ck-d-bn,.ck-d-spot{transition:none}.m-live *,.ck-d-dots i{animation:none!important}}
+
+/* ================================================================
+   space — как было и как предлагаю, выноски по бокам
+   ================================================================ */
+.ck-cab{--pw:clamp(220px,20vw,290px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(32px,4vw,64px);align-items:start}
+.ck-cab-f{margin:0;display:flex;flex-direction:column;gap:16px}
+.ck-cab-f.before{align-items:flex-end}
+.ck-cab-f.after{align-items:flex-start}
+.ck-cab-f figcaption{width:var(--pw);font-size:clamp(20px,1.6vw,24px);font-weight:500;line-height:1.15}
+.ck-cab-pic{position:relative;width:var(--pw)}
+/* «как было» мельче и бледнее — это прошлое */
+.ck-cab-f.before{--pw:clamp(160px,14vw,210px)}
+.ck-cab-f.before .ck-cab-p{opacity:.85;filter:saturate(.7)}
+.ck-cab-f.before figcaption{opacity:.6}
+.ck-cab-p{all:unset;position:relative;display:block;width:100%;cursor:zoom-in;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--ck-line),0 18px 44px rgba(20,24,40,.08)}
+.ck-cab-p img{display:block;width:100%;height:auto;transition:opacity .8s var(--ease)}
+.ck-cab-p img.alt{position:absolute;inset:0;opacity:0}
+.after[data-v="line"] .ck-cab-p img.alt{opacity:1}
+.after[data-v="line"] .ck-cab-p img:not(.alt){opacity:1}
+.ck-cab-p:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.ck-cab-f .ck-tabs{width:var(--pw);margin:4px 0 0}
+.ck-cab-f .ck-tab{font-size:17px}
+/* выноски: подпись, линия и точка на краю картинки */
+.ck-cab-m{list-style:none;margin:0;padding:0}
+.ck-cab-m li{position:absolute;top:var(--y);transform:translateY(-50%);width:clamp(170px,17vw,270px);font-size:clamp(16px,1.2vw,18px);line-height:1.3;
+  opacity:0;transition:opacity .6s var(--ease)}
+.ck-ch.in .ck-cab-m li{opacity:1;transition-delay:calc(var(--y) * 0 + .4s)}
+.ck-cab-m.l li{right:calc(100% + 56px);text-align:right}
+.ck-cab-m.r li{left:calc(100% + 56px)}
+.ck-cab-m li::before{content:"";position:absolute;top:50%;width:48px;height:1.5px;background:currentColor;opacity:.35}
+.ck-cab-m li::after{content:"";position:absolute;top:calc(50% - 4px);width:9px;height:9px;border-radius:50%;background:var(--ink)}
+.ck-cab-m.l li::before{left:calc(100% + 8px)}
+.ck-cab-m.l li::after{left:calc(100% + 52px)}
+.ck-cab-m.r li::before{right:calc(100% + 8px)}
+.ck-cab-m.r li::after{right:calc(100% + 52px)}
+.ck-cab-m.l li::after{background:none;box-shadow:inset 0 0 0 2px var(--ink)}
+.after[data-v="color"] .ck-cab-m li[data-v="line"],.after[data-v="line"] .ck-cab-m li[data-v="color"]{opacity:0!important}
+/* на планшете и телефоне — две картинки рядом, выноски списком под ними */
+@media (max-width:1000px){
+  .ck-cab{--pw:100%;column-gap:16px;grid-template-columns:minmax(0,.75fr) minmax(0,1fr)}
+  .ck-cab-f.before{--pw:100%}
+  .ck-cab-f.before,.ck-cab-f.after{align-items:stretch}
+  .ck-cab-pic{display:flex;flex-direction:column;gap:14px}
+  .ck-cab-m{display:flex;flex-direction:column;gap:8px}
+  .ck-cab-m li{position:relative;top:auto;left:auto!important;right:auto!important;transform:none;width:auto;text-align:left!important;padding-left:18px;font-size:16px}
+  .ck-cab-m li::before{display:none}
+  .ck-cab-m li::after{left:0!important;right:auto!important;top:.45em}
+  .after[data-v="color"] .ck-cab-m li[data-v="line"],.after[data-v="line"] .ck-cab-m li[data-v="color"]{display:none}
+  .ck-cab-f .ck-tabs{order:0}
+}
+
+/* ================================================================
+   chats — список чатов
+   ================================================================ */
+.ck-phone{max-width:560px;margin:0 auto;border-radius:var(--r-img);background:#E9E9EB;padding:clamp(14px,2vw,24px);color:#1D1D1F;font-family:"Golos Text","Manrope",system-ui,sans-serif}
+.ck-sw{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:999px;background:#DADADE;margin-bottom:14px}
+.ck-sw button{position:relative;z-index:1;font:inherit;font-size:16px;font-weight:500;padding:10px 12px;border:0;background:none;color:#1D1D1F;opacity:.55;cursor:pointer;transition:opacity .3s}
+.ck-sw button[aria-selected="true"]{opacity:1}
+.ck-sw i{position:absolute;left:4px;top:4px;bottom:4px;width:calc(50% - 4px);border-radius:999px;background:#fff;transition:transform .5s var(--ease)}
+.ck-sw[data-k="next"] i{transform:translateX(100%)}
+.ck-chatlist{list-style:none;margin:0;padding:6px 0;border-radius:12px;background:#fff}
+.ck-chat{display:grid;grid-template-columns:46px minmax(0,1fr) auto;column-gap:12px;align-items:center;padding:9px 16px}
+.ck-av{position:relative;width:46px;height:46px;border-radius:50%;overflow:hidden}
+.ck-av img{position:absolute;inset:0;width:100%;height:100%;transition:opacity .6s}
+.ck-av .b{opacity:0}
+.ck-chatlist[data-k="next"] .ck-av .b{opacity:1}
+.ck-chat-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ck-chat-t b{font-weight:600;font-size:16px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ck-chat-t b u{text-decoration:none;border-radius:3px;background:var(--accent);color:var(--accent-text);box-shadow:0 0 0 1px var(--accent)}
+.ck-chat-t b u.now{animation:ckPop .3s var(--ease)}
+@keyframes ckPop{from{transform:scale(1.4)}}
+.ck-chat-t small{font-size:16px;color:#8E8E93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ck-chat em{font-style:normal;font-size:16px;color:#8E8E93;align-self:start}
+@media (max-width:480px){.ck-chat{padding:8px 10px}.ck-chat em{display:none}}
+
+/* ================================================================
+   icons — пять продуктов
+   ================================================================ */
+.ck-rows{display:flex;flex-direction:column;gap:clamp(10px,1.2vw,16px)}
+.ck-row{margin:0;opacity:0;transform:translateX(-28px);transition:opacity .8s var(--ease),transform 1s var(--ease);transition-delay:calc(var(--i) * .12s + .2s)}
+.ck-ch.in .ck-row{opacity:1;transform:none}
+.ck-row-sc{border-radius:var(--r-img);overflow-x:auto;scrollbar-width:none}
+.ck-row-sc::-webkit-scrollbar{display:none}
+.ck-row-sc img{display:block;height:auto;width:calc(100% * var(--w) / 3009);min-width:calc(900px * var(--w) / 3009);aspect-ratio:var(--w)/193;border-radius:var(--r-img);background:#F1F1F3}
+.ck-row figcaption{font-size:16px;opacity:.5;margin-top:8px}
+
+/* ================================================================
+   backlog — четыре причины колонками
+   ================================================================ */
+.ck-bl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(28px,3vw,44px) clamp(16px,2.4vw,36px);align-items:start}
+@media (max-width:1100px){.ck-bl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.ck-bl{grid-template-columns:1fr}}
+.ck-bl-i{border-top:1.5px solid var(--ck-line);padding-top:20px;opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform 1s var(--ease);transition-delay:calc(var(--i) * .1s + .15s)}
+.ck-ch.in .ck-bl-i{opacity:1;transform:none}
+.ck-bl-ic{display:block;width:56px;height:56px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:18px}
+.ck-bl-i h3{font-size:clamp(20px,1.6vw,24px);font-weight:500;line-height:1.15;margin:0 0 14px;text-wrap:balance}
+.ck-bl-tags{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.ck-bl-tag{font-size:16px;line-height:1;padding:9px 13px;border-radius:999px;border:1.5px solid var(--ck-line)}
+.ck-bl-p{all:unset;display:block;margin-top:18px;cursor:zoom-in}
+.ck-bl-p img{display:block;width:100%;height:auto;border-radius:10px;box-shadow:0 0 0 1px var(--ck-line)}
+.ck-bl-p span{display:block;font-size:16px;opacity:.6;margin-top:8px}
+@media (max-width:560px){
+  .ck-sc-row{flex-wrap:wrap}
+  .ck-sc-f{flex:1 1 calc(50% - 8px)}
+}
+
+/* ---------- стол на всю ширину (≤1100 px): заголовок и текст рядом, боли — колонками над столом;
+   стол не выше экрана, чтобы переключатели и то, что они меняют, были видны вместе (просьба 04.11) ---------- */
+@media (max-width:1100px){
+  .ck-deskch .ck-col{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:clamp(16px,2.4vw,32px);row-gap:14px;align-items:end;width:100%}
+  .ck-deskch .ck-label{grid-column:1 / -1}
+  .ck-deskch .ck-title{grid-column:1 / span 2}
+  .ck-deskch .ck-text{grid-column:3 / -1}
+  .ck-pains{grid-column:1 / -1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:inherit;border-top:0;margin-top:10px}
+  .ck-pain{padding:10px 0 14px;border-bottom-width:1.5px}
+}
+@media (max-width:640px){
+  .ck-deskch .ck-title,.ck-deskch .ck-text{grid-column:1 / -1}
+  .ck-pains{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* стол не выше экрана: 1920 × 1000, на телефоне 1290 × 1000 */
+.ck-deskch .ck-desk,.ck-bannerch .ck-viz{max-width:calc((100svh - 330px) * 1.92)}
+.ck-search .ck-head + .wrap > *{max-width:calc((100svh - 400px) * 1.92)}
+@media (max-width:700px){.ck-deskch .ck-desk{max-width:none}.ck-search .ck-head + .wrap > *{max-width:none}}
+
+/* Марк — картинка; «как было» — снимок рабочего стола поверх собранного кодом */
+.ck-d-mk{width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+.ck-d-was{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#1C1C1E;opacity:0;transition:opacity .6s var(--ease);pointer-events:none}
+.ck-desk.m-before .ck-d-was{opacity:1}
+
+/* голубой блок — не шире плиток и баннера: Марк и поле сдвигаются внутрь */
+.ck-d-blk{left:0!important;right:0!important}
+.ck-d-mark,.ck-d-field,.ck-d-tags{transition:left .6s var(--ease),width .6s var(--ease)}
+.m-block .ck-d-mark{left:24px}
+.m-block .ck-d-field{left:140px;width:1068px}
+.m-block .ck-d-tags{left:140px}
+/* система аватарок под списком чатов: форма — тип чата, цвет — характер */
+.ck-lg{list-style:none;max-width:560px;margin:18px auto 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.ck-lg li{display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:14px;align-items:center;font-size:16px;line-height:1.35;cursor:default}
+.ck-lg img{width:40px;height:40px;border-radius:50%}
+.ck-chat{transition:opacity .3s,background .3s}
+.ck-chatlist.lg .ck-chat:not(.hl){opacity:.3}
+/* планшет: беклог в коллаже по три в ряд, а не крупно по два */
+@media (max-width:900px) and (min-width:561px){
+  .ck-sc-g.bl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:clamp(10px,1.2vw,16px)}
+  .ck-sc-g.bl .ck-sc-h{grid-column:1 / -1}
+  .ck-sc-g.bl .ck-sc-row{display:contents}
+  .ck-sc-g.bl .ck-sc-f{margin-bottom:clamp(14px,1.6vw,22px)}
+}

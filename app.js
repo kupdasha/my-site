@@ -67,7 +67,7 @@ addEventListener('error', e => {
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'speaker'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'checkup', 'speaker'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -119,13 +119,14 @@ if (isNdaPage) {
 </div>`);
 }
 /* Страница NDA: проекты по годам — сверху самые новые, внизу самые старые. Год — последний в поле year
-   («2023–2025» → 2025); при одинаковом годе — как в списке content.js; без года — в самом низу */
+   («2023–2025» → 2025); при одинаковом годе — как в списке content.js; без года — в самом низу; last: true — всегда последним */
 if (SITE.ndaPage && Array.isArray(SITE.ndaPage.items)) {
   // draft: true — кейс еще не согласован: виден только на локальном превью и по адресу с ?draft
   const showDrafts = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || /[?&]draft\b/.test(location.search);
   SITE.ndaPage.items = SITE.ndaPage.items.filter(p => !p.draft || showDrafts);
   const lastYear = p => Math.max(0, ...(String(p.year || '').match(/\d{4}/g) || []).map(Number));
-  SITE.ndaPage.items = SITE.ndaPage.items.map((p, i) => [p, i]).sort((a, b) => lastYear(b[0]) - lastYear(a[0]) || a[1] - b[1]).map(x => x[0]);
+  // last: true — кейс всегда в самом конце списка, независимо от года
+  SITE.ndaPage.items = SITE.ndaPage.items.map((p, i) => [p, i]).sort((a, b) => !!a[0].last - !!b[0].last || lastYear(b[0]) - lastYear(a[0]) || a[1] - b[1]).map(x => x[0]);
 }
 /* Разделы, которых нет на этой странице (на Тильде у каждой страницы свои тексты), — пустые */
 ['works', 'nda', 'directions', 'clients', 'about'].forEach(k => { SITE[k] = SITE[k] || {}; });
@@ -2607,6 +2608,8 @@ function renderCase(k, keepScroll){
   if (p.life) body += `<div class="lf lf-mount"></div>`;
   // atomid — редизайн логотипа Атом ID: путь по раундам, отказ, «ID» в букве «О», четыре идеи, проверка именем, финалисты, Росатом ID; рисует atomid.js
   if (p.atomid) body += `<div class="ri ri-mount"></div>`;
+  // checkup — аудит внутренних систем Росатома: одиннадцать систем, общие болезни, рабочий стол с Марком, баннеры, кабинет в мессенджере, чаты, иконки, беклог; рисует checkup.js
+  if (p.checkup) body += `<div class="ck ck-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // heroEnd — ролик из шапки уходит в самый конец кейса, после живых глав (см. интерактивные презентации)
   if (p.heroEnd) body += `<div class="wrap case-hero-end"><div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div></div>`;
@@ -2787,6 +2790,10 @@ function renderCase(k, keepScroll){
   if (ri) caseImport('atomid')
     .then(m => m.mountAtomId(ri, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс логотипа Атом ID не загрузился', err));
+  const ckm = caseContent.querySelector('.ck-mount');
+  if (ckm) caseImport('checkup')
+    .then(m => m.mountCheckup(ckm, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс аудита систем Росатома не загрузился', err));
   const morphs = (p.gallery || []).filter(x => x && x.morph);
   caseContent.querySelectorAll('.morph').forEach((box, i) => startMorph(box, morphs[i].morph));
   caseContent.querySelectorAll('.thermo-box').forEach(box => startThermal(box, p.thermal));
