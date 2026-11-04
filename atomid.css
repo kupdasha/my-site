@@ -407,25 +407,12 @@
 .ri-blue .ri-fin-row{padding:clamp(40px,5vw,88px) clamp(24px,5vw,88px);border:0;border-radius:var(--r-img);background:linear-gradient(135deg,#050505,#262626);color:#fff}
 .ri-blue .ri-fin-v figcaption{color:#fff;opacity:.5}
 .ri-fav-img{display:block;width:88%;height:88%}
-/* окно входа «Росатом ID» с синим «iD»: без черной подложки, высотой с карточки ленты
-   (на узком экране — не ниже 420 px, иначе форма входа не помещается); карточка входа кончается сразу под кнопкой */
-.ri-ch-blue{--ri-sh:clamp(260px,30vw,480px);--ri-lh:max(var(--ri-sh),420px)}
-.ri-ch-blue .ri-login{aspect-ratio:auto;height:var(--ri-lh);width:min(100%,calc(var(--ri-lh) * 1.6));background:none;border-radius:calc(var(--ri-sh) * .1165)}
+/* окно входа «Росатом ID» с синим «iD»: того же размера, что у финалистов, но без черной подложки —
+   у сайта и так темный фон; карточка входа по центру и кончается под кнопкой, ничего не обрезается */
+.ri-ch-blue .ri-login{background:none}
 .ri-ch-blue .ri-login::after{content:"";position:absolute;inset:0;border:1.5px solid #E2E2E2;border-radius:inherit;pointer-events:none}
 .ri-ch-blue .ri-win{inset:0;border-radius:inherit;box-shadow:none}
-.ri-ch-blue .ri-tabs-bar{height:40px}
-.ri-ch-blue .ri-bar{height:44px}
-.ri-ch-blue .ri-site{display:flex;align-items:center;justify-content:center}
-.ri-ch-blue .ri-card{position:relative;left:auto;top:auto;bottom:auto;transform:none;width:min(56%,380px);gap:12px;padding-top:18px;border-radius:16px;overflow:hidden}
-.ri-ch-blue .ri-card-logo{height:28px}
-.ri-ch-blue .ri-form{flex:none;gap:4px;padding:18px 9%;border-radius:14px 14px 0 0}
-.ri-ch-blue .ri-signin{margin-bottom:4px}
-.ri-ch-blue .ri-input{height:38px;margin-bottom:4px}
-.ri-ch-blue .ri-go{height:38px;margin-top:6px}
-@media (max-width:760px){ .ri-ch-blue .ri-card{width:86%} }
-.ri-ch-blue .ri-card{gap:10px;padding-top:14px}
-.ri-ch-blue .ri-card-logo{height:26px}
-.ri-ch-blue .ri-form{padding:14px 9%}
-.ri-ch-blue .ri-signin{font-size:20px;margin:0 0 2px;line-height:1.2}
-.ri-ch-blue .ri-lbl{line-height:1.2}
-.ri-ch-blue .ri-input,.ri-ch-blue .ri-go{height:36px}
+.ri-ch-blue .ri-site{display:flex;align-items:center;justify-content:center;padding:24px 0}
+.ri-ch-blue .ri-card{position:relative;left:auto;top:auto;bottom:auto;transform:none;border-radius:16px;overflow:hidden}
+.ri-ch-blue .ri-form{flex:none;padding-bottom:9%;border-radius:14px 14px 0 0}
+@media (max-width:760px){ .ri-ch-blue .ri-card{width:86%} .ri-ch-blue .ri-login{aspect-ratio:3/4.4} }
