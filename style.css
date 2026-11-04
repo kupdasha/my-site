@@ -302,6 +302,10 @@ img,video{display:block;max-width:100%}
   scale:.3;opacity:0;transition:scale .35s var(--ease),opacity .25s var(--ease)}
 .look-cursor.show span{scale:1;opacity:1}
 :root:not([data-theme="dark"]) .look-cursor span{background:var(--ink);color:var(--bg)}
+/* серьезная версия: кружок «смотреть» — инверсия того, что под ним. Белый круг с черным текстом в режиме «разница»:
+   на светлой обложке выходит темный круг со светлым текстом (как раньше), на темной — светлый с темным, не сливается */
+:root:not([data-theme="dark"]) .look-cursor{mix-blend-mode:difference}
+:root:not([data-theme="dark"]) .look-cursor span{background:#fff;color:#000}
 .work .media{cursor:none}
 .client-preview{position:fixed;left:0;top:0;z-index:85;width:280px;pointer-events:none;opacity:0;scale:.92;transition:opacity .3s var(--ease),scale .4s var(--ease)}
 .client-preview.show{opacity:1;scale:1}
