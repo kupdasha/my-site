@@ -121,7 +121,7 @@ if (isNdaPage) {
 }
 /* Страница NDA: проекты по годам — сверху самые новые, внизу самые старые. Год — последний в поле year
    («2023–2025» → 2025); при одинаковом годе — как в списке content.js; без года — в самом низу;
-   проекты Росатома — в конце, аудит (last: true) — предпоследним */
+   проекты Росатома — в конце в порядке поля tail, аудит (last: true) — последним */
 if (SITE.ndaPage && Array.isArray(SITE.ndaPage.items)) {
   // draft: true — кейс еще не согласован: виден только на локальном превью и по адресу с ?draft
   const showDrafts = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || /[?&]draft\b/.test(location.search);
@@ -129,11 +129,13 @@ if (SITE.ndaPage && Array.isArray(SITE.ndaPage.items)) {
   const lastYear = p => Math.max(0, ...(String(p.year || '').match(/\d{4}/g) || []).map(Number));
   const byYear = SITE.ndaPage.items.map((p, i) => [p, i]).sort((a, b) => lastYear(b[0]) - lastYear(a[0]) || a[1] - b[1]).map(x => x[0]);
   // проекты Росатома (в названии «Росатом» или «Атом ID») — всегда в конце, между собой тоже по годам;
-  // last: true (аудит внутренних систем) — всегда предпоследний кейс на странице
+  // last: true (аудит внутренних систем) — всегда последний кейс на странице
   // up: true — проект Росатома, который остается в общем порядке по годам (ребрендинг HR-экосистемы — наверху, перед кейсами VK)
   const isRosatom = p => !p.up && /росатом|атом id/i.test([].concat(p.title).join(' '));
   const pinned = byYear.filter(p => p.last), ros = byYear.filter(p => !p.last && isRosatom(p)), rest = byYear.filter(p => !p.last && !isRosatom(p));
-  SITE.ndaPage.items = ros.length ? [...rest, ...ros.slice(0, -1), ...pinned, ...ros.slice(-1)] : [...rest, ...pinned];
+  // порядок проектов Росатома — поле tail (1, 2, …); без tail — после них, по годам; last: true (аудит) — самым последним
+  ros.sort((a, b) => (a.tail || 99) - (b.tail || 99));
+  SITE.ndaPage.items = [...rest, ...ros, ...pinned];
 }
 /* Разделы, которых нет на этой странице (на Тильде у каждой страницы свои тексты), — пустые */
 ['works', 'nda', 'directions', 'clients', 'about'].forEach(k => { SITE[k] = SITE[k] || {}; });
