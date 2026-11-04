@@ -74,8 +74,8 @@
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="content.js"></script>
-<script src="app.js"></script>
+<!-- на localhost скрипты грузятся без кеша браузера: правка видна сразу после обновления страницы -->
+<script>(function(){var v=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'?v='+Date.now():'';['content.js','app.js'].forEach(function(f){document.write('<script src="'+f+v+'"><\/script>')})})()</script>
 <script src="waves.js"></script>
 <script src="fun.js"></script>
 </body>

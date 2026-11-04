@@ -68,7 +68,7 @@ addEventListener('error', e => {
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'checkup', 'speaker'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'rosmedia', 'checkup', 'speaker'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -2609,6 +2609,8 @@ function renderCase(k, keepScroll){
   if (p.life) body += `<div class="lf lf-mount"></div>`;
   // atomid — редизайн логотипа Атом ID: путь по раундам, отказ, «ID» в букве «О», четыре идеи, проверка именем, финалисты, Росатом ID; рисует atomid.js
   if (p.atomid) body += `<div class="ri ri-mount"></div>`;
+  // rosmedia — сообщество дизайнеров Росатома: оформление, форматы, спикеры, редакция, карусели, свои тексты, площадки, план статей; рисует rosmedia.js
+  if (p.rosmedia) body += `<div class="dc dc-mount"></div>`;
   // checkup — аудит внутренних систем Росатома: одиннадцать систем, общие болезни, рабочий стол с Марком, баннеры, кабинет в мессенджере, чаты, иконки, беклог; рисует checkup.js
   if (p.checkup) body += `<div class="ck ck-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
@@ -2791,6 +2793,10 @@ function renderCase(k, keepScroll){
   if (ri) caseImport('atomid')
     .then(m => m.mountAtomId(ri, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс логотипа Атом ID не загрузился', err));
+  const dcm = caseContent.querySelector('.dc-mount');
+  if (dcm) caseImport('rosmedia')
+    .then(m => m.mountRosMedia(dcm, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс сообщества дизайнеров Росатома не загрузился', err));
   const ckm = caseContent.querySelector('.ck-mount');
   if (ckm) caseImport('checkup')
     .then(m => m.mountCheckup(ckm, p, { T, pick, openViewer, base: SCRIPT_BASE }))
