@@ -408,11 +408,8 @@
 .ri-blue .ri-fin-v figcaption{color:#fff;opacity:.5}
 .ri-fav-img{display:block;width:88%;height:88%}
 /* окно входа «Росатом ID» с синим «iD»: того же размера, что у финалистов, но без черной подложки —
-   у сайта и так темный фон; карточка входа по центру и кончается под кнопкой, ничего не обрезается */
+   у сайта и так темный фон; карточка входа, как у финалистов, уходит за нижний край окна */
 .ri-ch-blue .ri-login{background:none}
 .ri-ch-blue .ri-login::after{content:"";position:absolute;inset:0;border:1.5px solid #E2E2E2;border-radius:inherit;pointer-events:none}
 .ri-ch-blue .ri-win{inset:0;border-radius:inherit;box-shadow:none}
-.ri-ch-blue .ri-site{display:flex;align-items:center;justify-content:center;padding:24px 0}
-.ri-ch-blue .ri-card{position:relative;left:auto;top:auto;bottom:auto;transform:none;border-radius:16px;overflow:hidden}
-.ri-ch-blue .ri-form{flex:none;padding-bottom:9%;border-radius:14px 14px 0 0}
-@media (max-width:760px){ .ri-ch-blue .ri-card{width:86%} .ri-ch-blue .ri-login{aspect-ratio:3/4.4} }
+@media (max-width:760px){ .ri-ch-blue .ri-login{aspect-ratio:3/4.4} }
