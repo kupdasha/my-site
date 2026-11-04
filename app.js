@@ -680,6 +680,10 @@ function renderNdaPage(){
       : `<button class="${cls}" data-k="${k}" data-reveal>${inner}</button>`;
   }).join('');
   $$('#ndaProjects .media').forEach(watchMedia);
+  // карточек на странице NDA немного — их ролики-превью грузятся сразу после страницы, не дожидаясь прокрутки:
+  // к моменту, когда карточка доезжает до экрана, ролик уже готов и играет без паузы на обложке
+  const preloadNda = () => $$('#ndaProjects video[data-src]').forEach(v => { if (!v.src) { v.preload = 'auto'; v.src = v.dataset.src; } });
+  document.readyState === 'complete' ? setTimeout(preloadNda, 300) : addEventListener('load', () => setTimeout(preloadNda, 300), { once: true });
 }
 
 
