@@ -486,7 +486,7 @@ const SHIELD = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5
 const loginHTML = (it, c) => `${it.themes ? tabsHTML(it.themes, 'ri-tabs-th') : ''}<div class="ri-login"${it.themes ? ` data-th="${it.themes[0].k}"` : ''}${it.bg ? ` data-bg style="--ri-bg:url(${img(it.bg + '.webp')})"` : ''}>
     <div class="ri-win">
       <div class="ri-tabs-bar"><span class="ri-wtab">
-        <i class="ri-fav"><b style="background-image:url(${img(it.logo + '.svg')});background-position:${it.fav[0]} center;aspect-ratio:${it.fav[1]}"></b></i>
+        <i class="ri-fav">${it.favImg ? `<img class="ri-fav-img" src="${img(it.favImg + '.svg')}" alt="">` : `<b style="background-image:url(${img(it.logo + '.svg')});background-position:${it.fav[0]} center;aspect-ratio:${it.fav[1]}"></b>`}</i>
         <span class="ri-wtab-t">${esc(it.name)}</span>${CROSS}</span></div>
       <div class="ri-bar">${BACK}<div class="ri-addr">${SHIELD}<span>${esc(it.url)}</span></div></div>
       <div class="ri-site">
@@ -575,8 +575,8 @@ const sizesHTML = c => `<div class="ri-sizes"><p class="ri-fin-t">${H.T(c.sizes.
   `<figure style="--h:${h}px;--i:${i}"><span class="ri-sz"><img class="ri-logo ri-keep" src="${img('fin-short.svg')}" alt=""></span><figcaption>${esc(t)}, ${h} px</figcaption></figure>`).join('')}</div></div>`;
 /* первый «Росатом ID» (вариант 3а): полная и короткая версия рядом, без подписей рядов */
 const blueHTML = (c, f3) => `<div class="wrap ri-wide"><div class="ri-fin ri-blue"><div class="ri-fin-row">
-    <figure class="ri-fin-v ri-fin-full">${logo(c.logos.full)}<figcaption>${H.T(c.full)}</figcaption></figure>
-    <figure class="ri-fin-v ri-fin-short">${logo(c.logos.short)}<figcaption>${H.T(c.short)}</figcaption></figure>
+    <figure class="ri-fin-v ri-fin-full">${logo(c.logos.full, 'ri-keep')}<figcaption>${H.T(c.full)}</figcaption></figure>
+    <figure class="ri-fin-v ri-fin-short">${logo(c.logos.short, 'ri-keep')}<figcaption>${H.T(c.short)}</figcaption></figure>
   </div></div></div>
   ${f3 ? `<div class="wrap">${loginHTML(c, f3)}</div>` : ''}
   ${c.pieces ? `<div class="wrap">${stripHTML('ros3a', c, f3 && f3.open)}</div>` : ''}`;

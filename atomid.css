@@ -394,7 +394,7 @@
 @media (max-width:760px){ .ri-blue .ri-fin-row{grid-template-columns:1fr} }
 /* окно входа на узоре из иконок (слайд «Росатом ID» с синим «iD») */
 .ri-login[data-bg] .ri-site{background:linear-gradient(135deg,#050505,#2A2A2A);isolation:isolate}
-.ri-login[data-bg] .ri-site::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--ri-bg) center/cover no-repeat;opacity:.09}
+.ri-login[data-bg] .ri-site::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--ri-bg) center/max(220%,1700px) auto no-repeat;opacity:.065}
 .ri-login[data-bg] .ri-card{padding-top:clamp(20px,2.4vw,36px);border-radius:16px 16px 0 0;background:#F4F4F4}
 .ri-ch-blue .ri-login{margin-top:clamp(32px,4vw,64px)}
 .ri-ch-blue .ri-strip{margin-top:clamp(40px,5vw,80px)}
@@ -402,3 +402,8 @@
 /* планшет: окну входа нужна высота, иначе «Продолжить» уходит под край */
 @media (min-width:761px) and (max-width:1100px){ .ri-login{aspect-ratio:4/3.3} }
 @media (max-width:760px){ .ri-login{aspect-ratio:3/4.2} .ri-login[data-th]{aspect-ratio:3/4.7} }
+/* пара знаков «Росатом ID» с синим «iD» — на темном, как на слайде */
+.ri-blue{border:0}
+.ri-blue .ri-fin-row{padding:clamp(40px,5vw,88px) clamp(24px,5vw,88px);border:0;border-radius:var(--r-img);background:linear-gradient(135deg,#050505,#262626);color:#fff}
+.ri-blue .ri-fin-v figcaption{color:#fff;opacity:.5}
+.ri-fav-img{display:block;width:88%;height:88%}
