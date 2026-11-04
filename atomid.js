@@ -25,6 +25,7 @@
               рендеры и айдентика с цветами; сверху липкое меню концепций;
    names    — третий раунд: три имени против четырех критериев,
               таблица заполняется сама, внизу итог — счет галочек;
+   blue     — первый «Росатом ID»: синее «iD», полная и короткая версия
    final3   — четвертый раунд: три финалиста рядом, потом у каждого
               своя «страница» — окно браузера с входом и лента айдентики;
               у «Росатом ID» окно само перекрашивается в цвета HR-сервисов,
@@ -572,6 +573,11 @@ function liveShutter(box){
 }
 const sizesHTML = c => `<div class="ri-sizes"><p class="ri-fin-t">${H.T(c.sizes.t)}</p><div class="ri-sizes-row">${c.sizes.list.map(([h, t], i) =>
   `<figure style="--h:${h}px;--i:${i}"><span class="ri-sz"><img class="ri-logo ri-keep" src="${img('fin-short.svg')}" alt=""></span><figcaption>${esc(t)}, ${h} px</figcaption></figure>`).join('')}</div></div>`;
+/* первый «Росатом ID» (вариант 3а): полная и короткая версия рядом, без подписей рядов */
+const blueHTML = c => `<div class="ri-fin ri-blue"><div class="ri-fin-row">
+    <figure class="ri-fin-v ri-fin-full">${logo(c.logos.full)}<figcaption>${H.T(c.full)}</figcaption></figure>
+    <figure class="ri-fin-v ri-fin-short">${logo(c.logos.short)}<figcaption>${H.T(c.short)}</figcaption></figure>
+  </div></div>`;
 function finalHTML(c){
   return `${c.beforeLogo ? shutterHTML(c) : ''}<div class="ri-fin">${c.rows.map(r => `<div class="ri-fin-row">
     <span class="ri-fin-t">${H.T(r.t)}</span>
@@ -614,6 +620,7 @@ export async function mountAtomId(mount, p, helpers){
     + (s.values   ? wide('values', valuesHTML(s.values), s.values) : '')
     + (s.ideas    ? `<section class="ri-ch ri-ch-ideas ri-deck"><div class="wrap ri-head">${block(s.ideas)}</div>${navHTML(s.ideas.items, s.ideas.menu)}${s.ideas.items.map(it => ideaPage(it, s.ideas)).join('')}</section>` : '')
     + (s.names    ? wide('names', namesHTML(s.names), s.names) : '')
+    + (s.blue     ? wide('blue', blueHTML(s.blue), s.blue) : '')
     + (s.final3   ? `<section class="ri-ch ri-ch-final3 ri-deck"><div class="wrap ri-head">${block(s.final3)}</div>${final3HTML(s.final3)}</section>` : '')
     + (s.final    ? wide('final', finalHTML(s.final), s.final) : '');
   // продукт одной картинкой — в самом начале кейса, выше задачи и роли

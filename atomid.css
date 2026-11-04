@@ -389,3 +389,6 @@
 .ri-sizes-row figcaption{font-size:16px;opacity:.55;white-space:nowrap}
 /* на телефоне размеры переносятся рядами, а не уезжают за край */
 @media (max-width:760px){ .ri-sizes-row{flex-wrap:wrap;overflow:visible;gap:24px 28px} }
+/* первый «Росатом ID»: два знака без подписи ряда */
+.ri-blue .ri-fin-row{grid-template-columns:1.8fr 1fr}
+@media (max-width:760px){ .ri-blue .ri-fin-row{grid-template-columns:1fr} }
