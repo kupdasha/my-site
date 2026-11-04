@@ -392,3 +392,13 @@
 /* первый «Росатом ID»: два знака без подписи ряда */
 .ri-blue .ri-fin-row{grid-template-columns:1.8fr 1fr}
 @media (max-width:760px){ .ri-blue .ri-fin-row{grid-template-columns:1fr} }
+/* окно входа на узоре из иконок (слайд «Росатом ID» с синим «iD») */
+.ri-login[data-bg] .ri-site{background:linear-gradient(135deg,#050505,#2A2A2A);isolation:isolate}
+.ri-login[data-bg] .ri-site::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--ri-bg) center/cover no-repeat;opacity:.09}
+.ri-login[data-bg] .ri-card{padding-top:clamp(20px,2.4vw,36px);border-radius:16px 16px 0 0;background:#F4F4F4}
+.ri-ch-blue .ri-login{margin-top:clamp(32px,4vw,64px)}
+.ri-ch-blue .ri-strip{margin-top:clamp(40px,5vw,80px)}
+@media (max-width:760px){ .ri-login[data-bg]{aspect-ratio:3/4.5} .ri-login[data-bg] .ri-card{padding-top:16px;gap:12px} }
+/* планшет: окну входа нужна высота, иначе «Продолжить» уходит под край */
+@media (min-width:761px) and (max-width:1100px){ .ri-login{aspect-ratio:4/3.3} }
+@media (max-width:760px){ .ri-login{aspect-ratio:3/4.2} .ri-login[data-th]{aspect-ratio:3/4.7} }

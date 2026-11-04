@@ -318,7 +318,7 @@ function stripHTML(k, it, open){
   return `<div class="ri-strip"><div class="ri-strip-in">${row(false)}${row(true)}</div></div>`;
 }
 // плитки со светлым краем (посчитано по картинкам) — им нужна рамка
-const LIGHT = ['p-shield-wide', 'p-cycle-wide', 'p-oval-sq', 'p-oval-wide', 'p-portal-wide', 'p-ros-sq', 'p-steps-wide'];
+const LIGHT = ['p-ros3a-tall', 'p-shield-wide', 'p-cycle-wide', 'p-oval-sq', 'p-oval-wide', 'p-portal-wide', 'p-ros-sq', 'p-steps-wide'];
 // сначала рендеры (lead), потом плитки айдентики
 const stripList = (k, it) => (it.lead || []).concat(it.pieces.map(p => 'p-' + k + '-' + p));
 function liveStrip(box){
@@ -483,7 +483,7 @@ const CROSS = '<svg class="ri-x" viewBox="0 0 24 24" aria-hidden="true"><path d=
 const SHIELD = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-3 7.7-7 9.5-4-1.8-7-5.2-7-9.5V6z"/></svg>';
 // окно браузера: вкладка с фавиконом и названием, строка адреса, страница входа.
 // фавикон — знак из логотипа (край fav[0], клетка fav[1] к высоте) белым на черной плашке
-const loginHTML = (it, c) => `${it.themes ? tabsHTML(it.themes, 'ri-tabs-th') : ''}<div class="ri-login"${it.themes ? ` data-th="${it.themes[0].k}"` : ''}>
+const loginHTML = (it, c) => `${it.themes ? tabsHTML(it.themes, 'ri-tabs-th') : ''}<div class="ri-login"${it.themes ? ` data-th="${it.themes[0].k}"` : ''}${it.bg ? ` data-bg style="--ri-bg:url(${img(it.bg + '.webp')})"` : ''}>
     <div class="ri-win">
       <div class="ri-tabs-bar"><span class="ri-wtab">
         <i class="ri-fav"><b style="background-image:url(${img(it.logo + '.svg')});background-position:${it.fav[0]} center;aspect-ratio:${it.fav[1]}"></b></i>
@@ -574,10 +574,12 @@ function liveShutter(box){
 const sizesHTML = c => `<div class="ri-sizes"><p class="ri-fin-t">${H.T(c.sizes.t)}</p><div class="ri-sizes-row">${c.sizes.list.map(([h, t], i) =>
   `<figure style="--h:${h}px;--i:${i}"><span class="ri-sz"><img class="ri-logo ri-keep" src="${img('fin-short.svg')}" alt=""></span><figcaption>${esc(t)}, ${h} px</figcaption></figure>`).join('')}</div></div>`;
 /* первый «Росатом ID» (вариант 3а): полная и короткая версия рядом, без подписей рядов */
-const blueHTML = c => `<div class="ri-fin ri-blue"><div class="ri-fin-row">
+const blueHTML = (c, f3) => `<div class="wrap ri-wide"><div class="ri-fin ri-blue"><div class="ri-fin-row">
     <figure class="ri-fin-v ri-fin-full">${logo(c.logos.full)}<figcaption>${H.T(c.full)}</figcaption></figure>
     <figure class="ri-fin-v ri-fin-short">${logo(c.logos.short)}<figcaption>${H.T(c.short)}</figcaption></figure>
-  </div></div>`;
+  </div></div></div>
+  ${f3 ? `<div class="wrap">${loginHTML(c, f3)}</div>` : ''}
+  ${c.pieces ? `<div class="wrap">${stripHTML('ros3a', c, f3 && f3.open)}</div>` : ''}`;
 function finalHTML(c){
   return `${c.beforeLogo ? shutterHTML(c) : ''}<div class="ri-fin">${c.rows.map(r => `<div class="ri-fin-row">
     <span class="ri-fin-t">${H.T(r.t)}</span>
@@ -620,7 +622,7 @@ export async function mountAtomId(mount, p, helpers){
     + (s.values   ? wide('values', valuesHTML(s.values), s.values) : '')
     + (s.ideas    ? `<section class="ri-ch ri-ch-ideas ri-deck"><div class="wrap ri-head">${block(s.ideas)}</div>${navHTML(s.ideas.items, s.ideas.menu)}${s.ideas.items.map(it => ideaPage(it, s.ideas)).join('')}</section>` : '')
     + (s.names    ? wide('names', namesHTML(s.names), s.names) : '')
-    + (s.blue     ? wide('blue', blueHTML(s.blue), s.blue) : '')
+    + (s.blue     ? `<section class="ri-ch ri-ch-blue"><div class="wrap ri-head">${block(s.blue)}</div>${blueHTML(s.blue, s.final3)}</section>` : '')
     + (s.final3   ? `<section class="ri-ch ri-ch-final3 ri-deck"><div class="wrap ri-head">${block(s.final3)}</div>${final3HTML(s.final3)}</section>` : '')
     + (s.final    ? wide('final', finalHTML(s.final), s.final) : '');
   // продукт одной картинкой — в самом начале кейса, выше задачи и роли
@@ -640,6 +642,7 @@ export async function mountAtomId(mount, p, helpers){
   if (s.values) liveValues(q('.ri-ch-values'));
   if (s.ideas) liveIdeas(q('.ri-ch-ideas'), s.ideas);
   if (s.names) liveNames(q('.ri-ch-names'));
+  if (s.blue) { const b = q('.ri-ch-blue'); if (s.blue.pieces) liveStrip(b); if (s.final3) liveTyping(b); }
   if (s.final3) liveFinal3(q('.ri-ch-final3'), s.final3);
   if (s.final && s.final.beforeLogo) liveShutter(q('.ri-ch-final'));
 }
