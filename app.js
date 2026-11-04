@@ -56,6 +56,15 @@ addEventListener('error', e => {
   // ролики: на свежем коммите jsDelivr иногда не отдает крупные файлы («Failed to fetch the requested commit»)
   // или обрывает их на 10 МБ — после второй неудачи ролик берется прямо с GitHub (raw, ветка main)
   const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/main/' + path;
+  // SVG: GitHub отдает его как текст, и картинка с raw не рисуется — берем текст и показываем его как svg
+  if (el.tagName === 'IMG' && /\.svg$/i.test(path)) {
+    if (n) return;
+    fetch(raw).then(r => r.ok ? r.text() : Promise.reject()).then(t => {
+      if (el.srcset) el.removeAttribute('srcset');
+      el.src = URL.createObjectURL(new Blob([t], { type: 'image/svg+xml' }));
+    }).catch(() => {});
+    return;
+  }
   const next = n === 0 && raster ? raw
              : n === 2 || (n === 1 && !raster) ? raw
              : SCRIPT_BASE + path + '?r=' + (n + 1);
