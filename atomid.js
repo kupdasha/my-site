@@ -315,16 +315,24 @@ function stripHTML(k, it, open){
   // плитки не увеличиваются; у светлых по краю — серая рамка, иначе они сливаются со страницей.
   // ряд повторен дважды: лента едет по кругу без конца
   const row = hidden => all.map(n =>
-    `<span class="ri-pc${/^p-/.test(n) ? '' : ' ri-pc-r'}${LIGHT.includes(n) ? ' ri-pc-light' : ''}"${hidden ? ' aria-hidden="true"' : ''}><img ${/^p-/.test(n) ? pic(n, '(max-width: 900px) 70vw, 40vw', 1800, 900) : pic(n, '(max-width: 900px) 100vw, 60vw')} alt="" loading="lazy" decoding="async"></span>`).join('')
+    `<span class="ri-pc${/^p-/.test(n) ? '' : ' ri-pc-r'}${LIGHT.includes(n) ? ' ri-pc-light' : ''}"${hidden ? ' aria-hidden="true"' : ''}${RATIO[n] ? ` style="aspect-ratio:${RATIO[n]}"` : ''}><img ${(/^p-/.test(n) ? pic(n, tileSizes(n, '(max-width: 900px) 70vw, 40vw'), 1800, 900) : pic(n, tileSizes(n, '(max-width: 900px) 100vw, 60vw'))).replace(/(^| )(src|srcset)=/g, '$1data-$2=')} alt="" decoding="async"></span>`).join('')
     + `<div class="ri-pal"${hidden ? ' data-copy' : ''} aria-hidden="true">${sw}</div>`;
   return `<div class="ri-strip"><div class="ri-strip-in">${row(false)}${row(true)}</div></div>`;
 }
+// пропорции плиток (ширина к высоте): место под картинку есть до загрузки — лента не прыгает и палитра не стоит одна
+// ширина плитки на экране — по высоте ленты (до 480 px, на телефоне 260 px): браузер берет картинку нужного размера
+const tileSizes = (n, def) => RATIO[n] ? `(max-width: 900px) ${Math.round(RATIO[n] * 260)}px, ${Math.round(RATIO[n] * 480)}px` : def;
+const RATIO = {"c-cycle-hero":1.7778,"c-portal-hero":1.7778,"c-steps-hero":1.7778,"p-cycle-right":0.6956,"p-cycle-sq":1.1356,"p-cycle-tall":0.725,"p-cycle-ui":1.8499,"p-cycle-wide":1.873,"p-key-right":0.6956,"p-key-sq":1.1356,"p-key-tall":0.725,"p-key-ui":1.8499,"p-oval-right":0.6958,"p-oval-sq":1.1357,"p-oval-tall":0.725,"p-oval-ui":1.8499,"p-oval-wide":1.873,"p-portal-right":0.6956,"p-portal-sq":1.1356,"p-portal-tall":0.725,"p-portal-ui":1.8499,"p-portal-wide":1.873,"p-ros-right":0.6956,"p-ros-sq":1.1356,"p-ros-tall":0.725,"p-ros-ui":1.8499,"p-ros-wide":1.873,"p-ros3a-right":0.6958,"p-ros3a-sq":1.1357,"p-ros3a-tall":0.725,"p-ros3a-ui":1.8499,"p-ros3a-web1":0.6667,"p-ros3a-web2":0.8178,"p-ros3a-web3":0.6667,"p-ros3a-web4":0.8,"p-ros3a-wide":1.873,"p-shield-right":0.6958,"p-shield-sq":1.1357,"p-shield-tall":0.725,"p-shield-ui":1.8499,"p-shield-wide":1.7778,"p-steps-right":0.6956,"p-steps-sq":1.1356,"p-steps-tall":0.725,"p-steps-ui":1.8499,"p-steps-wide":1.873};
 // плитки со светлым краем (посчитано по картинкам) — им нужна рамка
 const LIGHT = ['p-ros3a-tall', 'p-shield-wide', 'p-cycle-wide', 'p-oval-sq', 'p-oval-wide', 'p-portal-wide', 'p-ros-sq', 'p-steps-wide'];
 // сначала рендеры (lead), потом плитки айдентики
 const stripList = (k, it) => (it.lead || []).concat(it.pieces.map(p => 'p-' + k + '-' + p));
 function liveStrip(box){
   const strip = box.querySelector('.ri-strip'), inner = strip.firstElementChild;
+  // картинки ленты грузятся все сразу, как лента подходит к экрану (а не по одной, когда доедут до края)
+  const load = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecting)) return; load.disconnect();
+    strip.querySelectorAll('img[data-src]').forEach(im => { if (im.dataset.srcset) im.srcset = im.dataset.srcset; im.src = im.dataset.src; im.removeAttribute('data-src'); }); }, { rootMargin: '900px 0px' });
+  load.observe(strip);
   // первая плитка второй копии ряда: на ее месте лента незаметно возвращается к началу
   const firstCopy = () => inner.children[inner.children.length / 2];
   // лента сама плавно едет вправо по кругу; наведение — пауза, касание пальцем — пауза на 4 с
