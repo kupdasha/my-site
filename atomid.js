@@ -2,29 +2,38 @@
    КЕЙС «РЕДИЗАЙН ЛОГОТИПА АТОМ ID» (поле atomid у проекта, страница NDA)
    Логотипы стоят прямо на странице, без подложек (в дружеской версии
    и на темном фоне черные знаки становятся белыми — фильтр в atomid.css).
-   path     — в самом начале, выше задачи и роли: весь путь одним
-              взглядом — логотип каждого раунда крупно, под ним строка
-              с датами; листается само, пока не тронули;
-   refusal  — что уже попробовали: два прежних знака, полоска от подачи
-              до отказа заполняется;
+   entry    — в самом начале, выше задачи и роли: продукт одной
+              картинкой — сотрудник, одна дверь, 34 системы; линии
+              прорисовываются, по ним бегут импульсы, счетчики
+              «200 000+ входов в день» и «34 системы» накручиваются;
+   path     — весь путь по раундам (убран по просьбе 04.11, код остался);
+   refusal  — что уже попробовали: два прежних знака и короткое описание
+              (полоска с датами, штамп и пиктограммы причин — только если
+              они заданы в content.js; с 04.11 убраны);
    inside   — первый раунд: «ID» прячется в букву «О». Варианты
               сменяются сами (строка надписей с таймером), у каждого
               английская и русская версия по очереди;
    sketches — наброски плиткой: каждый вынут из Фигмы отдельным
               вектором, клетки проявляются по очереди;
-   values   — шесть ценностей Росатома кругом, как на их схеме: знак
-              в центре, светло-серые сегменты с текстом по дуге;
+   values   — шесть ценностей Росатома кругом, как на их схеме: настоящий
+              знак Росатома в центре, светло-серые сегменты с текстом по дуге;
    ideas    — второй раунд: четыре концепции, у каждой своя «страница»:
-              имя, мысль, знак крупно в векторе, лента — рендеры
-              и айдентика с цветами; сверху липкое меню концепций;
+              слева имя и мысль, справа инфографика к знаку (pict или bars —
+              у «этапов» ступени лестницей вправо вверх), знак крупно —
+              вектор вставлен в страницу и собирается из частей (точки,
+              полоски, буквы) каждый раз, как попадает на экран, лента —
+              рендеры и айдентика с цветами; сверху липкое меню концепций;
    names    — третий раунд: три имени против четырех критериев,
-              таблица заполняется сама;
+              таблица заполняется сама, внизу итог — счет галочек;
    final3   — четвертый раунд: три финалиста рядом, потом у каждого
               своя «страница» — окно браузера с входом и лента айдентики;
               у «Росатом ID» окно само перекрашивается в цвета HR-сервисов,
               отрасли и заказчиков, а черно-белый знак остается тем же;
-   final    — Росатом ID: синий в основных сервисах, черно-белый
-              в остальных — полная и короткая версии рядами.
+              в окне сам печатается логин и нажимается «Продолжить»;
+   final    — Росатом ID: (шторка «было / стало» — только если заданы
+              beforeLogo/afterLogo, с 04.11 убрана), синий в основных сервисах и черно-белый
+              в остальных рядами, короткая версия в размерах от фавикона
+              до экрана входа, палитра брендбука.
    Тексты — в content.js, оформление — atomid.css.
    ================================================================ */
 let H;   // помощники из app.js: T (типограф), pick, openViewer, base
@@ -40,6 +49,34 @@ const logo = (n, cls = '') => `<img class="ri-logo ${cls}" src="${img(n + '.svg'
 // картинка с легкой копией для телефона
 const pic = (n, sizes = '(max-width: 900px) 100vw, 60vw', full = 1920, small = 900) =>
   `src="${img(n + '.webp')}" srcset="${img(n + '-s.webp')} ${small}w, ${img(n + '.webp')} ${full}w" sizes="${sizes}"`;
+
+// число накручивается от нуля: разряды через тонкий пробел
+const fmtNum = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
+function countUp(el, to, ms = 2200, delay = 0){
+  const suf = el.dataset.suf || '';
+  if (still()) { el.textContent = fmtNum(to) + suf; return; }
+  let t0 = 0;
+  const step = now => { if (!t0) t0 = now; const k = clamp((now - t0 - delay) / ms, 0, 1), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = fmtNum(to * e) + (k >= 1 ? suf : ''); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+// пиктограммы: штрих 2 px, 24-сетка, рисуются текущим цветом
+const ICONS = {
+  pass:  '<rect x="3" y="7" width="18" height="10" rx="3"/><circle cx="8" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.3" fill="currentColor" stroke="none"/>',
+  code:  '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M10 11h4M10 14h2.5"/>',
+  face:  '<path d="M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"/><circle cx="9.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="10" r="1" fill="currentColor" stroke="none"/><path d="M9.5 14.5c1.2 1.3 3.8 1.3 5 0"/>',
+  door:  '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="15" cy="12.5" r="1.2" fill="currentColor" stroke="none"/><path d="M5 21h14"/>',
+  lock:  '<rect x="5" y="10" width="14" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.3" fill="currentColor" stroke="none"/><path d="M12 16.3v1.8"/>',
+  A:     '<path d="M4.5 20L12 4l7.5 16M7.6 14h8.8"/>',
+  six:   '<circle cx="12" cy="4" r="2.2"/><circle cx="18.9" cy="8" r="2.2"/><circle cx="18.9" cy="16" r="2.2"/><circle cx="12" cy="20" r="2.2"/><circle cx="5.1" cy="16" r="2.2"/><circle cx="5.1" cy="8" r="2.2"/>',
+  atoms: '<circle cx="7" cy="7" r="2.6"/><circle cx="17" cy="6" r="2.6"/><circle cx="12" cy="13" r="2.6"/><circle cx="5.5" cy="18" r="2.6"/><circle cx="18.5" cy="17" r="2.6"/><path d="M9.3 8.4l1.4 2.2M14.6 8.1l-1.3 2.4M9.9 15.2l-2.2 1.5M14.2 15.1l2.4 1.4" stroke-width="1.4"/>',
+  id:    '<rect x="3" y="5" width="18" height="14" rx="3" stroke-dasharray="3 2.5"/><path d="M8.5 9v6M12 9h2.6a3 3 0 0 1 0 6H12z"/>',
+  key:   '<circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15 12v2.5"/>',
+  person:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>',
+};
+const icon = (k, cls = '') => `<svg class="ri-ic ${cls}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[k] || ''}</svg>`;
+// кусок логотипа как картинка-значок: край side, клетка квадратная
+const markIcon = (n, side) => `<i class="ri-ic ri-ic-img" style="background-image:url(${img(n + '.svg')});background-position:${side} center"></i>`;
 
 /* ---------- текст главы ---------- */
 const block = (c, extra = '') => `<div class="ri-col">
@@ -113,20 +150,110 @@ function livePath(box){
 }
 
 /* ================================================================
+   entry — продукт одной картинкой: сотрудник → одна дверь → 34 системы.
+   Линии к системам прорисовываются по очереди, плитки загораются,
+   по линиям без конца бегут импульсы (animateMotion, без скриптов);
+   рядом счетчики входов и систем накручиваются от нуля
+   ================================================================ */
+function entryHTML(c){
+  const W = 1000, Hh = 480, cy = Hh / 2;
+  const px = 110, dx = 420, dw = 104, dh = 148;             // сотрудник и дверь
+  const gx = 560, cols = 6, cell = 58, gap = 12;            // сетка систем 6 × 6, последние две клетки пустые
+  const n = c.systems, rows = Math.ceil(n / cols), gy = cy - (rows * (cell + gap) - gap) / 2;
+  let lines = '', tiles = '', pulses = '';
+  for (let i = 0; i < n; i++) {
+    const r = Math.floor(i / cols), col = i % cols;
+    const tx = gx + col * (cell + gap), ty = gy + r * (cell + gap) + cell / 2;
+    const x0 = dx + dw, x1 = tx;
+    const d = `M${x0} ${cy}C${x0 + 70} ${cy} ${x1 - 90} ${ty} ${x1} ${ty}`;
+    lines += `<path id="riE${i}" class="ri-e-line" d="${d}" pathLength="1" style="--i:${i}"/>`;
+    tiles += `<rect class="ri-e-tile" x="${tx}" y="${ty - cell / 2}" width="${cell}" height="${cell}" rx="14" style="--i:${i}"/>`;
+    // импульс по каждой третьей линии, со сдвигом по времени
+    if (i % 3 === 0) pulses += `<circle class="ri-e-pulse" r="5"><animateMotion dur="${(2.2 + (i % 5) * .35).toFixed(2)}s" begin="${(i * .17).toFixed(2)}s" repeatCount="indefinite"><mpath href="#riE${i}"/></animateMotion></circle>`;
+  }
+  const walk = `M${px + 52} ${cy}L${dx} ${cy}`;
+  return `<div class="ri-entry">
+    <div class="ri-e-nums">
+      <div class="ri-e-num"><b class="ri-num" data-to="${c.count}" data-suf="+">0</b><span>${H.T(c.countT)}</span></div>
+      <div class="ri-e-num"><b class="ri-num" data-to="${c.systems}">0</b><span>${H.T(c.systemsT)}</span></div>
+    </div>
+    <svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="${esc(H.pick(c.title))}">
+      <path id="riEw" class="ri-e-line ri-e-walk" d="${walk}" pathLength="1"/>
+      ${lines}
+      <g class="ri-e-who"><circle cx="${px}" cy="${cy - 56}" r="22"/><path d="M${px - 40} ${cy + 36}c0-26 18-42 40-42s40 16 40 42"/></g>
+      <text class="ri-e-t" x="${px}" y="${cy + 72}" text-anchor="middle">${esc(H.pick(c.who))}</text>
+      <g class="ri-e-door"><rect x="${dx}" y="${cy - dh / 2}" width="${dw}" height="${dh}" rx="16"/>
+        <rect x="${dx + 36}" y="${cy - 18}" width="32" height="36" rx="8" class="ri-e-hole"/><circle cx="${dx + 52}" cy="${cy - 4}" r="5" class="ri-e-pin"/><path d="M${dx + 52} ${cy}v10" class="ri-e-pin2"/></g>
+      <text class="ri-e-t" x="${dx + dw / 2}" y="${cy + dh / 2 + 30}" text-anchor="middle">${esc(H.pick(c.door))}</text>
+      ${tiles}
+      <circle class="ri-e-pulse" r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#riEw"/></animateMotion></circle>
+      ${pulses}
+    </svg>
+  </div>`;
+}
+function liveEntry(box, c){
+  const nums = [...box.querySelectorAll('.ri-num')], svg = box.querySelector('svg');
+  // подписи в схеме не мельче 16 px на экране — пересчет по ширине
+  const fit = () => { const w = svg.getBoundingClientRect().width || 1000; svg.style.setProperty('--fs', Math.max(18, 16 * 1000 / w).toFixed(1)); };
+  new ResizeObserver(fit).observe(svg); fit();
+  let done = false;
+  onScreen(box, v => { if (v && !done) { done = true; nums.forEach((el, i) => countUp(el, +el.dataset.to, i ? 1600 : 2400, 500)); } }, .35);
+}
+
+/* ================================================================
    refusal — что уже попробовали: два знака, полоска «подача → отказ»
+   с месяцами, штамп, причины пиктограммами
    ================================================================ */
 function refusalHTML(c){
+  // 18 месяцев между подачей и отказом — рисками по полоске (только если в content.js есть даты)
+  const ticks = Array.from({ length: 19 }, (_, i) => `<i style="left:${(i / 18 * 100).toFixed(2)}%"></i>`).join('');
+  const cap = t => t ? `<figcaption>${H.T(t)}</figcaption>` : '';
   return `<div class="ri-refusal">
     <div class="ri-olds">
-      <figure class="ri-old">${logo('old-dots')}<figcaption>${H.T(c.first)}</figcaption></figure>
-      <figure class="ri-old">${logo('old-orbit')}<figcaption>${H.T(c.second)}</figcaption></figure>
-    </div>
+      <figure class="ri-old">${logo('old-dots')}${cap(c.first)}</figure>
+      <figure class="ri-old">${logo('old-orbit')}${cap(c.second)}</figure>
+    </div>${c.dateFrom ? `
     <div class="ri-wait">
       <span class="ri-date"><small>${H.T(c.from)}</small>${esc(c.dateFrom)}</span>
-      <i class="ri-wait-line"><b></b></i>
-      <span class="ri-date ri-date-to"><small>${H.T(c.to)}</small>${esc(c.dateTo)}</span>
-    </div>
+      <span class="ri-wait-line"><span class="ri-ticks" aria-hidden="true">${ticks}</span><b></b><em>${H.T(c.months)}</em></span>
+      <span class="ri-date ri-date-to"><small>${H.T(c.to)}</small>${esc(c.dateTo)}<span class="ri-stamp" aria-hidden="true">${H.T(c.stamp)}</span></span>
+    </div>` : ''}
   </div>`;
+}
+const whyHTML = c => `<div class="ri-why">${c.why.map(w => `<span class="ri-why-i">${icon(w.ic)}<span>${H.T(w.t)}</span></span>`).join('')}</div>`;
+
+/* ---------- пиктограммы мысли: ряд значков со стрелками или столбики ---------- */
+function pictHTML(it){
+  // этапы — лестница вправо вверх: шаг за шагом, длина ступени — сколько длится проверка
+  if (it.bars) {
+    const total = it.bars.reduce((a, b) => a + b.h, 0), n = it.bars.length;
+    let at = 0;
+    return `<div class="ri-stairs" style="--n:${n}" aria-hidden="true">${it.bars.map((b, i) => {
+      const left = at / total * 100, w = b.h / total * 100; at += b.h;
+      return `<span class="ri-step" style="--i:${i};left:${left.toFixed(2)}%;width:${w.toFixed(2)}%;bottom:calc(${i} * var(--row))"><i></i><span>${H.T(b.t)}</span></span>`;
+    }).join('')}</div>`;
+  }
+  if (!it.pict) return '';
+  return `<div class="ri-pict" aria-hidden="true">${it.pict.map((p, i) => typeof p === 'string'
+    ? `<span class="ri-pict-sep">${esc(p)}</span>`
+    : `<span class="ri-pict-i" style="--i:${i}">${p.img ? markIcon(p.img, p.side) : icon(p.ic)}<span>${H.T(p.t)}</span></span>`).join('')}</div>`;
+}
+
+/* ---------- знак крупно: вектор вставляется в страницу и собирается из частей ---------- */
+let svgCache = {};
+async function inlineLogo(host, name){
+  if (!svgCache[name]) svgCache[name] = fetch(img(name + '.svg')).then(r => r.text());
+  let txt = await svgCache[name];
+  if (!host.isConnected) return;
+  // у каждого вставленного вектора свои id, иначе обтравки разных знаков перепутаются
+  const pfx = 'ri' + name.replace(/\W/g, '') + '_';
+  txt = txt.replace(/id="/g, `id="${pfx}`).replace(/url\(#/g, `url(#${pfx}`).replace(/href="#/g, `href="#${pfx}`);
+  const doc = new DOMParser().parseFromString(txt, 'image/svg+xml'), svg = doc.documentElement;
+  svg.removeAttribute('width'); svg.removeAttribute('height'); svg.setAttribute('class', 'ri-logo-v');
+  const parts = [...svg.querySelectorAll('path, image, rect, circle, ellipse')].filter(e => !e.closest('defs, clipPath'));
+  parts.forEach((e, i) => { e.classList.add('ri-part'); e.style.setProperty('--i', i); });
+  host.replaceChildren(svg);
+  host.classList.add('ri-sign-v');
 }
 
 /* ================================================================
@@ -231,7 +358,7 @@ function valuesHTML(c){
   // дуга для текста: сверху — по часовой, снизу — против, чтобы буквы стояли ровно
   const arc = (i, r) => { const mid = i * 360 / n, a0 = mid - 28, a1 = mid + 28, down = Math.cos(rad(mid) + Math.PI / 2) < -.01;
     return down ? `M${P(a1, r)}A${r} ${r} 0 0 0 ${P(a0, r)}` : `M${P(a0, r)}A${r} ${r} 0 0 1 ${P(a1, r)}`; };
-  const D = 236, ar = 913.619 / 151.808;
+  const D = 248;   // знак Росатома — оригинал с градиентом (rosatom-sign.webp, прислан Дашей 04.11)
   let defs = '', segs = '';
   c.items.forEach((t, i) => {
     const lines = H.pick(t).split('/'), mid = (R0 + R1) / 2, down = Math.cos(rad(i * 360 / n) + Math.PI / 2) < -.01;
@@ -242,9 +369,9 @@ function valuesHTML(c){
     }).join('')}</g>`;
   });
   return `<div class="ri-vals"><svg viewBox="0 0 ${V} ${V}" role="img" aria-label="${esc(c.items.map(t => H.pick(t).replace('/', ' ')).join(', '))}">
-    <defs>${defs}<clipPath id="riVsign"><rect x="${cx - D / 2}" y="${cy - D / 2}" width="${D}" height="${D}"/></clipPath></defs>
+    <defs>${defs}</defs>
     ${segs}
-    <image href="${img('fin-full.svg')}" x="${cx - D / 2}" y="${cy - D / 2}" width="${(D * ar).toFixed(1)}" height="${D}" clip-path="url(#riVsign)" preserveAspectRatio="xMinYMid meet"/>
+    <image href="${img('rosatom-sign.webp')}" x="${cx - D / 2}" y="${cy - D / 2}" width="${D}" height="${D}"/>
   </svg></div>`;
 }
 function liveValues(box){
@@ -298,10 +425,12 @@ function liveNav(box){
 /* ================================================================
    ideas — четыре концепции, у каждой своя «страница»
    ================================================================ */
-const pageHead = (it, mark = '') => `<div class="wrap ri-page-head">
+// слева заголовок и описание, справа — знак (у финалистов) или инфографика к знаку (у концепций)
+const pageHead = (it, mark = '') => { const right = mark || pictHTML(it);
+  return `<div class="wrap ri-page-head">
     <div class="ri-page-t"><h3 class="ri-name">${H.T(it.t)}</h3><p class="ri-text">${H.T(it.idea)}</p></div>
-    ${mark ? `<div class="ri-page-mark">${mark}</div>` : ''}
-  </div>`;
+    ${right ? `<div class="ri-page-mark${mark ? '' : ' ri-page-info'}">${right}</div>` : ''}
+  </div>`; };
 // главная картинка концепции — сам знак в векторе, крупно; у «ключа» — русская и английская версии
 function ideaPage(it, c){
   return `<article class="ri-page" data-k="${it.k}">
@@ -312,7 +441,17 @@ function ideaPage(it, c){
 }
 function liveIdeas(box, c){
   liveNav(box);
-  c.items.forEach(it => liveStrip(box.querySelector(`.ri-page[data-k="${it.k}"]`)));
+  c.items.forEach(it => {
+    const page = box.querySelector(`.ri-page[data-k="${it.k}"]`);
+    liveStrip(page);
+    // знак собирается из частей каждый раз, как оказывается на экране
+    const sign = page.querySelector('.ri-sign');
+    [...sign.querySelectorAll('.ri-logo')].forEach(im => {
+      const host = document.createElement('span'); host.className = 'ri-sign-host'; im.replaceWith(host);
+      inlineLogo(host, im.getAttribute('src').match(/([^/]+)\.svg/)[1]);
+    });
+    onScreen(sign, v => sign.classList.toggle('build', v), .45);
+  });
 }
 
 /* ================================================================
@@ -325,7 +464,14 @@ function namesHTML(c){
   const head = `<div class="ri-nt-c ri-nt-h"></div>${c.cols.map((n, j) => `<div class="ri-nt-c ri-nt-h ri-nt-name${j === 2 ? ' best' : ''}">${esc(n)}</div>`).join('')}`;
   const rows = c.rows.map(r => `<div class="ri-nt-c ri-nt-crit">${H.T(r.t)}</div>${r.v.map((v, j) =>
     `<div class="ri-nt-c ri-nt-v ${v ? 'yes' : 'no'}${j === 2 ? ' best' : ''}" style="--d:${(d++) * 110}ms">${v ? YES : NO}<span>${H.T(r.n[j])}</span></div>`).join('')}`).join('');
-  return `<div class="ri-nt" role="table">${head}${rows}</div>`;
+  const sums = c.cols.map((_, j) => c.rows.reduce((a, r) => a + (r.v[j] ? 1 : 0), 0));
+  const total = `<div class="ri-nt-c ri-nt-crit ri-nt-sumt">${H.T(c.sum)}</div>${sums.map((v, j) =>
+    `<div class="ri-nt-c ri-nt-s${j === 2 ? ' best' : ''}"><b class="ri-num" data-to="${v}">0</b><small>${H.T(c.of)}</small><i class="ri-pips">${c.rows.map((_, k) => `<u${k < v ? ' class="on"' : ''} style="--i:${k}"></u>`).join('')}</i></div>`).join('')}`;
+  return `<div class="ri-nt" role="table">${head}${rows}${total}</div>`;
+}
+function liveNames(box){
+  let done = false;
+  onScreen(box, v => { if (v && !done) { done = true; box.querySelectorAll('.ri-num').forEach(el => countUp(el, +el.dataset.to, 900, 1400)); } }, .3);
 }
 
 /* ================================================================
@@ -348,8 +494,8 @@ const loginHTML = (it, c) => `${it.themes ? tabsHTML(it.themes, 'ri-tabs-th') : 
           <div class="ri-card-logo">${logo(it.logo, 'ri-keep')}</div>
           <div class="ri-form">
             <b class="ri-signin">${H.T(c.sign)}</b>
-            <span class="ri-lbl">${H.T(c.login)}</span><span class="ri-input">i.petrov</span>
-            <span class="ri-lbl">${H.T(c.pass)}</span><span class="ri-input ri-dots">••••••••</span>
+            <span class="ri-lbl">${H.T(c.login)}</span><span class="ri-input ri-type" data-text="i.petrov"><span></span><i class="ri-caret"></i></span>
+            <span class="ri-lbl">${H.T(c.pass)}</span><span class="ri-input ri-dots ri-type" data-text="••••••••"><span></span><i class="ri-caret"></i></span>
             <span class="ri-go">${H.T(c.go)}</span>
           </div>
         </div>
@@ -373,19 +519,65 @@ function liveFinal3(box, c){
     liveStrip(page);
     // расцветки сервисов: окно перекрашивается, знак остается черно-белым
     if (it.themes) { const win = page.querySelector('.ri-login'); autoTabs(page, page.querySelector('.ri-tabs-th'), 2800, k => { win.dataset.th = k; }); }
+    liveTyping(page);
   });
   box.querySelectorAll('.ri-trio-i').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
 }
 
+// в окне входа сам печатается логин, потом пароль точками, потом нажимается «Продолжить» — и по кругу
+function liveTyping(page){
+  const fields = [...page.querySelectorAll('.ri-type')], go = page.querySelector('.ri-go');
+  let on = false, t, run = 0;
+  const wait = ms => new Promise(r => { t = setTimeout(r, ms); });
+  const type = async (f, id) => { const sp = f.firstElementChild, txt = f.dataset.text; f.classList.add('on'); sp.textContent = '';
+    for (const ch of txt) { if (run !== id) return; sp.textContent += ch; await wait(f.classList.contains('ri-dots') ? 70 : 110); } f.classList.remove('on'); };
+  const cycle = async () => {
+    const id = ++run;
+    while (on && run === id && !still()) {
+      fields.forEach(f => { f.firstElementChild.textContent = ''; f.classList.remove('on'); }); go.classList.remove('press');
+      await wait(900); if (run !== id) return;
+      await type(fields[0], id); await wait(350); await type(fields[1], id); await wait(500); if (run !== id) return;
+      go.classList.add('press'); await wait(3200);
+    }
+  };
+  onScreen(page.querySelector('.ri-login'), v => { on = v; clearTimeout(t); if (v) cycle(); else { run++; fields.forEach(f => { f.firstElementChild.textContent = f.dataset.text; f.classList.remove('on'); }); } }, .4);
+  fields.forEach(f => { f.firstElementChild.textContent = f.dataset.text; });
+}
+
 /* ================================================================
-   final — Росатом ID: версии и монохром на трех интерфейсах
+   final — Росатом ID: шторка «было / стало», версии в цвете
+   и монохроме, размеры, палитра
    ================================================================ */
+function shutterHTML(c){
+  return `<div class="ri-ba" style="--x:50%">
+    <div class="ri-ba-pane ri-ba-old">${logo(c.beforeLogo)}<span class="ri-ba-l">${H.T(c.before)}</span></div>
+    <div class="ri-ba-pane ri-ba-new">${logo(c.afterLogo)}<span class="ri-ba-l ri-ba-lr">${H.T(c.after)}</span></div>
+    <div class="ri-ba-h" aria-hidden="true"><i></i></div>
+  </div>`;
+}
+function liveShutter(box){
+  const ba = box.querySelector('.ri-ba');
+  let raf = 0, on = false, user = 0, t0 = 0, x = .5;
+  const set = v => { x = clamp(v, .02, .98); ba.style.setProperty('--x', (x * 100).toFixed(2) + '%'); };
+  const move = e => { const r = ba.getBoundingClientRect(); set((e.clientX - r.left) / r.width); user = performance.now(); };
+  ba.addEventListener('pointerdown', e => { ba.setPointerCapture(e.pointerId); move(e); });
+  ba.addEventListener('pointermove', e => { if (e.buttons) move(e); });
+  // сама ходит туда-сюда, пока не потянули; через 4 с после касания идет снова
+  const loop = now => {
+    if (!t0) t0 = now;
+    if (now - user > 4000) set(.5 + Math.sin((now - t0) / 1900) * .36);
+    if (on) raf = requestAnimationFrame(loop);
+  };
+  onScreen(ba, v => { on = v; cancelAnimationFrame(raf); if (v && !still()) raf = requestAnimationFrame(loop); }, .3);
+}
+const sizesHTML = c => `<div class="ri-sizes"><p class="ri-fin-t">${H.T(c.sizes.t)}</p><div class="ri-sizes-row">${c.sizes.list.map(([h, t], i) =>
+  `<figure style="--h:${h}px;--i:${i}"><span class="ri-sz"><img class="ri-logo ri-keep" src="${img('fin-short.svg')}" alt=""></span><figcaption>${esc(t)}, ${h} px</figcaption></figure>`).join('')}</div></div>`;
 function finalHTML(c){
-  return `<div class="ri-fin">${c.rows.map(r => `<div class="ri-fin-row">
+  return `${c.beforeLogo ? shutterHTML(c) : ''}<div class="ri-fin">${c.rows.map(r => `<div class="ri-fin-row">
     <span class="ri-fin-t">${H.T(r.t)}</span>
     <figure class="ri-fin-v ri-fin-full">${logo(r.full)}<figcaption>${H.T(c.full)}</figcaption></figure>
     <figure class="ri-fin-v ri-fin-short">${logo(r.short)}<figcaption>${H.T(c.short)}</figcaption></figure>
-  </div>`).join('')}</div>${c.palette ? `<div class="ri-brand"><p class="ri-brand-t">${H.T(c.palette.t)}</p>
+  </div>`).join('')}</div>${c.sizes ? sizesHTML(c) : ''}${c.palette ? `<div class="ri-brand"><p class="ri-brand-t">${H.T(c.palette.t)}</p>
     <div class="ri-brand-sw" aria-hidden="true">${c.palette.colors.map((col, i) => `<i style="background:${col};--i:${i}"></i>`).join('')}</div></div>` : ''}`;
 }
 
@@ -414,8 +606,9 @@ export async function mountAtomId(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   const s = p.atomid;
   mount.innerHTML =
-      (s.path     ? `<section class="ri-ch ri-path-ch"><div class="wrap">${pathHTML(s.path)}</div></section>` : '')
-    + (s.refusal  ? split('refusal', refusalHTML(s.refusal), s.refusal, false) : '')
+      (s.entry    ? `<section class="ri-ch ri-path-ch ri-ch-entry"><div class="wrap ri-head">${block(s.entry)}</div><div class="wrap ri-wide">${entryHTML(s.entry)}</div></section>` : '')
+    + (s.path     ? `<section class="ri-ch ri-path-ch"><div class="wrap">${pathHTML(s.path)}</div></section>` : '')
+    + (s.refusal  ? split('refusal', refusalHTML(s.refusal), s.refusal, false, s.refusal.why ? whyHTML(s.refusal) : '') : '')
     + (s.inside   ? split('inside', insideHTML(s.inside), s.inside, true) : '')
     + (s.sketches ? wide('sketches', sketchesHTML(s.sketches), s.sketches) : '')
     + (s.values   ? wide('values', valuesHTML(s.values), s.values) : '')
@@ -423,19 +616,23 @@ export async function mountAtomId(mount, p, helpers){
     + (s.names    ? wide('names', namesHTML(s.names), s.names) : '')
     + (s.final3   ? `<section class="ri-ch ri-ch-final3 ri-deck"><div class="wrap ri-head">${block(s.final3)}</div>${final3HTML(s.final3)}</section>` : '')
     + (s.final    ? wide('final', finalHTML(s.final), s.final) : '');
-  // путь — в самом начале кейса, выше задачи и роли
-  const path = mount.querySelector('.ri-path-ch'), scheme = mount.parentElement.querySelector(':scope > .wrap:has(.camp-head)');
-  if (path && scheme) {
+  // продукт одной картинкой — в самом начале кейса, выше задачи и роли
+  const tops = [...mount.querySelectorAll('.ri-path-ch')], scheme = mount.parentElement.querySelector(':scope > .wrap:has(.camp-head)');
+  if (tops.length && scheme) {
     const top = document.createElement('div');
     top.className = 'ri ri-top';
-    top.appendChild(path);
+    tops.forEach(el => top.appendChild(el));
     scheme.before(top);
   }
+  const path = tops.find(el => !el.classList.contains('ri-ch-entry'));
   mount.parentElement.querySelectorAll('.ri-ch, .ri-page').forEach(el => reveal.observe(el));
   const q = c => mount.querySelector(c);
   if (path) livePath(path);
+  if (s.entry) liveEntry(tops.find(el => el.classList.contains('ri-ch-entry')), s.entry);
   if (s.inside) liveInside(q('.ri-ch-inside'));
   if (s.values) liveValues(q('.ri-ch-values'));
   if (s.ideas) liveIdeas(q('.ri-ch-ideas'), s.ideas);
+  if (s.names) liveNames(q('.ri-ch-names'));
   if (s.final3) liveFinal3(q('.ri-ch-final3'), s.final3);
+  if (s.final && s.final.beforeLogo) liveShutter(q('.ri-ch-final'));
 }

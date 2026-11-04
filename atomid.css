@@ -11,7 +11,7 @@
 .ri-ch{margin-bottom:var(--ri-gap)}
 .ri-top .ri-ch{margin-bottom:clamp(48px,6vw,96px)}
 .ri-logo{display:block;width:100%;height:100%;object-fit:contain}
-:root[data-theme="dark"] .ri .ri-logo:not(.ri-keep),:root[data-theme="dark"] .ri-sk img{filter:invert(1) hue-rotate(180deg)}
+:root[data-theme="dark"] .ri .ri-logo:not(.ri-keep),:root[data-theme="dark"] .ri-sk img,:root[data-theme="dark"] .ri-logo-v,:root[data-theme="dark"] .ri-ic-img{filter:invert(1) hue-rotate(180deg)}
 
 /* ---------- раскладка: картинка 7 колонок, текст 4; rev — картинка справа ---------- */
 .ri-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
@@ -252,3 +252,140 @@
 .ri-v-seg path{fill:#ECECEC;transition:fill .6s var(--ease)}
 .ri-v-seg.on path{fill:#D2D2D2}
 .ri-v-seg text{font-family:inherit;font-size:calc(var(--fs, 19) * 1px);font-weight:500;fill:#1D1D1B}
+
+/* ================================================================
+   вау-блоки: герой, штамп, пиктограммы, сборка знака, итог, печать, шторка, размеры
+   ================================================================ */
+/* ---------- entry: сотрудник → дверь → 34 системы ---------- */
+.ri-ch-entry .ri-head{margin-bottom:clamp(16px,2vw,28px)}
+.ri-entry{display:grid;grid-template-columns:minmax(220px,1fr) 3.2fr;gap:clamp(24px,4vw,64px);align-items:center}
+.ri-e-nums{display:flex;flex-direction:column;gap:clamp(24px,3vw,44px)}
+.ri-e-num{display:flex;flex-direction:column;gap:6px}
+.ri-e-num b{font-weight:500;font-size:clamp(44px,5.4vw,84px);line-height:.95;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ri-e-num span{font-size:clamp(17px,1.4vw,21px);opacity:.6}
+.ri-entry svg{display:block;width:100%;height:auto;overflow:visible}
+.ri-e-line{fill:none;stroke:currentColor;stroke-width:1.5;opacity:.28;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.1s var(--ease) calc(.4s + var(--i,0) * 28ms)}
+.ri-e-walk{stroke-width:2;opacity:.5;transition-delay:.1s}
+.ri-ch.in .ri-e-line{stroke-dashoffset:0}
+.ri-e-who,.ri-e-door{fill:none;stroke:currentColor;stroke-width:3;opacity:0;transform:translateY(10px);transition:opacity .7s var(--ease),transform .9s var(--ease)}
+.ri-e-door{transition-delay:.25s}
+.ri-e-door rect:first-child{fill:var(--bg,#fff)}
+.ri-e-hole{fill:currentColor;stroke:none}
+.ri-e-pin{fill:var(--bg,#fff);stroke:none}
+.ri-e-pin2{stroke:var(--bg,#fff);stroke-width:4}
+.ri-ch.in .ri-e-who,.ri-ch.in .ri-e-door{opacity:1;transform:none}
+.ri-e-t{font-size:calc(var(--fs, 18) * 1px);font-weight:500;fill:currentColor;opacity:0;transition:opacity .7s var(--ease) .5s}
+.ri-ch.in .ri-e-t{opacity:1}
+.ri-e-tile{fill:currentColor;opacity:.08;transition:fill .6s var(--ease) calc(1.2s + var(--i) * 34ms),opacity .6s var(--ease) calc(1.2s + var(--i) * 34ms)}
+.ri-ch.in .ri-e-tile{fill:var(--ri-blue);opacity:.85}
+:root[data-theme="dark"] .ri-ch.in .ri-e-tile{fill:#57AEE9}
+.ri-e-pulse{fill:var(--ri-blue);opacity:0;transition:opacity .6s 2.2s}
+:root[data-theme="dark"] .ri-e-pulse{fill:#8CCBF2}
+.ri-ch.in .ri-e-pulse{opacity:1}
+@media (prefers-reduced-motion:reduce){ .ri-e-pulse{display:none} }
+@media (max-width:900px){
+  .ri-entry{grid-template-columns:1fr;gap:28px}
+  .ri-e-nums{flex-direction:row;gap:32px}
+  .ri-e-num{flex:1}
+}
+
+/* ---------- refusal: риски месяцев, подпись, штамп, причины ---------- */
+.ri-wait-line{overflow:visible}
+.ri-ticks{position:absolute;left:0;right:0;top:-6px;height:14px;pointer-events:none}
+.ri-ticks i{position:absolute;top:0;width:1.5px;height:100%;background:currentColor;opacity:.22;transform:scaleY(0);transform-origin:50% 100%;transition:transform .4s var(--ease)}
+.ri-ticks i:nth-child(6n+1){opacity:.5;top:-4px;height:22px}
+.ri-ch.in .ri-ticks i{transform:none}
+.ri-ticks i:nth-child(1){transition-delay:.5s}.ri-ticks i:nth-child(2){transition-delay:.64s}.ri-ticks i:nth-child(3){transition-delay:.78s}.ri-ticks i:nth-child(4){transition-delay:.92s}
+.ri-ticks i:nth-child(5){transition-delay:1.06s}.ri-ticks i:nth-child(6){transition-delay:1.2s}.ri-ticks i:nth-child(7){transition-delay:1.34s}.ri-ticks i:nth-child(8){transition-delay:1.48s}
+.ri-ticks i:nth-child(9){transition-delay:1.62s}.ri-ticks i:nth-child(10){transition-delay:1.76s}.ri-ticks i:nth-child(11){transition-delay:1.9s}.ri-ticks i:nth-child(12){transition-delay:2.04s}
+.ri-ticks i:nth-child(13){transition-delay:2.18s}.ri-ticks i:nth-child(14){transition-delay:2.32s}.ri-ticks i:nth-child(15){transition-delay:2.46s}.ri-ticks i:nth-child(16){transition-delay:2.6s}
+.ri-ticks i:nth-child(17){transition-delay:2.74s}.ri-ticks i:nth-child(18){transition-delay:2.88s}.ri-ticks i:nth-child(19){transition-delay:3.02s}
+.ri-wait-line em{position:absolute;left:50%;top:-44px;transform:translateX(-50%);font-style:normal;font-size:16px;white-space:nowrap;opacity:0;transition:opacity .6s var(--ease) 1.8s}
+.ri-ch.in .ri-wait-line em{opacity:.6}
+.ri-date-to{position:relative}
+/* штамп падает на дату отказа, когда полоска дошла до конца */
+.ri-stamp{position:absolute;right:-10px;top:-14px;padding:4px 12px;border:3px solid currentColor;border-radius:6px;font-size:clamp(18px,1.6vw,24px);font-weight:600;letter-spacing:.06em;line-height:1.1;
+  transform:rotate(-14deg) scale(1.6);opacity:0;pointer-events:none;background:var(--bg,#fff)}
+.ri-ch.in .ri-stamp{animation:riStamp .5s cubic-bezier(.2,1.6,.4,1) 3.15s both}
+@keyframes riStamp{from{transform:rotate(-14deg) scale(2.4);opacity:0}60%{opacity:1}to{transform:rotate(-8deg) scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){ .ri-ch.in .ri-stamp{animation:none;transform:rotate(-8deg);opacity:1} }
+.ri-why{display:flex;flex-wrap:wrap;gap:16px 28px}
+.ri-why-i{display:flex;align-items:center;gap:12px;font-size:17px;line-height:1.25;max-width:230px}
+.ri-why-i .ri-ic{flex:none}
+.ri-ic{width:44px;height:44px}
+
+/* ---------- пиктограммы мысли ---------- */
+.ri-page-info{align-self:center}
+/* инфографика к знаку — всегда в одну линию */
+.ri-pict{display:flex;flex-wrap:nowrap;justify-content:flex-end;align-items:flex-start;gap:clamp(4px,.8vw,10px)}
+@media (max-width:900px){ .ri-pict{justify-content:flex-start} }
+.ri-pict-i{flex:none;display:flex;flex-direction:column;align-items:center;gap:8px;width:clamp(64px,6.6vw,96px);text-align:center;font-size:16px;line-height:1.2;opacity:0;transform:translateY(10px);transition:opacity .6s var(--ease) calc(.5s + var(--i) * 90ms),transform .8s var(--ease) calc(.5s + var(--i) * 90ms)}
+.ri-page.in .ri-pict-i{opacity:1;transform:none}
+.ri-pict .ri-ic{width:52px;height:52px}
+.ri-ic-img{display:block;width:52px;height:52px;background-repeat:no-repeat;background-size:auto 100%}
+.ri-pict-sep{flex:none;align-self:flex-start;margin-top:12px;font-size:24px;line-height:1;opacity:.45}
+.ri-stairs{--row:46px;position:relative;width:100%;max-width:440px;margin-left:auto;height:calc(var(--n) * var(--row) + 30px)}
+.ri-step{position:absolute;display:block;height:14px}
+.ri-step i{position:absolute;inset:0;border-radius:7px;background:var(--ri-blue);transform:scaleX(0);transform-origin:0 50%;transition:transform .7s var(--ease) calc(.5s + var(--i) * 260ms)}
+.ri-step:last-child i{background:#003378}
+:root[data-theme="dark"] .ri-step i{background:#57AEE9}
+:root[data-theme="dark"] .ri-step:last-child i{background:#8CCBF2}
+.ri-step span{position:absolute;left:0;bottom:22px;font-size:16px;line-height:1.1;white-space:nowrap;opacity:0;transition:opacity .5s var(--ease) calc(.8s + var(--i) * 260ms)}
+.ri-page.in .ri-step i{transform:none}
+.ri-page.in .ri-step span{opacity:1}
+@media (max-width:900px){ .ri-stairs{margin-left:0} }
+
+/* ---------- знак собирается из частей ---------- */
+.ri-sign-host{display:block;width:100%}
+.ri-logo-v{display:block;width:100%;height:auto;overflow:visible}
+.ri-sign .ri-sign-host{max-height:46%;display:flex;align-items:center;justify-content:center}
+.ri-sign-2 .ri-sign-host{max-height:28%}
+.ri-sign-host .ri-logo-v{max-height:100%}
+.ri-part{opacity:0;transform:translateY(6%) scale(.6);transform-box:fill-box;transform-origin:center;transition:opacity .35s var(--ease),transform .5s var(--ease)}
+.ri-sign.build .ri-part{opacity:1;transform:none;transition:opacity .5s var(--ease) calc(var(--i) * 28ms),transform .9s cubic-bezier(.2,1.4,.4,1) calc(var(--i) * 28ms)}
+@media (prefers-reduced-motion:reduce){ .ri-part{opacity:1;transform:none} }
+
+/* ---------- names: итог ---------- */
+.ri-nt-sumt{border-bottom:0;padding-top:26px}
+.ri-nt-s{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border-bottom:0;padding-top:22px}
+.ri-nt-s b{font-weight:500;font-size:clamp(30px,3vw,44px);line-height:1;letter-spacing:-.02em}
+.ri-nt-s small{font-size:16px;opacity:.55}
+.ri-pips{display:flex;gap:4px;width:100%;margin-top:6px}
+.ri-pips u{display:block;width:22px;height:6px;border-radius:3px;background:currentColor;opacity:.14;transition:opacity .4s var(--ease) calc(1.5s + var(--i) * 120ms)}
+.ri-ch.in .ri-pips u.on{opacity:1}
+.ri-nt-s.best{border-radius:0 0 var(--r-img) var(--r-img)}
+@media (max-width:760px){ .ri-nt-sumt{grid-column:1 / -1;padding-bottom:4px} .ri-nt-s{flex-direction:column;gap:4px;padding-inline:8px} .ri-pips u{width:14px} }
+
+/* ---------- экран входа: печать логина ---------- */
+.ri-type > span{white-space:pre}
+.ri-caret{display:none;width:1.5px;height:1.1em;margin-left:1px;background:currentColor;animation:riCaret 1s steps(2) infinite}
+.ri-type.on .ri-caret{display:inline-block}
+@keyframes riCaret{to{opacity:0}}
+.ri-go{transition:transform .15s var(--ease),filter .15s}
+.ri-go.press{transform:scale(.97);filter:brightness(1.35)}
+
+/* ---------- было / стало ---------- */
+.ri-ba{position:relative;aspect-ratio:3/1;margin-bottom:clamp(40px,5vw,72px);border-radius:var(--r-img);border:1.5px solid var(--ri-line);overflow:hidden;cursor:ew-resize;touch-action:pan-y;user-select:none}
+.ri-ba-pane{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 10%}
+.ri-ba-pane .ri-logo{width:auto;max-width:100%;height:42%;pointer-events:none}
+.ri-ba-old{clip-path:inset(0 calc(100% - var(--x)) 0 0)}
+.ri-ba-new{clip-path:inset(0 0 0 var(--x))}
+.ri-ba-l{position:absolute;left:clamp(14px,2vw,28px);bottom:clamp(12px,1.8vw,24px);font-size:16px;opacity:.55}
+.ri-ba-lr{left:auto;right:clamp(14px,2vw,28px)}
+.ri-ba-h{position:absolute;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:currentColor;pointer-events:none}
+.ri-ba-h i{position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);border-radius:50%;background:var(--ink,#1D1D1B);box-shadow:0 0 0 3px var(--bg,#fff)}
+.ri-ba-h i::before,.ri-ba-h i::after{content:"";position:absolute;top:50%;width:7px;height:7px;border:2px solid var(--bg,#fff);border-width:2px 0 0 2px;transform:translateY(-50%) rotate(-45deg);left:10px}
+.ri-ba-h i::after{left:auto;right:10px;transform:translateY(-50%) rotate(135deg)}
+@media (max-width:760px){ .ri-ba{aspect-ratio:16/9} .ri-ba-pane .ri-logo{height:30%} }
+
+/* ---------- размеры ---------- */
+.ri-sizes{padding:clamp(28px,3.4vw,52px) 0;border-bottom:1.5px solid var(--ri-line)}
+.ri-sizes-row{display:flex;align-items:flex-end;gap:clamp(20px,3.4vw,56px);margin-top:clamp(20px,2.4vw,32px);overflow-x:auto;scrollbar-width:none}
+.ri-sizes-row::-webkit-scrollbar{display:none}
+.ri-sizes-row figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;flex:none;opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease) calc(var(--i) * 110ms),transform .8s var(--ease) calc(var(--i) * 110ms)}
+.ri-ch.in .ri-sizes-row figure{opacity:1;transform:none}
+.ri-sz{display:block;height:var(--h)}
+.ri-sz img{height:100%;width:auto}
+.ri-sizes-row figcaption{font-size:16px;opacity:.55;white-space:nowrap}
+/* на телефоне размеры переносятся рядами, а не уезжают за край */
+@media (max-width:760px){ .ri-sizes-row{flex-wrap:wrap;overflow:visible;gap:24px 28px} }
