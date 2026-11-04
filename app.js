@@ -61,7 +61,8 @@ addEventListener('error', e => {
              : SCRIPT_BASE + path + '?r=' + (n + 1);
   setTimeout(() => {
     if (el.tagName === 'SOURCE') { el.src = next; el.parentElement?.load?.(); }
-    else { el.src = next; if (el.tagName === 'VIDEO') el.load(); }
+    else { if (el.srcset) el.removeAttribute('srcset');   // иначе браузер снова берет вариант из srcset, а не новый src
+      el.src = next; if (el.tagName === 'VIDEO') el.load(); }
   }, n === 0 && raster ? 0 : 1500);
 }, true);
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
