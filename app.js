@@ -130,7 +130,8 @@ if (SITE.ndaPage && Array.isArray(SITE.ndaPage.items)) {
   const byYear = SITE.ndaPage.items.map((p, i) => [p, i]).sort((a, b) => lastYear(b[0]) - lastYear(a[0]) || a[1] - b[1]).map(x => x[0]);
   // проекты Росатома (в названии «Росатом» или «Атом ID») — всегда в конце, между собой тоже по годам;
   // last: true (аудит внутренних систем) — всегда предпоследний кейс на странице
-  const isRosatom = p => /росатом|атом id/i.test([].concat(p.title).join(' '));
+  // up: true — проект Росатома, который остается в общем порядке по годам (ребрендинг HR-экосистемы — наверху, перед кейсами VK)
+  const isRosatom = p => !p.up && /росатом|атом id/i.test([].concat(p.title).join(' '));
   const pinned = byYear.filter(p => p.last), ros = byYear.filter(p => !p.last && isRosatom(p)), rest = byYear.filter(p => !p.last && !isRosatom(p));
   SITE.ndaPage.items = ros.length ? [...rest, ...ros.slice(0, -1), ...pinned, ...ros.slice(-1)] : [...rest, ...pinned];
 }
