@@ -4304,6 +4304,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 'Прогулялась по одиннадцати внутренним системам и вернулась с планом лечения'],
         image: 'img/rosatom-audit/cover.webp',
         thumb: 'img/rosatom-audit/cover-s.webp',
+        preview: 'img/rosatom-audit/preview.mp4',   // карточка в сетке: Марк машет, в поиске печатается запрос, по тегам бежит блик (5 с по кругу); кадр без анимации — cover
         noHero: true,
         schemeCols: true,
         scheme: {

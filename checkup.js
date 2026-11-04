@@ -27,7 +27,7 @@ const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const onScreen = (el, cb, threshold = .3) =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { threshold }).observe(el);
-const IMGV = 6;   // меняется, когда картинки пересобраны: иначе браузер показывает старые из кеша
+const IMGV = 7;   // меняется, когда картинки пересобраны: иначе браузер показывает старые из кеша
 const img = n => H.base + 'img/rosatom-audit/' + n + '?v=' + IMGV;
 const pic = (n, sizes = '(max-width: 900px) 100vw, 58vw') =>
   `src="${img(n + '.webp')}" srcset="${img(n + '-s.webp')} 900w, ${img(n + '.webp')} 1600w" sizes="${sizes}"`;
