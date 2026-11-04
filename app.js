@@ -120,14 +120,19 @@ if (isNdaPage) {
 </div>`);
 }
 /* Страница NDA: проекты по годам — сверху самые новые, внизу самые старые. Год — последний в поле year
-   («2023–2025» → 2025); при одинаковом годе — как в списке content.js; без года — в самом низу; last: true — всегда последним */
+   («2023–2025» → 2025); при одинаковом годе — как в списке content.js; без года — в самом низу;
+   проекты Росатома — в конце, аудит (last: true) — предпоследним */
 if (SITE.ndaPage && Array.isArray(SITE.ndaPage.items)) {
   // draft: true — кейс еще не согласован: виден только на локальном превью и по адресу с ?draft
   const showDrafts = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || /[?&]draft\b/.test(location.search);
   SITE.ndaPage.items = SITE.ndaPage.items.filter(p => !p.draft || showDrafts);
   const lastYear = p => Math.max(0, ...(String(p.year || '').match(/\d{4}/g) || []).map(Number));
-  // last: true — кейс всегда в самом конце списка, независимо от года
-  SITE.ndaPage.items = SITE.ndaPage.items.map((p, i) => [p, i]).sort((a, b) => !!a[0].last - !!b[0].last || lastYear(b[0]) - lastYear(a[0]) || a[1] - b[1]).map(x => x[0]);
+  const byYear = SITE.ndaPage.items.map((p, i) => [p, i]).sort((a, b) => lastYear(b[0]) - lastYear(a[0]) || a[1] - b[1]).map(x => x[0]);
+  // проекты Росатома (в названии «Росатом» или «Атом ID») — всегда в конце, между собой тоже по годам;
+  // last: true (аудит внутренних систем) — всегда предпоследний кейс на странице
+  const isRosatom = p => /росатом|атом id/i.test([].concat(p.title).join(' '));
+  const pinned = byYear.filter(p => p.last), ros = byYear.filter(p => !p.last && isRosatom(p)), rest = byYear.filter(p => !p.last && !isRosatom(p));
+  SITE.ndaPage.items = ros.length ? [...rest, ...ros.slice(0, -1), ...pinned, ...ros.slice(-1)] : [...rest, ...pinned];
 }
 /* Разделы, которых нет на этой странице (на Тильде у каждой страницы свои тексты), — пустые */
 ['works', 'nda', 'directions', 'clients', 'about'].forEach(k => { SITE[k] = SITE[k] || {}; });
