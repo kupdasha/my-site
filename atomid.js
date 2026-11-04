@@ -212,7 +212,7 @@ function refusalHTML(c){
   return `<div class="ri-refusal">
     <div class="ri-olds">
       <figure class="ri-old">${logo('old-dots')}${cap(c.first)}</figure>
-      <figure class="ri-old">${logo('old-orbit')}${cap(c.second)}</figure>
+      <figure class="ri-old">${logo('old-orbit2')}${cap(c.second)}</figure>
     </div>${c.dateFrom ? `
     <div class="ri-wait">
       <span class="ri-date"><small>${H.T(c.from)}</small>${esc(c.dateFrom)}</span>
