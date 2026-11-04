@@ -4758,7 +4758,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             /* знаки — как на слайде 107: на темном, белые буквы и синее «iD» */
             logos: { full: 'r3a-full-d', short: 'r3a-short-d' },
             /* как у финалистов: окно входа как на слайде 106 (знак черно-белый, фавикон — белое «iD» на черной плашке, фон — узор из иконок со слайда 112), лента айдентики и сайта */
-            name: 'Росатом ID', url: 'iam.rosatom.ru', logo: 'r3a-card', favImg: 'r3a-fav', bg: 'ros3a-pattern',
+            name: 'Росатом ID', url: 'iam.rosatom.ru', logo: 'r3a-login', favImg: 'r3a-fav', bg: 'ros3a-pattern',
             pieces: ['tall', 'sq', 'ui', 'wide', 'right', 'web2', 'web1', 'web3', 'web4'], pal: ['#0061A6', '#000000', '#ABABA9', '#E9E9E9'],
           },
           /* четвертый раунд: три финалиста — сначала рядом, потом у каждого своя «страница»:
