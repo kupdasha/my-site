@@ -444,7 +444,7 @@ const pageHead = (it, mark = '') => { const right = mark || pictHTML(it);
   </div>`; };
 // главная картинка концепции — сам знак в векторе, крупно; у «ключа» — русская и английская версии
 function ideaPage(it, c){
-  return `<article class="ri-page${it.tint ? ' ri-tinted' : ''}" data-k="${it.k}"${it.tint ? ` style="--ri-tc:${it.tint}"` : ''}>
+  return `<article class="ri-page" data-k="${it.k}">
     ${pageHead(it)}
     <div class="wrap"><div class="ri-sign${it.mark2 ? ' ri-sign-2' : ''}">${logo(it.mark)}${it.mark2 ? logo(it.mark2) : ''}</div></div>
     <div class="wrap">${stripHTML(it.k, it, c.open)}</div>

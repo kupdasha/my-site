@@ -412,7 +412,3 @@
 .ri-ch-blue .ri-login::after{content:"";position:absolute;inset:0;border:1.5px solid #E2E2E2;border-radius:inherit;pointer-events:none}
 .ri-ch-blue .ri-win{inset:0;border-radius:inherit;box-shadow:none}
 @media (max-width:760px){ .ri-ch-blue .ri-login{aspect-ratio:3/4.4} }
-/* у каждой концепции свой фон — легкий оттенок ее цвета на всю ширину сайта: видно, где началась новая идея */
-.ri-page.ri-tinted{--ri-tbg:color-mix(in srgb,var(--ri-tc) 11%,var(--bg));background:var(--ri-tbg);box-shadow:0 0 0 100vmax var(--ri-tbg);clip-path:inset(0 -100vmax);padding-block:clamp(56px,7vw,120px);margin-bottom:0}
-:root[data-theme="dark"] .ri-page.ri-tinted{--ri-tbg:color-mix(in srgb,var(--ri-tc) 16%,var(--bg))}
-.ri-ch-ideas .ri-in-deck{padding-block:clamp(72px,9vw,150px)}
