@@ -431,6 +431,6 @@
 .ri-band .ri-sign-2 .ri-sign-host{height:clamp(60px,6.5vw,110px)}
 .ri-band .ri-sign-host .ri-logo-v{height:100%;width:auto;max-width:100%}
 @media (max-width:760px){ .ri-band .ri-sign .ri-sign-host{height:80px} .ri-band .ri-sign-2 .ri-sign-host{height:54px} }
-/* «дело не в рисунке, а в имени» — весь блок на черном на всю ширину сайта, текст и графика белые */
-.ri-ch-names{position:relative;background:#111113;color:#fff;box-shadow:0 0 0 100vmax #111113;clip-path:inset(0 -100vmax);padding-block:var(--ri-gap)}
-.ri-ch-names .ri-nt .best{background:color-mix(in srgb,#57AEE9 22%,transparent)}
+/* «дело не в рисунке, а в имени» — весь блок на фирменном синем Росатома (--ri-blue) на всю ширину сайта, текст и графика белые */
+.ri-ch-names{position:relative;background:var(--ri-blue);color:#fff;box-shadow:0 0 0 100vmax var(--ri-blue);clip-path:inset(0 -100vmax);padding-block:var(--ri-gap)}
+.ri-ch-names .ri-nt .best{background:rgba(255,255,255,.14)}
