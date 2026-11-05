@@ -443,10 +443,13 @@ const pageHead = (it, mark = '', noName = false) => { const right = mark || pict
     ${right ? `<div class="ri-page-mark${mark ? '' : ' ri-page-info'}">${right}</div>` : ''}
   </div>`; };
 // главная картинка концепции — сам знак в векторе, крупно; у «ключа» — русская и английская версии
+// плашка-перебивка «концепция N» — у всех вариантов подряд: четыре концепции, первый «Росатом ID», три финалиста
+const numHTML = n => `<div class="ri-num"><div class="wrap"><span>концепция ${n}</span></div></div>`;
 function ideaPage(it, c, n){
-  // перебивка: тонкая черта на всю ширину сайта, номер концепции, имя крупно и знак; фон везде белый
+  // перебивка: невысокая черная плашка на всю ширину сайта с номером концепции, дальше имя крупно и знак; фон везде белый
   return `<article class="ri-page ri-page-b" data-k="${it.k}">
-    <div class="ri-band"><div class="wrap ri-band-in"><div class="ri-band-t"><span class="ri-band-n">концепция ${n}</span><h3 class="ri-name">${H.T(it.t)}</h3></div>
+    ${numHTML(n)}
+    <div class="ri-band"><div class="wrap ri-band-in"><div class="ri-band-t"><h3 class="ri-name">${H.T(it.t)}</h3></div>
       <div class="ri-sign${it.mark2 ? ' ri-sign-2' : ''}">${logo(it.mark)}${it.mark2 ? logo(it.mark2) : ''}</div></div></div>
     ${pageHead(it, '', true)}
     <div class="wrap">${stripHTML(it.k, it, c.open)}</div>
@@ -515,10 +518,11 @@ const loginHTML = (it, c) => `${it.themes ? tabsHTML(it.themes, 'ri-tabs-th') : 
       </div>
     </div>
   </div>`;
-function final3HTML(c){
+function final3HTML(c, n0 = 0){
   const trio = `<div class="wrap"><div class="ri-trio">${c.items.map(it =>
     `<button type="button" class="ri-trio-i ri-trio-${it.k}" data-go="${it.k}" aria-label="${esc(H.pick(it.t))}"><span class="ri-trio-l">${logo(it.logo)}</span></button>`).join('')}</div></div>`;
-  const pages = c.items.map(it => `<article class="ri-page" data-k="${it.k}">
+  const pages = c.items.map((it, i) => `<article class="ri-page" data-k="${it.k}">
+    ${n0 ? numHTML(n0 + i + 1) : ''}
     ${pageHead(it, `<div class="ri-pair"><figure>${logo(it.logo)}<figcaption>${H.T(c.ru)}</figcaption></figure><figure>${logo(it.logo2)}<figcaption>${H.T(c.en)}</figcaption></figure></div>`)}
     <div class="wrap">${loginHTML(it, c)}</div>
     <div class="wrap">${stripHTML(it.k, it, c.open)}</div>
@@ -624,7 +628,7 @@ export async function mountAtomId(mount, p, helpers){
   H = helpers;
   await loadCSS(H.base);
   if (!mount.isConnected) return;   // кейс успели закрыть
-  const s = p.atomid;
+  const s = p.atomid, nIdeas = s.ideas ? s.ideas.items.length : 0;
   mount.innerHTML =
       (s.entry    ? `<section class="ri-ch ri-path-ch ri-ch-entry"><div class="wrap ri-head">${block(s.entry)}</div><div class="wrap ri-wide">${entryHTML(s.entry)}</div></section>` : '')
     + (s.path     ? `<section class="ri-ch ri-path-ch"><div class="wrap">${pathHTML(s.path)}</div></section>` : '')
@@ -634,8 +638,8 @@ export async function mountAtomId(mount, p, helpers){
     + (s.values   ? wide('values', valuesHTML(s.values), s.values) : '')
     + (s.ideas    ? `<section class="ri-ch ri-ch-ideas ri-deck"><div class="wrap ri-head">${block(s.ideas)}</div>${navHTML(s.ideas.items, s.ideas.menu)}${s.ideas.items.map((it, i) => ideaPage(it, s.ideas, i + 1)).join('')}</section>` : '')
     + (s.names    ? wide('names', namesHTML(s.names), s.names) : '')
-    + (s.blue     ? `<section class="ri-ch ri-ch-blue"><div class="wrap ri-head">${block(s.blue)}</div>${blueHTML(s.blue, s.final3)}</section>` : '')
-    + (s.final3   ? `<section class="ri-ch ri-ch-final3 ri-deck"><div class="wrap ri-head">${block(s.final3)}</div>${final3HTML(s.final3)}</section>` : '')
+    + (s.blue     ? `<section class="ri-ch ri-ch-blue">${numHTML(nIdeas + 1)}<div class="wrap ri-head">${block(s.blue)}</div>${blueHTML(s.blue, s.final3)}</section>` : '')
+    + (s.final3   ? `<section class="ri-ch ri-ch-final3 ri-deck"><div class="wrap ri-head">${block(s.final3)}</div>${final3HTML(s.final3, nIdeas + (s.blue ? 1 : 0))}</section>` : '')
     + (s.final    ? wide('final', finalHTML(s.final), s.final) : '');
   // продукт одной картинкой — в самом начале кейса, выше задачи и роли
   const tops = [...mount.querySelectorAll('.ri-path-ch')], scheme = mount.parentElement.querySelector(':scope > .wrap:has(.camp-head)');

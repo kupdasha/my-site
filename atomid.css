@@ -412,11 +412,12 @@
 .ri-ch-blue .ri-login::after{content:"";position:absolute;inset:0;border:1.5px solid #E2E2E2;border-radius:inherit;pointer-events:none}
 .ri-ch-blue .ri-win{inset:0;border-radius:inherit;box-shadow:none}
 @media (max-width:760px){ .ri-ch-blue .ri-login{aspect-ratio:3/4.4} }
-/* перебивка перед концепцией: фон белый, тонкая черта на всю ширину сайта, номер концепции, имя крупно и знак собирается */
-.ri-band{position:relative;padding-top:clamp(40px,5vw,80px);margin-bottom:clamp(24px,3vw,48px)}
-.ri-band::before{content:"";position:absolute;top:0;left:calc(50% - 50vw);width:100vw;height:1.5px;background:color-mix(in srgb,currentColor 22%,transparent)}
+/* перебивка перед концепцией: фон белый, черная плашка с номером, имя крупно и знак собирается */
+.ri-band{margin-bottom:clamp(24px,3vw,48px)}
+/* плашка «концепция N»: невысокая, черная, на всю ширину сайта; в темной версии — светлая */
+.ri-num{position:relative;background:var(--ink);color:var(--bg);box-shadow:0 0 0 100vmax var(--ink);clip-path:inset(0 -100vmax);padding-block:clamp(18px,1.8vw,28px);margin-bottom:clamp(40px,5vw,80px)}
+.ri-num span{display:block;font-weight:500;font-size:clamp(20px,1.8vw,28px);line-height:1.1}
 .ri-band-t{display:flex;flex-direction:column;gap:14px}
-.ri-band-n{font-size:16px;opacity:.55}
 .ri-band-in{display:flex;flex-direction:column;gap:clamp(24px,3vw,48px)}
 .ri-band .ri-sign{flex:1;border:0;aspect-ratio:auto;min-height:clamp(200px,24vw,380px)}
 .ri-band .ri-sign .ri-logo{max-height:clamp(90px,11vw,190px)}
