@@ -1,10 +1,28 @@
 <!-- Направления -->
-  <section class="sec" id="directions">
+  <section class="sec" id="directions" data-pre="">
     <div class="wrap">
       <div class="sec-head">
-        <h2 class="h2" data-reveal data-text="directions.title"></h2>
-        <p class="sec-note" data-reveal data-text="directions.note"></p>
+        <h2 class="h2" data-reveal="" data-text="directions.title" aria-label="направления"><span class="wd">направления</span></h2>
+        <p class="sec-note" data-reveal="" data-text="directions.note">Беру проект целиком или&nbsp;подключаюсь на&nbsp;нужном&nbsp;этапе</p>
       </div>
-      <div class="dirs" id="dirList"></div>
+      <div class="dirs" id="dirList"><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div>
+    <a class="dir" href="#works" data-cat="дизайн">
+      <h3 aria-label="дизайн"><span class="wd">дизайн</span></h3><p>Айдентика, логотипы, ключевые визуалы и&nbsp;рекламные&nbsp;кампании</p><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span>
+    </a><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div>
+    <a class="dir" href="#works" data-cat="вайб-кодинг">
+      <h3 aria-label="вайб-кодинг"><span class="nobr"><span class="wd">вайб-кодинг</span></span></h3><p>Программы и&nbsp;интерфейсы на&nbsp;Claude&nbsp;Code: конструкторы, редакторы, рабочие&nbsp;инструменты</p><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span>
+    </a><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div>
+    <a class="dir" href="#works" data-cat="продакшен">
+      <h3 aria-label="продакшен"><span class="wd">продакшен</span></h3><p>Ролики, <span class="caps">CG</span>&nbsp;и&nbsp;<span class="nobr"><span class="caps">ИИ</span>-видео</span>: концепт, раскадровки, супервайзинг&nbsp;графики</p><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span>
+    </a><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div>
+    <a class="dir" href="#works" data-cat="3D">
+      <h3 aria-label="3D и&nbsp;стенды"><span class="wd">3D</span> <span class="wd">и&nbsp;стенды</span></h3><p>Выставочные стенды, детские зоны и&nbsp;визуализации&nbsp;— от&nbsp;идеи до&nbsp;монтажа</p><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span>
+    </a><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div>
+    <a class="dir" href="#works" data-cat="мерч">
+      <h3 aria-label="мерч"><span class="wd">мерч</span></h3><p>Капсульные коллекции для&nbsp;команд и&nbsp;блогеров: от&nbsp;идеи и&nbsp;сметы до&nbsp;производства&nbsp;партии</p><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span>
+    </a><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div>
+    <a class="dir" href="https://kupdasha.ru/ai">
+      <h3 aria-label="AI-воркшоп"><span class="nobr"><span class="caps"><span class="wd">AI</span></span><span class="wd">-воркшоп</span></span></h3><p>Обучение команд нейросетям на&nbsp;реальных задачах&nbsp;— онлайн или&nbsp;в&nbsp;офисе</p><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span>
+    </a><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div></div>
     </div>
   </section>

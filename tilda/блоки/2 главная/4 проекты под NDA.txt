@@ -1,13 +1,37 @@
 <!-- Проекты под NDA -->
-  <section class="sec" id="nda">
+  <section class="sec" id="nda" data-pre="">
     <div class="wrap">
       <div class="sec-head">
-        <h2 class="h2" data-reveal data-text="nda.title"></h2>
-        <p class="sec-note" data-reveal data-text="nda.note"></p>
+        <h2 class="h2" data-reveal="" data-text="nda.title" aria-label="проекты под&nbsp;NDA"><span class="wd">проекты</span> <span class="wd">под&nbsp;</span><span class="caps"><span class="wd">NDA</span></span></h2>
+        <p class="sec-note" data-reveal="" data-text="nda.note">Показываю лично или&nbsp;по&nbsp;паролю</p>
       </div>
-      <div class="nda" id="ndaList"></div>
+      <div class="nda" id="ndaList"><a class="nda-item" href="https://kupdasha.ru/n_d_a" data-reveal="" style="--d:0s">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#F3F0FE,#E0D6FB,#CDBDF8,#F5D9F0"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3 aria-label="ребрендинг HR-экосистемы"><span class="wd">ребрендинг</span> <span class="nobr"><span class="caps"><span class="wd">HR</span></span><span class="wd">-экосистемы</span></span></h3><span class="tag" aria-label="ребрендинг"><span class="wd">ребрендинг</span></span></span>
+    </a><a class="nda-item" href="https://kupdasha.ru/n_d_a" data-reveal="" style="--d:0.1s">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#FDF0F2,#F9D6DC,#F2C2D3,#F7DCE8"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3 aria-label="рекламная кампания для&nbsp;премиум-девелопера"><span class="wd">рекламная</span> <span class="wd">кампания</span> <span class="wd">для&nbsp;</span><span class="nobr"><span class="wd">премиум-девелопера</span></span></h3><span class="tag" aria-label="реклама"><span class="wd">реклама</span></span></span>
+    </a><a class="nda-item" href="https://kupdasha.ru/n_d_a" data-reveal="" style="--d:0s">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#EAF7F8,#C9EBF0,#ADDFE7,#D5F1DE"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3 aria-label="шоурил годовых проектов дизайн-команды"><span class="wd">шоурил</span> <span class="wd">годовых</span> <span class="wd">проектов</span> <span class="nobr"><span class="wd">дизайн-команды</span></span></h3><span class="tag" aria-label="продакшен"><span class="wd">продакшен</span></span></span>
+    </a><a class="nda-item" href="https://kupdasha.ru/n_d_a" data-reveal="" style="--d:0.1s">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#EDF3FE,#D0E1FD,#B7CFFA,#DDD6FA"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3 aria-label="дизайн спортивной формы для&nbsp;12&nbsp;команд"><span class="wd">дизайн</span> <span class="wd">спортивной</span> <span class="wd">формы</span> <span class="wd">для&nbsp;12&nbsp;команд</span></h3><span class="tag" aria-label="мерч"><span class="wd">мерч</span></span></span>
+    </a></div>
       <!-- закрытые карточки под градиентом: дальше — только по паролю -->
-      <div class="nda nda-more" id="ndaMore"></div>
-      <div class="ctas nda-cta" data-reveal><a class="btn btn-accent" data-href="telegram"><span data-text="nda.button"></span><span class="arr">→</span></a><a class="btn btn-line" data-href="nda.link"><span data-text="nda.button2"></span><span class="arr">→</span></a></div>
+      <div class="nda nda-more" id="ndaMore"><a class="nda-ghost" href="https://kupdasha.ru/n_d_a" aria-hidden="true" tabindex="-1">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#EEF8F1,#D4F0DE,#BFE7CF,#E2F3E0"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3>проект под&nbsp;паролем</h3></span>
+    </a><a class="nda-ghost" href="https://kupdasha.ru/n_d_a" aria-hidden="true" tabindex="-1">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#FBF0F8,#F3D9EC,#EAC8E3,#F0E0F5"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3>проект под&nbsp;паролем</h3></span>
+    </a><a class="nda-ghost" href="https://kupdasha.ru/n_d_a" aria-hidden="true" tabindex="-1">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#F7FBE6,#EAF5C2,#DDEFA6,#E3F3D2"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3>проект под&nbsp;паролем</h3></span>
+    </a><a class="nda-ghost" href="https://kupdasha.ru/n_d_a" aria-hidden="true" tabindex="-1">
+      <span class="nda-media"><span class="waves" data-waves="" data-speed="1.1" data-scroll="" data-colors="#EEF0FE,#D9DDFB,#C6CCF8,#E4DAF8"></span><span class="nda-lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9zm3 4a2 2 0 0 1 1 3.7V19h-2v-1.3A2 2 0 0 1 12 14z"></path></svg></span></span>
+      <span class="meta"><h3>проект под&nbsp;паролем</h3></span>
+    </a></div>
+      <div class="ctas nda-cta" data-reveal=""><a class="btn btn-accent" data-href="telegram" href="https://t.me/kupdasha"><span data-text="nda.button" aria-label="запросить пароль"><span class="wd">запросить</span> <span class="wd">пароль</span></span><span class="arr">→</span></a><a class="btn btn-line" data-href="nda.link" href="https://kupdasha.ru/n_d_a"><span data-text="nda.button2" aria-label="я&nbsp;знаю пароль"><span class="wd">я&nbsp;знаю</span> <span class="wd">пароль</span></span><span class="arr">→</span></a></div>
     </div>
   </section>

@@ -6,13 +6,13 @@
 <script>KUP.css('style.css')</script>
 
 <!-- Шапка -->
-<header class="head" id="head">
+<header class="head" id="head" data-pre="">
   <div class="wrap">
-    <span class="logo" data-text="name"></span>
-    <nav class="nav" id="nav"></nav>
-    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
-      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    <span class="logo" data-text="name">Дарья Купцова</span>
+    <nav class="nav" id="nav"><a class="link" href="/#works">работы</a><a class="link" href="/i">обо мне</a><a class="link" href="#contact">контакт</a></nav><button type="button" id="menuBtn" class="menu-btn" aria-controls="nav" aria-expanded="false">меню</button>
+    <button class="switch unseen nudge" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <span data-text="switchLeft">серьезно</span><i></i><span data-text="switchRight">повеселее</span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true">попробуй</b>
     </button>
   </div>
 </header>
@@ -21,83 +21,88 @@
 <script>KUP.js(['content.js'])</script>
 
 <!-- Обо мне -->
-  <section class="about-page" id="about" data-page="about">
+  <section class="about-page" id="about" data-page="about" data-pre="">
     <div class="wrap">
-      <h1 class="h1 split" data-text="about.title"></h1>
+      <h1 class="h1 split" data-text="about.title"><span class="w"><span style="--d:0.00s">обо</span></span> <span class="w"><span style="--d:0.07s">мне</span></span></h1>
       <div class="about">
-        <div class="portrait" data-reveal id="portrait"><img id="photo" alt="Дарья Купцова" loading="lazy"></div>
+        <div class="portrait" data-reveal="" id="portrait"><img id="photo" alt="Дарья Купцова" loading="lazy"></div>
         <div>
-          <p class="big" data-reveal data-text="about.big"></p>
-          <p class="txt" data-reveal style="--d:.1s" data-text="about.text"></p>
-          <div class="facts" id="facts"></div>
-          <h3 class="facts-title" data-reveal data-text="about.coursesTitle"></h3>
-          <div class="facts" id="courses"></div>
+          <p class="big" data-reveal="" data-text="about.big"><span class="nobr">Арт-директор</span> с&nbsp;десятилетним опытом. Айдентика и&nbsp;ключевые визуалы для&nbsp;аудитории&nbsp;97M+.</p>
+          <p class="txt" data-reveal="" style="--d:.1s" data-text="about.text">Бывший лид <span class="nobr">дизайн-команды</span> в&nbsp;центральном маркетинге <span class="caps">VK</span>, автор первой нейрогенеративной федеральной рекламной кампании мегабренда. Работала с&nbsp;<span class="caps">LEGO</span>, T2, <span class="caps">МТС</span>, Armani&nbsp;Casa и&nbsp;Росатомом. Член жюри премий Russian&nbsp;Design&nbsp;Cup, <span class="caps">WDA</span>, Айда, Основа, Таврида х&nbsp;Dprofile и&nbsp;других. Выступаю на&nbsp;конференциях.</p>
+          <div class="facts" id="facts"><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div><div class="fact" data-reveal="" style="--d:0s"><span>Событие года 2024</span><span>айдентика <span class="caps">VK</span>&nbsp;Инклюзия</span></div><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div><div class="fact" data-reveal="" style="--d:0.06s"><span>Awwwards 2022</span><span>Honorable&nbsp;Mention</span></div><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div><div class="fact" data-reveal="" style="--d:0.12s"><span>Среда 2022</span><span>бронза, «Дизайн печатной&nbsp;рекламы»</span></div><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div></div>
+          <h3 class="facts-title" data-reveal="" data-text="about.coursesTitle">обучение</h3>
+          <div class="facts" id="courses"><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div><div class="fact" data-reveal="" style="--d:0s"><span>Bang&nbsp;Bang&nbsp;Education</span><span><span class="hang-q">«</span>Как&nbsp;управлять дизайнерами»</span></div><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div><div class="fact" data-reveal="" style="--d:0.06s"><span><span class="caps">MADS</span></span><span><span class="caps">AI</span>&nbsp;and Creativity</span></div><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div><div class="fact" data-reveal="" style="--d:0.12s"><span>Endy&nbsp;Education</span><span>Brand&nbsp;Design&nbsp;Insider: полное погружение</span></div><div class="string"><svg preserveAspectRatio="none" viewBox="0 -60 0 120"><path class="ghost" style="--gc:#F3E94A;--go:1.00"></path><path class="ghost" style="--gc:#7DE36A;--go:0.87"></path><path class="ghost" style="--gc:#3FD3C9;--go:0.73"></path><path class="ghost" style="--gc:#4F7BF2;--go:0.60"></path><path class="ghost" style="--gc:#A65BEF;--go:0.47"></path><path class="ghost" style="--gc:#E85BD0;--go:0.33"></path><path class="line"></path></svg></div></div>
         </div>
       </div>
 
       <!-- Клиенты: все имена сразу, под курсором увеличиваются -->
       <div class="clients">
-        <h3 class="clients-title" data-reveal data-text="clients.title"></h3>
-        <div class="clients-wall" id="clients"></div>
-        <p class="clients-what" id="clientsWhat" aria-live="polite"></p>
+        <h3 class="clients-title" data-reveal="" data-text="clients.title" aria-label="клиенты"><span class="wd">клиенты</span></h3>
+        <div class="clients-wall" id="clients"><a class="client" href="/#case-2" target="_blank" data-k="0" data-reveal="" style="--d:0.00s;" aria-label="VK"><span class="caps"><span class="wd">VK</span></span></a><span class="client" data-k="1" data-reveal="" style="--d:0.03s;" aria-label="LEGO"><span class="caps"><span class="wd">LEGO</span></span></span><a class="client" href="/#case-29" target="_blank" data-k="2" data-reveal="" style="--d:0.06s;" aria-label="МТС"><span class="caps"><span class="wd">МТС</span></span></a><span class="client" data-k="3" data-reveal="" style="--d:0.09s;" aria-label="T2"><span class="wd">T2</span></span><a class="client" href="/#case-17" target="_blank" data-k="4" data-reveal="" style="--d:0.12s;" aria-label="Armani/Casa"><span class="wd">Armani/Casa</span></a><span class="client" data-k="5" data-reveal="" style="--d:0.15s;" aria-label="Росатом"><span class="wd">Росатом</span></span><span class="client" data-k="6" data-reveal="" style="--d:0.18s;" aria-label="Philips"><span class="wd">Philips</span></span><a class="client" href="/#case-5" target="_blank" data-k="7" data-reveal="" style="--d:0.21s;" aria-label="MANGO&nbsp;OFFICE"><span class="wd-glue"><span class="caps"><span class="wd">MANGO</span></span><span class="wd" data-glue="">&nbsp;</span></span><span class="caps"><span class="wd">OFFICE</span></span></a><span class="client" data-k="8" data-reveal="" style="--d:0.24s;" aria-label="Heineken"><span class="wd">Heineken</span></span><a class="client" href="/#case-22" target="_blank" data-k="9" data-reveal="" style="--d:0.27s;" aria-label="Ростех"><span class="wd">Ростех</span></a><span class="client" data-k="10" data-reveal="" style="--d:0.30s;" aria-label="Merz"><span class="wd">Merz</span></span><span class="client" data-k="11" data-reveal="" style="--d:0.33s;" aria-label="Столото"><span class="wd">Столото</span></span><span class="client" data-k="12" data-reveal="" style="--d:0.36s;" aria-label="Crocs"><span class="wd">Crocs</span></span><a class="client" href="/#case-25" target="_blank" data-k="13" data-reveal="" style="--d:0.39s;" aria-label="Сколково"><span class="wd">Сколково</span></a><a class="client" href="/#case-9" target="_blank" data-k="14" data-reveal="" style="--d:0.42s;" aria-label="Евразийский банк развития"><span class="wd">Евразийский</span> <span class="wd">банк</span> <span class="wd">развития</span></a><a class="client" href="/#case-7" target="_blank" data-k="15" data-reveal="" style="--d:0.45s;" aria-label="Яндекс"><span class="wd">Яндекс</span></a></div>
+        <p class="clients-what" id="clientsWhat" aria-live="polite"></p><p id="clientsNote" class="clients-note">Если&nbsp;кейса для&nbsp;компании нет, значит, он&nbsp;под&nbsp;<span class="caps">NDA</span> или&nbsp;визуально&nbsp;устарел</p>
       </div>
     </div>
   </section>
 
   <!-- Фотографии -->
-  <section class="sec" id="photos">
+  <section class="sec" id="photos" data-pre="">
     <div class="wrap">
-      <div class="sec-head"><h2 class="h2" data-reveal data-text="photos.title"></h2></div>
-      <div class="photo-strip" id="photoStrip"></div>
+      <div class="sec-head"><h2 class="h2" data-reveal="" data-text="photos.title" aria-label="в&nbsp;жизни и&nbsp;на&nbsp;сцене"><span class="wd">в&nbsp;жизни</span> <span class="wd">и&nbsp;на&nbsp;сцене</span></h2></div>
+      <div class="photo-strip ev-strip" id="photoStrip"><figure class="ev" data-i="0" data-reveal="" style="--d:0.00s;--ar:1.5"><img alt="Российский форум индустрии дизайна, Росконгресс" loading="lazy"><figcaption>Российский форум индустрии дизайна,&nbsp;Росконгресс</figcaption></figure><figure class="ev" data-i="13" data-reveal="" style="--d:0.08s;--ar:0.67"><img alt="Корпоратив Студии Лебедева" loading="lazy"><figcaption>Корпоратив Студии Лебедева</figcaption></figure><figure class="ev" data-i="2" data-reveal="" style="--d:0.16s;--ar:1.5"><img alt="Кайференция, PRAGMATICA" loading="lazy"><figcaption>Кайференция, <span class="caps">PRAGMATICA</span></figcaption></figure><figure class="ev" data-i="3" data-reveal="" style="--d:0.24s;--ar:1.5"><img alt="ШУМ, Росмолодёжь, 2023" loading="lazy"><figcaption><span class="caps">ШУМ</span>, Росмолодёжь, 2023</figcaption></figure><p class="ev-more" data-reveal=""><button type="button" class="link ev-all">все&nbsp;выступления</button><sup class="yr">60</sup></p></div>
     </div>
   </section>
 
   <!-- В профессиональном сообществе: выступления, жюри, статьи и подкаст одним блоком -->
-  <section class="sec" id="community">
+  <section class="sec" id="community" data-pre="">
     <div class="wrap">
       <div class="sec-head">
-        <h2 class="h2" data-reveal data-text="community.title"></h2>
-        <p class="sec-note" data-reveal data-text="community.note"></p>
+        <h2 class="h2" data-reveal="" data-text="community.title" aria-label="в&nbsp;профессиональном сообществе"><span class="wd">в&nbsp;профессиональном</span> <span class="wd">сообществе</span></h2>
+        <p class="sec-note" data-reveal="" data-text="community.note">Периодически <span class="ev-link ev-all" role="button" tabindex="0">выступаю на&nbsp;конференциях и&nbsp;митапах</span>, сижу в&nbsp;жюри премий (Айда, Основа и&nbsp;другие), пишу статьи и&nbsp;веду подкаст о&nbsp;дизайне</p>
       </div>
 
       <!-- две колонки: последние статьи и подкаст -->
       <div class="comm">
-        <div class="comm-col" data-reveal>
-          <h3 class="comm-title" data-text="articles.title"></h3>
-          <div class="articles articles-compact" id="articleList"></div>
-          <p class="pod-links"><a class="link" data-href="articles.all.link" data-text="articles.all.text"></a></p>
+        <div class="comm-col" data-reveal="">
+          <h3 class="comm-title" data-text="articles.title">статьи</h3>
+          <div class="articles articles-compact" id="articleList"><a class="article" href="https://dsgners.ru/kupdaria/46790-kak-prevratit-brendbuk-v-mashinu-kotoraya-sama-verstaet-banneryi" data-reveal="" style="--d:0.00s"><span class="article-source">дизайнерс</span><span class="article-title">Как&nbsp;превратить брендбук в&nbsp;машину, которая сама верстает&nbsp;баннеры</span><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span></a><a class="article" href="https://dsgners.ru/kupdaria/42524-yubiley-s-harakterom-balans-mejdu-prazdnikom-i-chitaemostyu" data-reveal="" style="--d:0.05s"><span class="article-source">дизайнерс</span><span class="article-title">Юбилейный логотип как&nbsp;баланс между&nbsp;праздником и&nbsp;читаемостью</span><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span></a><a class="article" href="https://dsgners.ru/kupdaria/9101-dorabotat-nelzya-ostavit-vesennyaya-kampaniya-vk-video" data-reveal="" style="--d:0.10s"><span class="article-source">дизайнерс</span><span class="article-title">Доработать нельзя оставить: весенняя кампания <span class="caps">VK</span>&nbsp;Видео</span><span class="go"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M11 5l5 5-5 5"></path></svg></span></a></div>
+          <p class="pod-links"><a class="link" data-href="articles.all.link" data-text="articles.all.text" href="https://dsgners.ru/kupdaria">все&nbsp;статьи на&nbsp;«дизайнерс»</a></p>
         </div>
-        <div class="comm-col" data-reveal>
-          <h3 class="comm-title" data-text="podcast.title"></h3>
-          <div class="pod-player" id="podPlayer"></div>
-          <p class="pod-links" id="podLinks"></p>
+        <div class="comm-col" data-reveal="">
+          <h3 class="comm-title" data-text="podcast.title">подкаст «Одна кавычка»</h3>
+          <div class="pod-player" id="podPlayer"><img alt="Проектирование выставок и музеев. В гостях Metapole" loading="lazy"><span class="pod-play"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"></path></svg></span></div>
+          <p class="pod-links" id="podLinks"><a class="link" href="https://vkvideo.ru/playlist/-226119573_2">все&nbsp;выпуски на&nbsp;<span class="caps">VK</span>&nbsp;Видео</a><a class="link" href="https://onekavychka.mave.digital/">слушать на&nbsp;Mave</a><a class="link" href="https://t.me/onekav"><span class="nobr">Telegram-канал</span> «Одна кавычка»</a><a class="link" href="https://vk.com/club226119573">сообщество ВКонтакте</a><a class="link" href="https://dzen.ru/kupyashaa">Дзен</a></p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Контакт -->
-  <section class="contact" id="contact">
+  <section class="contact" id="contact" data-pre="">
     <div class="wrap">
       <!-- Конец страницы: написать или переключиться на дружескую версию.
            Тумблер справа работает как в шапке и возвращает в начало страницы -->
-      <div class="ty" data-reveal>
-        <h2 class="h2" data-text="contact.title"></h2>
-        <p class="lead" data-text="contact.lead"></p>
+      <div class="ty" data-reveal="">
+        <h2 class="h2" data-text="contact.title" aria-label="обсудим проект или&nbsp;подружимся?"><span class="wd">обсудим</span> <span class="wd">проект</span> <span class="wd">или&nbsp;подружимся?</span></h2>
+        <p class="lead" data-text="contact.lead">Напишите, где&nbsp;удобнее, или&nbsp;переключите сайт на&nbsp;дружескую&nbsp;версию</p>
         <div class="ty-row">
-          <div class="ctas contact-links" id="contactLinks"></div>
+          <div class="ctas contact-links" id="contactLinks"><a class="btn btn-accent big-btn tease" href="https://t.me/kupdasha"><span class="spell" aria-label="Telegram"><span class="wd">Telegram</span></span><span class="arr">→</span></a><a class="btn btn-line big-btn" href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4"><span class="spell" aria-label="MAX"><span class="caps"><span class="wd">MAX</span></span></span><span class="arr">→</span></a></div>
         </div>
         <!-- радужный перелив только под тумблером -->
-        <div class="ty-switch" data-waves data-colors="#E2FB5A,#B9F5C8,#BCD6FE,#E3D2FD" data-speed=".8">
+        <div class="ty-switch" data-waves="" data-colors="#E2FB5A,#B9F5C8,#BCD6FE,#E3D2FD" data-speed=".8">
           <button class="switch switch-big" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-            <span data-text="contact.switch"></span><i></i>
+            <span data-text="contact.switch">перейти на&nbsp;«ты»</span><i></i>
           </button>
         </div>
       </div>
-      <div class="ttt" id="ttt" data-reveal></div>
+      <div class="ttt" id="ttt" data-reveal="">
+    <h3 class="ttt-title"><span class="iris" data-t="или играем?">или&nbsp;играем?</span></h3>
+    <p class="ttt-rules">Ты&nbsp;крестики, я&nbsp;нолики. Выиграю я&nbsp;— пишешь мне ты. Выиграешь ты&nbsp;— оставляешь контакт, и&nbsp;я&nbsp;пишу&nbsp;первой.</p>
+    <div class="ttt-board" role="grid"><button class="ttt-cell" data-i="0" aria-label="клетка 1"></button><button class="ttt-cell" data-i="1" aria-label="клетка 2"></button><button class="ttt-cell" data-i="2" aria-label="клетка 3"></button><button class="ttt-cell" data-i="3" aria-label="клетка 4"></button><button class="ttt-cell" data-i="4" aria-label="клетка 5"></button><button class="ttt-cell" data-i="5" aria-label="клетка 6"></button><button class="ttt-cell" data-i="6" aria-label="клетка 7"></button><button class="ttt-cell" data-i="7" aria-label="клетка 8"></button><button class="ttt-cell" data-i="8" aria-label="клетка 9"></button></div>
+    <p class="ttt-status" aria-live="polite">твой ход</p>
+    <div class="ttt-after"></div></div>
       <footer class="foot">
-        <span data-text="footer.left"></span>
-      </footer>
+        <span data-text="footer.left">© Дарья Купцова</span>
+      <span class="foot-legal"><a href="https://kupdasha.ru/politics" target="_blank" rel="noopener">Политика обработки персональных&nbsp;данных</a><a href="https://kupdasha.ru/data" target="_blank" rel="noopener">Согласие на&nbsp;обработку персональных&nbsp;данных</a></span></footer>
     </div>
   </section>
 
@@ -105,7 +110,6 @@
 <!-- Кнопка «Связаться», всегда на экране -->
 <!-- Маленькая кнопка «наверх» -->
 <button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
-<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 

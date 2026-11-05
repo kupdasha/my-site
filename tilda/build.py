@@ -98,11 +98,35 @@ missing = [k for _, k in keys if k not in SHARED + ['hero', 'directions', 'works
 assert not missing, f'новые разделы в content.js, их надо распределить по блокам: {missing}'
 
 
+# ---------- текст заранее (для поисковиков и нейросетей) ----------
+# tilda/prerender.json собирает node tilda/prerender.js: разметка разделов, уже заполненная текстами
+# из content.js (серьезная версия). Она ставится в блоки вместо пустых тегов — робот видит текст без
+# JavaScript, а app.js на сайте перерисовывает разделы как раньше. Нет файла — блоки как раньше, без текста
+PRE = {}
+if os.path.exists(os.path.join(HERE, 'prerender.json')):
+    PRE = json.load(open(os.path.join(HERE, 'prerender.json'), encoding='utf-8'))
+
+def prefill(html, page):
+    """заменить пустые разделы (header и section с id) на готовые из prerender.json"""
+    for sid, ready in (PRE.get(page) or {}).items():
+        m = re.search(r'<(header|section)\b[^>]*\bid="%s"[^>]*>' % sid, html)
+        if not m: continue
+        tag, depth, pos = m.group(1), 1, m.end()
+        for t in re.finditer(r'<%s\b|</%s>' % (tag, tag), html[pos:]):
+            depth += -1 if t.group(0).startswith('</') else 1
+            if not depth:
+                html = html[:m.start()] + ready + html[pos + t.end():]
+                break
+    return html
+
+
 # ---------- разметка: index.html режется на части ----------
-index = read('index.html')
+index = prefill(read('index.html'), 'index')
 def between(a, b, src=index):
     i = src.index(a); j = src.index(b, i)
-    return src[i:j].strip()
+    # загрузчик прототипа (content.js и app.js с ?v= на localhost) в блоки не идет: на Тильде файлы подключает KUP.
+    # Внутри него тоже есть «<script src=», поэтому кусок обрывается на середине — убираем и обрывок, и комментарий над ним
+    return re.sub(r'(<!-- на localhost[^\n]*-->\n)?<script>\(function\(\)\{var v=.*$', '', src[i:j], flags=re.S).strip()
 
 header_html = between('<!-- Шапка -->', '<main>')
 sections = {sid: re.search(r'(  <!--[^\n]*-->\n)?  <section class="[^"]*" id="%s".*?\n  </section>' % sid, index, re.S).group(0).strip()
@@ -114,14 +138,14 @@ service_html = between('<!-- Кнопка «Связаться»', '<script src=
 # у страницы NDA свое окно кейса: кнопка «назад» ведет к проектам под NDA
 nda_service_html = between('<!-- Кнопка «Связаться»', '<script src=', nda_html)
 # страница «Обо мне» (about.html): все ее разделы целиком; data-page="about" — по нему код узнает страницу на Тильде
-about_html = read('about.html')
-about_sections = between('<!-- Обо мне -->', '</main>', about_html).replace(
-    '<section class="about-page" id="about">', '<section class="about-page" id="about" data-page="about">', 1)
+about_html = prefill(read('about.html'), 'about')
+about_sections = re.sub(r'<section class="about-page" id="about"', '<section class="about-page" id="about" data-page="about"',
+    between('<!-- Обо мне -->', '</main>', about_html), count=1)
 about_service_html = between('<!-- Кнопка «Связаться»', '<script src=', about_html)
 # страница спикера (speaker.html): только серьезная версия, data-page="speaker" — по нему код узнает страницу на Тильде
-speaker_html = read('speaker.html')
-speaker_sections = between('<!-- Профиль спикера -->', '</main>', speaker_html).replace(
-    '<section class="sp-hero" id="speaker">', '<section class="sp-hero" id="speaker" data-page="speaker">', 1)
+speaker_html = prefill(read('speaker.html'), 'speaker')
+speaker_sections = re.sub(r'<section class="sp-hero" id="speaker"', '<section class="sp-hero" id="speaker" data-page="speaker"',
+    between('<!-- Профиль спикера -->', '</main>', speaker_html), count=1)
 speaker_service_html = between('<!-- Кнопка «Связаться»', '<script src=', speaker_html)
 
 
@@ -258,7 +282,9 @@ def taplink_block():
             '<!-- ЗАГРУЗЧИК: дальше ничего не менять. Оформление и анимация лежат на GitHub в taplink.html. -->\n'
             # Тильда на компьютере прячет страницу и проявляет ее через 0,4 с после загрузки — таплинку это не нужно
             '<style>#allrecords.t-records{opacity:1!important;transition:none!important}</style>\n'
-            '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>\n'
+            # внутри — текст и ссылки заранее (для поисковиков, tilda/prerender.js): скрыт, пока не пришла верстка с GitHub
+            '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF">'
+            + (f'<div data-pre style="visibility:hidden">{PRE["tap"]}</div>' if PRE.get('tap') else '') + '</div>\n'
             "<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',\n"
             "G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
             "['https://cdn.jsdelivr.net'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});\n"
@@ -277,7 +303,7 @@ def taplink_block():
             "list('.actions',T.buttons,function(a,it){a.dataset.serious=it[0];a.dataset.fun=it[1]||it[0];a.href=it[2];var s=a.querySelector('.t');if(s)s.textContent=it[0]});\n"
             "list('.soc',T.socials,function(a,it){a.textContent=it[0];a.href=it[1]})\n"
             "}catch(e){}}\n"
-            "function show(h){if(shown||!h)return;shown=1;var doc=new DOMParser().parseFromString(h,'text/html');\n"
+            "function show(h){if(shown||!h)return;shown=1;root.innerHTML='';var doc=new DOMParser().parseFromString(h,'text/html');\n"
             "[].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});\n"
             "[].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});\n"
             "apply(root);\n"

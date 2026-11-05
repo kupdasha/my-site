@@ -6,13 +6,13 @@
 <script>KUP.css('style.css')</script>
 
 <!-- Шапка -->
-<header class="head" id="head">
+<header class="head" id="head" data-pre="">
   <div class="wrap">
-    <span class="logo" data-text="name"></span>
-    <nav class="nav" id="nav"></nav>
-    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
-      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    <span class="logo" data-text="name">Дарья Купцова</span>
+    <nav class="nav" id="nav"><a class="link" href="/#works">работы</a><a class="link" href="/i">обо мне</a><a class="link" href="#contact">контакт</a></nav><button type="button" id="menuBtn" class="menu-btn" aria-controls="nav" aria-expanded="false">меню</button>
+    <button class="switch unseen nudge" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <span data-text="switchLeft">серьезно</span><i></i><span data-text="switchRight">повеселее</span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true">попробуй</b>
     </button>
   </div>
 </header>
@@ -35,7 +35,6 @@
 <!-- Кнопка «Связаться», всегда на экране -->
 <!-- Маленькая кнопка «наверх» -->
 <button class="to-top" id="toTop" aria-label="Наверх"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg></button>
-<a class="fab tease" id="fab" data-href="telegram"><span data-text="contactButton" class="spell"></span></a>
 
 <!-- Страница кейса: заполняется при клике на карточку -->
 <div class="case" id="case" role="dialog" aria-modal="true" aria-labelledby="caseTitle">

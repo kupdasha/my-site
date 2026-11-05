@@ -1,24 +1,29 @@
 <!-- Контакт -->
-  <section class="contact" id="contact">
+  <section class="contact" id="contact" data-pre="">
     <div class="wrap">
       <!-- Конец страницы: написать или переключиться на дружескую версию.
            Тумблер справа работает как в шапке и возвращает в начало страницы -->
-      <div class="ty" data-reveal>
-        <h2 class="h2" data-text="contact.title"></h2>
-        <p class="lead" data-text="contact.lead"></p>
+      <div class="ty" data-reveal="">
+        <h2 class="h2" data-text="contact.title" aria-label="обсудим проект или&nbsp;подружимся?"><span class="wd">обсудим</span> <span class="wd">проект</span> <span class="wd">или&nbsp;подружимся?</span></h2>
+        <p class="lead" data-text="contact.lead">Напишите, где&nbsp;удобнее, или&nbsp;переключите сайт на&nbsp;дружескую&nbsp;версию</p>
         <div class="ty-row">
-          <div class="ctas contact-links" id="contactLinks"></div>
+          <div class="ctas contact-links" id="contactLinks"><a class="btn btn-accent big-btn tease" href="https://t.me/kupdasha"><span class="spell" aria-label="Telegram"><span class="wd">Telegram</span></span><span class="arr">→</span></a><a class="btn btn-line big-btn" href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4"><span class="spell" aria-label="MAX"><span class="caps"><span class="wd">MAX</span></span></span><span class="arr">→</span></a></div>
         </div>
         <!-- радужный перелив только под тумблером -->
-        <div class="ty-switch" data-waves data-colors="#E2FB5A,#B9F5C8,#BCD6FE,#E3D2FD" data-speed=".8">
+        <div class="ty-switch" data-waves="" data-colors="#E2FB5A,#B9F5C8,#BCD6FE,#E3D2FD" data-speed=".8">
           <button class="switch switch-big" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-            <span data-text="contact.switch"></span><i></i>
+            <span data-text="contact.switch">перейти на&nbsp;«ты»</span><i></i>
           </button>
         </div>
       </div>
-      <div class="ttt" id="ttt" data-reveal></div>
+      <div class="ttt" id="ttt" data-reveal="">
+    <h3 class="ttt-title"><span class="iris" data-t="или играем?">или&nbsp;играем?</span></h3>
+    <p class="ttt-rules">Ты&nbsp;крестики, я&nbsp;нолики. Выиграю я&nbsp;— пишешь мне ты. Выиграешь ты&nbsp;— оставляешь контакт, и&nbsp;я&nbsp;пишу&nbsp;первой.</p>
+    <div class="ttt-board" role="grid"><button class="ttt-cell" data-i="0" aria-label="клетка 1"></button><button class="ttt-cell" data-i="1" aria-label="клетка 2"></button><button class="ttt-cell" data-i="2" aria-label="клетка 3"></button><button class="ttt-cell" data-i="3" aria-label="клетка 4"></button><button class="ttt-cell" data-i="4" aria-label="клетка 5"></button><button class="ttt-cell" data-i="5" aria-label="клетка 6"></button><button class="ttt-cell" data-i="6" aria-label="клетка 7"></button><button class="ttt-cell" data-i="7" aria-label="клетка 8"></button><button class="ttt-cell" data-i="8" aria-label="клетка 9"></button></div>
+    <p class="ttt-status" aria-live="polite">твой ход</p>
+    <div class="ttt-after"></div></div>
       <footer class="foot">
-        <span data-text="footer.left"></span>
-      </footer>
+        <span data-text="footer.left">© Дарья Купцова</span>
+      <span class="foot-legal"><a href="https://kupdasha.ru/politics" target="_blank" rel="noopener">Политика обработки персональных&nbsp;данных</a><a href="https://kupdasha.ru/data" target="_blank" rel="noopener">Согласие на&nbsp;обработку персональных&nbsp;данных</a></span></footer>
     </div>
   </section>

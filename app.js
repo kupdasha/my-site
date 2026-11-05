@@ -3382,6 +3382,8 @@ root.dataset.theme = saved;
 document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', saved === 'dark'));
 renderTexts();
 renderLists();
+// разделы с заранее вписанным текстом (для поисковиков, tilda/prerender.js) уже перерисованы — снимаем пометку
+document.querySelectorAll('[data-pre]').forEach(el => el.removeAttribute('data-pre'));
 /* плавающей кнопки «связаться» нет: для этого есть пункт меню. В блоках Тильды она еще в разметке */
 document.querySelector('#fab')?.remove();
 

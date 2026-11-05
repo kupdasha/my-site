@@ -46,7 +46,37 @@ window.TAPLINK = {
 
 <!-- ЗАГРУЗЧИК: дальше ничего не менять. Оформление и анимация лежат на GitHub в taplink.html. -->
 <style>#allrecords.t-records{opacity:1!important;transition:none!important}</style>
-<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"></div>
+<div id="taplink-root" style="min-height:100vh;background:#FFFFFF"><div data-pre style="visibility:hidden"><main class="tl" id="tl">
+  <div class="top">
+    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию">
+      <span>серьезно</span><i></i><span>повеселее</span>
+    </button>
+  </div>
+  <div class="col">
+    <div class="intro">
+      <h1 data-text="">Даша Купцова</h1>
+      <p class="tl-bio" data-text="">Делаю дизайн для брендов, спикерствую и&nbsp;организовываю мероприятия. Ex-лид дизайн-команды VK, в&nbsp;портфолио LEGO, Armani/Casa, МТС. Веду видеоподкаст <a href="https://vkvideo.ru/playlist/-226119573_2" target="_blank" rel="noopener">«Одна&nbsp;кавычка»</a></p>
+    </div>
+    <!-- классы tl-*: старые настройки в блоке страницы ищут .actions/.soc/.bio и подменяли бы тексты — теперь тексты и ссылки только отсюда -->
+    <nav class="tl-actions" aria-label="Главное">
+      <a class="btn" href="https://kupdasha.ru/" target="_blank" rel="noopener" data-serious="сайт портфолио" data-fun="что умею?"><span class="t">сайт портфолио</span></a>
+      <a class="btn" href="https://kupdasha.ru/profile" target="_blank" rel="noopener" data-serious="позвать выступать" data-fun="позвать"><span class="t">позвать выступать</span></a>
+      <a class="btn" href="https://kupdasha.ru/ai" target="_blank" rel="noopener" data-serious="ИИ-воркшоп для вашей команды" data-fun="ИИшнуться"><span class="t">ИИ-воркшоп для вашей команды</span></a>
+    </nav>
+    <nav class="tl-soc" aria-label="Соцсети">
+      <a href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
+      <a href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
+      <a href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
+      <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
+      <a href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
+      <a href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
+    </nav>
+  </div>
+  <p class="legal" data-text="">*Instagram&nbsp;— продукт Meta Platforms Inc., деятельность которой запрещена на&nbsp;территории Российской Федерации</p>
+</main></div></div>
 <script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',
 G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;
 ['https://cdn.jsdelivr.net'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});
@@ -64,7 +94,7 @@ items.forEach(function(it){var a=tpl.cloneNode(true);fill(a,it);box.appendChild(
 list('.actions',T.buttons,function(a,it){a.dataset.serious=it[0];a.dataset.fun=it[1]||it[0];a.href=it[2];var s=a.querySelector('.t');if(s)s.textContent=it[0]});
 list('.soc',T.socials,function(a,it){a.textContent=it[0];a.href=it[1]})
 }catch(e){}}
-function show(h){if(shown||!h)return;shown=1;var doc=new DOMParser().parseFromString(h,'text/html');
+function show(h){if(shown||!h)return;shown=1;root.innerHTML='';var doc=new DOMParser().parseFromString(h,'text/html');
 [].slice.call(doc.querySelectorAll('head link, head style, body > link, body > style')).forEach(function(n){document.head.appendChild(n)});
 [].slice.call(doc.body.childNodes).forEach(function(n){root.appendChild(n)});
 apply(root);

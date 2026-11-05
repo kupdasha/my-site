@@ -1,11 +1,11 @@
 <!-- Шапка -->
-<header class="head" id="head">
+<header class="head" id="head" data-pre="">
   <div class="wrap">
-    <span class="logo" data-text="name"></span>
-    <nav class="nav" id="nav"></nav>
-    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
-      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    <span class="logo" data-text="name">Дарья Купцова</span>
+    <nav class="nav" id="nav"><a class="link" href="/#works">работы</a><a class="link" href="/i">обо мне</a><a class="link" href="#contact">контакт</a></nav><button type="button" id="menuBtn" class="menu-btn" aria-controls="nav" aria-expanded="false">меню</button>
+    <button class="switch unseen nudge" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <span data-text="switchLeft">серьезно</span><i></i><span data-text="switchRight">повеселее</span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true">попробуй</b>
     </button>
   </div>
 </header>

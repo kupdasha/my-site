@@ -1,15 +1,15 @@
 <!-- Первый экран -->
-  <section class="hero" id="hero">
+  <section class="hero" id="hero" data-pre="">
     <canvas id="dots" aria-hidden="true"></canvas>
     <div class="wrap">
-      <div class="eyebrow" data-reveal data-text="hero.eyebrow"></div>
-      <h1 class="h1 split" data-text="hero.title"></h1>
-      <p class="hero-sub" data-reveal style="--d:.25s" data-text="hero.subtitle"></p>
+      <div class="eyebrow" data-reveal="" data-text="hero.eyebrow"><span class="nobr">Арт-директор</span>, дизайнер, <span class="nobr">вайб-кодер</span></div>
+      <h1 class="h1 split heat" data-text="hero.title"><span class="w"><span style="--d:0.00s">коммуникационный</span></span> <span class="w"><span style="--d:0.07s">дизайн,</span></span> <span class="w"><span style="--d:0.14s">брендинг</span></span> <span class="w"><span style="--d:0.21s">и&nbsp;нейросети</span></span></h1>
+      <p class="hero-sub" data-reveal="" style="--d:.25s" data-text="hero.subtitle" hidden=""></p>
       <div class="hero-row">
-        <p class="lead" data-reveal style="--d:.35s" data-text="hero.lead"></p>
-        <div class="ctas" data-reveal style="--d:.5s">
-          <a class="btn btn-accent tease" data-href="telegram"><span data-text="hero.button"></span><span class="arr">→</span></a>
-          <a class="link hero-link" href="#works" data-text="hero.button2"></a>
+        <p class="lead" data-reveal="" style="--d:.35s" data-text="hero.lead">Вела дизайн федеральных кампаний и&nbsp;команды до&nbsp;15&nbsp;дизайнеров</p>
+        <div class="ctas" data-reveal="" style="--d:.5s">
+          <a class="btn btn-accent tease" data-href="telegram" href="https://t.me/kupdasha"><span data-text="hero.button" aria-label="обсудить проект"><span class="wd">обсудить</span> <span class="wd">проект</span></span><span class="arr">→</span></a>
+          <a class="link hero-link" href="#works" data-text="hero.button2">смотреть работы</a>
         </div>
       </div>
     </div>

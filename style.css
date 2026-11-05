@@ -149,6 +149,8 @@ img,video{display:block;max-width:100%}
    ================================================================ */
 .head{position:fixed;inset:0 0 auto;z-index:50;transition:transform .5s var(--ease),background .5s}
 .head.solid{background:var(--bg);box-shadow:0 10px 30px -12px rgba(14,15,18,.22)}
+/* заранее вписанный текст (tilda/prerender.js) — серьезная версия; в дружеской он скрыт, пока app.js не подставит свои тексты */
+:root[data-theme="dark"] [data-pre]{visibility:hidden}
 :root[data-theme="dark"] .head.solid{box-shadow:0 12px 32px -10px rgba(0,0,0,.6)}
 .head .wrap{display:flex;align-items:center;gap:32px;height:76px}
 .logo{font-weight:500;font-size:18px;white-space:nowrap}

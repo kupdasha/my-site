@@ -6,13 +6,13 @@
 <script>KUP.css('style.css')</script>
 
 <!-- Шапка -->
-<header class="head" id="head">
+<header class="head" id="head" data-pre="">
   <div class="wrap">
-    <span class="logo" data-text="name"></span>
-    <nav class="nav" id="nav"></nav>
-    <button class="switch" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
-      <span data-text="switchLeft"></span><i></i><span data-text="switchRight"></span>
-      <b class="switch-hint" data-text="switchHint" aria-hidden="true"></b>
+    <span class="logo" data-text="name">Дарья Купцова</span>
+    <nav class="nav" id="nav"><a class="link" href="/#works">работы</a><a class="link" href="/i">обо мне</a><a class="link" href="#contact">контакт</a></nav><button type="button" id="menuBtn" class="menu-btn" aria-controls="nav" aria-expanded="false">меню</button>
+    <button class="switch unseen nudge" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
+      <span data-text="switchLeft">серьезно</span><i></i><span data-text="switchRight">повеселее</span>
+      <b class="switch-hint" data-text="switchHint" aria-hidden="true">попробуй</b>
     </button>
   </div>
 </header>
@@ -21,61 +21,135 @@
 <script>KUP.js(['content.js'])</script>
 
 <!-- Профиль спикера -->
-  <section class="sp-hero" id="speaker" data-page="speaker">
+  <section class="sp-hero" id="speaker" data-page="speaker" data-pre="">
     <div class="wrap">
-      <h1 class="sp-title split" data-text="speaker.title"></h1>
+      <h1 class="sp-title split" data-text="speaker.title"><span class="w"><span style="--d:0.00s">профиль</span></span> <span class="w"><span style="--d:0.07s">спикера</span></span></h1>
       <div class="sp-top">
         <div>
-          <p class="sp-lead" data-reveal data-text="speaker.lead"></p>
-          <p class="sp-lead" data-reveal data-text="speaker.podcast"></p>
-          <p class="sp-lead" data-reveal data-text="speaker.jury"></p>
+          <p class="sp-lead" data-reveal="" data-text="speaker.lead"><span class="nobr">Арт-директор</span> коммуникационного дизайна, <span class="nobr">ex-лид</span> <span class="nobr">дизайн-команды</span> <span class="caps">VK</span>. Спикер о&nbsp;дизайне, <span class="caps">ИИ</span>&nbsp;и&nbsp;креативе. Говорю о&nbsp;том, как&nbsp;нейросети меняют профессию, из&nbsp;чего складывается вкус и&nbsp;как&nbsp;вести креативную команду&nbsp;— на&nbsp;опыте работы с&nbsp;крупными&nbsp;брендами.</p>
+          <p class="sp-lead" data-reveal="" data-text="speaker.podcast">Автор <span class="nobr">видео-подкаста</span> о&nbsp;дизайне <a class="link" href="https://vkvideo.ru/playlist/-226119573_2" target="_blank" rel="noopener">«Одна кавычка»</a>: среди&nbsp;гостей Студия Артемия Лебедева, Depot, Супрематика, <span class="caps">DDVB</span> и&nbsp;другие.</p>
+          <p class="sp-lead" data-reveal="" data-text="speaker.jury">Член жюри премий Russian&nbsp;Design&nbsp;Cup, <span class="caps">WDA</span>, Айда, Основа, Таврида&nbsp;х&nbsp;Dprofile и&nbsp;других.</p>
         </div>
-        <div class="sp-photo" id="spPhoto" data-reveal></div>
+        <div class="sp-photo" id="spPhoto" data-reveal=""><img alt="Дарья Купцова на сцене" loading="lazy"><img alt="Дарья Купцова на сцене" loading="lazy"><img alt="Дарья Купцова на сцене" loading="lazy"><img alt="Дарья Купцова на сцене" loading="lazy"></div>
       </div>
     </div>
   </section>
 
   <!-- Темы выступлений -->
-  <section class="sp-sec" id="topics">
+  <section class="sp-sec" id="topics" data-pre="">
     <div class="wrap">
-      <h2 class="h2 sp-h2" data-reveal data-text="speaker.topicsTitle"></h2>
-      <div class="sp-topics" id="topicList"></div>
+      <h2 class="h2 sp-h2" data-reveal="" data-text="speaker.topicsTitle" aria-label="темы выступлений"><span class="wd">темы</span> <span class="wd">выступлений</span></h2>
+      <div class="sp-topics" id="topicList">
+    <article class="sp-topic open" data-reveal="" style="--d:0.00s">
+      <button class="sp-topic-head" aria-expanded="true">
+        <span class="sp-icon" aria-hidden="true"><svg viewBox="0 0 96 96"><rect class="flick" x="6" y="6" width="18" height="18" rx="3" style="--k:0"></rect><rect class="flick" x="28" y="6" width="18" height="18" rx="3" style="--k:7"></rect><rect class="flick" x="50" y="6" width="18" height="18" rx="3" style="--k:14"></rect><rect class="flick" x="72" y="6" width="18" height="18" rx="3" style="--k:5"></rect><rect class="flick" x="6" y="28" width="18" height="18" rx="3" style="--k:12"></rect><rect class="flick" x="28" y="28" width="18" height="18" rx="3" style="--k:3"></rect><rect class="pick" x="50" y="28" width="18" height="18" rx="3" style="--k:10"></rect><rect class="flick" x="72" y="28" width="18" height="18" rx="3" style="--k:1"></rect><rect class="flick" x="6" y="50" width="18" height="18" rx="3" style="--k:8"></rect><rect class="flick" x="28" y="50" width="18" height="18" rx="3" style="--k:15"></rect><rect class="flick" x="50" y="50" width="18" height="18" rx="3" style="--k:6"></rect><rect class="flick" x="72" y="50" width="18" height="18" rx="3" style="--k:13"></rect><rect class="flick" x="6" y="72" width="18" height="18" rx="3" style="--k:4"></rect><rect class="flick" x="28" y="72" width="18" height="18" rx="3" style="--k:11"></rect><rect class="flick" x="50" y="72" width="18" height="18" rx="3" style="--k:2"></rect><rect class="flick" x="72" y="72" width="18" height="18" rx="3" style="--k:9"></rect></svg></span>
+        <span class="sp-topic-name"><span class="caps">ИИ</span>&nbsp;в&nbsp;<span class="nobr">дизайн-продакшене</span></span>
+        <span class="sp-tags"><span class="sp-tag">доклад</span><span class="sp-tag">воркшоп</span></span>
+        <span class="sp-plus" aria-hidden="true"></span>
+      </button>
+      <div class="sp-topic-body"><div><div class="sp-topic-in">
+        <p>Где&nbsp;<span class="caps">ИИ</span>&nbsp;реально ускоряет процесс, а&nbsp;где&nbsp;создает иллюзию скорости и&nbsp;потом стоит дороже; как&nbsp;собрать локальный <span class="nobr"><span class="caps">AI</span>-пайплайн</span> в&nbsp;команде и&nbsp;внедрить так, чтобы&nbsp;он&nbsp;прижился, а&nbsp;не&nbsp;остался игрушкой; что&nbsp;остается за&nbsp;человеком&nbsp;— вкус, отбор, ответственность за&nbsp;результат; почему «промптить умеют все, а&nbsp;отвечать за&nbsp;уровень&nbsp;—&nbsp;единицы»</p>
+        <p class="sp-who"><span>Для&nbsp;кого:</span> агентства, бренды, <span class="nobr">дизайн-команды</span></p>
+      </div></div></div>
+    </article>
+    <article class="sp-topic" data-reveal="" style="--d:0.05s">
+      <button class="sp-topic-head" aria-expanded="false">
+        <span class="sp-icon" aria-hidden="true"><svg viewBox="0 0 96 96"><circle class="seek" cx="16" cy="20" r="5" style="--x:32px;--y:28px;--k:0"></circle><circle class="seek" cx="38" cy="12" r="5" style="--x:10px;--y:36px;--k:1"></circle><circle class="seek" cx="64" cy="18" r="5" style="--x:-16px;--y:30px;--k:2"></circle><circle class="seek" cx="82" cy="34" r="5" style="--x:-34px;--y:14px;--k:3"></circle><circle class="seek" cx="14" cy="48" r="5" style="--x:34px;--y:0px;--k:4"></circle><circle class="seek" cx="82" cy="62" r="5" style="--x:-34px;--y:-14px;--k:5"></circle><circle class="seek" cx="24" cy="78" r="5" style="--x:24px;--y:-30px;--k:6"></circle><circle class="seek" cx="50" cy="86" r="5" style="--x:-2px;--y:-38px;--k:7"></circle><circle class="seek" cx="72" cy="80" r="5" style="--x:-24px;--y:-32px;--k:8"></circle><circle class="pick grow" cx="48" cy="48" r="17"></circle></svg></span>
+        <span class="sp-topic-name">вкус против насмотренности: что&nbsp;отличает <span class="nobr">арт-директора</span> от&nbsp;хорошего&nbsp;дизайнера</span>
+        <span class="sp-tags"><span class="sp-tag">доклад</span><span class="sp-tag">лекция</span></span>
+        <span class="sp-plus" aria-hidden="true"></span>
+      </button>
+      <div class="sp-topic-body"><div><div class="sp-topic-in">
+        <p>Насмотренность&nbsp;— это&nbsp;база, а&nbsp;вкус&nbsp;— это&nbsp;умение принять решение и&nbsp;объяснить его; как&nbsp;рождается айдентика, которую запоминают; как&nbsp;отличить сильное решение от&nbsp;просто аккуратного; почему в&nbsp;эпоху <span class="caps">ИИ</span>&nbsp;вкус становится главным дефицитом, а&nbsp;не&nbsp;навык в&nbsp;софте</p>
+        <p class="sp-who"><span>Для&nbsp;кого:</span> дизайнеры middle+, <span class="nobr">дизайн-сообщество</span></p>
+      </div></div></div>
+    </article>
+    <article class="sp-topic" data-reveal="" style="--d:0.10s">
+      <button class="sp-topic-head" aria-expanded="false">
+        <span class="sp-icon" aria-hidden="true"><svg viewBox="0 0 96 96"><g class="orbit"><circle class="ink" cx="84.0" cy="48.0" r="8"></circle><circle class="ink" cx="59.1" cy="82.2" r="8"></circle><circle class="ink" cx="18.9" cy="69.2" r="8"></circle><circle class="ink" cx="18.9" cy="26.8" r="8"></circle><circle class="ink" cx="59.1" cy="13.8" r="8"></circle></g><circle class="pick pulse" cx="48" cy="48" r="13"></circle></svg></span>
+        <span class="sp-topic-name">креативное лидерство без&nbsp;выгорания</span>
+        <span class="sp-tags"><span class="sp-tag">доклад</span><span class="sp-tag">менторская сессия</span></span>
+        <span class="sp-plus" aria-hidden="true"></span>
+      </button>
+      <div class="sp-topic-body"><div><div class="sp-topic-in">
+        <p>Как&nbsp;ставить задачи так, чтобы&nbsp;не&nbsp;переделывать; как&nbsp;защищать концепции перед&nbsp;<span class="nobr">топ-менеджментом</span> и&nbsp;не&nbsp;сливаться; как&nbsp;давать обратную связь, которая растит, а&nbsp;не&nbsp;убивает; как&nbsp;собрать процесс в&nbsp;удалённой команде; где&nbsp;граница между&nbsp;«<span class="nobr">арт-директор</span>» и&nbsp;«нянька»</p>
+        <p class="sp-who"><span>Для&nbsp;кого:</span> тимлиды, <span class="nobr">арт-директора</span>, руководители</p>
+      </div></div></div>
+    </article>
+    <article class="sp-topic" data-reveal="" style="--d:0.15s">
+      <button class="sp-topic-head" aria-expanded="false">
+        <span class="sp-icon" aria-hidden="true"><svg viewBox="0 0 96 96"><rect class="line" x="10" y="14" width="50" height="50" rx="4"></rect><rect class="pick morph" x="10" y="14" width="50" height="50" rx="4"></rect></svg></span>
+        <span class="sp-topic-name">дизайн на&nbsp;российских платформах</span>
+        <span class="sp-tags"><span class="sp-tag">доклад</span></span>
+        <span class="sp-plus" aria-hidden="true"></span>
+      </button>
+      <div class="sp-topic-body"><div><div class="sp-topic-in">
+        <p>Чем&nbsp;визуальный язык российских продуктов отличается от&nbsp;кальки с&nbsp;западных; какие визуальные коды формируют доверие у&nbsp;массовой аудитории и&nbsp;у&nbsp;аудитории госкорпораций; как&nbsp;адаптировать тренды, а&nbsp;не&nbsp;копировать их; работа в&nbsp;условиях, когда&nbsp;часть привычных инструментов&nbsp;недоступна</p>
+        <p class="sp-who"><span>Для&nbsp;кого:</span> бренды, продуктовые команды,&nbsp;госсектор</p>
+      </div></div></div>
+    </article>
+    <article class="sp-topic" data-reveal="" style="--d:0.20s">
+      <button class="sp-topic-head" aria-expanded="false">
+        <span class="sp-icon" aria-hidden="true"><svg viewBox="0 0 96 96"><circle class="wave" cx="38" cy="38" r="20"></circle><circle class="wave" cx="38" cy="38" r="20" style="--k:1"></circle><circle class="wave" cx="38" cy="38" r="20" style="--k:2"></circle><circle class="pick" cx="38" cy="38" r="15"></circle><path class="stick" d="M48 49 L80 84"></path></svg></span>
+        <span class="sp-topic-name"><span class="nobr">дизайн-стендап</span>: разбор работ&nbsp;вживую</span>
+        <span class="sp-tags"><span class="sp-tag">авторский формат</span><span class="sp-tag">модерация</span></span>
+        <span class="sp-plus" aria-hidden="true"></span>
+      </button>
+      <div class="sp-topic-body"><div><div class="sp-topic-in">
+        <p>Живой разбор присланных работ с&nbsp;точки зрения <span class="nobr">арт-директора</span>; что&nbsp;работает, что&nbsp;нет&nbsp;и&nbsp;почему; вкус как&nbsp;навык, который можно объяснить. Ценно тем, что&nbsp;это&nbsp;интерактив, а&nbsp;не&nbsp;монолог&nbsp;— организаторы такое&nbsp;любят.</p>
+        <p class="sp-who"><span>Для&nbsp;кого:</span> любые <span class="nobr">дизайн-события</span>, сообщества</p>
+      </div></div></div>
+    </article></div>
     </div>
   </section>
 
   <!-- Для анонса: био разной длины и фотографии -->
-  <section class="sp-sec" id="bio">
+  <section class="sp-sec" id="bio" data-pre="">
     <div class="wrap sp-bio">
       <div class="sp-bio-side">
-        <h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2>
-        <p class="sp-note" data-reveal data-text="speaker.bioNote"></p>
-        <div class="ctas sp-photos-btn" data-reveal><a class="btn btn-line" data-href="speaker.photosLink"><span data-text="speaker.photosButton"></span><span class="arr">↓</span></a></div>
+        <h2 class="h2" data-reveal="" data-text="speaker.bioTitle" aria-label="для&nbsp;анонса"><span class="wd">для&nbsp;анонса</span></h2>
+        <p class="sp-note" data-reveal="" data-text="speaker.bioNote">Био трех длин и&nbsp;мои фотографии для&nbsp;вашего сайта или&nbsp;анонсов</p>
+        <div class="ctas sp-photos-btn" data-reveal=""><a class="btn btn-line" data-href="speaker.photosLink" href="https://disk.yandex.ru/d/uTU-pnLyG-rHSQ"><span data-text="speaker.photosButton" aria-label="скачать фотографии"><span class="wd">скачать</span> <span class="wd">фотографии</span></span><span class="arr">↓</span></a></div>
       </div>
-      <div class="sp-bio-main" id="bioBox" data-reveal></div>
+      <div class="sp-bio-main" id="bioBox" data-reveal=""><div class="sp-seg" role="tablist"><button role="tab" data-k="0">короткое</button><button role="tab" data-k="1">среднее</button><button role="tab" data-k="2">длинное</button></div>
+    <div class="sp-bio-text"><p><span class="nobr">Арт-директор</span> коммуникационного дизайна, <span class="nobr">ex-лид</span> <span class="nobr">дизайн-команды</span>&nbsp;<span class="caps">VK</span></p></div>
+    <div class="sp-bio-foot"><span class="sp-count">65 знаков</span><button class="btn btn-line sp-copy"><span>скопировать</span></button></div></div>
     </div>
   </section>
 
   <!-- Организую мероприятия: текст и сайты событий -->
-  <section class="sp-sec" id="org">
+  <section class="sp-sec" id="org" data-pre="">
     <div class="wrap sp-bio">
-      <h2 class="h2" data-reveal data-text="speaker.orgTitle"></h2>
-      <div data-reveal>
-        <p class="sp-org-text" data-text="speaker.orgText"></p>
+      <h2 class="h2" data-reveal="" data-text="speaker.orgTitle" aria-label="организую мероприятия"><span class="wd">организую</span> <span class="wd">мероприятия</span></h2>
+      <div data-reveal="">
+        <p class="sp-org-text" data-text="speaker.orgText">Кроме&nbsp;выступлений я&nbsp;сама организую <span class="nobr">дизайн-мероприятия</span>. Если&nbsp;у&nbsp;вас есть идея или&nbsp;площадка, предложите сотрудничество.</p>
       </div>
     </div>
-    <div class="wrap"><div class="sp-shows" id="showList"></div></div>
+    <div class="wrap"><div class="sp-shows" id="showList">
+    <a class="sp-show" href="https://kupdasha.ru/comdesign" data-reveal="">
+      <span class="sp-show-img"><img alt="" loading="lazy"><img alt="" loading="lazy"><img alt="" loading="lazy"><img alt="" loading="lazy"></span>
+      <span class="sp-show-name">конференции<span class="arr">→</span></span>
+    </a>
+    <a class="sp-show" href="https://kupdasha.ru/love14" data-reveal="">
+      <span class="sp-show-img"><img alt="" loading="lazy"><img alt="" loading="lazy"><img alt="" loading="lazy"><img alt="" loading="lazy"></span>
+      <span class="sp-show-name">митапы<span class="arr">→</span></span>
+    </a>
+    <a class="sp-show" href="https://kupdasha.ru/dsnstand" data-reveal="">
+      <span class="sp-show-img"><img alt="" loading="lazy"><img alt="" loading="lazy"></span>
+      <span class="sp-show-name"><span class="nobr">дизайн-стендап</span><span class="arr">→</span></span>
+    </a></div></div>
   </section>
 
   <!-- Контакт -->
-  <section class="contact" id="contact">
+  <section class="contact" id="contact" data-pre="">
     <div class="wrap">
-      <h2 class="h2 center" data-reveal data-text="speaker.contactTitle"></h2>
-      <p class="lead" data-reveal data-text="speaker.contactLead"></p>
-      <div class="ctas contact-links" id="contactLinks" data-reveal></div>
-      <p class="sp-mail" data-reveal><a class="link" id="speakerMail"><span id="speakerMailText"></span></a></p>
+      <h2 class="h2 center" data-reveal="" data-text="speaker.contactTitle" aria-label="позвать выступить"><span class="wd">позвать</span> <span class="wd">выступить</span></h2>
+      <p class="lead" data-reveal="" data-text="speaker.contactLead">Напишите тему, дату и&nbsp;формат события. Отвечу и&nbsp;подскажу, что&nbsp;подойдет.</p>
+      <div class="ctas contact-links" id="contactLinks" data-reveal=""><a class="btn btn-accent big-btn tease" href="https://t.me/kupdasha"><span class="spell" aria-label="Telegram"><span class="wd">Telegram</span></span><span class="arr">→</span></a><a class="btn btn-line big-btn" href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4"><span class="spell" aria-label="MAX"><span class="caps"><span class="wd">MAX</span></span></span><span class="arr">→</span></a></div>
+      <p class="sp-mail" data-reveal=""><a class="link" id="speakerMail" href="mailto:kupdaria@yandex.ru"><span id="speakerMailText">kupdaria@yandex.ru</span></a></p>
       <footer class="foot">
-        <span data-text="footer.left"></span>
-      </footer>
+        <span data-text="footer.left">© Дарья Купцова</span>
+      <span class="foot-legal"><a href="https://kupdasha.ru/politics" target="_blank" rel="noopener">Политика обработки персональных&nbsp;данных</a><a href="https://kupdasha.ru/data" target="_blank" rel="noopener">Согласие на&nbsp;обработку персональных&nbsp;данных</a></span></footer>
     </div>
   </section>
 
