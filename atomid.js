@@ -651,7 +651,8 @@ export async function mountAtomId(mount, p, helpers){
   }
   // шесть ценностей — прямо перед концепцией «циклы защиты»: из них она и выросла
   const vals = mount.querySelector('.ri-ch-values'), cyc = mount.querySelector('.ri-ch-ideas .ri-page[data-k="cycle"]');
-  if (vals && cyc) { vals.classList.add('ri-in-deck'); cyc.before(vals); }
+  // ставим внутрь четвертой концепции — сразу под плашкой «концепция 4», иначе ценности оказываются в конце третьей
+  if (vals && cyc) { vals.classList.add('ri-in-deck'); const num = cyc.querySelector(':scope > .ri-num'); num ? num.after(vals) : cyc.prepend(vals); }
   const path = tops.find(el => !el.classList.contains('ri-ch-entry'));
   mount.parentElement.querySelectorAll('.ri-ch, .ri-page').forEach(el => reveal.observe(el));
   const q = c => mount.querySelector(c);
