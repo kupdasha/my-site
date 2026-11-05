@@ -643,6 +643,9 @@ export async function mountAtomId(mount, p, helpers){
     tops.forEach(el => top.appendChild(el));
     scheme.before(top);
   }
+  // шесть ценностей — прямо перед концепцией «циклы защиты»: из них она и выросла
+  const vals = mount.querySelector('.ri-ch-values'), cyc = mount.querySelector('.ri-ch-ideas .ri-page[data-k="cycle"]');
+  if (vals && cyc) { vals.classList.add('ri-in-deck'); cyc.before(vals); }
   const path = tops.find(el => !el.classList.contains('ri-ch-entry'));
   mount.parentElement.querySelectorAll('.ri-ch, .ri-page').forEach(el => reveal.observe(el));
   const q = c => mount.querySelector(c);
