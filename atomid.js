@@ -527,10 +527,13 @@ function final3HTML(c, n0 = 0){
     <div class="wrap">${loginHTML(it, c)}</div>
     <div class="wrap">${stripHTML(it.k, it, c.open)}</div>
   </article>`).join('');
-  return trio + navHTML(c.items, c.title) + pages;
+  return trio + pages;   // меню под знаками убрано (просьба 05.11): к финалисту ведут сами знаки
 }
 function liveFinal3(box, c){
-  const go = liveNav(box);
+  const sc = box.closest('.case') || document.scrollingElement;
+  const go = k => { const el = box.querySelector(`.ri-page[data-k="${k}"]`); if (!el) return;
+    const top = el.getBoundingClientRect().top - (sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top) - 80;
+    sc.scrollTo({ top: sc.scrollTop + top, behavior: still() ? 'auto' : 'smooth' }); };
   c.items.forEach(it => {
     const page = box.querySelector(`.ri-page[data-k="${it.k}"]`);
     liveStrip(page);
