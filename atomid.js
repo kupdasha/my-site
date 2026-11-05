@@ -444,7 +444,7 @@ const pageHead = (it, mark = '', noName = false) => { const right = mark || pict
   </div>`; };
 // главная картинка концепции — сам знак в векторе, крупно; у «ключа» — русская и английская версии
 // плашка-перебивка «концепция N» — у всех вариантов подряд: четыре концепции, первый «Росатом ID», три финалиста
-const numHTML = n => `<div class="ri-num"><div class="wrap"><span>концепция ${n}</span></div></div>`;
+const numHTML = n => `<div class="ri-cn"><div class="wrap"><span>концепция ${n}</span></div></div>`;
 function ideaPage(it, c, n){
   // перебивка: невысокая черная плашка на всю ширину сайта с номером концепции, дальше имя крупно и знак; фон везде белый
   return `<article class="ri-page ri-page-b" data-k="${it.k}">
@@ -652,7 +652,7 @@ export async function mountAtomId(mount, p, helpers){
   // шесть ценностей — прямо перед концепцией «циклы защиты»: из них она и выросла
   const vals = mount.querySelector('.ri-ch-values'), cyc = mount.querySelector('.ri-ch-ideas .ri-page[data-k="cycle"]');
   // ставим внутрь четвертой концепции — сразу под плашкой «концепция 4», иначе ценности оказываются в конце третьей
-  if (vals && cyc) { vals.classList.add('ri-in-deck'); const num = cyc.querySelector(':scope > .ri-num'); num ? num.after(vals) : cyc.prepend(vals); }
+  if (vals && cyc) { vals.classList.add('ri-in-deck'); const num = cyc.querySelector(":scope > .ri-cn"); num ? num.after(vals) : cyc.prepend(vals); }
   const path = tops.find(el => !el.classList.contains('ri-ch-entry'));
   mount.parentElement.querySelectorAll('.ri-ch, .ri-page').forEach(el => reveal.observe(el));
   const q = c => mount.querySelector(c);

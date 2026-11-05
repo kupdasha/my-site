@@ -415,8 +415,8 @@
 /* перебивка перед концепцией: фон белый, черная плашка с номером, имя крупно и знак собирается */
 .ri-band{margin-bottom:clamp(24px,3vw,48px)}
 /* плашка «концепция N»: невысокая, черная, на всю ширину сайта; в темной версии — светлая */
-.ri-num{position:relative;background:var(--ink);color:var(--bg);box-shadow:0 0 0 100vmax var(--ink);clip-path:inset(0 -100vmax);padding-block:clamp(18px,1.8vw,28px);margin-bottom:clamp(40px,5vw,80px)}
-.ri-num span{display:block;font-weight:500;font-size:clamp(20px,1.8vw,28px);line-height:1.1}
+.ri-cn{position:relative;background:var(--ink);color:var(--bg);box-shadow:0 0 0 100vmax var(--ink);clip-path:inset(0 -100vmax);padding-block:clamp(18px,1.8vw,28px);margin-bottom:clamp(40px,5vw,80px)}
+.ri-cn span{display:block;font-weight:500;font-size:clamp(20px,1.8vw,28px);line-height:1.1}
 .ri-band-t{display:flex;flex-direction:column;gap:14px}
 .ri-band-in{display:flex;flex-direction:column;gap:clamp(24px,3vw,48px)}
 .ri-band .ri-sign{flex:1;border:0;aspect-ratio:auto;min-height:clamp(200px,24vw,380px)}
@@ -431,3 +431,6 @@
 .ri-band .ri-sign-2 .ri-sign-host{height:clamp(60px,6.5vw,110px)}
 .ri-band .ri-sign-host .ri-logo-v{height:100%;width:auto;max-width:100%}
 @media (max-width:760px){ .ri-band .ri-sign .ri-sign-host{height:80px} .ri-band .ri-sign-2 .ri-sign-host{height:54px} }
+/* «дело не в рисунке, а в имени» — весь блок на черном на всю ширину сайта, текст и графика белые */
+.ri-ch-names{position:relative;background:#111113;color:#fff;box-shadow:0 0 0 100vmax #111113;clip-path:inset(0 -100vmax);padding-block:var(--ri-gap)}
+.ri-ch-names .ri-nt .best{background:color-mix(in srgb,#57AEE9 22%,transparent)}
