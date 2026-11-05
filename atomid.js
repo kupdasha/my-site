@@ -456,7 +456,7 @@ function ideaPage(it, c, n){
   </article>`;
 }
 function liveIdeas(box, c){
-  liveNav(box);
+  // липкого меню концепций нет (просьба 05.11): их разделяют плашки «концепция N»
   c.items.forEach(it => {
     const page = box.querySelector(`.ri-page[data-k="${it.k}"]`);
     liveStrip(page);
@@ -636,7 +636,7 @@ export async function mountAtomId(mount, p, helpers){
     + (s.inside   ? split('inside', insideHTML(s.inside), s.inside, true) : '')
     + (s.sketches ? wide('sketches', sketchesHTML(s.sketches), s.sketches) : '')
     + (s.values   ? wide('values', valuesHTML(s.values), s.values) : '')
-    + (s.ideas    ? `<section class="ri-ch ri-ch-ideas ri-deck"><div class="wrap ri-head">${block(s.ideas)}</div>${navHTML(s.ideas.items, s.ideas.menu)}${s.ideas.items.map((it, i) => ideaPage(it, s.ideas, i + 1)).join('')}</section>` : '')
+    + (s.ideas    ? `<section class="ri-ch ri-ch-ideas ri-deck"><div class="wrap ri-head">${block(s.ideas)}</div>${s.ideas.items.map((it, i) => ideaPage(it, s.ideas, i + 1)).join('')}</section>` : '')
     + (s.names    ? wide('names', namesHTML(s.names), s.names) : '')
     + (s.blue     ? `<section class="ri-ch ri-ch-blue">${numHTML(nIdeas + 1)}<div class="wrap ri-head">${block(s.blue)}</div>${blueHTML(s.blue, s.final3)}</section>` : '')
     + (s.final3   ? `<section class="ri-ch ri-ch-final3 ri-deck"><div class="wrap ri-head">${block(s.final3)}</div>${final3HTML(s.final3, nIdeas + (s.blue ? 1 : 0))}</section>` : '')
