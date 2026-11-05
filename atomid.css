@@ -412,10 +412,12 @@
 .ri-ch-blue .ri-login::after{content:"";position:absolute;inset:0;border:1.5px solid #E2E2E2;border-radius:inherit;pointer-events:none}
 .ri-ch-blue .ri-win{inset:0;border-radius:inherit;box-shadow:none}
 @media (max-width:760px){ .ri-ch-blue .ri-login{aspect-ratio:3/4.4} }
-/* перебивка перед концепцией: полоса на всю ширину сайта в легком оттенке ее цвета — имя крупно и знак собирается; дальше концепция на белом */
-.ri-band{--ri-tbg:color-mix(in srgb,var(--ri-tc,#84838C) 12%,var(--bg));background:var(--ri-tbg);box-shadow:0 0 0 100vmax var(--ri-tbg);clip-path:inset(0 -100vmax);padding-block:clamp(56px,7vw,120px);margin-bottom:clamp(40px,5vw,80px)}
-:root[data-theme="dark"] .ri-band{--ri-tbg:color-mix(in srgb,var(--ri-tc,#84838C) 18%,var(--bg))}
-.ri-band-in{display:flex;flex-direction:column;gap:clamp(24px,3vw,48px);min-height:min(62svh,640px)}
+/* перебивка перед концепцией: фон белый, тонкая черта на всю ширину сайта, номер концепции, имя крупно и знак собирается */
+.ri-band{position:relative;padding-top:clamp(40px,5vw,80px);margin-bottom:clamp(24px,3vw,48px)}
+.ri-band::before{content:"";position:absolute;top:0;left:calc(50% - 50vw);width:100vw;height:1.5px;background:color-mix(in srgb,currentColor 22%,transparent)}
+.ri-band-t{display:flex;flex-direction:column;gap:14px}
+.ri-band-n{font-size:16px;opacity:.55}
+.ri-band-in{display:flex;flex-direction:column;gap:clamp(24px,3vw,48px)}
 .ri-band .ri-sign{flex:1;border:0;aspect-ratio:auto;min-height:clamp(200px,24vw,380px)}
 .ri-band .ri-sign .ri-logo{max-height:clamp(90px,11vw,190px)}
 .ri-band .ri-sign-2 .ri-logo{max-height:clamp(60px,6.5vw,110px)}

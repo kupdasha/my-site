@@ -443,10 +443,10 @@ const pageHead = (it, mark = '', noName = false) => { const right = mark || pict
     ${right ? `<div class="ri-page-mark${mark ? '' : ' ri-page-info'}">${right}</div>` : ''}
   </div>`; };
 // главная картинка концепции — сам знак в векторе, крупно; у «ключа» — русская и английская версии
-function ideaPage(it, c){
-  // перебивка: полоса на всю ширину сайта в легком оттенке цвета концепции — имя крупно и знак, дальше мысль и лента на белом
-  return `<article class="ri-page ri-page-b" data-k="${it.k}"${it.tint ? ` style="--ri-tc:${it.tint}"` : ''}>
-    <div class="ri-band"><div class="wrap ri-band-in"><h3 class="ri-name">${H.T(it.t)}</h3>
+function ideaPage(it, c, n){
+  // перебивка: тонкая черта на всю ширину сайта, номер концепции, имя крупно и знак; фон везде белый
+  return `<article class="ri-page ri-page-b" data-k="${it.k}">
+    <div class="ri-band"><div class="wrap ri-band-in"><div class="ri-band-t"><span class="ri-band-n">концепция ${n}</span><h3 class="ri-name">${H.T(it.t)}</h3></div>
       <div class="ri-sign${it.mark2 ? ' ri-sign-2' : ''}">${logo(it.mark)}${it.mark2 ? logo(it.mark2) : ''}</div></div></div>
     ${pageHead(it, '', true)}
     <div class="wrap">${stripHTML(it.k, it, c.open)}</div>
@@ -632,7 +632,7 @@ export async function mountAtomId(mount, p, helpers){
     + (s.inside   ? split('inside', insideHTML(s.inside), s.inside, true) : '')
     + (s.sketches ? wide('sketches', sketchesHTML(s.sketches), s.sketches) : '')
     + (s.values   ? wide('values', valuesHTML(s.values), s.values) : '')
-    + (s.ideas    ? `<section class="ri-ch ri-ch-ideas ri-deck"><div class="wrap ri-head">${block(s.ideas)}</div>${navHTML(s.ideas.items, s.ideas.menu)}${s.ideas.items.map(it => ideaPage(it, s.ideas)).join('')}</section>` : '')
+    + (s.ideas    ? `<section class="ri-ch ri-ch-ideas ri-deck"><div class="wrap ri-head">${block(s.ideas)}</div>${navHTML(s.ideas.items, s.ideas.menu)}${s.ideas.items.map((it, i) => ideaPage(it, s.ideas, i + 1)).join('')}</section>` : '')
     + (s.names    ? wide('names', namesHTML(s.names), s.names) : '')
     + (s.blue     ? `<section class="ri-ch ri-ch-blue"><div class="wrap ri-head">${block(s.blue)}</div>${blueHTML(s.blue, s.final3)}</section>` : '')
     + (s.final3   ? `<section class="ri-ch ri-ch-final3 ri-deck"><div class="wrap ri-head">${block(s.final3)}</div>${final3HTML(s.final3)}</section>` : '')
