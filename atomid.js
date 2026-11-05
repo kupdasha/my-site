@@ -437,16 +437,18 @@ function liveNav(box){
    ideas — четыре концепции, у каждой своя «страница»
    ================================================================ */
 // слева заголовок и описание, справа — знак (у финалистов) или инфографика к знаку (у концепций)
-const pageHead = (it, mark = '') => { const right = mark || pictHTML(it);
+const pageHead = (it, mark = '', noName = false) => { const right = mark || pictHTML(it);
   return `<div class="wrap ri-page-head">
-    <div class="ri-page-t"><h3 class="ri-name">${H.T(it.t)}</h3><p class="ri-text">${H.T(it.idea)}</p></div>
+    <div class="ri-page-t">${noName ? '' : `<h3 class="ri-name">${H.T(it.t)}</h3>`}<p class="ri-text">${H.T(it.idea)}</p></div>
     ${right ? `<div class="ri-page-mark${mark ? '' : ' ri-page-info'}">${right}</div>` : ''}
   </div>`; };
 // главная картинка концепции — сам знак в векторе, крупно; у «ключа» — русская и английская версии
 function ideaPage(it, c){
-  return `<article class="ri-page" data-k="${it.k}">
-    ${pageHead(it)}
-    <div class="wrap"><div class="ri-sign${it.mark2 ? ' ri-sign-2' : ''}">${logo(it.mark)}${it.mark2 ? logo(it.mark2) : ''}</div></div>
+  // перебивка: полоса на всю ширину сайта в легком оттенке цвета концепции — имя крупно и знак, дальше мысль и лента на белом
+  return `<article class="ri-page ri-page-b" data-k="${it.k}"${it.tint ? ` style="--ri-tc:${it.tint}"` : ''}>
+    <div class="ri-band"><div class="wrap ri-band-in"><h3 class="ri-name">${H.T(it.t)}</h3>
+      <div class="ri-sign${it.mark2 ? ' ri-sign-2' : ''}">${logo(it.mark)}${it.mark2 ? logo(it.mark2) : ''}</div></div></div>
+    ${pageHead(it, '', true)}
     <div class="wrap">${stripHTML(it.k, it, c.open)}</div>
   </article>`;
 }
