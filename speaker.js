@@ -49,13 +49,23 @@ export async function mountSpeaker(S, helpers){
   }
   // абзацы первого блока — с точкой, хотя в двух из них по одному предложению: типограф ее убирает, рядом с первым абзацем выходит вразнобой
   document.querySelectorAll('.sp-lead').forEach(p => { if (!/[.!?…]$/.test(p.textContent.trim())) p.insertAdjacentText('beforeend', '.'); });
+  title(S);
   photos(S);
   $('#speakerMail').href = 'mailto:' + S.email;
   $('#speakerMailText').textContent = S.email;
   topics(S);
+  talks(S);
   bio(S);
   shows(S);
   H.watchReveals(document, true);
+}
+
+/* ---------- Заголовок: имя крупно, после тире — роль и темы помельче.
+   Текст целиком остается в одном h1, тире есть в разметке, на экране оно скрыто ---------- */
+function title(S){
+  const h = document.querySelector('.sp-title'), t = H.pick(S.title), i = t.indexOf(' — ');
+  if (!h || i < 0) return;
+  h.innerHTML = `<span class="sp-name">${H.T(t.slice(0, i))}</span><span class="sp-dash"> — </span><span class="sp-role">${H.T(t.slice(i + 3))}</span>`;
 }
 
 /* ---------- Фото в начале: кадры с Росконгресса сменяются сами ---------- */
@@ -109,6 +119,13 @@ function topics(S){
     box.querySelectorAll('.sp-topic').forEach(i => { i.classList.remove('open'); i.firstElementChild.setAttribute('aria-expanded', 'false'); });
     if (!was) { item.classList.add('open'); head.setAttribute('aria-expanded', 'true'); }
   });
+}
+
+/* ---------- Где выступала: событие слева, роль справа ---------- */
+function talks(S){
+  const box = $('#talkList'); if (!box || !S.talks) return;
+  box.innerHTML = S.talks.map((t, k) =>
+    `<div class="sp-talk" data-reveal style="--d:${(k * .04).toFixed(2)}s"><b>${H.T(t.event)}</b><span>${H.T(t.role)}</span></div>`).join('');
 }
 
 /* ---------- Био ---------- */

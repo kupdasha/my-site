@@ -40,7 +40,7 @@ const CHECK = process.argv.includes('--check');
 const PAGES = {
   index:   { file: 'index.html',   ids: ['head', 'hero', 'directions', 'works', 'nda', 'contact'] },
   about:   { file: 'about.html',   ids: ['about', 'photos', 'community', 'contact'] },
-  speaker: { file: 'speaker.html', ids: ['speaker', 'topics', 'bio', 'org', 'contact'] },
+  speaker: { file: 'speaker.html', ids: ['speaker', 'topics', 'talks', 'bio', 'org', 'contact'] },
 };
 
 function findChrome(){

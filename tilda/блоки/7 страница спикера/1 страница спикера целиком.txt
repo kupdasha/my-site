@@ -23,22 +23,25 @@
 <!-- Профиль спикера -->
   <section class="sp-hero" id="speaker" data-page="speaker" data-pre="">
     <div class="wrap">
-      <h1 class="sp-title split" data-text="speaker.title"><span class="w"><span style="--d:0.00s">профиль</span></span> <span class="w"><span style="--d:0.07s">спикера</span></span></h1>
+      <!-- верх: имя и темы слева, фото справа; низ под чертой: кто я — слева, подкаст и жюри — справа -->
       <div class="sp-top">
-        <div>
-          <p class="sp-lead" data-reveal="" data-text="speaker.lead"><span class="nobr">Арт-директор</span> коммуникационного дизайна, <span class="nobr">ex-лид</span> <span class="nobr">дизайн-команды</span> <span class="caps">VK</span>. Спикер о&nbsp;дизайне, <span class="caps">ИИ</span>&nbsp;и&nbsp;креативе. Говорю о&nbsp;том, как&nbsp;нейросети меняют профессию, из&nbsp;чего складывается вкус и&nbsp;как&nbsp;вести креативную команду&nbsp;— на&nbsp;опыте работы с&nbsp;крупными&nbsp;брендами.</p>
-          <p class="sp-lead" data-reveal="" data-text="speaker.podcast">Автор <span class="nobr">видео-подкаста</span> о&nbsp;дизайне <a class="link" href="https://vkvideo.ru/playlist/-226119573_2" target="_blank" rel="noopener">«Одна кавычка»</a>: среди&nbsp;гостей Студия Артемия Лебедева, Depot, Супрематика, <span class="caps">DDVB</span> и&nbsp;другие.</p>
-          <p class="sp-lead" data-reveal="" data-text="speaker.jury">Член жюри премий Russian&nbsp;Design&nbsp;Cup, <span class="caps">WDA</span>, Айда, Основа, Таврида&nbsp;х&nbsp;Dprofile и&nbsp;других.</p>
-        </div>
+        <h1 class="sp-title" data-reveal="" data-text="speaker.title"><span class="sp-name">Дарья Купцова</span><span class="sp-dash"> — </span><span class="sp-role">спикер: <span class="caps">ИИ</span>&nbsp;в&nbsp;<span class="nobr">дизайн-продакшене</span>, креативное&nbsp;лидерство</span></h1>
         <div class="sp-photo" id="spPhoto" data-reveal=""><img alt="Дарья Купцова на сцене" loading="lazy"><img alt="Дарья Купцова на сцене" loading="lazy"><img alt="Дарья Купцова на сцене" loading="lazy"><img alt="Дарья Купцова на сцене" loading="lazy"></div>
+      </div>
+      <div class="sp-intro" data-reveal="">
+        <p class="sp-lead" data-text="speaker.lead"><span class="nobr">Арт-директор</span> коммуникационного дизайна, <span class="nobr">ex-лид</span> <span class="nobr">дизайн-команды</span> <span class="caps">VK</span>. Говорю о&nbsp;том, как&nbsp;нейросети меняют профессию, из&nbsp;чего складывается вкус и&nbsp;как&nbsp;вести креативную команду&nbsp;— на&nbsp;опыте работы с&nbsp;крупными&nbsp;брендами.</p>
+        <div class="sp-side">
+          <p class="sp-lead" data-text="speaker.podcast">Веду видеоподкаст о&nbsp;дизайне <a class="link" href="https://vkvideo.ru/playlist/-226119573_2" target="_blank" rel="noopener">«Одна кавычка»</a>, в&nbsp;гостях&nbsp;— Студия Артемия Лебедева, Depot, Супрематика, <span class="caps">DDVB</span> и&nbsp;другие.</p>
+          <p class="sp-lead" data-text="speaker.jury">Член жюри <span class="nobr">дизайн-премий</span>.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Темы выступлений -->
+  <!-- Темы докладов -->
   <section class="sp-sec" id="topics" data-pre="">
     <div class="wrap">
-      <h2 class="h2 sp-h2" data-reveal="" data-text="speaker.topicsTitle" aria-label="темы выступлений"><span class="wd">темы</span> <span class="wd">выступлений</span></h2>
+      <h2 class="h2 sp-h2" data-reveal="" data-text="speaker.topicsTitle" aria-label="темы докладов"><span class="wd">темы</span> <span class="wd">докладов</span></h2>
       <div class="sp-topics" id="topicList">
     <article class="sp-topic open" data-reveal="" style="--d:0.00s">
       <button class="sp-topic-head" aria-expanded="true">
@@ -103,12 +106,21 @@
     </div>
   </section>
 
+  <!-- Где уже была спикером: события и роли в две колонки, жюри, ссылка на записи -->
+  <section class="sp-sec" id="talks" data-pre="">
+    <div class="wrap">
+      <h2 class="h2 sp-h2" data-reveal="" data-text="speaker.talksTitle" aria-label="где&nbsp;уже&nbsp;была спикером"><span class="wd">где&nbsp;уже&nbsp;была</span> <span class="wd">спикером</span></h2>
+      <div class="sp-talks" id="talkList"><div class="sp-talk" data-reveal="" style="--d:0.00s"><b>Кайференция Pragmatica</b><span>доклад</span></div><div class="sp-talk" data-reveal="" style="--d:0.04s"><b>Росконгресс</b><span>участница дискуссии</span></div><div class="sp-talk" data-reveal="" style="--d:0.08s"><b>Форум «<span class="caps">ШУМ</span>», Росмолодежь</b><span>спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.12s"><b>Telling&nbsp;Stories, <span class="caps">HSE</span>&nbsp;Creative&nbsp;Hub</b><span>спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.16s"><b>Школа <span class="caps">IKRA</span></b><span>вебинар</span></div><div class="sp-talk" data-reveal="" style="--d:0.20s"><b>Конференция «Дизайн коммуникации»,&nbsp;IThub</b><span>организатор и&nbsp;доклад об&nbsp;истории коммуникационного&nbsp;дизайна</span></div><div class="sp-talk" data-reveal="" style="--d:0.24s"><b>Митапы «С&nbsp;любовью, дизайн»</b><span>организатор и&nbsp;спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.28s"><b><span class="nobr">Дизайн-стендап</span> «Профдеформация», StandUp&nbsp;Cafe</b><span>ведущая и&nbsp;организатор</span></div><div class="sp-talk" data-reveal="" style="--d:0.32s"><b>Жюри премий</b><span>Russian&nbsp;Design&nbsp;Cup, <span class="caps">WDA</span>, Айда, Основа, Таврида&nbsp;х&nbsp;Dprofile и&nbsp;других</span></div></div>
+      <div class="ctas sp-talks-btn" data-reveal=""><a class="btn btn-line" data-href="speaker.talksLink" href="https://vkvideo.ru/playlist/-226119573_3"><span data-text="speaker.talksButton" aria-label="смотреть записи"><span class="wd">смотреть</span> <span class="wd">записи</span></span><span class="arr">→</span></a></div>
+    </div>
+  </section>
+
   <!-- Для анонса: био разной длины и фотографии -->
-  <section class="sp-sec" id="bio" data-pre="">
+  <section class="sp-band" id="bio" data-pre="">
     <div class="wrap sp-bio">
       <div class="sp-bio-side">
-        <h2 class="h2" data-reveal="" data-text="speaker.bioTitle" aria-label="для&nbsp;анонса"><span class="wd">для&nbsp;анонса</span></h2>
-        <p class="sp-note" data-reveal="" data-text="speaker.bioNote">Био трех длин и&nbsp;мои фотографии для&nbsp;вашего сайта или&nbsp;анонсов</p>
+        <h2 class="h2" data-reveal="" data-text="speaker.bioTitle" aria-label="материалы для&nbsp;вашего анонса"><span class="wd">материалы</span> <span class="wd">для&nbsp;вашего</span> <span class="wd">анонса</span></h2>
+        <p class="sp-note" data-reveal="" data-text="speaker.bioNote">Био трех длин и&nbsp;мои фотографии для&nbsp;сайта, афиши или&nbsp;поста</p>
         <div class="ctas sp-photos-btn" data-reveal=""><a class="btn btn-line" data-href="speaker.photosLink" href="https://disk.yandex.ru/d/uTU-pnLyG-rHSQ"><span data-text="speaker.photosButton" aria-label="скачать фотографии"><span class="wd">скачать</span> <span class="wd">фотографии</span></span><span class="arr">↓</span></a></div>
       </div>
       <div class="sp-bio-main" id="bioBox" data-reveal=""><div class="sp-seg" role="tablist"><button role="tab" data-k="0">короткое</button><button role="tab" data-k="1">среднее</button><button role="tab" data-k="2">длинное</button></div>
@@ -122,7 +134,7 @@
     <div class="wrap sp-bio">
       <h2 class="h2" data-reveal="" data-text="speaker.orgTitle" aria-label="организую мероприятия"><span class="wd">организую</span> <span class="wd">мероприятия</span></h2>
       <div data-reveal="">
-        <p class="sp-org-text" data-text="speaker.orgText">Кроме&nbsp;выступлений я&nbsp;сама организую <span class="nobr">дизайн-мероприятия</span>. Если&nbsp;у&nbsp;вас есть идея или&nbsp;площадка, предложите сотрудничество.</p>
+        <p class="sp-org-text" data-text="speaker.orgText">Еще&nbsp;я&nbsp;сама собираю <span class="nobr">дизайн-мероприятия</span>. Если&nbsp;у&nbsp;вас есть идея или&nbsp;площадка, предложите сотрудничество.</p>
       </div>
     </div>
     <div class="wrap"><div class="sp-shows" id="showList">
@@ -143,7 +155,7 @@
   <!-- Контакт -->
   <section class="contact" id="contact" data-pre="">
     <div class="wrap">
-      <h2 class="h2 center" data-reveal="" data-text="speaker.contactTitle" aria-label="позвать выступить"><span class="wd">позвать</span> <span class="wd">выступить</span></h2>
+      <h2 class="h2 center" data-reveal="" data-text="speaker.contactTitle" aria-label="пригласить спикером"><span class="wd">пригласить</span> <span class="wd">спикером</span></h2>
       <p class="lead" data-reveal="" data-text="speaker.contactLead">Напишите тему, дату и&nbsp;формат события. Отвечу и&nbsp;подскажу, что&nbsp;подойдет.</p>
       <div class="ctas contact-links" id="contactLinks" data-reveal=""><a class="btn btn-accent big-btn tease" href="https://t.me/kupdasha"><span class="spell" aria-label="Telegram"><span class="wd">Telegram</span></span><span class="arr">→</span></a><a class="btn btn-line big-btn" href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4"><span class="spell" aria-label="MAX"><span class="caps"><span class="wd">MAX</span></span></span><span class="arr">→</span></a></div>
       <p class="sp-mail" data-reveal=""><a class="link" id="speakerMail" href="mailto:kupdaria@yandex.ru"><span id="speakerMailText">kupdaria@yandex.ru</span></a></p>

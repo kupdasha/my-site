@@ -5,6 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Профиль спикера — Дарья Купцова</title>
 <link rel="stylesheet" href="style.css">
+<!-- Person: сведения о Даше для поисковиков и нейросетей. На Тильде — Настройки страницы → «HTML-код для вставки внутрь head» (tilda/блоки/7 страница спикера/0 в head страницы) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Дарья Купцова",
+  "alternateName": ["Даша Купцова", "Купяша"],
+  "url": "https://kupdasha.ru/profile",
+  "image": "https://static.tildacdn.com/tild3963-6534-4061-a466-353764656535/IMG_2571.JPG",
+  "jobTitle": "Арт-директор коммуникационного дизайна",
+  "description": "Арт-директор коммуникационного дизайна, ex-лид дизайн-команды VK. Спикер о дизайне, ИИ и креативе: ИИ в дизайн-продакшене, креативное лидерство, вкус и насмотренность, дизайн на российских платформах.",
+  "email": "mailto:kupdaria@yandex.ru",
+  "knowsAbout": ["ИИ в дизайн-продакшене", "креативное лидерство", "коммуникационный дизайн", "брендинг", "нейросети в дизайне", "арт-дирекшн"],
+  "sameAs": [
+    "https://kupdasha.ru/",
+    "https://t.me/kupdasha",
+    "https://www.linkedin.com/in/kup-daria/",
+    "https://www.behance.net/kupdaria",
+    "https://dsgners.ru/kupdaria",
+    "https://www.youtube.com/@kupyasha26",
+    "https://unsplash.com/@kupdasha"
+  ]
+}
+</script>
+
 <!-- одна версия: из дружеской остаются черный фон и белый текст -->
 <script>try{var r=document.documentElement;r.dataset.ink=localStorage.getItem('kd-mode')==='dark'?'black':'white';r.dataset.theme='light'}catch(e){}</script>
 </head>
@@ -26,19 +51,22 @@
   <!-- Профиль спикера -->
   <section class="sp-hero" id="speaker">
     <div class="wrap">
-      <h1 class="sp-title split" data-text="speaker.title"></h1>
+      <!-- верх: имя и темы слева, фото справа; низ под чертой: кто я — слева, подкаст и жюри — справа -->
       <div class="sp-top">
-        <div>
-          <p class="sp-lead" data-reveal data-text="speaker.lead"></p>
-          <p class="sp-lead" data-reveal data-text="speaker.podcast"></p>
-          <p class="sp-lead" data-reveal data-text="speaker.jury"></p>
-        </div>
+        <h1 class="sp-title" data-reveal data-text="speaker.title"></h1>
         <div class="sp-photo" id="spPhoto" data-reveal></div>
+      </div>
+      <div class="sp-intro" data-reveal>
+        <p class="sp-lead" data-text="speaker.lead"></p>
+        <div class="sp-side">
+          <p class="sp-lead" data-text="speaker.podcast"></p>
+          <p class="sp-lead" data-text="speaker.jury"></p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Темы выступлений -->
+  <!-- Темы докладов -->
   <section class="sp-sec" id="topics">
     <div class="wrap">
       <h2 class="h2 sp-h2" data-reveal data-text="speaker.topicsTitle"></h2>
@@ -46,8 +74,17 @@
     </div>
   </section>
 
+  <!-- Где уже была спикером: события и роли в две колонки, жюри, ссылка на записи -->
+  <section class="sp-sec" id="talks">
+    <div class="wrap">
+      <h2 class="h2 sp-h2" data-reveal data-text="speaker.talksTitle"></h2>
+      <div class="sp-talks" id="talkList"></div>
+      <div class="ctas sp-talks-btn" data-reveal><a class="btn btn-line" data-href="speaker.talksLink"><span data-text="speaker.talksButton"></span><span class="arr">→</span></a></div>
+    </div>
+  </section>
+
   <!-- Для анонса: био разной длины и фотографии -->
-  <section class="sp-sec" id="bio">
+  <section class="sp-band" id="bio">
     <div class="wrap sp-bio">
       <div class="sp-bio-side">
         <h2 class="h2" data-reveal data-text="speaker.bioTitle"></h2>

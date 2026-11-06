@@ -1,0 +1,23 @@
+<!-- Person: сведения о Даше для поисковиков и нейросетей. На Тильде — Настройки страницы → «HTML-код для вставки внутрь head» (tilda/блоки/7 страница спикера/0 в head страницы) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Дарья Купцова",
+  "alternateName": ["Даша Купцова", "Купяша"],
+  "url": "https://kupdasha.ru/profile",
+  "image": "https://static.tildacdn.com/tild3963-6534-4061-a466-353764656535/IMG_2571.JPG",
+  "jobTitle": "Арт-директор коммуникационного дизайна",
+  "description": "Арт-директор коммуникационного дизайна, ex-лид дизайн-команды VK. Спикер о дизайне, ИИ и креативе: ИИ в дизайн-продакшене, креативное лидерство, вкус и насмотренность, дизайн на российских платформах.",
+  "email": "mailto:kupdaria@yandex.ru",
+  "knowsAbout": ["ИИ в дизайн-продакшене", "креативное лидерство", "коммуникационный дизайн", "брендинг", "нейросети в дизайне", "арт-дирекшн"],
+  "sameAs": [
+    "https://kupdasha.ru/",
+    "https://t.me/kupdasha",
+    "https://www.linkedin.com/in/kup-daria/",
+    "https://www.behance.net/kupdaria",
+    "https://dsgners.ru/kupdaria",
+    "https://www.youtube.com/@kupyasha26",
+    "https://unsplash.com/@kupdasha"
+  ]
+}</script>

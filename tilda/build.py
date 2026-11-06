@@ -147,6 +147,8 @@ speaker_html = prefill(read('speaker.html'), 'speaker')
 speaker_sections = re.sub(r'<section class="sp-hero" id="speaker"', '<section class="sp-hero" id="speaker" data-page="speaker"',
     between('<!-- Профиль спикера -->', '</main>', speaker_html), count=1)
 speaker_service_html = between('<!-- Кнопка «Связаться»', '<script src=', speaker_html)
+# разметка Person (schema.org) — статичная, из head speaker.html; на Тильде — в настройках страницы, поле «HTML-код для вставки внутрь head»
+speaker_head = between('<!-- Person:', '</script>', read('speaker.html')) + '</script>'
 
 
 # ---------- блоки ----------
@@ -249,7 +251,7 @@ window.TAPLINK = {
   //  [ 'надпись в серьезной версии',   'надпись в веселой',  'куда ведет' ],
   buttons: [
     [ 'заказать дизайн-проект',         'что умею?',          'https://kupdasha.ru/' ],
-    [ 'позвать выступать',              'позвать',            'https://kupdasha.ru/profile' ],
+    [ 'пригласить спикером',            'позвать',            'https://kupdasha.ru/profile' ],
     [ 'ИИ-воркшоп для вашей команды',   'ИИшнуться',          'https://kupdasha.ru/ai' ],
   ],
 
@@ -356,6 +358,7 @@ BLOCKS = {
             js_block(['app.js', 'waves.js', 'fun.js'], 'КОД САЙТА.')])),
     ],
     '7 страница спикера': [
+        ('0 в head страницы', speaker_head),
         ('1 страница спикера целиком', '\n\n'.join([
             css_block().replace("document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'",
                                 "var r=document.documentElement;r.dataset.ink=localStorage.getItem('kd-mode')==='dark'?'black':'white';r.dataset.theme='light'"),

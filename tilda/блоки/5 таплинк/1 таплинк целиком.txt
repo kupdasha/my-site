@@ -23,7 +23,7 @@ window.TAPLINK = {
   //  [ 'надпись в серьезной версии',   'надпись в веселой',  'куда ведет' ],
   buttons: [
     [ 'заказать дизайн-проект',         'что умею?',          'https://kupdasha.ru/' ],
-    [ 'позвать выступать',              'позвать',            'https://kupdasha.ru/profile' ],
+    [ 'пригласить спикером',            'позвать',            'https://kupdasha.ru/profile' ],
     [ 'ИИ-воркшоп для вашей команды',   'ИИшнуться',          'https://kupdasha.ru/ai' ],
   ],
 
@@ -60,7 +60,7 @@ window.TAPLINK = {
     <!-- классы tl-*: старые настройки в блоке страницы ищут .actions/.soc/.bio и подменяли бы тексты — теперь тексты и ссылки только отсюда -->
     <nav class="tl-actions" aria-label="Главное">
       <a class="btn" href="https://kupdasha.ru/" target="_blank" rel="noopener" data-serious="сайт портфолио" data-fun="что умею?"><span class="t">сайт портфолио</span></a>
-      <a class="btn" href="https://kupdasha.ru/profile" target="_blank" rel="noopener" data-serious="позвать выступать" data-fun="позвать"><span class="t">позвать выступать</span></a>
+      <a class="btn" href="https://kupdasha.ru/profile" target="_blank" rel="noopener" data-serious="пригласить спикером" data-fun="позвать"><span class="t">пригласить спикером</span></a>
       <a class="btn" href="https://kupdasha.ru/ai" target="_blank" rel="noopener" data-serious="ИИ-воркшоп для вашей команды" data-fun="ИИшнуться"><span class="t">ИИ-воркшоп для вашей команды</span></a>
     </nav>
     <nav class="tl-soc" aria-label="Соцсети">

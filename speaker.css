@@ -10,11 +10,17 @@
 .sp-btn-quiet,:root[data-ink] .sp-btn-quiet,:root[data-ink] .sp-btn-quiet:hover{background:var(--soft);color:var(--ink)}
 
 /* первый экран */
-.sp-hero{padding-top:clamp(120px,13vw,176px)}
-.sp-title{font-weight:500;font-size:clamp(44px,7.4vw,112px);line-height:1;margin-bottom:clamp(32px,4vw,56px)}
-.sp-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px clamp(32px,5vw,88px);align-items:start}
-.sp-lead{font-size:clamp(18px,1.5vw,21px);line-height:1.4;margin-bottom:18px}
-.sp-photo{position:relative;border-radius:var(--r-img);overflow:hidden;aspect-ratio:3/2;background:var(--soft)}
+.sp-hero{padding-top:clamp(108px,9.5vw,140px)}
+.sp-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:28px clamp(32px,5vw,88px);align-items:end}
+.sp-title{font-weight:500;line-height:1}
+.sp-name{display:block;font-size:clamp(46px,7vw,108px);letter-spacing:-.025em}
+.sp-dash{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}   /* тире читают поисковики и экранные дикторы, глазу оно не нужно */
+.sp-role{display:block;max-width:31ch;margin-top:clamp(14px,1.6vw,22px);font-size:clamp(22px,2.3vw,34px);line-height:1.15;color:var(--ink);opacity:.62;text-wrap:balance}
+.sp-intro{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px clamp(32px,5vw,88px);margin-top:clamp(28px,3.2vw,44px);padding-top:clamp(20px,2.2vw,28px);border-top:2px solid var(--line)}
+.sp-intro .sp-lead{margin:0;font-size:clamp(18px,1.5vw,21px);line-height:1.42}
+.sp-side{display:grid;gap:14px;align-content:start}
+.sp-side .sp-lead{font-size:clamp(17px,1.25vw,18px);line-height:1.45;opacity:.78}
+.sp-photo{position:relative;border-radius:var(--r-img);overflow:hidden;aspect-ratio:4/3;background:var(--soft)}
 .sp-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%;opacity:0;transform:scale(1.06);transition:opacity 1.2s var(--ease),transform 5s linear}
 .sp-photo img.on{opacity:1;transform:none}
 
@@ -64,6 +70,23 @@
 @keyframes sp-wave{from{transform:scale(.75);opacity:.8}to{transform:scale(2.2);opacity:0}}
 .sp-icon .stick{fill:none;stroke:var(--ink);stroke-width:9;stroke-linecap:round}
 
+/* где выступала */
+.sp-talks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(32px,5vw,88px);border-bottom:2px solid var(--line)}
+.sp-talk{display:grid;gap:4px;align-content:start;padding:clamp(16px,1.8vw,22px) 0;border-top:2px solid var(--line)}
+.sp-talk:last-child:nth-child(odd){grid-column:1 / -1}   /* нечетная последняя строка (жюри) — на всю ширину */
+.sp-talk b{font-weight:500;font-size:clamp(20px,1.8vw,26px);line-height:1.2}
+.sp-talk b .caps{font:inherit;letter-spacing:.02em}
+.sp-talk>span{font-family:var(--font-read);font-size:clamp(18px,1.4vw,20px);line-height:1.4;opacity:.72}
+.sp-talks-btn{margin-top:clamp(28px,3vw,40px)}
+
+/* материалы для анонса — полоса на всю ширину, цвета наоборот (на светлой версии черная) */
+.sp-band{margin-top:clamp(88px,11vw,160px);padding:clamp(64px,8vw,112px) 0;background:var(--ink);color:var(--bg)}
+.sp-band .btn-line,:root[data-ink] .sp-band .btn-line,:root[data-ink] .sp-band .btn-line:hover{background:var(--bg);color:var(--ink)}
+.sp-band .sp-seg button{border-color:color-mix(in srgb,currentColor 28%,transparent)}
+.sp-band .sp-seg button:hover,.sp-band .sp-seg button.on{border-color:currentColor}
+.sp-band .sp-bio-foot{border-top-color:color-mix(in srgb,currentColor 22%,transparent)}
+.sp-band ::selection{background:var(--accent);color:var(--accent-text)}
+
 /* био */
 .sp-bio{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px clamp(32px,5vw,88px);align-items:start}
 .sp-seg{display:inline-flex;gap:8px;margin-bottom:clamp(20px,2.4vw,32px)}
@@ -97,7 +120,7 @@
   .sp-tags{display:none}
 }
 @media (max-width:760px){
-  .sp-top{grid-template-columns:1fr}
+  .sp-top,.sp-intro{grid-template-columns:1fr}
   .sp-topic-head{grid-template-columns:48px minmax(0,1fr) 24px;gap:12px}
   .sp-icon{width:48px;height:48px}
   .sp-topic-name{font-size:20px;overflow-wrap:anywhere}
@@ -105,6 +128,7 @@
   .sp-seg{display:flex}
   .sp-seg button{flex:1;padding:0 6px 2px;text-align:center}
   .sp-shows{grid-template-columns:1fr}
+  .sp-talks{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){
   .sp-icon *{animation:none!important}
