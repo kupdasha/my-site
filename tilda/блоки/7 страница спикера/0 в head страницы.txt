@@ -3,6 +3,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": "https://kupdasha.ru/#person",
   "name": "Дарья Купцова",
   "alternateName": ["Даша Купцова", "Купяша"],
   "url": "https://kupdasha.ru/profile",
