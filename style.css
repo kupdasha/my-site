@@ -169,7 +169,7 @@ img,video{display:block;max-width:100%}
   background-image:linear-gradient(100deg,#E2FB5A,#7DE36A,#3FD3C9,#4F7BF2,#A65BEF,#E85BD0,#A65BEF,#4F7BF2,#3FD3C9,#7DE36A,#E2FB5A);
   background-size:300% 100%;animation:track 6s linear infinite}
 .switch>i::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:#fff;
-  box-shadow:0 2px 6px rgba(14,15,18,.28);transition:transform .55s var(--ease-io),width .25s var(--ease)}
+  transition:transform .55s var(--ease-io),width .25s var(--ease)}
 :root[data-theme="dark"] .switch>i::after{transform:translateX(28px)}
 /* при наведении ползунок тянется к другой стороне, при нажатии сплющивается */
 .switch:hover>i::after{transform:translateX(5px)}
