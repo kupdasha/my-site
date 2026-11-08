@@ -654,7 +654,14 @@ function lines(el){
   }
   return out;
 }
+let cardsCache = null, cardsAt = 0;
 function cards(){
+  const t = performance.now();
+  if (cardsCache && t - cardsAt < 200) return cardsCache;   // top — в координатах страницы, прокрутка его не портит
+  cardsAt = t;
+  return (cardsCache = cardsRaw());
+}
+function cardsRaw(){
   const out = [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
     const rect = () => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top }; };
     const r = rect();
@@ -664,7 +671,9 @@ function cards(){
     const b = el.getBoundingClientRect();
     if (b.bottom < -H || b.top > H * 2 || !b.width) return;
     lines(el).forEach((l, i) => {
-      const rect = () => lines(el)[i] || l;
+      // строка пересчитывается не чаще раза в 200 мс; хранится в координатах страницы, отдается в координатах окна
+      let lastT = performance.now(), last = { ...l, top: l.top + scrollY };
+      const rect = () => { const t = performance.now(); if (t - lastT > 200) { lastT = t; const q = lines(el)[i]; if (q) last = { ...q, top: q.top + scrollY }; } return { left: last.left, right: last.right, top: last.top - scrollY }; };
       out.push({ el, rect, left: l.left + 6, right: l.right - 6, top: l.top + scrollY, vtop: l.top });
     });
   });
@@ -744,6 +753,71 @@ function updateBug(dt, now){
 /* Рисуем пушистую гусеницу сбоку: пол — дорожка (рамка окна или край кейса), «верх» — от пола.
    По телу бежит волна от хвоста к голове: сегмент приподнимается горбиком, ножки-капельки
    поджимаются и мягко встают обратно. Голова с глазами (моргает), щечками и усиками */
+/* Заготовки: сегмент с шерсткой (SWAY положений колыхания) и голова (глаза открыты / закрыты)
+   рисуются один раз на отдельном холсте и дальше только ставятся на место — так в кадре ~30 картинок,
+   а не ~600 волосков */
+const SWAY = 6, SPR = new Map();
+function sprite(key, size, draw){
+  if (SPR.has(key)) return SPR.get(key);
+  const dpr = Math.min(2, devicePixelRatio || 1), c = document.createElement('canvas');
+  c.width = c.height = Math.ceil(size * dpr);
+  const g = c.getContext('2d'); g.scale(dpr, dpr); g.translate(size / 2, size / 2); g.lineCap = 'round'; g.lineJoin = 'round';
+  draw(g);
+  const o = { c, size }; SPR.set(key, o); return o;
+}
+function segR(k){ const n = C.segments; return C.size * (k === 0 ? 1.15 : 1 - Math.max(0, k - n * 0.65) / n * 0.9); }
+function segSprite(scheme, k, v){
+  const sc = C.colors[scheme], r = segR(k);
+  return sprite(`s${scheme}|${k}|${v}`, r * 3.4, g => {
+    g.fillStyle = sc.skin; g.beginPath(); g.arc(0, 0, r * 0.84, 0, Math.PI * 2); g.fill();
+    g.globalAlpha = 0.85;
+    for (const h of HAIRS[k]) {
+      const sw = Math.sin(v / SWAY * Math.PI * 2 + h.ph) * 0.18, a = h.ang + sw;
+      if (Math.sin(a) > 0.55) continue;   // снизу шерсти нет — там ножки
+      const r0 = r * 0.35, r1 = r * (0.82 + h.len * 0.45);
+      g.strokeStyle = sc.fur[h.c]; g.lineWidth = h.w;
+      g.beginPath(); g.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
+      g.quadraticCurveTo(Math.cos(a) * r1 * 0.7, Math.sin(a) * r1 * 0.7 - 1.5, Math.cos(a + sw * 0.5) * r1, Math.sin(a + sw * 0.5) * r1);
+      g.stroke();
+    }
+    g.globalAlpha = 1;
+    const hl = g.createRadialGradient(-r * 0.35, -r * 0.45, 1, 0, 0, r * 0.9);
+    hl.addColorStop(0, 'rgba(255,255,255,.45)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = hl; g.beginPath(); g.arc(0, 0, r * 0.9, 0, Math.PI * 2); g.fill();
+    if (k % 2) {
+      g.strokeStyle = sc.tuft; g.lineWidth = 2;
+      for (const d of [-0.35, 0, 0.35]) { const a = -1.57 + d + Math.sin(v / SWAY * Math.PI * 2 + k) * 0.1; g.beginPath(); g.moveTo(Math.cos(a) * r * 0.6, Math.sin(a) * r * 0.6); g.lineTo(Math.cos(a) * r * 1.45, Math.sin(a) * r * 1.45); g.stroke(); }
+      g.fillStyle = sc.tuft; g.beginPath(); g.arc(0, -r * 1.48, 1.8, 0, Math.PI * 2); g.fill();
+    }
+  });
+}
+function headSprite(scheme, blink){
+  const sc = C.colors[scheme], r = segR(0);
+  return sprite(`h${scheme}|${blink ? 1 : 0}`, r * 5, g => {
+    const hr = r * 0.88, hx = r * 0.35, hy = r * 0.1;
+    const hg = g.createRadialGradient(hx - hr * 0.35, hy - hr * 0.45, hr * 0.1, hx, hy, hr);
+    hg.addColorStop(0, sc.head[0]); hg.addColorStop(1, sc.head[1]);
+    g.fillStyle = hg; g.beginPath(); g.arc(hx, hy, hr, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = sc.dark; g.lineWidth = 1.8;
+    for (const d of [-1, 1]) {
+      const bx = hx + hr * (0.25 + d * 0.42), by = hy - hr * 1.55;
+      g.beginPath(); g.moveTo(hx + hr * (0.15 + d * 0.25), hy - hr * 0.8); g.quadraticCurveTo(hx + hr * (0.2 + d * 0.5), hy - hr * 1.2, bx, by); g.stroke();
+      g.fillStyle = sc.tuft; g.beginPath(); g.arc(bx, by, 2.8, 0, Math.PI * 2); g.fill();
+    }
+    const eye = (x, y, er) => {
+      if (blink) { g.strokeStyle = '#1D222A'; g.lineWidth = 1.6; g.beginPath(); g.arc(x, y - er * 0.2, er * 0.8, 0.5, Math.PI - 0.5); g.stroke(); return; }
+      g.fillStyle = '#fff'; g.beginPath(); g.ellipse(x, y, er, er * 1.1, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#1D222A'; g.beginPath(); g.arc(x + er * 0.2, y + er * 0.1, er * 0.68, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(x - er * 0.05, y - er * 0.25, er * 0.26, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.arc(x + er * 0.38, y + er * 0.32, er * 0.11, 0, Math.PI * 2); g.fill();
+    };
+    eye(hx + hr * 0.05, hy - hr * 0.12, hr * 0.3); eye(hx + hr * 0.6, hy - hr * 0.1, hr * 0.27);
+    g.fillStyle = 'rgba(255,150,195,.55)';
+    g.beginPath(); g.ellipse(hx + hr * 0.05, hy + hr * 0.38, hr * 0.2, hr * 0.11, 0, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.ellipse(hx + hr * 0.78, hy + hr * 0.36, hr * 0.14, hr * 0.1, 0, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#2A2440'; g.lineWidth = 1.5; g.beginPath(); g.arc(hx + hr * 0.42, hy + hr * 0.28, hr * 0.17, 0.3, 2.6); g.stroke();
+  });
+}
 function drawBug(){
   const sc = C.colors[bug.scheme % C.colors.length], n = C.segments, R = C.size, oy = -scrollY, now = performance.now();
   const wave = (bug.dist || 0) / C.stride * Math.PI * 2;
@@ -764,16 +838,13 @@ function drawBug(){
     }
     if (ux * want[0] + uy * want[1] < 0) { ux = -ux; uy = -uy; }
     const hump = ease(Math.max(0, Math.sin(wave + k * 0.62)));
-    const r = R * (k === 0 ? 1.15 : 1 - Math.max(0, k - n * 0.65) / n * 0.9);
+    const r = segR(k);
     const lift = R * 1.25 + hump * R * 0.7;
     segs.push({ gx: x, gy: y + oy, x: x + ux * lift, y: y + oy + uy * lift, fx, fy, dx: -ux, dy: -uy, r, hump, lift, k });
   }
   bug.drawn = segs.map(q => [q.x, q.y]);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   const local = (q, fn) => { ctx.save(); ctx.translate(q.x, q.y); ctx.transform(q.fx, q.fy, q.dx, q.dy, 0, 0); fn(); ctx.restore(); };
-  // тень — только когда пол снизу (на кейсе и на нижнем крае окна); на боках и сверху тени нет
-  ctx.fillStyle = 'rgba(0,0,0,.3)';
-  segs.forEach(q => { if (q.dy > 0.8) local(q, () => { ctx.beginPath(); ctx.ellipse(0, q.lift + 1, q.r * 0.95, 2.6, 0, 0, Math.PI * 2); ctx.fill(); }); });
   // ножки-капельки (тоньше): пара у каждого сегмента, кроме шеи и кончика хвоста
   for (let k = n - 1; k >= 2; k--) {
     if (k === n - 3) continue;
@@ -793,60 +864,16 @@ function drawBug(){
       }
     });
   }
-  // тело: от хвоста к голове, у каждого сегмента кожа, шерстка, мягкий блик, у каждого второго — кисточка
+  // тело: от хвоста к голове, каждый сегмент — готовая картинка (шерстка рисуется один раз, см. segSprite)
+  const sway = Math.floor(now / 140) % SWAY;
   for (let k = n - 1; k >= 1; k--) {
-    const q = segs[k], r = q.r;
-    local(q, () => {
-      ctx.fillStyle = sc.skin; ctx.beginPath(); ctx.arc(0, 0, r * 0.84, 0, Math.PI * 2); ctx.fill();
-      ctx.globalAlpha = 0.85;
-      for (const h of HAIRS[k]) {
-        const sw = Math.sin(now / 500 + h.ph + k) * 0.18, a = h.ang + sw;
-        if (Math.sin(a) > 0.55) continue;   // снизу шерсти нет — там ножки
-        const r0 = r * 0.35, r1 = r * (0.82 + h.len * 0.45);
-        ctx.strokeStyle = sc.fur[h.c]; ctx.lineWidth = h.w;
-        ctx.beginPath(); ctx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
-        ctx.quadraticCurveTo(Math.cos(a) * r1 * 0.7, Math.sin(a) * r1 * 0.7 - 1.5, Math.cos(a + sw * 0.5) * r1, Math.sin(a + sw * 0.5) * r1);
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-      const hl = ctx.createRadialGradient(-r * 0.35, -r * 0.45, 1, 0, 0, r * 0.9);
-      hl.addColorStop(0, 'rgba(255,255,255,.45)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = hl; ctx.beginPath(); ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2); ctx.fill();
-      if (k % 2) {
-        ctx.strokeStyle = sc.tuft; ctx.lineWidth = 2;
-        for (const d of [-0.35, 0, 0.35]) { const a = -1.57 + d + Math.sin(now / 500 + k) * 0.1; ctx.beginPath(); ctx.moveTo(Math.cos(a) * r * 0.6, Math.sin(a) * r * 0.6); ctx.lineTo(Math.cos(a) * r * 1.45, Math.sin(a) * r * 1.45); ctx.stroke(); }
-        ctx.fillStyle = sc.tuft; ctx.beginPath(); ctx.arc(0, -r * 1.48, 1.8, 0, Math.PI * 2); ctx.fill();
-      }
-    });
+    const q = segs[k], img = segSprite(bug.scheme % C.colors.length, k, (sway + k) % SWAY), S = img.size;
+    local(q, () => ctx.drawImage(img.c, -S / 2, -S / 2, S, S));
   }
   // голова; моргает раз в 2,5–6 с
   if (now > bug.blinkAt + 160) { if (!bug.nextBlink || now > bug.nextBlink) { bug.blinkAt = now; bug.nextBlink = now + rand(2500, 6000); } }
-  const blink = now - bug.blinkAt < 160;
-  const h = segs[0];
-  local(h, () => {
-    const hr = h.r * 0.88, hx = h.r * 0.35, hy = h.r * 0.1;
-    const hg = ctx.createRadialGradient(hx - hr * 0.35, hy - hr * 0.45, hr * 0.1, hx, hy, hr);
-    hg.addColorStop(0, sc.head[0]); hg.addColorStop(1, sc.head[1]);
-    ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(hx, hy, hr, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = sc.dark; ctx.lineWidth = 1.8;
-    for (const d of [-1, 1]) {
-      const bx = hx + hr * (0.25 + d * 0.42), by = hy - hr * 1.55 + Math.sin(now / 330 + d) * 2;
-      ctx.beginPath(); ctx.moveTo(hx + hr * (0.15 + d * 0.25), hy - hr * 0.8); ctx.quadraticCurveTo(hx + hr * (0.2 + d * 0.5), hy - hr * 1.2, bx, by); ctx.stroke();
-      ctx.fillStyle = sc.tuft; ctx.beginPath(); ctx.arc(bx, by, 2.8, 0, Math.PI * 2); ctx.fill();
-    }
-    const eye = (x, y, r) => {
-      if (blink) { ctx.strokeStyle = '#1D222A'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(x, y - r * 0.2, r * 0.8, 0.5, Math.PI - 0.5); ctx.stroke(); return; }
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(x, y, r, r * 1.1, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#1D222A'; ctx.beginPath(); ctx.arc(x + r * 0.2, y + r * 0.1, r * 0.68, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x - r * 0.05, y - r * 0.25, r * 0.26, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x + r * 0.38, y + r * 0.32, r * 0.11, 0, Math.PI * 2); ctx.fill();
-    };
-    eye(hx + hr * 0.05, hy - hr * 0.12, hr * 0.3); eye(hx + hr * 0.6, hy - hr * 0.1, hr * 0.27);
-    ctx.fillStyle = 'rgba(255,150,195,.55)';
-    ctx.beginPath(); ctx.ellipse(hx + hr * 0.05, hy + hr * 0.38, hr * 0.2, hr * 0.11, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(hx + hr * 0.78, hy + hr * 0.36, hr * 0.14, hr * 0.1, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#2A2440'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(hx + hr * 0.42, hy + hr * 0.28, hr * 0.17, 0.3, 2.6); ctx.stroke();
-  });
+  const h = segs[0], img = headSprite(bug.scheme % C.colors.length, now - bug.blinkAt < 160), S = img.size;
+  local(h, () => ctx.drawImage(img.c, -S / 2, -S / 2, S, S));
 }
 
 /* клик по гусенице — перекрашивается (по кругу расцветок из FUN.centipede.colors) */
@@ -1243,7 +1270,7 @@ function frame(now){
   stepRain();
   updateBug(dt, now);
   ctx.clearRect(0, 0, W, H);
-  drawBug();
+  if (cv.style.opacity !== '0') drawBug();   // ниже зоны гусеницы не рисуем вовсе
   updateUfo(dt, now);
   stepGlow();
 }
