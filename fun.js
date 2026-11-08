@@ -13,8 +13,8 @@
       Любую кнопку можно поймать: под курсором она замирает и дрожит.
    2. Заголовки разделов живут своей жизнью: буквы плывут, кружат,
       дерутся или собираются в смайлик.
-   3. Пушистая гусеница ползет волной по рамке окна, иногда спрыгивает на кейсы
-      и падает с одного на другой. Моргает; клик — перекрашивается, курсор на ней — разворачивается.
+   3. Гусеница с коротким ворсом ползет волной по рамке окна, по кейсам и строкам текста,
+      сползает с одного на другое. Клик — перекрашивается, курсор на ней — разворачивается.
    5. Струны направлений оставляют радужный шлейф и звучат как гитара.
       Звук включается после первого клика где угодно (так требует браузер).
    6. НЛО летает по всей странице и ворует лучом то, что видно на экране:
@@ -49,7 +49,7 @@ const FUN = {
   headings: ['float', 'fight', 'smile', 'orbit'],  // по очереди для заголовков разделов
   centipede: {
     segments: 14,      // пушистых сегментов в теле
-    spacing:  12,      // расстояние между сегментами, px
+    spacing:  10,      // расстояние между сегментами, px (меньше радиуса — тело без просветов)
     size:     11,      // радиус сегмента, px
     speed:    28,      // скорость, px в секунду
     stride:   20,      // на сколько px продвигается за одну волну по телу — шаг ножек привязан к пройденному пути
@@ -568,11 +568,11 @@ function bottomS(x){
 const bug = {
   mode: 'frame', s: 0, dir: 1, speed: C.speed, x: 0, y: 0, vy: 0,
   card: null, cardDir: 1, pauseUntil: 0, nextVisit: 0, scheme: 0, clicks: 0, trail: [], t: 0,
-  blinkAt: 0, drawn: [],
+  drawn: [],
 };
 // шерстка: у каждого сегмента свой набор волосков (угол, длина, толщина, оттенок) — задается один раз
-const HAIRS = Array.from({ length: C.segments }, () => Array.from({ length: 40 }, () =>
-  ({ ang: Math.random() * 6.283, len: 0.55 + Math.random() * 0.6, w: 0.8 + Math.random() * 1.1, c: Math.floor(Math.random() * 4), ph: Math.random() * 6 })));
+const HAIRS = Array.from({ length: C.segments }, () => Array.from({ length: 34 }, () =>
+  ({ ang: Math.random() * 6.283, len: 0.4 + Math.random() * 0.6, w: 0.6 + Math.random() * 0.7, c: Math.floor(Math.random() * 4), ph: Math.random() * 6 })));
 /* развернуться: голова приподнимается и дугой перекидывается назад, тело само проходит по этой дуге
    (оно повторяет путь головы). Дуга — полукруг над полом: от головы назад, через верх */
 const TURN_R = () => C.size * 1.6;
@@ -770,52 +770,40 @@ function segSprite(scheme, k, v){
   const sc = C.colors[scheme], r = segR(k);
   return sprite(`s${scheme}|${k}|${v}`, r * 3.4, g => {
     g.fillStyle = sc.skin; g.beginPath(); g.arc(0, 0, r * 0.84, 0, Math.PI * 2); g.fill();
-    g.globalAlpha = 0.85;
+    g.globalAlpha = 0.7;
     for (const h of HAIRS[k]) {
       const sw = Math.sin(v / SWAY * Math.PI * 2 + h.ph) * 0.18, a = h.ang + sw;
       if (Math.sin(a) > 0.55) continue;   // снизу шерсти нет — там ножки
-      const r0 = r * 0.35, r1 = r * (0.82 + h.len * 0.45);
+      const r0 = r * 0.5, r1 = r * (0.86 + h.len * 0.22);   // короткий ворс, без пышной шапки
       g.strokeStyle = sc.fur[h.c]; g.lineWidth = h.w;
       g.beginPath(); g.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
-      g.quadraticCurveTo(Math.cos(a) * r1 * 0.7, Math.sin(a) * r1 * 0.7 - 1.5, Math.cos(a + sw * 0.5) * r1, Math.sin(a + sw * 0.5) * r1);
+      g.quadraticCurveTo(Math.cos(a) * r1 * 0.8, Math.sin(a) * r1 * 0.8 - 0.6, Math.cos(a + sw * 0.5) * r1, Math.sin(a + sw * 0.5) * r1);
       g.stroke();
     }
     g.globalAlpha = 1;
     const hl = g.createRadialGradient(-r * 0.35, -r * 0.45, 1, 0, 0, r * 0.9);
-    hl.addColorStop(0, 'rgba(255,255,255,.45)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+    hl.addColorStop(0, 'rgba(255,255,255,.25)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = hl; g.beginPath(); g.arc(0, 0, r * 0.9, 0, Math.PI * 2); g.fill();
-    if (k % 2) {
-      g.strokeStyle = sc.tuft; g.lineWidth = 2;
-      for (const d of [-0.35, 0, 0.35]) { const a = -1.57 + d + Math.sin(v / SWAY * Math.PI * 2 + k) * 0.1; g.beginPath(); g.moveTo(Math.cos(a) * r * 0.6, Math.sin(a) * r * 0.6); g.lineTo(Math.cos(a) * r * 1.45, Math.sin(a) * r * 1.45); g.stroke(); }
-      g.fillStyle = sc.tuft; g.beginPath(); g.arc(0, -r * 1.48, 1.8, 0, Math.PI * 2); g.fill();
+    if (k % 2) {   // редкие светлые волоски на спинке, без шариков
+      g.strokeStyle = sc.tuft; g.lineWidth = 1.2; g.globalAlpha = 0.8;
+      for (const d of [-0.25, 0.25]) { const a = -1.57 + d + Math.sin(v / SWAY * Math.PI * 2 + k) * 0.1; g.beginPath(); g.moveTo(Math.cos(a) * r * 0.7, Math.sin(a) * r * 0.7); g.lineTo(Math.cos(a) * r * 1.25, Math.sin(a) * r * 1.25); g.stroke(); }
+      g.globalAlpha = 1;
     }
   });
 }
-function headSprite(scheme, blink){
+function headSprite(scheme){
   const sc = C.colors[scheme], r = segR(0);
-  return sprite(`h${scheme}|${blink ? 1 : 0}`, r * 5, g => {
-    const hr = r * 0.88, hx = r * 0.35, hy = r * 0.1;
+  return sprite(`h${scheme}`, r * 5, g => {
+    // голова без мордочки: гладкая, чуть темнее тела, с короткими усиками
+    const hr = r * 0.82, hx = r * 0.3, hy = r * 0.1;
     const hg = g.createRadialGradient(hx - hr * 0.35, hy - hr * 0.45, hr * 0.1, hx, hy, hr);
     hg.addColorStop(0, sc.head[0]); hg.addColorStop(1, sc.head[1]);
     g.fillStyle = hg; g.beginPath(); g.arc(hx, hy, hr, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = sc.dark; g.lineWidth = 1.8;
+    g.strokeStyle = sc.dark; g.lineWidth = 1.4;
     for (const d of [-1, 1]) {
-      const bx = hx + hr * (0.25 + d * 0.42), by = hy - hr * 1.55;
-      g.beginPath(); g.moveTo(hx + hr * (0.15 + d * 0.25), hy - hr * 0.8); g.quadraticCurveTo(hx + hr * (0.2 + d * 0.5), hy - hr * 1.2, bx, by); g.stroke();
-      g.fillStyle = sc.tuft; g.beginPath(); g.arc(bx, by, 2.8, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(hx + hr * (0.35 + d * 0.2), hy - hr * 0.75);
+      g.quadraticCurveTo(hx + hr * (0.55 + d * 0.3), hy - hr * 1.15, hx + hr * (0.8 + d * 0.3), hy - hr * 1.3); g.stroke();
     }
-    const eye = (x, y, er) => {
-      if (blink) { g.strokeStyle = '#1D222A'; g.lineWidth = 1.6; g.beginPath(); g.arc(x, y - er * 0.2, er * 0.8, 0.5, Math.PI - 0.5); g.stroke(); return; }
-      g.fillStyle = '#fff'; g.beginPath(); g.ellipse(x, y, er, er * 1.1, 0, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#1D222A'; g.beginPath(); g.arc(x + er * 0.2, y + er * 0.1, er * 0.68, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#fff'; g.beginPath(); g.arc(x - er * 0.05, y - er * 0.25, er * 0.26, 0, Math.PI * 2); g.fill();
-      g.beginPath(); g.arc(x + er * 0.38, y + er * 0.32, er * 0.11, 0, Math.PI * 2); g.fill();
-    };
-    eye(hx + hr * 0.05, hy - hr * 0.12, hr * 0.3); eye(hx + hr * 0.6, hy - hr * 0.1, hr * 0.27);
-    g.fillStyle = 'rgba(255,150,195,.55)';
-    g.beginPath(); g.ellipse(hx + hr * 0.05, hy + hr * 0.38, hr * 0.2, hr * 0.11, 0, 0, Math.PI * 2); g.fill();
-    g.beginPath(); g.ellipse(hx + hr * 0.78, hy + hr * 0.36, hr * 0.14, hr * 0.1, 0, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = '#2A2440'; g.lineWidth = 1.5; g.beginPath(); g.arc(hx + hr * 0.42, hy + hr * 0.28, hr * 0.17, 0.3, 2.6); g.stroke();
   });
 }
 function drawBug(){
@@ -839,7 +827,7 @@ function drawBug(){
     if (ux * want[0] + uy * want[1] < 0) { ux = -ux; uy = -uy; }
     const hump = ease(Math.max(0, Math.sin(wave + k * 0.62)));
     const r = segR(k);
-    const lift = R * 1.25 + hump * R * 0.7;
+    const lift = R * 1.25 + hump * R * 0.45;
     segs.push({ gx: x, gy: y + oy, x: x + ux * lift, y: y + oy + uy * lift, fx, fy, dx: -ux, dy: -uy, r, hump, lift, k });
   }
   bug.drawn = segs.map(q => [q.x, q.y]);
@@ -864,15 +852,21 @@ function drawBug(){
       }
     });
   }
+  // сплошное тело под шерсткой: сегменты соединены, даже когда горбик поднимается
+  ctx.strokeStyle = sc.skin;
+  for (let k = n - 1; k >= 1; k--) {
+    const a = segs[k], b = segs[k - 1];
+    ctx.lineWidth = Math.min(a.r, b.r) * 1.7;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
   // тело: от хвоста к голове, каждый сегмент — готовая картинка (шерстка рисуется один раз, см. segSprite)
   const sway = Math.floor(now / 140) % SWAY;
   for (let k = n - 1; k >= 1; k--) {
     const q = segs[k], img = segSprite(bug.scheme % C.colors.length, k, (sway + k) % SWAY), S = img.size;
     local(q, () => ctx.drawImage(img.c, -S / 2, -S / 2, S, S));
   }
-  // голова; моргает раз в 2,5–6 с
-  if (now > bug.blinkAt + 160) { if (!bug.nextBlink || now > bug.nextBlink) { bug.blinkAt = now; bug.nextBlink = now + rand(2500, 6000); } }
-  const h = segs[0], img = headSprite(bug.scheme % C.colors.length, now - bug.blinkAt < 160), S = img.size;
+  // голова
+  const h = segs[0], img = headSprite(bug.scheme % C.colors.length), S = img.size;
   local(h, () => ctx.drawImage(img.c, -S / 2, -S / 2, S, S));
 }
 
