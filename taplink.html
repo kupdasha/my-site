@@ -69,7 +69,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 /* соцсети в веселой версии тоже на ножках: ножки светло-серые, плитки разбегаются кто куда */
 :root[data-mode="fun"] .tl-soc{gap:calc(26px*var(--k))}
 :root[data-mode="fun"] .tl-soc a{position:relative;isolation:isolate;z-index:3;will-change:translate}
-:root[data-mode="fun"] .tl-soc a{flex:0 0 auto;padding:0 15px 2px}   /* длинные русские надписи («фотографирую») не обрезаются: плитка по надписи */
+:root[data-mode="fun"] .tl-soc a{flex:0 0 auto;min-width:calc((100% - 16px) / 3);padding:0 22px 2px}   /* как было: плитка не уже трети ряда, длинные надписи шире */   /* длинные русские надписи («фотографирую») не обрезаются: плитка по надписи */
 .legs i:nth-child(1){left:16%}.legs i:nth-child(2){left:34%}.legs i:nth-child(3){left:66%}.legs i:nth-child(4){left:84%}
 
 /* соцсети — сетка 3×3, как в исходном таплинке */
@@ -77,6 +77,9 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 .tl-soc{display:flex;flex-direction:column;gap:calc(8px*var(--k))}
 /* серьезная версия: три одинаковые колонки (просьба 08.11); в веселой плитки по надписи — они все равно разбегаются */
 .tl-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(8px*var(--k))}
+/* первый ряд (VK, Яндекс Музыка, MAX): «Яндекс Музыка» по надписи и целиком, VK и MAX поровну по краям — ряд край в край с нижними */
+.tl-row:first-child{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+.tl-row:first-child a[href*="music.yandex"]{padding:0 24px 2px}
 :root[data-mode="fun"] .tl-row{display:flex;justify-content:center}
 .tl-soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 10px 2px;border-radius:99px;background:var(--soft);font-size:18px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
 /* при наведении — цвет самой соцсети, текст контрастный */
