@@ -13,8 +13,8 @@
       Любую кнопку можно поймать: под курсором она замирает и дрожит.
    2. Заголовки разделов живут своей жизнью: буквы плывут, кружат,
       дерутся или собираются в смайлик.
-   3. Гусеница с коротким ворсом ползет волной по рамке окна, по кейсам и строкам текста,
-      сползает с одного на другое. Клик — перекрашивается, курсор на ней — разворачивается.
+   3. Многоножка ползет по рамке окна, иногда спрыгивает на кейсы
+      и падает с одного на другой. Клик — перекрашивается, второй — убегает.
    5. Струны направлений оставляют радужный шлейф и звучат как гитара.
       Звук включается после первого клика где угодно (так требует браузер).
    6. НЛО летает по всей странице и ворует лучом то, что видно на экране:
@@ -48,23 +48,22 @@ const FUN = {
   // атрибутом у кнопки: data-mood="run" | "sleep" | "hug" | "push" | "clash"
   headings: ['float', 'fight', 'smile', 'orbit'],  // по очереди для заголовков разделов
   centipede: {
-    segments: 11,      // сегментов в теле
-    spacing:  10,      // расстояние между сегментами, px (меньше радиуса — тело без просветов)
-    size:     12,      // радиус сегмента, px (пухлее — не похожа на сколопендру)
-    speed:    28,      // скорость, px в секунду
-    stride:   20,      // на сколько px продвигается за одну волну по телу — шаг ножек привязан к пройденному пути
-    inset:    3,       // отступ дорожки (пола под ножками) от края окна, px
-    insetTop: 3,       // то же сверху
+    segments: 16,      // сегментов в теле
+    spacing:  11,      // расстояние между сегментами, px
+    size:     6,       // половина ширины тела, px
+    speed:    55,      // скорость, px в секунду
+    inset:    14,      // отступ дорожки от края окна, px
     corner:   60,      // скругление дорожки в углах, px
-    visitEvery: [7, 14],  // раз в сколько секунд уходит с рамки на кейсы и текст (от, до)
+    visitEvery: [12, 22], // раз в сколько секунд спрыгивает на кейсы (от, до)
     zone:     0.6,     // на сколько экранов ниже начала списка кейсов еще живет (дальше исчезает)
-    // гусеница светлая, цвет дает голографический перелив поверх (HOLO) — как у переключателя версий;
-    // клик сдвигает перелив на следующий оттенок
+    // расцветки по кругу (меняются по клику)
     colors: [
-      { fur: ['#F4F6FF', '#E6EAF5', '#FFFFFF', '#C9CFE0'], skin: '#C3C9DC', tuft: '#FFFFFF', head: ['#FFFFFF', '#C9CFE0'], leg: '#D3D7E2', dark: '#A7AEBD' },
+      { body: ['#E2FB5A', '#C6E244'], head: '#E2FB5A', legs: '#C9CDD6', boots: '#F4F4F6' },
+      { body: ['#F4F4F6', '#D4D5D9'], head: '#F4F4F6', legs: '#9AA1AD', boots: '#E2FB5A' },
+      { body: ['#B79FF3', '#9C84E6'], head: '#B79FF3', legs: '#C9CDD6', boots: '#F4F4F6' },
+      { body: ['#7DAFFC', '#5E93EE'], head: '#7DAFFC', legs: '#C9CDD6', boots: '#F4F4F6' },
+      { body: ['#F3E94A', '#7DE36A', '#3FD3C9', '#4F7BF2', '#A65BEF', '#E85BD0'], head: '#F4F4F6', legs: '#C9CDD6', boots: '#F4F4F6' },
     ],
-    holo: ['#D4F542', '#8BE36B', '#4FD9A8', '#3FD3C9', '#9BE86A', '#C8F06A'],   // перелив в зеленых: лаймовый, зеленый, мятный, бирюзовый
-    holoAlpha: 0.72,
   },
   guitar: {
     // струна над первой строкой и под каждой строкой — сверху вниз
@@ -541,66 +540,33 @@ function sizeCanvas(){
   const dpr = Math.min(2, devicePixelRatio || 1);
   W = innerWidth; H = innerHeight;
   cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const R = C.corner, a = W - 2 * C.inset - 2 * R, b = H - C.inset - C.insetTop - 2 * R;
+  const R = C.corner, a = W - 2 * C.inset - 2 * R, b = H - 2 * C.inset - 2 * R;
   L = 2 * a + 2 * b + 2 * Math.PI * R;
 }
 /* точка на дорожке-рамке по пройденному пути s (в координатах окна) */
 function at(s){
-  const R = C.corner, i = C.inset, T = C.insetTop, a = W - 2 * i - 2 * R, b = H - i - T - 2 * R, q = Math.PI * R / 2;
+  const R = C.corner, i = C.inset, a = W - 2 * i - 2 * R, b = H - 2 * i - 2 * R, q = Math.PI * R / 2;
   s = ((s % L) + L) % L;
   const arc = (cx, cy, from, k) => { const ang = from + k / R; return [cx + Math.cos(ang) * R, cy + Math.sin(ang) * R]; };
-  if (s < a) return [i + R + s, T];                         s -= a;
-  if (s < q) return arc(W - i - R, T + R, -Math.PI / 2, s); s -= q;
-  if (s < b) return [W - i, T + R + s];                     s -= b;
+  if (s < a) return [i + R + s, i];                         s -= a;
+  if (s < q) return arc(W - i - R, i + R, -Math.PI / 2, s); s -= q;
+  if (s < b) return [W - i, i + R + s];                     s -= b;
   if (s < q) return arc(W - i - R, H - i - R, 0, s);        s -= q;
   if (s < a) return [W - i - R - s, H - i];                 s -= a;
   if (s < q) return arc(i + R, H - i - R, Math.PI / 2, s);  s -= q;
   if (s < b) return [i, H - i - R - s];                     s -= b;
-  return arc(i + R, T + R, Math.PI, s);
+  return arc(i + R, i + R, Math.PI, s);
 }
 /* путь по нижнему краю рамки для точки x — чтобы вернуться на рамку после падения */
 function bottomS(x){
-  const R = C.corner, i = C.inset, a = W - 2 * i - 2 * R, b = H - i - C.insetTop - 2 * R, q = Math.PI * R / 2;
+  const R = C.corner, i = C.inset, a = W - 2 * i - 2 * R, b = H - 2 * i - 2 * R, q = Math.PI * R / 2;
   return a + q + b + q + Math.min(a, Math.max(0, W - i - R - x));
 }
 
 const bug = {
   mode: 'frame', s: 0, dir: 1, speed: C.speed, x: 0, y: 0, vy: 0,
   card: null, cardDir: 1, pauseUntil: 0, nextVisit: 0, scheme: 0, clicks: 0, trail: [], t: 0,
-  drawn: [],
 };
-// шерстка: у каждого сегмента свой набор волосков (угол, длина, толщина, оттенок) — задается один раз
-const HAIRS = Array.from({ length: C.segments }, () => Array.from({ length: 34 }, () =>
-  ({ ang: Math.random() * 6.283, len: 0.4 + Math.random() * 0.6, w: 0.6 + Math.random() * 0.7, c: Math.floor(Math.random() * 4), ph: Math.random() * 6 })));
-/* развернуться: голова приподнимается и дугой перекидывается назад, тело само проходит по этой дуге
-   (оно повторяет путь головы). Дуга — полукруг над полом: от головы назад, через верх */
-const TURN_R = () => C.size * 1.6;
-function inward(x, y){   // куда «вверх» от пола в этой точке (координаты страницы)
-  return bug.mode === 'frame' ? [W / 2 - x, H / 2 - (y - scrollY)] : [0, -1];
-}
-function startTurn(){
-  const [hx, hy] = bug.trail[0], [bx, by] = bug.trail[Math.min(6, bug.trail.length - 1)];
-  let fx = hx - bx, fy = hy - by; const fl = Math.hypot(fx, fy) || 1; fx /= fl; fy /= fl;
-  let ux = fy, uy = -fx; const w = inward(hx, hy); if (ux * w[0] + uy * w[1] < 0) { ux = -ux; uy = -uy; }
-  const r = TURN_R();
-  bug.turn = { cx: hx - fx * r, cy: hy - fy * r, fx, fy, ux, uy, r, th: 0 };
-  bug.loop = { cx: bug.turn.cx, cy: bug.turn.cy, r, until: Infinity };
-}
-function stepTurn(dt){
-  const t = bug.turn;
-  t.th = Math.min(Math.PI, t.th + bug.speed * dt / t.r);
-  bug.x = t.cx + t.fx * t.r * Math.cos(t.th) + t.ux * t.r * Math.sin(t.th);
-  bug.y = t.cy + t.fy * t.r * Math.cos(t.th) + t.uy * t.r * Math.sin(t.th);
-  if (t.th < Math.PI) return;
-  // приземлилась головой назад — дальше ползет в обратную сторону
-  bug.turn = null;
-  bug.loop.until = (bug.dist || 0) + C.segments * C.spacing + t.r * 4;
-  if (bug.mode === 'frame') {
-    let best = 0, bd = 1e9;
-    for (let s = 0; s < L; s += 2) { const [x, y] = at(s), d = Math.hypot(x - bug.x, y + scrollY - bug.y); if (d < bd) { bd = d; best = s; } }
-    bug.s = best; bug.dir = -bug.dir;
-  } else bug.cardDir = -bug.cardDir;
-}
 function resetTrail(){
   bug.trail = [];
   for (let k = 0; k < (C.segments + 2) * C.spacing; k += 3) {
@@ -639,51 +605,18 @@ function bugZone(){
 }
 const onCasesPage = () => !!document.getElementById('workList');
 /* кейсы, на которые можно спрыгнуть: верхний край превью в координатах страницы (кроме тех, что под инеем) */
-/* где можно ползать, кроме рамки: верхние края превью кейсов и строки крупного текста
-   (заголовки, первый экран): по строке ползет, с края строки сползает на следующую */
-const TEXT_SURF = '#hero .h1, #hero .hero-sub, #hero .lead, .h2, .sec-note, .dir h3, .work h3, .nda-item h3, .contact h2, .about-page .big, .sp-lead';
-function lines(el){
-  const rg = document.createRange(); rg.selectNodeContents(el);
-  const out = [], fs = parseFloat(getComputedStyle(el).fontSize) || 16;
-  for (const q of rg.getClientRects()) {
-    if (q.width < 4 || q.height < 8) continue;
-    const ln = out.find(l => Math.abs(l.top - q.top) < q.height * 0.5);
-    if (ln) { ln.left = Math.min(ln.left, q.left); ln.right = Math.max(ln.right, q.right); }
-    else out.push({ top: q.top + q.height * 0.5 - fs * 0.22, left: q.left, right: q.right });   // пол — верх строчных букв (середина строки минус пол-x-высоты)
-  }
-  return out;
-}
-let cardsCache = null, cardsAt = 0;
 function cards(){
-  const t = performance.now();
-  if (cardsCache && t - cardsAt < 200) return cardsCache;   // top — в координатах страницы, прокрутка его не портит
-  cardsAt = t;
-  return (cardsCache = cardsRaw());
+  return [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
+    const r = el.getBoundingClientRect();
+    return { el, left: r.left + 12, right: r.right - 12, top: r.top + scrollY, vtop: r.top };
+  }).filter(c => c.right - c.left > 80);
 }
-function cardsRaw(){
-  const out = [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
-    const rect = () => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top }; };
-    const r = rect();
-    return { el, rect, left: r.left + 12, right: r.right - 12, top: r.top + scrollY, vtop: r.top };
-  });
-  document.querySelectorAll(TEXT_SURF).forEach(el => {
-    const b = el.getBoundingClientRect();
-    if (b.bottom < -H || b.top > H * 2 || !b.width) return;
-    lines(el).forEach((l, i) => {
-      // строка пересчитывается не чаще раза в 200 мс; хранится в координатах страницы, отдается в координатах окна
-      let lastT = performance.now(), last = { ...l, top: l.top + scrollY };
-      const rect = () => { const t = performance.now(); if (t - lastT > 200) { lastT = t; const q = lines(el)[i]; if (q) last = { ...q, top: q.top + scrollY }; } return { left: last.left, right: last.right, top: last.top - scrollY }; };
-      out.push({ el, rect, left: l.left + 6, right: l.right - 6, top: l.top + scrollY, vtop: l.top });
-    });
-  });
-  return out.filter(c => c.right - c.left > 80);
-}
-const STAND = () => 1;   // дорожка — это пол, на котором стоят ножки
+const STAND = () => C.size * 1.1;   // насколько тело выше края, на котором стоит
 
 function updateBug(dt, now){
   // прокрутка: на рамке многоножка остается на месте экрана, на кейсе — едет со страницей
   const ds = scrollY - lastScroll; lastScroll = scrollY;
-  if (bug.mode === 'frame' && ds) { bug.trail.forEach(p => p[1] += ds); if (bug.turn) { bug.turn.cy += ds; bug.y += ds; } if (bug.loop) bug.loop.cy += ds; }
+  if (bug.mode === 'frame' && ds) bug.trail.forEach(p => p[1] += ds);
   // ниже своей зоны многоножка гаснет и возвращается на рамку
   const inZone = bugZone();
   cv.style.opacity = inZone ? 1 : 0;
@@ -692,28 +625,23 @@ function updateBug(dt, now){
   bug.speed += (C.speed - bug.speed) * 0.02;
   const moving = now > bug.pauseUntil;
   bug.t += dt * (moving ? bug.speed / C.speed : 0.25);
-  // волна по телу и шаги ножек идут ровно с пройденным путем: быстрее ползет — чаще шагает
-  if (moving && bug.mode !== 'fall') bug.dist = (bug.dist || 0) + bug.speed * dt * (bug.mode === 'walk' ? 1.4 : 1);
-  // курсор на гусенице — разворачивается в другую сторону; следующий раз — когда курсор уйдет с нее
-  const cursorDist = bug.drawn.reduce((m, q) => Math.min(m, Math.hypot(q[0] - px, q[1] - py)), 1e9);
-  if (cursorDist > C.size * 4) bug.dodged = false;
-  if (cursorDist < C.size * 1.6 && !bug.dodged && !bug.turn && (bug.mode === 'frame' || bug.mode === 'edge')) { bug.dodged = true; startTurn(); }
-  if (bug.loop && (bug.dist || 0) > bug.loop.until) bug.loop = null;
-  if (bug.turn) {
-    if (bug.mode === 'edge') { const r = bug.card.rect(); bug.card.top = r.top + scrollY; }
-    stepTurn(dt); pushHead(); return;
-  }
+  const headScreenY = bug.y - scrollY;
+  // курсор у головы — один резкий разворот; следующий только после того, как курсор отойдет
+  const cursorDist = Math.hypot(bug.x - px, headScreenY - py);
+  if (cursorDist > 160) bug.dodged = false;
+  const scared = cursorDist < 80 && !bug.dodged;
+  if (scared) bug.dodged = true;
 
   if (bug.mode === 'frame') {
+    if (scared) { bug.dir = -bug.dir; bug.speed = C.speed * 3.5; }
     if (moving) bug.s += bug.dir * bug.speed * dt;
     const [x, y] = at(bug.s); bug.x = x; bug.y = y + scrollY;
     // пора прогуляться по кейсам
     if (now > bug.nextVisit) {
       bug.nextVisit = now + rand(...C.visitEvery) * 1000;
-      const near = cards().filter(c => c.vtop > 120 && c.vtop < H - 120);
+      const near = cards().filter(c => c.vtop > 120 && c.vtop < H - 200);
       if (near.length) {
-        // одна из трех ближайших — так она бывает и на тексте, и на кейсах
-        const c = near.sort((a, b) => Math.hypot(a.left - bug.x, a.top - bug.y) - Math.hypot(b.left - bug.x, b.top - bug.y))[Math.floor(Math.random() * Math.min(3, near.length))];
+        const c = near.reduce((a, b) => (Math.hypot(a.left - bug.x, a.top - bug.y) < Math.hypot(b.left - bug.x, b.top - bug.y) ? a : b));
         const fromLeft = Math.abs(bug.x - c.left) < Math.abs(bug.x - c.right);
         bug.card = c; bug.cardDir = fromLeft ? 1 : -1;
         bug.mode = 'walk'; bug.tx = fromLeft ? c.left : c.right; bug.ty = c.top - STAND();
@@ -726,8 +654,9 @@ function updateBug(dt, now){
     else { bug.x += dx / d * step; bug.y += dy / d * step; }
   } else if (bug.mode === 'edge') {
     // ползет по верхнему краю превью
-    const c = bug.card, r = c.rect(), pad = c.el.matches('.media, .nda-media') ? 12 : 6;
-    c.left = r.left + pad; c.right = r.right - pad; c.top = r.top + scrollY;
+    const c = bug.card, r = c.el.getBoundingClientRect();
+    c.left = r.left + 12; c.right = r.right - 12; c.top = r.top + scrollY;
+    if (scared) { bug.cardDir = -bug.cardDir; bug.speed = C.speed * 3; }
     if (moving) bug.x += bug.cardDir * bug.speed * dt;
     bug.y = c.top - STAND();
     if (bug.x > c.right || bug.x < c.left) { bug.x = Math.min(c.right + 14, Math.max(c.left - 14, bug.x)); bug.mode = 'fall'; bug.vy = 0; }
@@ -749,146 +678,80 @@ function updateBug(dt, now){
   pushHead();
 }
 
-/* Рисуем пушистую гусеницу сбоку: пол — дорожка (рамка окна или край кейса), «верх» — от пола.
-   По телу бежит волна от хвоста к голове: сегмент приподнимается горбиком, ножки-капельки
-   поджимаются и мягко встают обратно. Голова с глазами (моргает), щечками и усиками */
-/* Заготовки: сегмент с шерсткой (SWAY положений колыхания) и голова (глаза открыты / закрыты)
-   рисуются один раз на отдельном холсте и дальше только ставятся на место — так в кадре ~30 картинок,
-   а не ~600 волосков */
-const SWAY = 6, SPR = new Map();
-function sprite(key, size, draw){
-  if (SPR.has(key)) return SPR.get(key);
-  const dpr = Math.min(2, devicePixelRatio || 1), c = document.createElement('canvas');
-  c.width = c.height = Math.ceil(size * dpr);
-  const g = c.getContext('2d'); g.scale(dpr, dpr); g.translate(size / 2, size / 2); g.lineCap = 'round'; g.lineJoin = 'round';
-  draw(g);
-  const o = { c, size }; SPR.set(key, o); return o;
-}
-function segR(k){ const n = C.segments; return C.size * (k === 0 ? 1.15 : 1 - Math.max(0, k - n * 0.65) / n * 0.9); }
-function segSprite(scheme, k, v){
-  const sc = C.colors[scheme], r = segR(k);
-  return sprite(`s${scheme}|${k}|${v}`, r * 3.4, g => {
-    g.fillStyle = sc.skin; g.beginPath(); g.arc(0, 0, r * 0.84, 0, Math.PI * 2); g.fill();
-    g.globalAlpha = 0.7;
-    for (const h of HAIRS[k]) {
-      const sw = Math.sin(v / SWAY * Math.PI * 2 + h.ph) * 0.18, a = h.ang + sw;
-      if (Math.sin(a) > 0.55) continue;   // снизу шерсти нет — там ножки
-      const r0 = r * 0.5, r1 = r * (0.86 + h.len * 0.22);   // короткий ворс, без пышной шапки
-      g.strokeStyle = sc.fur[h.c]; g.lineWidth = h.w;
-      g.beginPath(); g.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
-      g.quadraticCurveTo(Math.cos(a) * r1 * 0.8, Math.sin(a) * r1 * 0.8 - 0.6, Math.cos(a + sw * 0.5) * r1, Math.sin(a + sw * 0.5) * r1);
-      g.stroke();
-    }
-    g.globalAlpha = 1;
-    const hl = g.createRadialGradient(-r * 0.35, -r * 0.45, 1, 0, 0, r * 0.9);
-    hl.addColorStop(0, 'rgba(255,255,255,.25)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = hl; g.beginPath(); g.arc(0, 0, r * 0.9, 0, Math.PI * 2); g.fill();
-    if (k % 2) {   // редкие светлые волоски на спинке, без шариков
-      g.strokeStyle = sc.tuft; g.lineWidth = 1.2; g.globalAlpha = 0.8;
-      for (const d of [-0.25, 0.25]) { const a = -1.57 + d + Math.sin(v / SWAY * Math.PI * 2 + k) * 0.1; g.beginPath(); g.moveTo(Math.cos(a) * r * 0.7, Math.sin(a) * r * 0.7); g.lineTo(Math.cos(a) * r * 1.25, Math.sin(a) * r * 1.25); g.stroke(); }
-      g.globalAlpha = 1;
-    }
-  });
-}
-function headSprite(scheme){
-  const sc = C.colors[scheme], r = segR(0);
-  return sprite(`h${scheme}`, r * 5, g => {
-    // голова без мордочки: гладкая (усики рисуются в кадре, они качаются)
-    const hr = r * 0.82, hx = r * 0.3, hy = 0;
-    const hg = g.createRadialGradient(hx - hr * 0.35, hy - hr * 0.45, hr * 0.1, hx, hy, hr);
-    hg.addColorStop(0, sc.head[0]); hg.addColorStop(1, sc.head[1]);
-    g.fillStyle = hg; g.beginPath(); g.arc(hx, hy, hr, 0, Math.PI * 2); g.fill();
-  });
-}
+/* Рисуем многоножку: сегменты-капсулы, тонкие ножки с круглыми ступнями,
+   на хвостовой паре — маленькие сапожки, голова с глазками и усиками */
 function drawBug(){
-  const sc = C.colors[bug.scheme % C.colors.length], n = C.segments, R = C.size, oy = -scrollY, now = performance.now();
-  const wave = (bug.dist || 0) / C.stride * Math.PI * 2;
-  // куда «вверх» у каждой точки тела: на рамке — внутрь окна, на кейсе и в полете — вверх экрана
-  const cx = W / 2, cy = H / 2;
-  const segs = [];
+  const sc = C.colors[bug.scheme % C.colors.length], n = C.segments, sz = C.size, oy = -scrollY;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const pts = [];
   for (let k = 0; k < n; k++) {
     const d = k * C.spacing;
-    const [x, y] = sample(d), [xa, ya] = sample(Math.max(0, d - 4)), [xb, yb] = sample(d + 4);
-    let fx = xa - xb, fy = ya - yb; const fl = Math.hypot(fx, fy) || 1; fx /= fl; fy /= fl;
-    let ux = fy, uy = -fx;   // перпендикуляр к телу
-    let want = bug.mode === 'frame' ? [cx - x, cy - (y + oy)] : [0, -1];
-    // на дуге разворота «верх» — наружу от дуги (шерстка снаружи, ножки внутри)
-    const lp = bug.loop;
-    if (lp && Math.hypot(x - lp.cx, y - lp.cy) < lp.r * 1.8) {
-      const wl = Math.hypot(want[0], want[1]) || 1, ox = x - lp.cx, oy2 = y - lp.cy, ol = Math.hypot(ox, oy2) || 1;
-      want = [ox / ol + want[0] / wl * 0.6, oy2 / ol + want[1] / wl * 0.6];
+    const [x, y] = sample(d), [xa, ya] = sample(Math.max(0, d - 3)), [xb, yb] = sample(d + 3);
+    let tx = xa - xb, ty = ya - yb; const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
+    pts.push({ x, y: y + oy, tx, ty, nx: -ty, ny: tx });
+  }
+  // ножки: тонкие, с коленцем, шагают волной
+  for (let k = 1; k < n; k++) {
+    const p = pts[k], booted = k === n - 1;
+    for (const side of [-1, 1]) {
+      const step = Math.sin(bug.t * 10 - k * 0.7 + (side > 0 ? 0 : Math.PI));
+      const bx = p.x + p.nx * side * sz * 0.7, by = p.y + p.ny * side * sz * 0.7;
+      const kx = bx + p.nx * side * sz * 0.8 + p.tx * step * sz * 0.3, ky = by + p.ny * side * sz * 0.8 + p.ty * step * sz * 0.3;
+      const fx = kx + p.nx * side * sz * 0.5 + p.tx * (step * 0.6 - 0.3) * sz, fy = ky + p.ny * side * sz * 0.5 + p.ty * (step * 0.6 - 0.3) * sz;
+      ctx.strokeStyle = sc.legs; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
+      if (booted) {
+        ctx.fillStyle = sc.boots;
+        ctx.save(); ctx.translate(fx, fy); ctx.rotate(Math.atan2(p.ty, p.tx));
+        ctx.beginPath(); ctx.ellipse(1.2, 0, 3, 2.1, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.fillStyle = sc.legs; ctx.beginPath(); ctx.arc(fx, fy, 1.3, 0, Math.PI * 2); ctx.fill();
+      }
     }
-    if (ux * want[0] + uy * want[1] < 0) { ux = -ux; uy = -uy; }
-    const hump = ease(Math.max(0, Math.sin(wave + k * 0.62)));
-    const r = segR(k);
-    const lift = R * 1.2 + hump * R * 0.35;   // над полом — длина ножек
-    segs.push({ gx: x, gy: y + oy, x: x + ux * lift, y: y + oy + uy * lift, fx, fy, dx: -ux, dy: -uy, r, hump, lift, k });
   }
-  bug.drawn = segs.map(q => [q.x, q.y]);
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  const local = (q, fn) => { ctx.save(); ctx.translate(q.x, q.y); ctx.transform(q.fx, q.fy, q.dx, q.dy, 0, 0); fn(); ctx.restore(); };
-  // ножки как у настоящей гусеницы: три пары спереди и пухлые ложноножки сзади, в середине их нет;
-  // видна только сторона у пола — так она не похожа на сколопендру. Шагают в такт пути
-  const LEGS = [1, 2, 3, n - 5, n - 4, n - 3, n - 1];
-  ctx.fillStyle = sc.leg; ctx.strokeStyle = sc.leg; ctx.lineCap = 'round';
-  for (const k of LEGS) {
-    const q = segs[k], up = q.hump;
-    local(q, () => {
-      const front = k <= 3, w = q.r * (front ? 0.22 : 0.34);
-      const hx = 0, hy = q.r * 0.6, fx = Math.cos(wave + k * 0.62) * up * 2.5, fy = q.lift - up * 4;
-      ctx.lineWidth = w * 2; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(fx, fy - w * 0.4); ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(fx, fy - w * 0.3, w * 1.15, w * 0.75, 0, 0, Math.PI * 2); ctx.fill();
-    });
-  }
-  // сплошное тело под шерсткой: сегменты соединены, даже когда горбик поднимается
-  ctx.strokeStyle = sc.skin;
+  // тело
   for (let k = n - 1; k >= 1; k--) {
-    const a = segs[k], b = segs[k - 1];
-    ctx.lineWidth = Math.min(a.r, b.r) * 1.7;
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-  }
-  // тело: от хвоста к голове, каждый сегмент — готовая картинка (шерстка рисуется один раз, см. segSprite)
-  const sway = Math.floor(now / 140) % SWAY;
-  for (let k = n - 1; k >= 1; k--) {
-    const q = segs[k], img = segSprite(bug.scheme % C.colors.length, k, (sway + k) % SWAY), S = img.size;
-    local(q, () => ctx.drawImage(img.c, -S / 2, -S / 2, S, S));
+    const p = pts[k], w = sz * (1 - Math.max(0, k - n * 0.7) / n * 0.9);
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.atan2(p.ty, p.tx));
+    ctx.fillStyle = sc.body[k % sc.body.length];
+    ctx.beginPath(); ctx.ellipse(0, 0, C.spacing * 0.6, w, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
   }
   // голова
-  const h = segs[0], img = headSprite(bug.scheme % C.colors.length), S = img.size;
-  local(h, () => {
-    // два коротких рожка на макушке, чуть покачиваются
-    const hr = h.r * 0.82, hx = h.r * 0.3;
-    ctx.strokeStyle = sc.dark; ctx.fillStyle = sc.dark; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
-    for (const side of [-0.35, 0.35]) {
-      const a = -Math.PI / 2 + side + Math.sin(now / 400 + side * 5) * 0.08, bx = hx + Math.cos(a) * hr * 1.45, by = Math.sin(a) * hr * 1.45;
-      ctx.beginPath(); ctx.moveTo(hx + Math.cos(a) * hr * 0.7, Math.sin(a) * hr * 0.7); ctx.lineTo(bx, by); ctx.stroke();
-      ctx.beginPath(); ctx.arc(bx, by, 1.6, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.drawImage(img.c, -S / 2, -S / 2, S, S);
-  });
-  // голографический перелив: поверх уже нарисованной гусеницы (source-atop красит только ее),
-  // полосы оттенков вдоль тела медленно текут; клик (bug.scheme) сдвигает их на один оттенок
-  const tail = segs[n - 1], ax = h.x - tail.x, ay = h.y - tail.y, al = Math.hypot(ax, ay) || 1;
-  const ux = ax / al, uy = ay / al, Lh = C.spacing * n * 0.9, shift = (now / 4000 + bug.scheme / C.holo.length) % 1;
-  const x0 = tail.x - ux * Lh * shift, y0 = tail.y - uy * Lh * shift;
-  const gr = ctx.createLinearGradient(x0 - uy * 20, y0 + ux * 20, x0 + ux * Lh * 2 + uy * 20, y0 + uy * Lh * 2 - ux * 20);
-  const hc = C.holo, m = hc.length * 2;
-  for (let i = 0; i <= m; i++) gr.addColorStop(i / m, hc[i % hc.length]);
-  let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
-  segs.forEach(q => { minX = Math.min(minX, q.x); maxX = Math.max(maxX, q.x); minY = Math.min(minY, q.y); maxY = Math.max(maxY, q.y); });
-  ctx.save(); ctx.globalCompositeOperation = 'source-atop'; ctx.globalAlpha = C.holoAlpha; ctx.fillStyle = gr;
-  ctx.fillRect(minX - R * 4, minY - R * 4, maxX - minX + R * 8, maxY - minY + R * 8);
+  const h = pts[0], R = sz * 1.2, ang = Math.atan2(h.ty, h.tx);
+  ctx.strokeStyle = sc.legs; ctx.lineWidth = 1.4;
+  for (const side of [-1, 1]) {
+    const a = side * (0.5 + Math.sin(bug.t * 4 + side) * 0.2);
+    const dx = h.tx * Math.cos(a) + h.nx * Math.sin(a), dy = h.ty * Math.cos(a) + h.ny * Math.sin(a);
+    ctx.beginPath(); ctx.moveTo(h.x + dx * R * 0.6, h.y + dy * R * 0.6);
+    ctx.quadraticCurveTo(h.x + h.tx * R * 1.8 + h.nx * side * R * 0.3, h.y + h.ty * R * 1.8 + h.ny * side * R * 0.3, h.x + dx * R * 2.4, h.y + dy * R * 2.4);
+    ctx.stroke();
+  }
+  ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(ang);
+  ctx.fillStyle = sc.head; ctx.beginPath(); ctx.ellipse(0, 0, R * 1.05, R, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#1D222A';
+  for (const side of [-1, 1]) { ctx.beginPath(); ctx.arc(R * 0.45, side * R * 0.45, R * 0.17, 0, Math.PI * 2); ctx.fill(); }
   ctx.restore();
 }
 
-/* клик по гусенице — перекрашивается (по кругу расцветок из FUN.centipede.colors) */
+/* клик по многоножке: первый — перекрашивается, второй — убегает */
 addEventListener('click', e => {
   if (!on || !bugZone()) return;
-  if (!bug.drawn.some(q => Math.hypot(q[0] - e.clientX, q[1] - e.clientY) < C.size * 1.5)) return;
-  bug.scheme++;
-  if (++bug.clicks === 1) joke('bug');
+  for (let k = 0; k < C.segments; k++) {
+    const [x, y] = sample(k * C.spacing);
+    if (Math.hypot(x - e.clientX, y - scrollY - e.clientY) < 18) {
+      bug.clicks++;
+      if (bug.clicks % 2) { bug.scheme++; joke('bug'); }
+      else {
+        joke('bugRun');
+        if (bug.mode === 'frame') { bug.dir = -bug.dir; bug.speed = C.speed * 5; }
+        else if (bug.mode === 'edge') { bug.mode = 'fall'; bug.vy = 0; }
+      }
+      return;
+    }
+  }
 });
-
 
 
 /* ================================================================
@@ -1275,7 +1138,7 @@ function frame(now){
   stepRain();
   updateBug(dt, now);
   ctx.clearRect(0, 0, W, H);
-  if (cv.style.opacity !== '0') drawBug();   // ниже зоны гусеницы не рисуем вовсе
+  drawBug();
   updateUfo(dt, now);
   stepGlow();
 }
