@@ -112,6 +112,12 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 
 /* планшет и большой экран: все крупнее, колонка шире */
 @media (min-width:600px) and (min-height:640px){
+  /* тумблер крупнее на планшете */
+  .switch{height:54px;gap:12px;font-size:20px}
+  .switch>span{width:104px}
+  .switch>i{width:76px;height:44px}
+  .switch>i::after{top:5px;left:5px;width:34px;height:34px}
+  :root[data-mode="fun"] .switch>i::after{transform:translateX(32px)}
   .col{max-width:540px;gap:calc(34px*var(--k))}
   h1{font-size:calc(58px*var(--k))}
   .tl-bio{font-size:21px;margin-top:calc(16px*var(--k))}
@@ -143,7 +149,11 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   :root[data-mode="fun"] .tl-actions{gap:calc(32px*var(--k))}
   .tl-soc a{height:calc(64px*var(--k));font-size:23px}
   :root[data-mode="fun"] .tl-soc{row-gap:calc(30px*var(--k))}
-  .switch{font-size:18px}
+  .switch{height:60px;gap:14px;font-size:22px}
+  .switch>span{width:116px}
+  .switch>i{width:86px;height:50px}
+  .switch>i::after{top:6px;left:6px;width:38px;height:38px}
+  :root[data-mode="fun"] .switch>i::after{transform:translateX(36px)}
   .legal{max-width:480px;font-size:13px}
 }
 @media (prefers-reduced-motion:reduce){.switch>i{animation:none}}
