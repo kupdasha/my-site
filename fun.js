@@ -56,7 +56,7 @@ const FUN = {
     inset:    3,       // отступ дорожки (пола под ножками) от края окна, px
     insetTop: 3,       // то же сверху
     corner:   60,      // скругление дорожки в углах, px
-    visitEvery: [12, 22], // раз в сколько секунд спрыгивает на кейсы (от, до)
+    visitEvery: [7, 14],  // раз в сколько секунд уходит с рамки на кейсы и текст (от, до)
     zone:     0.6,     // на сколько экранов ниже начала списка кейсов еще живет (дальше исчезает)
     // расцветки по кругу (меняются по клику): шерстка (4 оттенка), кожа под ней, кисточки, голова, ножки
     colors: [
@@ -573,16 +573,34 @@ const bug = {
 // шерстка: у каждого сегмента свой набор волосков (угол, длина, толщина, оттенок) — задается один раз
 const HAIRS = Array.from({ length: C.segments }, () => Array.from({ length: 40 }, () =>
   ({ ang: Math.random() * 6.283, len: 0.55 + Math.random() * 0.6, w: 0.8 + Math.random() * 1.1, c: Math.floor(Math.random() * 4), ph: Math.random() * 6 })));
-/* развернуться: хвост становится головой (на рамке — найти место хвоста на дорожке) */
-function turnAround(){
-  bug.trail.reverse();
-  [bug.x, bug.y] = bug.trail[0];
+/* развернуться: голова приподнимается и дугой перекидывается назад, тело само проходит по этой дуге
+   (оно повторяет путь головы). Дуга — полукруг над полом: от головы назад, через верх */
+const TURN_R = () => C.size * 1.6;
+function inward(x, y){   // куда «вверх» от пола в этой точке (координаты страницы)
+  return bug.mode === 'frame' ? [W / 2 - x, H / 2 - (y - scrollY)] : [0, -1];
+}
+function startTurn(){
+  const [hx, hy] = bug.trail[0], [bx, by] = bug.trail[Math.min(6, bug.trail.length - 1)];
+  let fx = hx - bx, fy = hy - by; const fl = Math.hypot(fx, fy) || 1; fx /= fl; fy /= fl;
+  let ux = fy, uy = -fx; const w = inward(hx, hy); if (ux * w[0] + uy * w[1] < 0) { ux = -ux; uy = -uy; }
+  const r = TURN_R();
+  bug.turn = { cx: hx - fx * r, cy: hy - fy * r, fx, fy, ux, uy, r, th: 0 };
+  bug.loop = { cx: bug.turn.cx, cy: bug.turn.cy, r, until: Infinity };
+}
+function stepTurn(dt){
+  const t = bug.turn;
+  t.th = Math.min(Math.PI, t.th + bug.speed * dt / t.r);
+  bug.x = t.cx + t.fx * t.r * Math.cos(t.th) + t.ux * t.r * Math.sin(t.th);
+  bug.y = t.cy + t.fy * t.r * Math.cos(t.th) + t.uy * t.r * Math.sin(t.th);
+  if (t.th < Math.PI) return;
+  // приземлилась головой назад — дальше ползет в обратную сторону
+  bug.turn = null;
+  bug.loop.until = (bug.dist || 0) + C.segments * C.spacing + t.r * 4;
   if (bug.mode === 'frame') {
     let best = 0, bd = 1e9;
-    for (let s = 0; s < L; s += 4) { const [x, y] = at(s), d = Math.hypot(x - bug.x, y + scrollY - bug.y); if (d < bd) { bd = d; best = s; } }
+    for (let s = 0; s < L; s += 2) { const [x, y] = at(s), d = Math.hypot(x - bug.x, y + scrollY - bug.y); if (d < bd) { bd = d; best = s; } }
     bug.s = best; bug.dir = -bug.dir;
-  } else if (bug.mode === 'edge') bug.cardDir = -bug.cardDir;
-  bug.speed = C.speed * 2;
+  } else bug.cardDir = -bug.cardDir;
 }
 function resetTrail(){
   bug.trail = [];
@@ -622,18 +640,42 @@ function bugZone(){
 }
 const onCasesPage = () => !!document.getElementById('workList');
 /* кейсы, на которые можно спрыгнуть: верхний край превью в координатах страницы (кроме тех, что под инеем) */
+/* где можно ползать, кроме рамки: верхние края превью кейсов и строки крупного текста
+   (заголовки, первый экран): по строке ползет, с края строки сползает на следующую */
+const TEXT_SURF = '#hero .h1, #hero .hero-sub, #hero .lead, .h2, .sec-note, .dir h3, .work h3, .nda-item h3, .contact h2, .about-page .big, .sp-lead';
+function lines(el){
+  const rg = document.createRange(); rg.selectNodeContents(el);
+  const out = [], fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+  for (const q of rg.getClientRects()) {
+    if (q.width < 4 || q.height < 8) continue;
+    const ln = out.find(l => Math.abs(l.top - q.top) < q.height * 0.5);
+    if (ln) { ln.left = Math.min(ln.left, q.left); ln.right = Math.max(ln.right, q.right); }
+    else out.push({ top: q.top + q.height * 0.5 - fs * 0.22, left: q.left, right: q.right });   // пол — верх строчных букв (середина строки минус пол-x-высоты)
+  }
+  return out;
+}
 function cards(){
-  return [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
-    const r = el.getBoundingClientRect();
-    return { el, left: r.left + 12, right: r.right - 12, top: r.top + scrollY, vtop: r.top };
-  }).filter(c => c.right - c.left > 80);
+  const out = [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
+    const rect = () => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top }; };
+    const r = rect();
+    return { el, rect, left: r.left + 12, right: r.right - 12, top: r.top + scrollY, vtop: r.top };
+  });
+  document.querySelectorAll(TEXT_SURF).forEach(el => {
+    const b = el.getBoundingClientRect();
+    if (b.bottom < -H || b.top > H * 2 || !b.width) return;
+    lines(el).forEach((l, i) => {
+      const rect = () => lines(el)[i] || l;
+      out.push({ el, rect, left: l.left + 6, right: l.right - 6, top: l.top + scrollY, vtop: l.top });
+    });
+  });
+  return out.filter(c => c.right - c.left > 80);
 }
 const STAND = () => 1;   // дорожка — это пол, на котором стоят ножки
 
 function updateBug(dt, now){
   // прокрутка: на рамке многоножка остается на месте экрана, на кейсе — едет со страницей
   const ds = scrollY - lastScroll; lastScroll = scrollY;
-  if (bug.mode === 'frame' && ds) bug.trail.forEach(p => p[1] += ds);
+  if (bug.mode === 'frame' && ds) { bug.trail.forEach(p => p[1] += ds); if (bug.turn) { bug.turn.cy += ds; bug.y += ds; } if (bug.loop) bug.loop.cy += ds; }
   // ниже своей зоны многоножка гаснет и возвращается на рамку
   const inZone = bugZone();
   cv.style.opacity = inZone ? 1 : 0;
@@ -647,7 +689,12 @@ function updateBug(dt, now){
   // курсор на гусенице — разворачивается в другую сторону; следующий раз — когда курсор уйдет с нее
   const cursorDist = bug.drawn.reduce((m, q) => Math.min(m, Math.hypot(q[0] - px, q[1] - py)), 1e9);
   if (cursorDist > C.size * 4) bug.dodged = false;
-  if (cursorDist < C.size * 1.6 && !bug.dodged && (bug.mode === 'frame' || bug.mode === 'edge')) { bug.dodged = true; turnAround(); }
+  if (cursorDist < C.size * 1.6 && !bug.dodged && !bug.turn && (bug.mode === 'frame' || bug.mode === 'edge')) { bug.dodged = true; startTurn(); }
+  if (bug.loop && (bug.dist || 0) > bug.loop.until) bug.loop = null;
+  if (bug.turn) {
+    if (bug.mode === 'edge') { const r = bug.card.rect(); bug.card.top = r.top + scrollY; }
+    stepTurn(dt); pushHead(); return;
+  }
 
   if (bug.mode === 'frame') {
     if (moving) bug.s += bug.dir * bug.speed * dt;
@@ -655,9 +702,10 @@ function updateBug(dt, now){
     // пора прогуляться по кейсам
     if (now > bug.nextVisit) {
       bug.nextVisit = now + rand(...C.visitEvery) * 1000;
-      const near = cards().filter(c => c.vtop > 120 && c.vtop < H - 200);
+      const near = cards().filter(c => c.vtop > 120 && c.vtop < H - 120);
       if (near.length) {
-        const c = near.reduce((a, b) => (Math.hypot(a.left - bug.x, a.top - bug.y) < Math.hypot(b.left - bug.x, b.top - bug.y) ? a : b));
+        // одна из трех ближайших — так она бывает и на тексте, и на кейсах
+        const c = near.sort((a, b) => Math.hypot(a.left - bug.x, a.top - bug.y) - Math.hypot(b.left - bug.x, b.top - bug.y))[Math.floor(Math.random() * Math.min(3, near.length))];
         const fromLeft = Math.abs(bug.x - c.left) < Math.abs(bug.x - c.right);
         bug.card = c; bug.cardDir = fromLeft ? 1 : -1;
         bug.mode = 'walk'; bug.tx = fromLeft ? c.left : c.right; bug.ty = c.top - STAND();
@@ -670,8 +718,8 @@ function updateBug(dt, now){
     else { bug.x += dx / d * step; bug.y += dy / d * step; }
   } else if (bug.mode === 'edge') {
     // ползет по верхнему краю превью
-    const c = bug.card, r = c.el.getBoundingClientRect();
-    c.left = r.left + 12; c.right = r.right - 12; c.top = r.top + scrollY;
+    const c = bug.card, r = c.rect(), pad = c.el.matches('.media, .nda-media') ? 12 : 6;
+    c.left = r.left + pad; c.right = r.right - pad; c.top = r.top + scrollY;
     if (moving) bug.x += bug.cardDir * bug.speed * dt;
     bug.y = c.top - STAND();
     if (bug.x > c.right || bug.x < c.left) { bug.x = Math.min(c.right + 14, Math.max(c.left - 14, bug.x)); bug.mode = 'fall'; bug.vy = 0; }
@@ -707,7 +755,13 @@ function drawBug(){
     const [x, y] = sample(d), [xa, ya] = sample(Math.max(0, d - 4)), [xb, yb] = sample(d + 4);
     let fx = xa - xb, fy = ya - yb; const fl = Math.hypot(fx, fy) || 1; fx /= fl; fy /= fl;
     let ux = fy, uy = -fx;   // перпендикуляр к телу
-    const want = bug.mode === 'frame' ? [cx - x, cy - (y + oy)] : [0, -1];
+    let want = bug.mode === 'frame' ? [cx - x, cy - (y + oy)] : [0, -1];
+    // на дуге разворота «верх» — наружу от дуги (шерстка снаружи, ножки внутри)
+    const lp = bug.loop;
+    if (lp && Math.hypot(x - lp.cx, y - lp.cy) < lp.r * 1.8) {
+      const wl = Math.hypot(want[0], want[1]) || 1, ox = x - lp.cx, oy2 = y - lp.cy, ol = Math.hypot(ox, oy2) || 1;
+      want = [ox / ol + want[0] / wl * 0.6, oy2 / ol + want[1] / wl * 0.6];
+    }
     if (ux * want[0] + uy * want[1] < 0) { ux = -ux; uy = -uy; }
     const hump = ease(Math.max(0, Math.sin(wave + k * 0.62)));
     const r = R * (k === 0 ? 1.15 : 1 - Math.max(0, k - n * 0.65) / n * 0.9);
