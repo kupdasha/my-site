@@ -77,6 +77,10 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 /* три в ряд; если в последнем ряду две плитки — встают по центру */
 .tl-soc a{grid-column:span 2}
 .tl-soc a:nth-last-child(2):nth-child(3n+1){grid-column:2 / span 2}
+/* «Яндекс Музыка» не влезает в обычную плитку — отдельной строкой шириной в две плитки по центру; Instagram и Unsplash над ней тоже по центру */
+.tl-soc a[href*="music.yandex"]{grid-column:2 / span 4}
+:root[data-mode="fun"] .tl-soc a[href*="music.yandex"]{grid-column:3 / span 2}   /* в веселой «пою» короткое — обычная плитка */
+.tl-soc a:nth-child(7):nth-last-child(3){grid-column:2 / span 2}
 .tl-soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 8px 2px;border-radius:99px;background:var(--soft);font-size:18px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
 /* при наведении — цвет самой соцсети, текст контрастный */
 .tl-soc a:hover{background:var(--brand);color:var(--brand-text,#fff)}
@@ -89,6 +93,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 .tl-soc a[href*="youtube"]{--brand:#FF0000;--legc:#FF0000}
 .tl-soc a[href*="instagram"]{--brand:linear-gradient(45deg,#5B51D8,#833AB4,#C13584,#E1306C);--legc:#A2348F}
 .tl-soc a[href*="unsplash"]{--brand:#111111;--legc:#F4F4F6}
+.tl-soc a[href*="music.yandex"]{--brand:#FFCC00;--brand-text:#1D222A;--legc:#FFCC00}
 .tl-soc a[href*="behance"]{--brand:#1769FF;--legc:#1769FF}
 /* веселая версия: плитки сразу в цвете своей соцсети, ножки того же цвета (у черных TikTok и Unsplash — фирменные бирюзовый и белый, иначе на темном не видно) */
 :root[data-mode="fun"] .tl-soc a{background:var(--brand);color:var(--brand-text,#fff)}
@@ -180,6 +185,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
       <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener" data-serious="YouTube" data-fun="видеоблог"><span class="t">YouTube</span></a>
       <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener" data-serious="Instagram*" data-fun="инста*"><span class="t">Instagram*</span></a>
       <a href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener" data-serious="Unsplash" data-fun="фотографирую"><span class="t">Unsplash</span></a>
+      <a href="https://music.yandex.ru/album/44857387" target="_blank" rel="noopener" data-serious="Яндекс Музыка" data-fun="пою"><span class="t">Яндекс&nbsp;Музыка</span></a>
     </nav>
   </div>
 
