@@ -170,10 +170,10 @@ img,video{display:block;max-width:100%}
      бирюзовый, синий, фиолетовый к розовому и обратно — красный и оранжевый пропускаем), без темных и грязных смешений; по краю — дисперсия.
      Только CSS (@property), на загрузку не влияет */
   background:radial-gradient(64% 100% at var(--tx) var(--ty),oklch(.76 .25 calc(var(--th) - 40deg)),oklch(.76 .25 calc(var(--th) - 40deg) / 0)),oklch(.86 .2 var(--th));
-  animation:track 12s ease-in-out infinite alternate,trackMove 7s ease-in-out infinite alternate}
+  animation:track 4s ease-in-out infinite alternate,trackMove 2.4s ease-in-out infinite alternate,trackDisp 1.3s ease-in-out infinite alternate}
 .switch>i::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 0 0 7px 2px rgba(255,255,255,.4),inset 2px 1px 3px rgba(0,229,255,.7),inset -2px -1px 3px rgba(255,64,214,.7)}   /* дисперсия: голубая и розовая кайма по краю */
-.switch>i::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff 55%,#F1F4FF);box-shadow:-2px -1px 2.5px rgba(0,229,255,.85),2px 1px 2.5px rgba(255,64,214,.85);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 0 0 7px 2px rgba(255,255,255,.4),inset var(--td) 1px 3px rgba(0,229,255,.75),inset calc(var(--td) * -1) -1px 3px rgba(255,64,214,.75)}   /* дисперсия: голубая и розовая кайма по краю */
+.switch>i::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff 55%,#F1F4FF);box-shadow:calc(var(--td) * -1) -1px 2.5px rgba(0,229,255,.9),var(--td) 1px 2.5px rgba(255,64,214,.9);
   transition:transform .55s var(--ease-io),width .25s var(--ease)}
 :root[data-theme="dark"] .switch>i::after{transform:translateX(28px)}
 /* при наведении ползунок тянется к другой стороне, при нажатии сплющивается */
@@ -185,6 +185,8 @@ img,video{display:block;max-width:100%}
 @property --tx{syntax:'<percentage>';inherits:false;initial-value:65%}
 @property --ty{syntax:'<percentage>';inherits:false;initial-value:70%}
 @keyframes track{from{--th:155deg}to{--th:330deg}}
+@property --td{syntax:'<length>';inherits:true;initial-value:2px}
+@keyframes trackDisp{from{--td:-2.5px}to{--td:2.5px}}   /* дисперсия покачивается, как блик в стекле */
 @keyframes trackMove{0%{--tx:65%;--ty:75%}33%{--tx:35%;--ty:25%}66%{--tx:80%;--ty:35%}100%{--tx:45%;--ty:80%}}
 
 /* Привлекаем внимание, пока переключателем ни разу не пользовались:
@@ -221,7 +223,7 @@ img,video{display:block;max-width:100%}
 @keyframes iris{to{background-position:300% 0,0 0}}
 
 /* серьезная версия: вокруг дорожки тумблера расходится мягкое кольцо — чтобы его точно заметили */
-:root:not([data-theme="dark"]) .switch>i{animation:track 12s ease-in-out infinite alternate,trackMove 7s ease-in-out infinite alternate,switchRing 2.8s var(--ease) infinite}
+:root:not([data-theme="dark"]) .switch>i{animation:track 4s ease-in-out infinite alternate,trackMove 2.4s ease-in-out infinite alternate,trackDisp 1.3s ease-in-out infinite alternate,switchRing 2.8s var(--ease) infinite}
 @keyframes switchRing{0%{box-shadow:0 0 0 0 rgba(166,91,239,.4)}70%,100%{box-shadow:0 0 0 12px rgba(166,91,239,0)}}
 .lead{font-size:clamp(18px,1.6vw,22px);line-height:1.35;max-width:36ch}
 .hero-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 48px;margin-top:clamp(28px,4vw,56px)}
