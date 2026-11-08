@@ -69,10 +69,14 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 /* соцсети в веселой версии тоже на ножках: ножки светло-серые, плитки разбегаются кто куда */
 :root[data-mode="fun"] .tl-soc{row-gap:calc(26px*var(--k))}
 :root[data-mode="fun"] .tl-soc a{position:relative;isolation:isolate;z-index:3;will-change:translate}
+:root[data-mode="fun"] .tl-soc a{min-width:100%;width:max-content;justify-self:center}   /* длинные русские надписи («фотографирую») не обрезаются: плитка по надписи */
 .legs i:nth-child(1){left:16%}.legs i:nth-child(2){left:34%}.legs i:nth-child(3){left:66%}.legs i:nth-child(4){left:84%}
 
 /* соцсети — сетка 3×3, как в исходном таплинке */
-.tl-soc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(8px*var(--k))}
+.tl-soc{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:calc(8px*var(--k))}
+/* три в ряд; если в последнем ряду две плитки — встают по центру */
+.tl-soc a{grid-column:span 2}
+.tl-soc a:nth-last-child(2):nth-child(3n+1){grid-column:2 / span 2}
 .tl-soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 6px 2px;border-radius:14px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
 /* при наведении — цвет самой соцсети, текст контрастный */
 .tl-soc a:hover{background:var(--brand);color:var(--brand-text,#fff)}
@@ -167,15 +171,14 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
     </nav>
 
     <nav class="tl-soc" aria-label="Соцсети">
-      <a href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://vk.com/odnakavychka" target="_blank" rel="noopener">VK</a>
-      <a href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener">MAX</a>
-      <a href="https://t.me/kupdasha" target="_blank" rel="noopener">Telegram</a>
-      <a href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener">TikTok</a>
-      <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener">YouTube</a>
-      <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener">Instagram*</a>
-      <a href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener">Unsplash</a>
-      <a href="https://www.behance.net/kupdaria" target="_blank" rel="noopener">Behance</a>
+      <a href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener" data-serious="LinkedIn" data-fun="ликн"><span class="t">LinkedIn</span></a>
+      <a href="https://vk.com/odnakavychka" target="_blank" rel="noopener" data-serious="VK" data-fun="вконтакте"><span class="t">VK</span></a>
+      <a href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener" data-serious="MAX" data-fun="макс"><span class="t">MAX</span></a>
+      <a href="https://t.me/kupdasha" target="_blank" rel="noopener" data-serious="Telegram" data-fun="Telegram"><span class="t">Telegram</span></a>
+      <a href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener" data-serious="TikTok" data-fun="тик так"><span class="t">TikTok</span></a>
+      <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener" data-serious="YouTube" data-fun="видеоблог"><span class="t">YouTube</span></a>
+      <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener" data-serious="Instagram*" data-fun="инста*"><span class="t">Instagram*</span></a>
+      <a href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener" data-serious="Unsplash" data-fun="фотографирую"><span class="t">Unsplash</span></a>
     </nav>
   </div>
 
