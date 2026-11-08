@@ -51,9 +51,10 @@ const FUN = {
     segments: 14,      // пушистых сегментов в теле
     spacing:  12,      // расстояние между сегментами, px
     size:     11,      // радиус сегмента, px
-    speed:    45,      // скорость, px в секунду
-    inset:    14,      // отступ дорожки от края окна, px
-    insetTop: 84,      // сверху — ниже шапки, чтобы гусеница не закрывала меню
+    speed:    28,      // скорость, px в секунду
+    stride:   20,      // на сколько px продвигается за одну волну по телу — шаг ножек привязан к пройденному пути
+    inset:    3,       // отступ дорожки (пола под ножками) от края окна, px
+    insetTop: 3,       // то же сверху
     corner:   60,      // скругление дорожки в углах, px
     visitEvery: [12, 22], // раз в сколько секунд спрыгивает на кейсы (от, до)
     zone:     0.6,     // на сколько экранов ниже начала списка кейсов еще живет (дальше исчезает)
@@ -641,6 +642,8 @@ function updateBug(dt, now){
   bug.speed += (C.speed - bug.speed) * 0.02;
   const moving = now > bug.pauseUntil;
   bug.t += dt * (moving ? bug.speed / C.speed : 0.25);
+  // волна по телу и шаги ножек идут ровно с пройденным путем: быстрее ползет — чаще шагает
+  if (moving && bug.mode !== 'fall') bug.dist = (bug.dist || 0) + bug.speed * dt * (bug.mode === 'walk' ? 1.4 : 1);
   // курсор на гусенице — разворачивается в другую сторону; следующий раз — когда курсор уйдет с нее
   const cursorDist = bug.drawn.reduce((m, q) => Math.min(m, Math.hypot(q[0] - px, q[1] - py)), 1e9);
   if (cursorDist > C.size * 4) bug.dodged = false;
@@ -695,6 +698,7 @@ function updateBug(dt, now){
    поджимаются и мягко встают обратно. Голова с глазами (моргает), щечками и усиками */
 function drawBug(){
   const sc = C.colors[bug.scheme % C.colors.length], n = C.segments, R = C.size, oy = -scrollY, now = performance.now();
+  const wave = (bug.dist || 0) / C.stride * Math.PI * 2;
   // куда «вверх» у каждой точки тела: на рамке — внутрь окна, на кейсе и в полете — вверх экрана
   const cx = W / 2, cy = H / 2;
   const segs = [];
@@ -705,7 +709,7 @@ function drawBug(){
     let ux = fy, uy = -fx;   // перпендикуляр к телу
     const want = bug.mode === 'frame' ? [cx - x, cy - (y + oy)] : [0, -1];
     if (ux * want[0] + uy * want[1] < 0) { ux = -ux; uy = -uy; }
-    const hump = ease(Math.max(0, Math.sin(bug.t * 3 + k * 0.62)));
+    const hump = ease(Math.max(0, Math.sin(wave + k * 0.62)));
     const r = R * (k === 0 ? 1.15 : 1 - Math.max(0, k - n * 0.65) / n * 0.9);
     const lift = R * 1.25 + hump * R * 0.7;
     segs.push({ gx: x, gy: y + oy, x: x + ux * lift, y: y + oy + uy * lift, fx, fy, dx: -ux, dy: -uy, r, hump, lift, k });
@@ -713,9 +717,9 @@ function drawBug(){
   bug.drawn = segs.map(q => [q.x, q.y]);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   const local = (q, fn) => { ctx.save(); ctx.translate(q.x, q.y); ctx.transform(q.fx, q.fy, q.dx, q.dy, 0, 0); fn(); ctx.restore(); };
-  // тень на полу
-  ctx.fillStyle = 'rgba(0,0,0,.35)';
-  segs.forEach(q => local(q, () => { ctx.beginPath(); ctx.ellipse(0, q.lift + 1, q.r * 0.95, 2.6, 0, 0, Math.PI * 2); ctx.fill(); }));
+  // тень — только когда пол снизу (на кейсе и на нижнем крае окна); на боках и сверху тени нет
+  ctx.fillStyle = 'rgba(0,0,0,.3)';
+  segs.forEach(q => { if (q.dy > 0.8) local(q, () => { ctx.beginPath(); ctx.ellipse(0, q.lift + 1, q.r * 0.95, 2.6, 0, 0, Math.PI * 2); ctx.fill(); }); });
   // ножки-капельки (тоньше): пара у каждого сегмента, кроме шеи и кончика хвоста
   for (let k = n - 1; k >= 2; k--) {
     if (k === n - 3) continue;
@@ -723,7 +727,7 @@ function drawBug(){
     local(q, () => {
       for (const sx of [-0.3, 0.3]) {
         const hx = sx * q.r, hy = q.r * 0.55;
-        const fx = sx * q.r * 1.1 + Math.cos(bug.t * 3 + k * 0.62) * up * 3, fy = q.lift - up * 5;
+        const fx = sx * q.r * 1.1 + Math.cos(wave + k * 0.62) * up * 3, fy = q.lift - up * 5;
         const sq = 1 - up;
         ctx.fillStyle = sc.leg;
         ctx.beginPath(); ctx.moveTo(hx - w * 0.7, hy);
