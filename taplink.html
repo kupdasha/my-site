@@ -40,17 +40,32 @@ a{color:inherit}
   /* «переливающееся стекло»: яркая заливка и пятно соседнего оттенка (на 40° по кругу — смешения чистые); оттенки идут по цветовому кругу (oklch, от лаймового через зеленый,
      бирюзовый, синий, фиолетовый к розовому и обратно — красный и оранжевый пропускаем), без темных и грязных смешений; по краю — дисперсия.
      Только CSS (@property), на загрузку не влияет */
-  background:radial-gradient(64% 100% at var(--tx) var(--ty),oklch(.76 .25 calc(var(--th) - 40deg)),oklch(.76 .25 calc(var(--th) - 40deg) / 0)),oklch(.86 .2 var(--th));
-  animation:track 4s ease-in-out infinite alternate,trackMove 2.4s ease-in-out infinite alternate,trackDisp 1.3s ease-in-out infinite alternate}
+  /* контрастнее и без грязи (08.11): светлая яркая заливка, внутри глубокое насыщенное пятно на 70° дальше по кругу; переход между ними
+     идет по кругу оттенков (in oklch), поэтому середина тоже яркая, без серого; пульс на сайте берет тот же оттенок */
+  background:oklch(.62 .27 calc(var(--th) + 70deg));   /* глубокий цвет в середине; светлые слои по форме овала — в ::before */
+  animation:track 4s ease-in-out infinite alternate,trackSpin 3.5s linear infinite,trackDisp 1.3s ease-in-out infinite alternate}
 .switch>i::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 0 0 7px 2px rgba(255,255,255,.4),inset var(--td) 1px 3px rgba(0,229,255,.75),inset calc(var(--td) * -1) -1px 3px rgba(255,64,214,.75)}   /* дисперсия: голубая и розовая кайма по краю */
+  /* цвет слоями по форме овала: светлый край, под ним насыщенная полоса, в середине глубокий цвет; слои с одной стороны толще —
+     и это место обтекает овал по кругу (--ta); поверх — дисперсия (голубая и розовая кайма) */
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),
+    inset calc(cos(var(--ta)) * 3px) calc(sin(var(--ta)) * 2px) 5px 2px oklch(.95 .16 var(--th)),
+    inset calc(cos(var(--ta)) * -4px) calc(sin(var(--ta)) * -3px) 11px 5px oklch(.84 .22 calc(var(--th) + 30deg)),
+    inset var(--td) 1px 3px rgba(0,229,255,.75),inset calc(var(--td) * -1) -1px 3px rgba(255,64,214,.75)}
 .switch>i::after{content:"";position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff 55%,#F1F4FF);box-shadow:calc(var(--td) * -1) -1px 2.5px rgba(0,229,255,.9),var(--td) 1px 2.5px rgba(255,64,214,.9);transition:transform .55s var(--ease-io)}
 :root[data-mode="fun"] .switch>i::after{transform:translateX(26px)}
 .switch:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:8px}
-@property --th{syntax:'<angle>';inherits:false;initial-value:155deg}
+@property --th{syntax:'<angle>';inherits:true;initial-value:120deg}
+@property --ta{syntax:'<angle>';inherits:true;initial-value:0deg}
+@keyframes trackSpin{to{--ta:360deg}}
+/* пульс, как на сайте: волна от тумблера в серьезной версии, того цвета, которым тумблер переливается в эту секунду */
+@property --rs{syntax:'<length>';inherits:false;initial-value:0px}
+@property --ra{syntax:'<number>';inherits:false;initial-value:0}
+@keyframes switchRing{0%{--rs:0px;--ra:.55}70%,100%{--rs:12px;--ra:0}}
+:root:not([data-mode="fun"]) .switch>i{box-shadow:0 0 0 var(--rs) oklch(.7 .25 calc(var(--th) + 35deg) / var(--ra));
+  animation:track 4s ease-in-out infinite alternate,trackSpin 3.5s linear infinite,trackDisp 1.3s ease-in-out infinite alternate,switchRing 2.8s var(--ease) infinite}
 @property --tx{syntax:'<percentage>';inherits:false;initial-value:65%}
 @property --ty{syntax:'<percentage>';inherits:false;initial-value:70%}
-@keyframes track{from{--th:155deg}to{--th:330deg}}
+@keyframes track{from{--th:120deg}to{--th:270deg}}   /* заливка 120–270°, пятно 190–340°: от лаймового до розового, без оранжевого */
 @property --td{syntax:'<length>';inherits:true;initial-value:2px}
 @keyframes trackDisp{from{--td:-2.5px}to{--td:2.5px}}   /* дисперсия покачивается, как блик в стекле */
 @keyframes trackMove{0%{--tx:65%;--ty:75%}33%{--tx:35%;--ty:25%}66%{--tx:80%;--ty:35%}100%{--tx:45%;--ty:80%}}
@@ -171,7 +186,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   :root[data-mode="fun"] .switch>i::after{transform:translateX(36px)}
   .legal{max-width:480px;font-size:13px}
 }
-@media (prefers-reduced-motion:reduce){.switch>i{animation:none}}
+@media (prefers-reduced-motion:reduce){.switch>i{animation:none!important}}
 </style>
 <style>body{margin:0}</style>
 </head>
