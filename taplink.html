@@ -124,6 +124,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 }
 /* телефон, повернутый набок: слева имя и описание, справа кнопки и соцсети */
 @media (orientation:landscape) and (max-height:540px){
+  .top{align-self:stretch;width:100%;max-width:860px;margin-inline:auto;justify-content:flex-start}   /* тумблер над именем, а не над кнопками */
   .col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;column-gap:28px;row-gap:calc(14px*var(--k));align-content:center;max-width:860px}
   .intro{grid-row:1 / span 2;align-self:center;text-align:left}
   h1{font-size:calc(38px*var(--k))}
