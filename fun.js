@@ -48,9 +48,9 @@ const FUN = {
   // атрибутом у кнопки: data-mood="run" | "sleep" | "hug" | "push" | "clash"
   headings: ['float', 'fight', 'smile', 'orbit'],  // по очереди для заголовков разделов
   centipede: {
-    segments: 14,      // пушистых сегментов в теле
+    segments: 11,      // сегментов в теле
     spacing:  10,      // расстояние между сегментами, px (меньше радиуса — тело без просветов)
-    size:     11,      // радиус сегмента, px
+    size:     12,      // радиус сегмента, px (пухлее — не похожа на сколопендру)
     speed:    28,      // скорость, px в секунду
     stride:   20,      // на сколько px продвигается за одну волну по телу — шаг ножек привязан к пройденному пути
     inset:    3,       // отступ дорожки (пола под ножками) от края окна, px
@@ -63,7 +63,7 @@ const FUN = {
     colors: [
       { fur: ['#F4F6FF', '#E6EAF5', '#FFFFFF', '#C9CFE0'], skin: '#C3C9DC', tuft: '#FFFFFF', head: ['#FFFFFF', '#C9CFE0'], leg: '#D3D7E2', dark: '#A7AEBD' },
     ],
-    holo: ['#D4F542', '#6BE38A', '#3FD3C9', '#5B8CFF', '#A06BFF', '#FF6BD6'],   // лаймовый → зеленый → бирюзовый → синий → фиолетовый → розовый (без красного и оранжевого)
+    holo: ['#D4F542', '#8BE36B', '#4FD9A8', '#3FD3C9', '#9BE86A', '#C8F06A'],   // перелив в зеленых: лаймовый, зеленый, мятный, бирюзовый
     holoAlpha: 0.72,
   },
   guitar: {
@@ -821,24 +821,23 @@ function drawBug(){
     if (ux * want[0] + uy * want[1] < 0) { ux = -ux; uy = -uy; }
     const hump = ease(Math.max(0, Math.sin(wave + k * 0.62)));
     const r = segR(k);
-    const lift = R * 1.45 + hump * R * 0.35;   // над полом — длина нижних ножек
+    const lift = R * 1.2 + hump * R * 0.35;   // над полом — длина ножек
     segs.push({ gx: x, gy: y + oy, x: x + ux * lift, y: y + oy + uy * lift, fx, fy, dx: -ux, dy: -uy, r, hump, lift, k });
   }
   bug.drawn = segs.map(q => [q.x, q.y]);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   const local = (q, fn) => { ctx.save(); ctx.translate(q.x, q.y); ctx.transform(q.fx, q.fy, q.dx, q.dy, 0, 0); fn(); ctx.restore(); };
-  // ножки по обоим бокам, как у первой многоножки: тонкие, с коленцем и круглой ступней, шагают волной в такт пути
-  ctx.strokeStyle = sc.leg; ctx.fillStyle = sc.leg; ctx.lineWidth = 1.6;
-  for (let k = 1; k < n; k++) {
-    const q = segs[k], sz = q.r * 0.55;
+  // ножки как у настоящей гусеницы: три пары спереди и пухлые ложноножки сзади, в середине их нет;
+  // видна только сторона у пола — так она не похожа на сколопендру. Шагают в такт пути
+  const LEGS = [1, 2, 3, n - 5, n - 4, n - 3, n - 1];
+  ctx.fillStyle = sc.leg; ctx.strokeStyle = sc.leg; ctx.lineCap = 'round';
+  for (const k of LEGS) {
+    const q = segs[k], up = q.hump;
     local(q, () => {
-      for (const side of [-1, 1]) {
-        const st = Math.sin(wave * 1.6 - k * 0.7 + (side > 0 ? 0 : Math.PI));
-        const by = side * q.r * 0.7, ky = side * (q.r * 0.7 + sz * 0.9), fy = side * (q.r * 0.7 + sz * 1.45);
-        const kx = st * sz * 0.35, fx = (st * 0.6 - 0.3) * sz;
-        ctx.beginPath(); ctx.moveTo(0, by); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
-        ctx.beginPath(); ctx.arc(fx, fy, 1.4, 0, Math.PI * 2); ctx.fill();
-      }
+      const front = k <= 3, w = q.r * (front ? 0.22 : 0.34);
+      const hx = 0, hy = q.r * 0.6, fx = Math.cos(wave + k * 0.62) * up * 2.5, fy = q.lift - up * 4;
+      ctx.lineWidth = w * 2; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(fx, fy - w * 0.4); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(fx, fy - w * 0.3, w * 1.15, w * 0.75, 0, 0, Math.PI * 2); ctx.fill();
     });
   }
   // сплошное тело под шерсткой: сегменты соединены, даже когда горбик поднимается
@@ -857,13 +856,13 @@ function drawBug(){
   // голова
   const h = segs[0], img = headSprite(bug.scheme % C.colors.length), S = img.size;
   local(h, () => {
-    // усики торчат из головы вперед и в стороны, покачиваются
+    // два коротких рожка на макушке, чуть покачиваются
     const hr = h.r * 0.82, hx = h.r * 0.3;
-    ctx.strokeStyle = sc.dark; ctx.lineWidth = 1.5;
-    for (const side of [-1, 1]) {
-      const a = side * (0.5 + Math.sin(now / 250 + side) * 0.18), dx = Math.cos(a), dy = Math.sin(a);
-      ctx.beginPath(); ctx.moveTo(hx + dx * hr * 0.6, dy * hr * 0.6);
-      ctx.quadraticCurveTo(hx + hr * 1.9, side * hr * 0.35, hx + dx * hr * 2.5, dy * hr * 2.5); ctx.stroke();
+    ctx.strokeStyle = sc.dark; ctx.fillStyle = sc.dark; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    for (const side of [-0.35, 0.35]) {
+      const a = -Math.PI / 2 + side + Math.sin(now / 400 + side * 5) * 0.08, bx = hx + Math.cos(a) * hr * 1.45, by = Math.sin(a) * hr * 1.45;
+      ctx.beginPath(); ctx.moveTo(hx + Math.cos(a) * hr * 0.7, Math.sin(a) * hr * 0.7); ctx.lineTo(bx, by); ctx.stroke();
+      ctx.beginPath(); ctx.arc(bx, by, 1.6, 0, Math.PI * 2); ctx.fill();
     }
     ctx.drawImage(img.c, -S / 2, -S / 2, S, S);
   });
