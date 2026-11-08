@@ -58,14 +58,13 @@ const FUN = {
     corner:   60,      // скругление дорожки в углах, px
     visitEvery: [7, 14],  // раз в сколько секунд уходит с рамки на кейсы и текст (от, до)
     zone:     0.6,     // на сколько экранов ниже начала списка кейсов еще живет (дальше исчезает)
-    // расцветки по кругу (меняются по клику): шерстка (4 оттенка), кожа под ней, кисточки, голова, ножки
+    // гусеница светлая, цвет дает голографический перелив поверх (HOLO) — как у переключателя версий;
+    // клик сдвигает перелив на следующий оттенок
     colors: [
-      { fur: ['#C6E85A', '#E2FB5A', '#F4FFC4', '#8DB422'], skin: '#9CC72A', tuft: '#F4FFC4', head: ['#F6FFD0', '#B5DA40'], leg: '#A9CF35', dark: '#7FA826' },
-      { fur: ['#B8A3F2', '#D7CAFF', '#F1ECFF', '#8670D6'], skin: '#9C86E6', tuft: '#9FF0D2', head: ['#F4EEFF', '#B19CF0'], leg: '#AE98F0', dark: '#7A64C8' },
-      { fur: ['#7EE0BE', '#A8F0D6', '#E4FFF5', '#3FB98F'], skin: '#55C9A0', tuft: '#F4FFC4', head: ['#EAFFF7', '#7EDDBB'], leg: '#6FD3AE', dark: '#2F9C77' },
-      { fur: ['#8FB8FA', '#B9D3FF', '#EAF2FF', '#5E8EE8'], skin: '#6E9BEF', tuft: '#F4FFC4', head: ['#EEF5FF', '#93B9F7'], leg: '#86AEF5', dark: '#4C78D0' },
-      { fur: ['#F2A6CF', '#FBC9E4', '#FFF0F8', '#D877AC'], skin: '#E38BBB', tuft: '#F1ECFF', head: ['#FFF2F9', '#F2AFD3'], leg: '#EE9DC8', dark: '#C0628F' },
+      { fur: ['#F4F6FF', '#E6EAF5', '#FFFFFF', '#C9CFE0'], skin: '#C3C9DC', tuft: '#FFFFFF', head: ['#FFFFFF', '#C9CFE0'], leg: '#D3D7E2', dark: '#A7AEBD' },
     ],
+    holo: ['#D4F542', '#6BE38A', '#3FD3C9', '#5B8CFF', '#A06BFF', '#FF6BD6'],   // лаймовый → зеленый → бирюзовый → синий → фиолетовый → розовый (без красного и оранжевого)
+    holoAlpha: 0.72,
   },
   guitar: {
     // струна над первой строкой и под каждой строкой — сверху вниз
@@ -794,16 +793,11 @@ function segSprite(scheme, k, v){
 function headSprite(scheme){
   const sc = C.colors[scheme], r = segR(0);
   return sprite(`h${scheme}`, r * 5, g => {
-    // голова без мордочки: гладкая, чуть темнее тела, с короткими усиками
-    const hr = r * 0.82, hx = r * 0.3, hy = r * 0.1;
+    // голова без мордочки: гладкая (усики рисуются в кадре, они качаются)
+    const hr = r * 0.82, hx = r * 0.3, hy = 0;
     const hg = g.createRadialGradient(hx - hr * 0.35, hy - hr * 0.45, hr * 0.1, hx, hy, hr);
     hg.addColorStop(0, sc.head[0]); hg.addColorStop(1, sc.head[1]);
     g.fillStyle = hg; g.beginPath(); g.arc(hx, hy, hr, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = sc.dark; g.lineWidth = 1.4;
-    for (const d of [-1, 1]) {
-      g.beginPath(); g.moveTo(hx + hr * (0.35 + d * 0.2), hy - hr * 0.75);
-      g.quadraticCurveTo(hx + hr * (0.55 + d * 0.3), hy - hr * 1.15, hx + hr * (0.8 + d * 0.3), hy - hr * 1.3); g.stroke();
-    }
   });
 }
 function drawBug(){
@@ -827,28 +821,23 @@ function drawBug(){
     if (ux * want[0] + uy * want[1] < 0) { ux = -ux; uy = -uy; }
     const hump = ease(Math.max(0, Math.sin(wave + k * 0.62)));
     const r = segR(k);
-    const lift = R * 1.25 + hump * R * 0.45;
+    const lift = R * 1.45 + hump * R * 0.35;   // над полом — длина нижних ножек
     segs.push({ gx: x, gy: y + oy, x: x + ux * lift, y: y + oy + uy * lift, fx, fy, dx: -ux, dy: -uy, r, hump, lift, k });
   }
   bug.drawn = segs.map(q => [q.x, q.y]);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   const local = (q, fn) => { ctx.save(); ctx.translate(q.x, q.y); ctx.transform(q.fx, q.fy, q.dx, q.dy, 0, 0); fn(); ctx.restore(); };
-  // ножки-капельки (тоньше): пара у каждого сегмента, кроме шеи и кончика хвоста
-  for (let k = n - 1; k >= 2; k--) {
-    if (k === n - 3) continue;
-    const q = segs[k], up = q.hump, w = q.r * 0.24;
+  // ножки по обоим бокам, как у первой многоножки: тонкие, с коленцем и круглой ступней, шагают волной в такт пути
+  ctx.strokeStyle = sc.leg; ctx.fillStyle = sc.leg; ctx.lineWidth = 1.6;
+  for (let k = 1; k < n; k++) {
+    const q = segs[k], sz = q.r * 0.55;
     local(q, () => {
-      for (const sx of [-0.3, 0.3]) {
-        const hx = sx * q.r, hy = q.r * 0.55;
-        const fx = sx * q.r * 1.1 + Math.cos(wave + k * 0.62) * up * 3, fy = q.lift - up * 5;
-        const sq = 1 - up;
-        ctx.fillStyle = sc.leg;
-        ctx.beginPath(); ctx.moveTo(hx - w * 0.7, hy);
-        ctx.bezierCurveTo(hx - w * 0.7, hy + (fy - hy) * 0.5, fx - w * (0.7 + sq * 0.35), fy - w * 0.6, fx, fy);
-        ctx.bezierCurveTo(fx + w * (0.7 + sq * 0.35), fy - w * 0.6, hx + w * 0.7, hy + (fy - hy) * 0.5, hx + w * 0.7, hy);
-        ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,.35)';
-        ctx.beginPath(); ctx.ellipse(hx - w * 0.2, hy + (fy - hy) * 0.35, w * 0.18, Math.max(0.5, (fy - hy) * 0.2), 0, 0, Math.PI * 2); ctx.fill();
+      for (const side of [-1, 1]) {
+        const st = Math.sin(wave * 1.6 - k * 0.7 + (side > 0 ? 0 : Math.PI));
+        const by = side * q.r * 0.7, ky = side * (q.r * 0.7 + sz * 0.9), fy = side * (q.r * 0.7 + sz * 1.45);
+        const kx = st * sz * 0.35, fx = (st * 0.6 - 0.3) * sz;
+        ctx.beginPath(); ctx.moveTo(0, by); ctx.lineTo(kx, ky); ctx.lineTo(fx, fy); ctx.stroke();
+        ctx.beginPath(); ctx.arc(fx, fy, 1.4, 0, Math.PI * 2); ctx.fill();
       }
     });
   }
@@ -867,7 +856,30 @@ function drawBug(){
   }
   // голова
   const h = segs[0], img = headSprite(bug.scheme % C.colors.length), S = img.size;
-  local(h, () => ctx.drawImage(img.c, -S / 2, -S / 2, S, S));
+  local(h, () => {
+    // усики торчат из головы вперед и в стороны, покачиваются
+    const hr = h.r * 0.82, hx = h.r * 0.3;
+    ctx.strokeStyle = sc.dark; ctx.lineWidth = 1.5;
+    for (const side of [-1, 1]) {
+      const a = side * (0.5 + Math.sin(now / 250 + side) * 0.18), dx = Math.cos(a), dy = Math.sin(a);
+      ctx.beginPath(); ctx.moveTo(hx + dx * hr * 0.6, dy * hr * 0.6);
+      ctx.quadraticCurveTo(hx + hr * 1.9, side * hr * 0.35, hx + dx * hr * 2.5, dy * hr * 2.5); ctx.stroke();
+    }
+    ctx.drawImage(img.c, -S / 2, -S / 2, S, S);
+  });
+  // голографический перелив: поверх уже нарисованной гусеницы (source-atop красит только ее),
+  // полосы оттенков вдоль тела медленно текут; клик (bug.scheme) сдвигает их на один оттенок
+  const tail = segs[n - 1], ax = h.x - tail.x, ay = h.y - tail.y, al = Math.hypot(ax, ay) || 1;
+  const ux = ax / al, uy = ay / al, Lh = C.spacing * n * 0.9, shift = (now / 4000 + bug.scheme / C.holo.length) % 1;
+  const x0 = tail.x - ux * Lh * shift, y0 = tail.y - uy * Lh * shift;
+  const gr = ctx.createLinearGradient(x0 - uy * 20, y0 + ux * 20, x0 + ux * Lh * 2 + uy * 20, y0 + uy * Lh * 2 - ux * 20);
+  const hc = C.holo, m = hc.length * 2;
+  for (let i = 0; i <= m; i++) gr.addColorStop(i / m, hc[i % hc.length]);
+  let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+  segs.forEach(q => { minX = Math.min(minX, q.x); maxX = Math.max(maxX, q.x); minY = Math.min(minY, q.y); maxY = Math.max(maxY, q.y); });
+  ctx.save(); ctx.globalCompositeOperation = 'source-atop'; ctx.globalAlpha = C.holoAlpha; ctx.fillStyle = gr;
+  ctx.fillRect(minX - R * 4, minY - R * 4, maxX - minX + R * 8, maxY - minY + R * 8);
+  ctx.restore();
 }
 
 /* клик по гусенице — перекрашивается (по кругу расцветок из FUN.centipede.colors) */
