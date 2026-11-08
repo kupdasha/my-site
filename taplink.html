@@ -67,21 +67,17 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 .legs i::after{content:"";position:absolute;left:-2px;bottom:-3px;width:9px;height:5px;border-radius:3px 4px 2px 2px;background:inherit}
 .btn:hover .legs i{background:var(--btn-hover)}
 /* соцсети в веселой версии тоже на ножках: ножки светло-серые, плитки разбегаются кто куда */
-:root[data-mode="fun"] .tl-soc{row-gap:calc(26px*var(--k))}
+:root[data-mode="fun"] .tl-soc{gap:calc(26px*var(--k))}
 :root[data-mode="fun"] .tl-soc a{position:relative;isolation:isolate;z-index:3;will-change:translate}
-:root[data-mode="fun"] .tl-soc a{min-width:100%;width:max-content;justify-self:center;padding:0 22px 2px}   /* длинные русские надписи («фотографирую») не обрезаются: плитка по надписи */
+:root[data-mode="fun"] .tl-soc a{flex:0 0 auto;padding:0 15px 2px}   /* длинные русские надписи («фотографирую») не обрезаются: плитка по надписи */
 .legs i:nth-child(1){left:16%}.legs i:nth-child(2){left:34%}.legs i:nth-child(3){left:66%}.legs i:nth-child(4){left:84%}
 
 /* соцсети — сетка 3×3, как в исходном таплинке */
-.tl-soc{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:calc(8px*var(--k))}
-/* три в ряд; если в последнем ряду две плитки — встают по центру */
-.tl-soc a{grid-column:span 2}
-.tl-soc a:nth-last-child(2):nth-child(3n+1){grid-column:2 / span 2}
-/* «Яндекс Музыка» не влезает в обычную плитку — отдельной строкой шириной в две плитки по центру; Instagram и Unsplash над ней тоже по центру */
-.tl-soc a[href*="music.yandex"]{grid-column:2 / span 4}
-:root[data-mode="fun"] .tl-soc a[href*="music.yandex"]{grid-column:3 / span 2}   /* в веселой «пою» короткое — обычная плитка */
-.tl-soc a:nth-child(7):nth-last-child(3){grid-column:2 / span 2}
-.tl-soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 8px 2px;border-radius:99px;background:var(--soft);font-size:18px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
+/* три ряда по три: ширина плитки — по надписи, ряд растягивается на всю ширину; длинная «Яндекс Музыка» стоит в ряду с короткими VK и MAX */
+.tl-soc{display:flex;flex-direction:column;gap:calc(8px*var(--k))}
+.tl-row{display:flex;justify-content:center;gap:calc(8px*var(--k))}
+.tl-row a{flex:1 1 auto}
+.tl-soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 10px 2px;border-radius:99px;background:var(--soft);font-size:18px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
 /* при наведении — цвет самой соцсети, текст контрастный */
 .tl-soc a:hover{background:var(--brand);color:var(--brand-text,#fff)}
 .tl-soc a[href*="linkedin"]{--brand:#0A66C2;--legc:#0A66C2}
@@ -177,15 +173,21 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
     </nav>
 
     <nav class="tl-soc" aria-label="Соцсети">
-      <a href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener" data-serious="LinkedIn" data-fun="ликн"><span class="t">LinkedIn</span></a>
-      <a href="https://vk.com/odnakavychka" target="_blank" rel="noopener" data-serious="VK" data-fun="вконтакте"><span class="t">VK</span></a>
-      <a href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener" data-serious="MAX" data-fun="макс"><span class="t">MAX</span></a>
-      <a href="https://t.me/kupdasha" target="_blank" rel="noopener" data-serious="Telegram" data-fun="телега"><span class="t">Telegram</span></a>
-      <a href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener" data-serious="TikTok" data-fun="тик так"><span class="t">TikTok</span></a>
-      <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener" data-serious="YouTube" data-fun="видеоблог"><span class="t">YouTube</span></a>
-      <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener" data-serious="Instagram*" data-fun="инста*"><span class="t">Instagram*</span></a>
-      <a href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener" data-serious="Unsplash" data-fun="фотографирую"><span class="t">Unsplash</span></a>
-      <a href="https://music.yandex.ru/album/44857387" target="_blank" rel="noopener" data-serious="Яндекс Музыка" data-fun="пою"><span class="t">Яндекс&nbsp;Музыка</span></a>
+      <div class="tl-row">
+        <a href="https://vk.com/odnakavychka" target="_blank" rel="noopener" data-serious="VK" data-fun="вконтакте"><span class="t">VK</span></a>
+        <a href="https://music.yandex.ru/album/44857387" target="_blank" rel="noopener" data-serious="Яндекс Музыка" data-fun="пою"><span class="t">Яндекс&nbsp;Музыка</span></a>
+        <a href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener" data-serious="MAX" data-fun="макс"><span class="t">MAX</span></a>
+      </div>
+      <div class="tl-row">
+        <a href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener" data-serious="LinkedIn" data-fun="ликн"><span class="t">LinkedIn</span></a>
+        <a href="https://unsplash.com/@kupdasha" target="_blank" rel="noopener" data-serious="Unsplash" data-fun="фотографирую"><span class="t">Unsplash</span></a>
+        <a href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener" data-serious="TikTok" data-fun="тик так"><span class="t">TikTok</span></a>
+      </div>
+      <div class="tl-row">
+        <a href="https://t.me/kupdasha" target="_blank" rel="noopener" data-serious="Telegram" data-fun="телега"><span class="t">Telegram</span></a>
+        <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener" data-serious="Instagram*" data-fun="инста*"><span class="t">Instagram*</span></a>
+        <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener" data-serious="YouTube" data-fun="видеоблог"><span class="t">YouTube</span></a>
+      </div>
     </nav>
   </div>
 
