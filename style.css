@@ -166,13 +166,14 @@ img,video{display:block;max-width:100%}
 :root[data-theme="dark"] .switch>span:nth-of-type(1){opacity:.45}
 :root[data-theme="dark"] .switch>span:nth-of-type(2){opacity:1}
 .switch>i{position:relative;width:64px;height:36px;border-radius:99px;flex:none;
-  /* «переливающееся стекло» (референс Даши 08.11): яркая заливка, внутри мягкое контрастное пятно, по краю светлый ободок (::before);
-     цвета и пятно плавно перетекают из одной пары в другую — через @property, только CSS, на загрузку не влияет; без оранжевого */
-  background:radial-gradient(62% 95% at var(--tx) var(--ty),var(--tc),color-mix(in oklab,var(--tc) 0%,transparent)),var(--tb);
-  animation:track 14s ease-in-out infinite}
+  /* «переливающееся стекло»: яркая заливка и пятно соседнего оттенка (на 40° по кругу — смешения чистые); оттенки идут по цветовому кругу (oklch, от лаймового через зеленый,
+     бирюзовый, синий, фиолетовый к розовому и обратно — красный и оранжевый пропускаем), без темных и грязных смешений; по краю — дисперсия.
+     Только CSS (@property), на загрузку не влияет */
+  background:radial-gradient(64% 100% at var(--tx) var(--ty),oklch(.76 .25 calc(var(--th) - 40deg)),oklch(.76 .25 calc(var(--th) - 40deg) / 0)),oklch(.86 .2 var(--th));
+  animation:track 12s ease-in-out infinite alternate,trackMove 7s ease-in-out infinite alternate}
 .switch>i::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 0 0 7px 2px rgba(255,255,255,.4),inset 2px 1px 3px rgba(0,229,255,.55),inset -2px -1px 3px rgba(255,64,214,.55)}   /* дисперсия: голубая и розовая кайма по краю */
-.switch>i::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff 55%,#F1F4FF);box-shadow:-1.5px -1px 2px rgba(0,229,255,.75),1.5px 1px 2px rgba(255,64,214,.75);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 0 0 7px 2px rgba(255,255,255,.4),inset 2px 1px 3px rgba(0,229,255,.7),inset -2px -1px 3px rgba(255,64,214,.7)}   /* дисперсия: голубая и розовая кайма по краю */
+.switch>i::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff 55%,#F1F4FF);box-shadow:-2px -1px 2.5px rgba(0,229,255,.85),2px 1px 2.5px rgba(255,64,214,.85);
   transition:transform .55s var(--ease-io),width .25s var(--ease)}
 :root[data-theme="dark"] .switch>i::after{transform:translateX(28px)}
 /* при наведении ползунок тянется к другой стороне, при нажатии сплющивается */
@@ -180,16 +181,11 @@ img,video{display:block;max-width:100%}
 :root[data-theme="dark"] .switch:hover>i::after{transform:translateX(23px)}
 .switch:active>i::after{width:34px}
 :root[data-theme="dark"] .switch:active>i::after{transform:translateX(22px)}
-@property --tb{syntax:'<color>';inherits:false;initial-value:#C6F02A}
-@property --tc{syntax:'<color>';inherits:false;initial-value:#8B3DFF}
-@property --tx{syntax:'<percentage>';inherits:false;initial-value:62%}
-@property --ty{syntax:'<percentage>';inherits:false;initial-value:78%}
-@keyframes track{
-  0%,100%{--tb:#C6F02A;--tc:#8B3DFF;--tx:62%;--ty:78%}
-  20%{--tb:#4FE07A;--tc:#0B2A14;--tx:50%;--ty:18%}
-  40%{--tb:#5AD6F2;--tc:#F25CD6;--tx:32%;--ty:62%}
-  60%{--tb:#F08BE0;--tc:#2A0A3A;--tx:52%;--ty:55%}
-  80%{--tb:#2638C4;--tc:#8EC8FF;--tx:50%;--ty:50%}}
+@property --th{syntax:'<angle>';inherits:false;initial-value:155deg}
+@property --tx{syntax:'<percentage>';inherits:false;initial-value:65%}
+@property --ty{syntax:'<percentage>';inherits:false;initial-value:70%}
+@keyframes track{from{--th:155deg}to{--th:330deg}}
+@keyframes trackMove{0%{--tx:65%;--ty:75%}33%{--tx:35%;--ty:25%}66%{--tx:80%;--ty:35%}100%{--tx:45%;--ty:80%}}
 
 /* Привлекаем внимание, пока переключателем ни разу не пользовались:
    пульсирующая точка, «подмигивание» ползунка и подсказка снизу */
@@ -225,7 +221,7 @@ img,video{display:block;max-width:100%}
 @keyframes iris{to{background-position:300% 0,0 0}}
 
 /* серьезная версия: вокруг дорожки тумблера расходится мягкое кольцо — чтобы его точно заметили */
-:root:not([data-theme="dark"]) .switch>i{animation:track 14s ease-in-out infinite,switchRing 2.8s var(--ease) infinite}
+:root:not([data-theme="dark"]) .switch>i{animation:track 12s ease-in-out infinite alternate,trackMove 7s ease-in-out infinite alternate,switchRing 2.8s var(--ease) infinite}
 @keyframes switchRing{0%{box-shadow:0 0 0 0 rgba(166,91,239,.4)}70%,100%{box-shadow:0 0 0 12px rgba(166,91,239,0)}}
 .lead{font-size:clamp(18px,1.6vw,22px);line-height:1.35;max-width:36ch}
 .hero-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 48px;margin-top:clamp(28px,4vw,56px)}
