@@ -69,7 +69,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 /* соцсети в веселой версии тоже на ножках: ножки светло-серые, плитки разбегаются кто куда */
 :root[data-mode="fun"] .tl-soc{row-gap:calc(26px*var(--k))}
 :root[data-mode="fun"] .tl-soc a{position:relative;isolation:isolate;z-index:3;will-change:translate}
-:root[data-mode="fun"] .tl-soc a{min-width:100%;width:max-content;justify-self:center}   /* длинные русские надписи («фотографирую») не обрезаются: плитка по надписи */
+:root[data-mode="fun"] .tl-soc a{min-width:100%;width:max-content;justify-self:center;padding:0 22px 2px}   /* длинные русские надписи («фотографирую») не обрезаются: плитка по надписи */
 .legs i:nth-child(1){left:16%}.legs i:nth-child(2){left:34%}.legs i:nth-child(3){left:66%}.legs i:nth-child(4){left:84%}
 
 /* соцсети — сетка 3×3, как в исходном таплинке */
@@ -77,7 +77,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
 /* три в ряд; если в последнем ряду две плитки — встают по центру */
 .tl-soc a{grid-column:span 2}
 .tl-soc a:nth-last-child(2):nth-child(3n+1){grid-column:2 / span 2}
-.tl-soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 6px 2px;border-radius:14px;background:var(--soft);font-size:16px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
+.tl-soc a{display:flex;align-items:center;justify-content:center;height:calc(44px*var(--k));padding:0 8px 2px;border-radius:99px;background:var(--soft);font-size:18px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .3s}
 /* при наведении — цвет самой соцсети, текст контрастный */
 .tl-soc a:hover{background:var(--brand);color:var(--brand-text,#fff)}
 .tl-soc a[href*="linkedin"]{--brand:#0A66C2;--legc:#0A66C2}
@@ -119,7 +119,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   :root[data-mode="fun"] .btn{min-width:200px;padding:0 34px 3px}
   :root[data-mode="fun"] .tl-actions{gap:calc(28px*var(--k))}
   .tl-soc{gap:calc(10px*var(--k))}
-  .tl-soc a{height:calc(56px*var(--k));font-size:18px;border-radius:16px}
+  .tl-soc a{height:calc(56px*var(--k));font-size:21px}
   .legal{max-width:440px;font-size:12px}
 }
 /* телефон, повернутый набок: слева имя и описание, справа кнопки и соцсети */
@@ -139,7 +139,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   .btn{height:calc(70px*var(--k));font-size:23px}
   :root[data-mode="fun"] .btn{min-width:250px;padding:0 40px 3px}
   :root[data-mode="fun"] .tl-actions{gap:calc(32px*var(--k))}
-  .tl-soc a{height:calc(64px*var(--k));font-size:20px;border-radius:18px}
+  .tl-soc a{height:calc(64px*var(--k));font-size:23px}
   :root[data-mode="fun"] .tl-soc{row-gap:calc(30px*var(--k))}
   .switch{font-size:18px}
   .legal{max-width:480px;font-size:13px}
@@ -174,7 +174,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
       <a href="https://www.linkedin.com/in/kup-daria/" target="_blank" rel="noopener" data-serious="LinkedIn" data-fun="ликн"><span class="t">LinkedIn</span></a>
       <a href="https://vk.com/odnakavychka" target="_blank" rel="noopener" data-serious="VK" data-fun="вконтакте"><span class="t">VK</span></a>
       <a href="https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4" target="_blank" rel="noopener" data-serious="MAX" data-fun="макс"><span class="t">MAX</span></a>
-      <a href="https://t.me/kupdasha" target="_blank" rel="noopener" data-serious="Telegram" data-fun="Telegram"><span class="t">Telegram</span></a>
+      <a href="https://t.me/kupdasha" target="_blank" rel="noopener" data-serious="Telegram" data-fun="телега"><span class="t">Telegram</span></a>
       <a href="https://www.tiktok.com/@odnakav" target="_blank" rel="noopener" data-serious="TikTok" data-fun="тик так"><span class="t">TikTok</span></a>
       <a href="https://www.youtube.com/@kupyasha26" target="_blank" rel="noopener" data-serious="YouTube" data-fun="видеоблог"><span class="t">YouTube</span></a>
       <a href="https://www.instagram.com/kupyasha/" target="_blank" rel="noopener" data-serious="Instagram*" data-fun="инста*"><span class="t">Instagram*</span></a>
@@ -418,7 +418,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
      уклон; курсор рядом — убегают; под курсором дрожат на цыпочках;
      в жидкости покачиваются на волнах. Друг на друга не налезают.
      ================================================================ */
-  const RUN = { speed: 170, fleeSpeed: 300, rest: [600, 2200], margin: 6 };
+  const RUN = { speed: 170, fleeSpeed: 300, rest: [250, 1100], margin: 6 };
   const runners = [...document.querySelectorAll('.tl-actions .btn, .tl-soc a')].map(el => {
     const legs = document.createElement('span');
     legs.className = 'legs'; legs.setAttribute('aria-hidden', 'true');
@@ -459,7 +459,7 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   function stepRunners(dt, now) {
     if (!fun || !runners[0].home) return;
     const gx = sensor ? Math.sin(tiltX) : 0, gy = sensor ? Math.sin(tiltY - 1) : 0;   // наклон относительно обычного хвата (~57°)
-    const downhill = sensor && Math.hypot(gx, gy) > .18;
+    const downhill = false;   // наклон больше не гонит всех в одну сторону: бег всегда случайный и не прекращается (просьба 08.11)
     runners.forEach(r => {
       const hx = r.home.x + r.x, hy = r.home.y + r.y;
       if (r.caught && !touch) {              // пойманная — на цыпочках дрожит
