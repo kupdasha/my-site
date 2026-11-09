@@ -935,7 +935,16 @@ function stepRain(){
    Превью закрыто запотевшим стеклом. Курсор стирает туман; когда
    протерто больше половины, остатки тают сами.
    ================================================================ */
-const FOG = { brush: 48, clearAt: 0.55, hint: 'протри' };
+const FOG = { brush: 48, clearAt: 0.55, hint: 'протри', light: 0.3, alpha: 0.9 };   // light — сколько белого поверх фото инея, alpha — прозрачность инея
+/* иней — фото морозных узоров (img/frost); у каждого кейса свой вариант: одно из двух фото
+   и одно из четырех отражений, варианты не повторяются, пока не пройдут все восемь */
+const FUN_BASE = (document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/fun\.js(\?|$)/.test(s)) || '').replace(/fun\.js(\?.*)?$/, '');
+const FROST = ['img/frost/frost-1.webp', 'img/frost/frost-2.webp'].map(src => { const i = new Image(); i.decoding = 'async'; i.src = FUN_BASE + src; return i; });
+let frostLeft = [];
+function frostPick(){
+  if (!frostLeft.length) { for (let i = 0; i < 2; i++) for (let m = 0; m < 4; m++) frostLeft.push([i, m & 1, m >> 1]); frostLeft.sort(() => Math.random() - 0.5); }
+  return frostLeft.pop();
+}
 let fogs = [];
 /* иней: голубовато-белая наледь, морозные узоры от краев и снежинки */
 function makeFog(media){
@@ -945,36 +954,24 @@ function makeFog(media){
   const r = media.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1), W = r.width, H = r.height;
   c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
   const g = c.getContext('2d'); g.scale(dpr, dpr);
-  const base = g.createLinearGradient(0, 0, W, H);
-  base.addColorStop(0, 'rgba(238,244,252,.97)'); base.addColorStop(.5, 'rgba(214,226,242,.94)'); base.addColorStop(1, 'rgba(236,242,250,.97)');
-  g.fillStyle = base; g.fillRect(0, 0, W, H);
-  // морозные папоротники: ветвятся от краев к центру
-  g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineCap = 'round';
-  const fern = (x, y, ang, len, depth) => {
-    if (depth > 3 || len < 4) return;
-    const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len;
-    g.lineWidth = Math.max(0.5, 2.2 - depth * 0.45);
-    g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke();
-    const n = 3;
-    for (let k = 1; k <= n; k++) {
-      const px = x + (x2 - x) * k / (n + 1), py = y + (y2 - y) * k / (n + 1);
-      fern(px, py, ang + 0.75 + rand(-0.15, 0.15), len * 0.42, depth + 1);
-      fern(px, py, ang - 0.75 + rand(-0.15, 0.15), len * 0.42, depth + 1);
-    }
-    fern(x2, y2, ang + rand(-0.3, 0.3), len * 0.6, depth + 1);
+  const [pic, fx, fy] = frostPick(), img = FROST[pic];
+  const paint = () => {
+    g.clearRect(0, 0, W, H);
+    g.globalAlpha = FOG.alpha;
+    if (img.complete && img.naturalWidth) {
+      // фото по размеру превью (как object-fit: cover), отраженное по своему варианту
+      const k = Math.max(W / img.naturalWidth, H / img.naturalHeight), iw = img.naturalWidth * k, ih = img.naturalHeight * k;
+      g.save(); g.translate(fx ? W : 0, fy ? H : 0); g.scale(fx ? -1 : 1, fy ? -1 : 1);
+      g.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih); g.restore();
+      g.fillStyle = `rgba(255,255,255,${FOG.light})`; g.fillRect(0, 0, W, H);
+    } else { g.fillStyle = 'rgba(226,236,248,1)'; g.fillRect(0, 0, W, H); }
+    g.globalAlpha = 1;
+    g.fillStyle = '#1D222A'; g.font = '500 18px "Golos Text", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(FOG.hint, W / 2, H / 2);
   };
-  for (let i = 0; i < 9; i++) {
-    const edge = Math.floor(Math.random() * 4), t = Math.random();
-    const [x, y, a] = edge === 0 ? [t * W, 0, Math.PI / 2] : edge === 1 ? [W, t * H, Math.PI] : edge === 2 ? [t * W, H, -Math.PI / 2] : [0, t * H, 0];
-    fern(x, y, a + rand(-0.5, 0.5), Math.min(W, H) * rand(0.18, 0.32), 0);
-  }
-  // снежинки и зерно льда
-  for (let i = 0; i < W * H / 40; i++) {
-    g.fillStyle = `rgba(255,255,255,${rand(0.15, 0.6)})`;
-    g.beginPath(); g.arc(Math.random() * W, Math.random() * H, rand(0.4, 1.6), 0, Math.PI * 2); g.fill();
-  }
-  g.fillStyle = '#1D222A'; g.font = '500 18px "Golos Text", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillText(FOG.hint, W / 2, H / 2);
+  paint();
+  // фото еще грузится — дорисуем, когда придет (если протирать еще не начали)
+  if (!(img.complete && img.naturalWidth)) img.addEventListener('load', () => { if (!f.cleared && !f.done) paint(); }, { once: true });
   const cols = 16, rows = 10;
   const f = { media, c, g, w: W, h: H, grid: new Uint8Array(cols * rows), cols, rows, cleared: 0, last: null };
   f.onMove = e => wipe(f, e);
