@@ -825,7 +825,7 @@ function setupUfo(){
   ufo.el.setAttribute('role', 'img'); ufo.el.setAttribute('aria-label', 'НЛО');
   document.body.append(ufo.beam, ufo.el);
   ufo.el.addEventListener('click', () => { joke('ufo'); ufo.state = 'leave'; });
-  ufo.state = 'wait'; ufo.until = performance.now() + rand(6000, 10000);
+  ufo.state = 'wait'; ufo.until = performance.now() + rand(3000, 6000);
 }
 /* иней или листалка фото на экране или рядом (margin — запас в экранах): там НЛО не место */
 function frostNear(margin){
@@ -869,11 +869,11 @@ function updateUfo(dt, now){
   if (ufo.state === 'wait') {
     tx = -260; ty = 120;
     // на первом экране НЛО не появляется; не появляется и у многоножки, у инея и поверх сообщения
-    if (now > ufo.until && scrollY > innerHeight * 0.8 && !(onCasesPage() && bugZone()) && !frostNear(0.5) && !document.querySelector('.toast')) { ufo.state = 'fly';
+    if (now > ufo.until && scrollY > innerHeight * 0.8 && !(onCasesPage() && bugZone()) && !frostNear(0.1) && !document.querySelector('.toast')) { ufo.state = 'fly';
       ufo.target = pickTarget(); ufo.x = Math.random() < 0.5 ? -200 : innerWidth + 80; ufo.y = rand(90, 200); }
   } else if (ufo.state === 'leave') {
     tx = ufo.x > innerWidth / 2 ? innerWidth + 300 : -300; ty = -140; k = 0.05;
-    if (ufo.x < -240 || ufo.x > innerWidth + 240) { giveBack(); ufo.state = 'wait'; ufo.until = now + (ufo.shooed ? rand(4000, 8000) : rand(25000, 40000)); ufo.shooed = false; }
+    if (ufo.x < -240 || ufo.x > innerWidth + 240) { giveBack(); ufo.state = 'wait'; ufo.until = now + (ufo.shooed ? rand(4000, 8000) : rand(10000, 16000)); ufo.shooed = false; }
   } else {
     const t = ufo.target;
     const r = t && t.getBoundingClientRect();
