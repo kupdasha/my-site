@@ -292,7 +292,7 @@ img,video{display:block;max-width:100%}
 .media iframe.ready{opacity:1}
 /* ролик не 16:9 (поле ratio у проекта) — растягиваем плеер, чтобы видео закрыло обложку без черных полос */
 .media iframe[style*="--vr"]{width:max(calc(var(--ph,0px) * 16 / 9), calc(var(--pw,100%) / var(--vr) * 16 / 9));height:max(var(--ph,100%), calc(var(--pw,100%) / var(--vr)))}
-.work .meta{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-top:20px}
+.work .meta{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:20px}   /* тег — под названием */
 .case-ttl{display:flex;align-items:flex-start;gap:.35em;min-width:0}
 /* год идет сразу за последним словом названия, даже если название в две строки */
 .ttl{display:block;min-width:0;transition:transform .5s var(--ease)}
@@ -746,7 +746,7 @@ img,video{display:block;max-width:100%}
 .nda-media img{position:absolute;inset:-12%;width:124%;height:124%;object-fit:cover;filter:blur(36px) saturate(1.2)}
 .nda-lock{position:absolute;left:20px;bottom:20px;width:48px;height:48px;border-radius:14px;background:var(--bg);color:var(--ink);display:grid;place-items:center;z-index:1;transition:transform .5s var(--ease)}
 .nda-item:hover .nda-lock{transform:rotate(-8deg) scale(1.06)}
-.nda-item .meta{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-top:20px}
+.nda-item .meta{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:20px}   /* тег — под названием */
 .nda-item h3{font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.1}
 .nda-cta{margin-top:clamp(40px,5vw,64px)}
 /* закрытые карточки уходят под градиент цвета фона */
