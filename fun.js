@@ -1028,28 +1028,38 @@ function setupFog(){
    ================================================================ */
 const SECRET = { clearAt: 0.6 };   // тексты — в content.js, раздел secret
 let secrets = [];
+/* досье — готовые картинки (img/dossier): бумага одного тона, печать «засекречено», замок и серебряная
+   пластина уже нарисованы. Пластина — стираемый слой: холст на ее месте, в него перерисован этот же кусок
+   картинки; под ним — шутка на бумаге. Сверху — вымаранные строки, у каждого досье свои.
+   plate — место пластины в долях картинки (x, y, ширина, высота), ratio — ширина к высоте */
+const DOSSIERS = [
+  { src: 'img/dossier/d-1.webp', ratio: 1.792,  plate: [0.1526, 0.4245, 0.6937, 0.2707] },
+  { src: 'img/dossier/d-2.webp', ratio: 1.8081, plate: [0.1635, 0.404,  0.6407, 0.2735] },
+  { src: 'img/dossier/d-3.webp', ratio: 1.7805, plate: [0.1654, 0.4315, 0.6665, 0.2795] },
+  { src: 'img/dossier/d-4.webp', ratio: 1.8082, plate: [0.1778, 0.4342, 0.6285, 0.2672] },
+];
 function makeSecret(media, k){
   const T = SITE.secret, prank = T.pranks[Math.min(k, T.pranks.length - 1)];
+  const D = DOSSIERS[k % DOSSIERS.length], [px, py, pw, ph] = D.plate;
   const d = document.createElement('div');
   d.className = 'dossier'; d.setAttribute('aria-hidden', 'true');
-  // вымаранные строки: черные плашки разной длины
+  // вымаранные строки: от двух до четырех, у каждого досье своя длина и отступ
   let lines = '';
-  for (let i = 0; i < 4; i++) lines += `<i style="width:${Math.round(rand(35, 92))}%"></i>`;
-  d.innerHTML = `<span class="dossier-lines">${lines}</span><b class="stamp">${T.stamp}</b><span class="prank">${prank}</span><canvas class="silver"></canvas>`;
+  const n = 2 + ((k * 7 + 3) % 3);
+  for (let i = 0; i < n; i++) lines += `<i style="width:${Math.round(rand(28, 62))}%;margin-left:${i ? Math.round(rand(0, 6)) : 0}%"></i>`;
+  const at = `left:${px * 100}%;top:${py * 100}%;width:${pw * 100}%;height:${ph * 100}%`;
+  d.innerHTML = `<div class="dossier-page" style="aspect-ratio:${D.ratio};background-image:url('${FUN_BASE}${D.src}')">
+    <span class="dossier-lines" style="top:${8 + (k % 3) * 2}%">${lines}</span>
+    <span class="prank" style="${at}">${prank}</span><canvas class="silver" style="${at}"></canvas></div>`;
   media.appendChild(d);
   const c = d.querySelector('.silver'), r = c.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
   c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
   const g = c.getContext('2d'); g.scale(dpr, dpr);
-  // серебро: металлический перелив, искорки и подпись
-  const grad = g.createLinearGradient(0, 0, r.width, r.height);
-  grad.addColorStop(0, '#AEB4BE'); grad.addColorStop(0.35, '#EEF1F5'); grad.addColorStop(0.55, '#C3C8D0'); grad.addColorStop(0.8, '#F4F6F9'); grad.addColorStop(1, '#A4AAB4');
-  g.fillStyle = grad; g.fillRect(0, 0, r.width, r.height);
-  for (let i = 0; i < r.width * r.height / 18; i++) {
-    g.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,.35)' : 'rgba(90,97,110,.18)';
-    g.fillRect(Math.random() * r.width, Math.random() * r.height, 1, 1);
-  }
-  g.fillStyle = '#5A616E'; g.font = '500 16px "Golos Text", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillText(T.label, r.width / 2, r.height / 2);
+  // пластина: тот же кусок картинки досье (с надписью «сотри монеткой»); пока картинка грузится — ровное серебро
+  g.fillStyle = '#C3C8D0'; g.fillRect(0, 0, r.width, r.height);
+  const img = new Image();
+  img.onload = () => { if (!f.cleared && !f.done) { const W = img.naturalWidth, H = img.naturalHeight; g.drawImage(img, px * W, py * H, pw * W, ph * H, 0, 0, r.width, r.height); } };
+  img.src = FUN_BASE + D.src;
   const cols = 14, rows = 5;
   const f = { d, c, g, w: r.width, h: r.height, grid: new Uint8Array(cols * rows), cols, rows, cleared: 0, last: null };
   f.onMove = e => scratch(f, e);
