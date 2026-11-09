@@ -13,8 +13,8 @@
       Любую кнопку можно поймать: под курсором она замирает и дрожит.
    2. Заголовки разделов живут своей жизнью: буквы плывут, кружат,
       дерутся или собираются в смайлик.
-   3. Многоножка ползет по рамке окна, иногда спрыгивает на кейсы
-      и падает с одного на другой. Клик — перекрашивается, второй — убегает.
+   3. Многоножка ползет по рамке окна, иногда спрыгивает на кейсы и строки
+      крупного текста и сползает с одного на другое. Клик — перекрашивается, второй — убегает.
    5. Струны направлений оставляют радужный шлейф и звучат как гитара.
       Звук включается после первого клика где угодно (так требует браузер).
    6. НЛО летает по всей странице и ворует лучом то, что видно на экране:
@@ -54,7 +54,7 @@ const FUN = {
     speed:    55,      // скорость, px в секунду
     inset:    14,      // отступ дорожки от края окна, px
     corner:   60,      // скругление дорожки в углах, px
-    visitEvery: [12, 22], // раз в сколько секунд спрыгивает на кейсы (от, до)
+    visitEvery: [7, 14],  // раз в сколько секунд уходит с рамки на кейсы и строки текста (от, до)
     zone:     0.6,     // на сколько экранов ниже начала списка кейсов еще живет (дальше исчезает)
     // расцветки по кругу (меняются по клику)
     colors: [
@@ -605,11 +605,42 @@ function bugZone(){
 }
 const onCasesPage = () => !!document.getElementById('workList');
 /* кейсы, на которые можно спрыгнуть: верхний край превью в координатах страницы (кроме тех, что под инеем) */
+/* где можно ползать, кроме рамки: верхние края превью кейсов и строки крупного текста
+   (первый экран, заголовки): по строке ползет, с края строки сползает на следующую.
+   Раскладка строк дорогая — список обновляется не чаще раза в 200 мс */
+const TEXT_SURF = '#hero .h1, #hero .hero-sub, #hero .lead, .h2, .sec-note, .dir h3, .work h3, .nda-item h3, .contact h2, .about-page .big';
+function lines(el){
+  const rg = document.createRange(); rg.selectNodeContents(el);
+  const out = [], fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+  for (const q of rg.getClientRects()) {
+    if (q.width < 4 || q.height < 8) continue;
+    const ln = out.find(l => Math.abs(l.top - q.top) < q.height * 0.5);
+    if (ln) { ln.left = Math.min(ln.left, q.left); ln.right = Math.max(ln.right, q.right); }
+    else out.push({ top: q.top + q.height * 0.5 - fs * 0.22, left: q.left, right: q.right });   // пол — верх строчных букв
+  }
+  return out;
+}
+let cardsCache = null, cardsAt = 0;
 function cards(){
-  return [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
-    const r = el.getBoundingClientRect();
-    return { el, left: r.left + 12, right: r.right - 12, top: r.top + scrollY, vtop: r.top };
-  }).filter(c => c.right - c.left > 80);
+  const t = performance.now();
+  if (cardsCache && t - cardsAt < 200) return cardsCache;   // top — в координатах страницы, прокрутка его не портит
+  cardsAt = t;
+  const out = [...document.querySelectorAll('.work .media:not(.fogged), .nda-media')].map(el => {
+    const rect = () => { const r = el.getBoundingClientRect(); return { left: r.left + 12, right: r.right - 12, top: r.top }; };
+    const r = rect();
+    return { el, rect, left: r.left, right: r.right, top: r.top + scrollY, vtop: r.top };
+  });
+  document.querySelectorAll(TEXT_SURF).forEach(el => {
+    const b = el.getBoundingClientRect();
+    if (b.bottom < -H || b.top > H * 2 || !b.width) return;
+    lines(el).forEach((l, i) => {
+      // строка пересчитывается не чаще раза в 200 мс; хранится в координатах страницы, отдается в координатах окна
+      let lastT = t, last = { ...l, top: l.top + scrollY };
+      const rect = () => { const n = performance.now(); if (n - lastT > 200) { lastT = n; const q = lines(el)[i]; if (q) last = { ...q, top: q.top + scrollY }; } return { left: last.left + 6, right: last.right - 6, top: last.top - scrollY }; };
+      out.push({ el, rect, left: l.left + 6, right: l.right - 6, top: l.top + scrollY, vtop: l.top });
+    });
+  });
+  return (cardsCache = out.filter(c => c.right - c.left > 80));
 }
 const STAND = () => C.size * 1.1;   // насколько тело выше края, на котором стоит
 
@@ -639,9 +670,10 @@ function updateBug(dt, now){
     // пора прогуляться по кейсам
     if (now > bug.nextVisit) {
       bug.nextVisit = now + rand(...C.visitEvery) * 1000;
-      const near = cards().filter(c => c.vtop > 120 && c.vtop < H - 200);
+      const near = cards().filter(c => c.vtop > 120 && c.vtop < H - 120);
       if (near.length) {
-        const c = near.reduce((a, b) => (Math.hypot(a.left - bug.x, a.top - bug.y) < Math.hypot(b.left - bug.x, b.top - bug.y) ? a : b));
+        // одна из трех ближайших — так она бывает и на тексте, и на кейсах
+        const c = near.sort((a, b) => Math.hypot(a.left - bug.x, a.top - bug.y) - Math.hypot(b.left - bug.x, b.top - bug.y))[Math.floor(Math.random() * Math.min(3, near.length))];
         const fromLeft = Math.abs(bug.x - c.left) < Math.abs(bug.x - c.right);
         bug.card = c; bug.cardDir = fromLeft ? 1 : -1;
         bug.mode = 'walk'; bug.tx = fromLeft ? c.left : c.right; bug.ty = c.top - STAND();
@@ -654,8 +686,8 @@ function updateBug(dt, now){
     else { bug.x += dx / d * step; bug.y += dy / d * step; }
   } else if (bug.mode === 'edge') {
     // ползет по верхнему краю превью
-    const c = bug.card, r = c.el.getBoundingClientRect();
-    c.left = r.left + 12; c.right = r.right - 12; c.top = r.top + scrollY;
+    const c = bug.card, r = c.rect();
+    c.left = r.left; c.right = r.right; c.top = r.top + scrollY;
     if (scared) { bug.cardDir = -bug.cardDir; bug.speed = C.speed * 3; }
     if (moving) bug.x += bug.cardDir * bug.speed * dt;
     bug.y = c.top - STAND();
