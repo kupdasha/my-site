@@ -1070,8 +1070,11 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 /* НЛО и его луч */
 #nda .wrap{position:relative}
 .ufo{position:fixed;left:0;top:0;width:120px;height:60px;z-index:87;cursor:pointer;will-change:transform}
-.ufo-lights circle{animation:ufoBlink 1.2s steps(2) infinite;animation-delay:calc(var(--i) * .2s)}
-@keyframes ufoBlink{50%{fill:#EF8EDB}}
+.ufo-img{position:absolute;left:0;top:6px;width:120px;height:auto;pointer-events:none;user-select:none}
+.ufo-glow{position:absolute;inset:0;pointer-events:none}
+/* огоньки на днище: поверх шариков картинки по очереди вспыхивают розовым */
+.ufo-lights circle{fill:transparent;animation:ufoBlink 1.2s steps(2) infinite;animation-delay:calc(var(--i) * .2s)}
+@keyframes ufoBlink{50%{fill:rgba(255,170,236,.85)}}
 .ufo-beam{position:fixed;left:0;top:0;z-index:86;pointer-events:none;opacity:0;transition:opacity .5s var(--ease)}
 /* сам луч: конус, который мягко растворяется книзу и по краям, и мерцает, как лампа */
 .ufo-beam::before{content:"";position:absolute;inset:0;

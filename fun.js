@@ -810,29 +810,18 @@ function addNotes(){
    ================================================================ */
 const STEAL = '.h2 .wd, .work h3, .work .tag, .nda-item h3, .nda-item .tag, .dir .go, .client, .fact span:last-child, .sec-note, .pod-play, .about .big, .ttt-rules';
 const ufo = { el: null, beam: null, x: -200, y: 120, loot: [], state: 'fly', until: 0, target: null, back: 0 };
-const UFO_HTML = `
-<svg viewBox="0 0 120 60" width="120" height="60">
-  <defs>
-    <linearGradient id="ufoMetal" x1="0" y1="0" x2="1" y2="0.35">
-      <stop offset="0" stop-color="#4C525E"/><stop offset=".22" stop-color="#C9CED6"/><stop offset=".42" stop-color="#6B727F"/>
-      <stop offset=".62" stop-color="#E4E7EC"/><stop offset=".82" stop-color="#5C636F"/><stop offset="1" stop-color="#8E95A1"/>
-    </linearGradient>
-    <linearGradient id="ufoGlass" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8FA3C4"/><stop offset="1" stop-color="#3A4358"/>
-    </linearGradient>
-  </defs>
-  <circle cx="60" cy="26" r="17" fill="url(#ufoGlass)" stroke="#2A2F3A" stroke-width="1.5"/>
-  <circle cx="54" cy="21" r="4" fill="#FFFFFF"/>
-  <ellipse cx="60" cy="36" rx="54" ry="12" fill="url(#ufoMetal)" stroke="#2A2F3A" stroke-width="1.5"/>
-  <rect x="10" y="33" width="100" height="6" rx="3" fill="#E2FB5A"/>
-  <g class="ufo-lights">${[22, 38, 54, 70, 86].map((x, i) => `<circle cx="${x + 6}" cy="45" r="3.2" fill="#1D222A" style="--i:${i}"/>`).join('')}</g>
+// тарелка — картинка (img/ufo.webp), поверх нее мигают огоньки на днище (по местам шариков на картинке)
+const UFO_HTML = () => `
+<img class="ufo-img" src="${FUN_BASE}img/ufo.webp" alt="" width="120" height="45" draggable="false">
+<svg class="ufo-glow" viewBox="0 0 120 60" width="120" height="60">
+  <g class="ufo-lights">${[25.1, 42.6, 60.2, 77.7, 95.3].map((x, i) => `<circle cx="${x}" cy="46.6" r="3.4" style="--i:${i}"/>`).join('')}</g>
 </svg>`;
 function setupUfo(){
   ufo.el?.remove(); ufo.beam?.remove(); ufo.el = ufo.beam = null;
   giveBack(true);
   if (!on) return;
   ufo.beam = document.createElement('div'); ufo.beam.className = 'ufo-beam';
-  ufo.el = document.createElement('div'); ufo.el.className = 'ufo'; ufo.el.innerHTML = UFO_HTML;
+  ufo.el = document.createElement('div'); ufo.el.className = 'ufo'; ufo.el.innerHTML = UFO_HTML();
   ufo.el.setAttribute('role', 'img'); ufo.el.setAttribute('aria-label', 'НЛО');
   document.body.append(ufo.beam, ufo.el);
   ufo.el.addEventListener('click', () => { joke('ufo'); ufo.state = 'leave'; });
@@ -909,7 +898,7 @@ function updateUfo(dt, now){
   const beamOn = (ufo.state === 'beam' || ufo.state === 'hold') && ufo.target;
   ufo.beam.style.opacity = beamOn ? 1 : 0;
   if (beamOn) {
-    const r = ufo.target.getBoundingClientRect(), top = ufo.y + bob + 44, wb = Math.min(r.width, 260) + 30;
+    const r = ufo.target.getBoundingClientRect(), top = ufo.y + bob + 48, wb = Math.min(r.width, 260) + 30;
     ufo.beam.style.transform = `translate(${(ufo.x + 60 - wb / 2).toFixed(1)}px, ${top.toFixed(1)}px)`;
     ufo.beam.style.width = wb + 'px';
     ufo.beam.style.height = Math.max(0, r.bottom + 6 - top) + 'px';
