@@ -1053,11 +1053,14 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 .fog.gone{opacity:0}
 
 /* секретные материалы: досье с серебряной полосой, которую стирают монеткой */
-.dossier{position:absolute;inset:0;z-index:2;border-radius:inherit;background:#14161B;overflow:hidden}
+.dossier{position:absolute;inset:0;z-index:2;border-radius:inherit;background:none;overflow:hidden}
 /* лист досье — картинка целиком (без обрезки), по центру превью */
 .dossier-page{position:absolute;left:0;right:0;top:50%;translate:0 -50%;background:center/100% 100% no-repeat}
 /* замок уже нарисован на досье — свой значок карточки поверх не нужен */
 .nda-media:has(.dossier) .nda-lock{display:none}
+/* под досье ничего: ни темной подложки, ни цветных переливов карточки — только лист */
+.nda-media:has(.dossier){background:none}
+.nda-media:has(.dossier) .waves{display:none}
 /* под пластиной — бумага того же тона, что у картинок досье, с вдавленным следом от пластины */
 .dossier-page .prank{background:#CFC8C0;border-radius:10px;box-shadow:inset 0 1px 4px rgba(60,45,30,.35);color:#2E2822}
 .dossier-page .silver{border-radius:10px}
