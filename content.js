@@ -2329,7 +2329,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                    'Я думаю, что мы все ждем подтверждения, что будущее есть и однажды мы проснемся старыми и счастливыми.'],
             movie: { src: 'img/clip/clip.mp4', poster: 'img/clip/dial.jpg' } },
           // альбом «Белая радуга»: обложка-петля (тихая, без кнопок и полного экрана), текст и ссылки на площадки
-          { label: ['альбом 2026', 'альбом 2026'],
+          { label: ['ноябрь 2026', 'ноябрь 2026'],
             title: ['песни с Claude', 'песни с Claude'],
             album: {
               src: 'img/clip/album.mp4', srcS: 'img/clip/album-s.mp4', poster: 'img/clip/album.webp',
