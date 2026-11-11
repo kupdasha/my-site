@@ -171,6 +171,10 @@ img,video{display:block;max-width:100%}
 .switch>span::before{content:"";position:absolute;inset:-12px -16px;z-index:-1;pointer-events:none;border-radius:99px;
   background:radial-gradient(closest-side,var(--bg) 55%,color-mix(in srgb,var(--bg) 0%,transparent))}
 .switch-big>span::before{display:none}
+/* в дружеской версии фон под шапкой — яркий перелив, и облачко цвета фона (почти черное) выглядело черным пятном (11.11):
+   облачка нет, надписи читаются за счет легкой тени */
+:root[data-theme="dark"] .switch>span::before{display:none}
+:root[data-theme="dark"] .switch>span{text-shadow:0 1px 8px rgba(14,15,18,.45)}
 
 .switch>i{position:relative;width:64px;height:36px;border-radius:99px;flex:none;
   /* «переливающееся стекло»: яркая заливка и пятно соседнего оттенка (на 40° по кругу — смешения чистые); оттенки идут по цветовому кругу (oklch, от лаймового через зеленый,
