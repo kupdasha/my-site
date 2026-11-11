@@ -246,6 +246,36 @@ function movieHTML(c){
   return `<div class="cl-movie"><video src="${c.src}" poster="${c.poster}" controls preload="metadata" playsinline></video></div>${cap(c.hint)}`;
 }
 
+/* ---------- альбом «Белая радуга»: обложка-петля без кнопок, текст колонками, ссылки на площадки ---------- */
+// ролик тихий, крутится по кругу; полноэкранного режима и меню нет — это обложка, а не плеер.
+// Грузится, только когда подходит к экрану; на узком экране — легкая копия (src-s), играет, лишь пока виден
+function albumHTML(c){
+  return `<div class="cl-album">
+    <div class="cl-album-v"><video muted loop playsinline preload="none" disablepictureinpicture disableremoteplayback
+      controlslist="nofullscreen nodownload noremoteplayback" poster="${c.poster}" data-src="${c.src}" data-src-s="${c.srcS || c.src}" aria-hidden="true"></video></div>
+    ${c.more ? `<div class="cl-album-more">${c.more.map(t => `<p>${H.T(t)}</p>`).join('')}</div>` : ''}
+    ${c.links ? `<div class="cl-album-links">${c.links.map(l =>
+      `<a class="btn btn-accent" href="${l.link}" target="_blank" rel="noopener"><span>${H.T(l.text)}</span></a>`).join('')}</div>` : ''}
+  </div>`;
+}
+function liveAlbum(box){
+  const v = box.querySelector('.cl-album video');
+  v.addEventListener('dblclick', e => e.preventDefault());
+  v.addEventListener('contextmenu', e => e.preventDefault());
+  const load = () => {
+    if (v.src) return;
+    v.src = matchMedia('(max-width:760px)').matches ? v.dataset.srcS : v.dataset.src;
+  };
+  // раз в полсекунды: близко к экрану — грузим и играем, ушел — пауза (как у лестницы: сигнал «на экране» приходит не всегда)
+  const tick = () => {
+    if (!v.isConnected) return clearInterval(t);
+    const r = v.getBoundingClientRect(), near = r.bottom > -300 && r.top < innerHeight + 300;
+    if (near) { load(); if (v.paused && !still()) v.play().catch(() => {}); }
+    else if (!v.paused) v.pause();
+  };
+  const t = setInterval(tick, 500); tick();
+}
+
 const KINDS = {
   worlds: [worldsHTML, liveWorlds],
   voice:  [voiceHTML, liveVoice],
@@ -253,6 +283,7 @@ const KINDS = {
   takes:  [takesHTML, liveTakes],
   score:  [scoreHTML, liveScore],
   movie:  [movieHTML, () => {}],
+  album:  [albumHTML, liveAlbum],
 };
 
 /* ---------- запуск ---------- */
