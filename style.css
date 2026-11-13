@@ -1731,6 +1731,8 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
 
 /* светлые картинки с белыми полями: 3% черного отделяют их от белого фона страницы */
 .camp-shot.tint::after,.zm-shot::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.03);pointer-events:none}
+/* светлая по краям картинка — тонкая серая рамка поверх (у img inset-тень не рисуется, поэтому на ::after) */
+.camp-shot.light::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px #E4E5E8;pointer-events:none}
 @media (prefers-reduced-motion:reduce){
   .ys-track i,.ys-tags li,.zm-arrow path{transition:none;transform:none;opacity:1;stroke-dashoffset:0}
 }

@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- служебная страница: по ней записывается ролик-обложка кейса Воскресенска (исходники/vosk-cover.mjs) -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="../style.css">
+<style>
+  html,body{margin:0;background:#fff;overflow:hidden}
+  #wrap{width:1600px;height:900px;position:relative}
+  #wrap .case-hero{position:absolute;inset:0;aspect-ratio:auto!important;max-height:none;background:#fff}
+  #wrap .case-hero::after{display:none}
+</style>
+<div id="wrap"><div class="case-hero"></div><div class="case-body"><div class="vo-mount"></div></div></div>
+<script type="module">
+  // наблюдатель видимости выключен: сборку запускает запись, а не прокрутка
+  window.IntersectionObserver = class { observe(){} unobserve(){} disconnect(){} };
+  const { mountVosk } = await import('../vosk.js?v=' + Date.now());
+  await mountVosk(document.querySelector('.vo-mount'), { gallery: [], vosk: {} }, { T: x => x, pick: x => x[0], base: '../' });
+  const hero = document.querySelector('.case-hero'), svg = hero.querySelector('.vo-mark');
+  let anims = [];
+  window.build = () => {
+    svg.getBoundingClientRect();
+    svg.classList.add('in');
+    anims = document.getAnimations().filter(a => hero.contains(a.effect && a.effect.target));
+    anims.forEach(a => a.pause());
+    return anims.length;
+  };
+  // t — секунды от начала цикла; исчезновение — общая прозрачность
+  window.at = (t, fade) => new Promise(res => {
+    anims.forEach(a => { a.currentTime = t * 1000; });
+    hero.style.opacity = fade;
+    requestAnimationFrame(() => requestAnimationFrame(res));
+  });
+  window.ready = true;
+</script>

@@ -77,7 +77,7 @@ addEventListener('error', e => {
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'rosmedia', 'checkup', 'speaker'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'rosmedia', 'checkup', 'speaker', 'vosk'];
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -1526,7 +1526,8 @@ function campCell(src){
     return html.replace('class="camp-shot frame"', `class="${cls}" style="--ar:${src.ratio || 16 / 9}${src.frame ? ';--fr:' + src.frame : ''}"`);
   }
   // { img, tint: true } — светлая картинка с белыми полями: легкое затемнение отделяет ее от белого фона
-  if (src && src.img) return campCell(src.img).replace('class="camp-shot"', `class="camp-shot${src.tint ? ' tint' : ''}"`);
+  // { img, light: true } — светлая по краям картинка: тонкая серая рамка, чтобы не сливалась с белой страницей (см. Воскресенск)
+  if (src && src.img) return campCell(src.img).replace('class="camp-shot"', `class="camp-shot${src.tint ? ' tint' : ''}${src.light ? ' light' : ''}"`);
   const m = parseMedia(src);
   if (m.type === 'image') return `<button class="camp-shot" aria-label="Увеличить"><img src="${m.src}" alt="" loading="lazy"></button>`;
   if (m.type === 'file') return `<div class="camp-shot frame"><video src="${m.src}" muted loop playsinline autoplay></video></div>`;
@@ -2304,6 +2305,8 @@ function galleryItem(x){
   if (x && x.frames) return framesHTML(x.frames);
   // { ctPlayer } — рабочий плеер со сценами, { ctStories } — сторис по очереди; оба рисует cartoon.js (см. «мультик созданный кодом»)
   if (x && (x.ctPlayer || x.ctStories)) return `<div class="ct-mount"></div>`;
+  // { vosk: 'tiles' | 'cards' } — блоки кейса Воскресенска (картинки с подписью у каждой); рисует vosk.js по порядку
+  if (x && x.vosk) return `<div class="wrap vo-ch"></div>`;
   if (x && x.row) return campRow(x.row, x.caption, x.narrow);
   // { screen: [ряды], title, text } — проект во весь экран: название и подпись, под ними ряды картинок; ряд — картинка
   // или список картинок рядом (высокие плакаты — парой), ряд не выше экрана, широкий кадр — во всю ширину.
@@ -2629,6 +2632,8 @@ function renderCase(k, keepScroll){
   if (p.stickers) body += `<div class="stk stk-mount"></div>`;
   // egg — таймер для яйца: переключатели условий и кастрюля, пять желтков, экран таймера; рисует egg.js
   if (p.egg) body += `<div class="eg eg-mount"></div>`;
+  // vosk — айдентика Воскресенска: знак собирается в шапке (сетка, орбиты, ядро, электроны калия, три круга); рисует vosk.js
+  if (p.vosk) body += `<div class="vo-mount"></div>`;
   // flip — шоурил Bright Side: полоски громкости в цветах кадров, вторая половина переворачивается вместе с музыкой; рисует showreel.js
   if (p.flip) body += `<div class="sr sr-mount"></div>`;
   // rosatom — ребрендинг HR-экосистемы Росатома: зоопарк логотипов, ресерч под спойлером, три концепции с липким меню; рисует rosatom.js
@@ -2803,6 +2808,10 @@ function renderCase(k, keepScroll){
   if (eg) caseImport('egg')
     .then(m => m.mountEgg(eg, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс таймера для яйца не загрузился', err));
+  const vo = caseContent.querySelector('.vo-mount');
+  if (vo) caseImport('vosk')
+    .then(m => m.mountVosk(vo, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс Воскресенска не загрузился', err));
   const sr = caseContent.querySelector('.sr-mount');
   if (sr) caseImport('showreel')
     .then(m => m.mountShowreel(sr, p, { T, pick, base: SCRIPT_BASE }))
