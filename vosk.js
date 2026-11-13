@@ -439,22 +439,22 @@ float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32);
 float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3. - 2. * f);
   return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y); }
 float fbm(vec2 p){ float v = 0., a = .5; for (int i = 0; i < 5; i++){ v += a * noise(p); p = p * 2.03 + 17.1; a *= .5; } return v; }
-float height(vec2 p){ return fbm(p / 210.) * 1.3 + fbm(p / 52.) * .3 + noise(p / 7.) * .025; }
+float height(vec2 p){ return fbm(p / 120.) * .9 + fbm(p / 9.) * .22 + noise(p / 2.6) * .07; }   // мелкая мятая фольга, как на обложке
 void main(){
   vec2 sp = uPos + vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) / uDpr;   // точка на экране, css px
   float e = 1.5, h = height(sp);
-  vec3 n = normalize(vec3(-(height(sp + vec2(e, 0)) - h) * 16., (height(sp + vec2(0, e)) - h) * 16., 1.));
+  vec3 n = normalize(vec3(-(height(sp + vec2(e, 0)) - h) * 6., (height(sp + vec2(0, e)) - h) * 6., 1.));
   // свет на постоянной высоте: за курсором поворачивается только направление — средняя яркость не прыгает
   vec2 dir = uLight - uCenter; dir = length(dir) > 1. ? normalize(dir) : vec2(0., -1.);
   vec3 L = normalize(vec3(dir * vec2(1, -1) * .75, .66));
   vec3 V = vec3(0, 0, 1), Hh = normalize(L + V), r = reflect(-V, n);
-  float diff = clamp(dot(n, L), 0., 1.); diff = pow(diff, 3.);
-  float spec = pow(max(dot(n, Hh), 0.), 90.) + .2 * pow(max(dot(n, Hh), 0.), 14.);
+  float diff = clamp(dot(n, L), 0., 1.); diff = smoothstep(.55, 1., diff);
+  float spec = pow(max(dot(n, Hh), 0.), 60.) * .55 + .12 * pow(max(dot(n, Hh), 0.), 8.);
   float band = .5 + .5 * sin(r.x * 7. + r.y * 4. + atan(dir.y, dir.x) * 1.5 + uT * .15);
-  vec3 deep = vec3(.66, .43, .05), mid = vec3(.93, .70, .15), lite = vec3(1., .87, .42);
-  vec3 c = mix(deep, mid, smoothstep(.15, .95, diff));
-  c = mix(c, lite, band * band * band * .45);
-  c += vec3(1., .96, .78) * spec * .7;
+  vec3 deep = vec3(.56, .35, .01), mid = vec3(.84, .61, .17), lite = vec3(1., .86, .43);   // цвета сняты с обложки-референса
+  vec3 c = mix(mix(deep, mid, .55), mid, diff);
+  c = mix(c, lite, band * band * band * .3);
+  c += vec3(1., .93, .62) * spec * .6;
   gl_FragColor = vec4(min(c, 1.), 1.);
 }`;
 let G = null;

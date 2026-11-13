@@ -682,7 +682,7 @@ function renderNdaPage(){
     const ratio = p.ratio || '16/9';
     const inner = `
       <span class="media" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
-      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
+      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}`;
     const cls = 'work';
     // page: '' — отдельной страницы еще нет: карточка видна, но никуда не ведет
@@ -949,6 +949,14 @@ let workFilter = SITE.works.startFilter ?? 'дизайн';   // какая ка�
 /* «другие работы»: other: true — внизу списком; promote: ['3D'] — но в этой категории крупной карточкой */
 const isOther = p => p.other && !(workFilter && [].concat(p.promote || []).includes(workFilter));
 const inCat = p => !workFilter || [].concat(p.cat).includes(workFilter);
+/* тег, который повторяет заголовок («логотип» у «логотип MTS STARS»), не показываем (просьба 13.11);
+   сравнение по началам слов: «айдентика» в «айдентика Воскресенска», «3D + AI» в «3D + AI. Иллюстрации» */
+const tagNorm = s => String(Array.isArray(s) ? pick(s) : s || '').toLowerCase().replace(/[ .,:;«»"()–—-]/g, ' ').replace(/\s+/g, ' ').trim();
+function tagRepeatsTitle(tag, title){
+  const t = ' ' + tagNorm(title) + ' ', ws = tagNorm(tag).split(' ').filter(Boolean);
+  return ws.length > 0 && ws.every(w => w.length < 4 ? t.includes(' ' + w + ' ') : t.includes(w.slice(0, Math.max(4, w.length - 2))));
+}
+const shownTag = p => p.tag && !tagRepeatsTitle(p.tag, p.title) ? p.tag : '';
 /* год проекта — маленькой цифрой рядом с названием */
 const yearHTML = p => p.year ? `<sup class="yr">${T(p.year)}</sup>` : '';
 function renderWorks(){
@@ -974,7 +982,7 @@ function renderWorks(){
     return `
     <button class="work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}" data-k="${k}" data-reveal${p.cardWidth ? ` style="--cw:${p.cardWidth}"` : ''}>
       <span class="media${p.cardRatio ? ' whole' : ''}" style="aspect-ratio:${ratio}">${mediaHTML(p)}${p.cardTint ? `<span class="media-tint" style="background:${p.cardTint}"></span>` : ''}${p.wip ? `<span class="work-wip">${T(W.wip)}</span>` : ''}</span>
-      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
+      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}
     </button>`;
   }).join('');
@@ -983,7 +991,7 @@ function renderWorks(){
   $('#otherWorks').hidden = !other.length;
   // между строками — струны: в серьезной версии это просто линии, в веселой они звенят и светятся радугой
   $('#otherList').innerHTML = STRING_HTML + other.map(([p, k]) =>
-    `<button class="article" data-k="${k}"><span class="article-source">${T(p.tag || [].concat(p.cat)[0])}</span><span class="article-title">${T(p.title)}${yearHTML(p)}${p.wip ? `<span class="work-wip">${T(SITE.works.wip)}</span>` : ''}</span><span class="go">${ARROW}</span></button>${STRING_HTML}`).join('');
+    `<button class="article" data-k="${k}"><span class="article-source">${T(shownTag(p) || ([].concat(p.cat)[0] && !tagRepeatsTitle([].concat(p.cat)[0], p.title) ? [].concat(p.cat)[0] : ''))}</span><span class="article-title">${T(p.title)}${yearHTML(p)}${p.wip ? `<span class="work-wip">${T(SITE.works.wip)}</span>` : ''}</span><span class="go">${ARROW}</span></button>${STRING_HTML}`).join('');
   collectStrings();
   dispatchEvent(new CustomEvent('strings:rendered'));
 }
@@ -1186,7 +1194,7 @@ function renderNda(){
     const picture = p.image ? `<img src="${p.image}" alt="" loading="lazy">` : `<span class="waves" data-waves data-speed="1.1" data-scroll data-colors="${cols}"></span>`;
     return `<a class="nda-item" href="${N.link}" data-reveal style="--d:${(k % 2) * 0.1}s">
       <span class="nda-media">${picture}<span class="nda-lock">${LOCK}</span></span>
-      <span class="meta"><h3>${T(p.title)}</h3>${p.tag ? `<span class="tag">${T(p.tag)}</span>` : ''}</span>
+      <span class="meta"><h3>${T(p.title)}</h3>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
     </a>`;
   }).join('');
   // еще ряд закрытых карточек, уходящих под градиент
