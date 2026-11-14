@@ -14,7 +14,12 @@ function loadCSS(base){
   if (!cssReady) cssReady = new Promise(res => {
     const l = document.createElement('link');
     l.rel = 'stylesheet'; l.href = base + 'vosk.css?v=' + VERS;
-    l.onload = l.onerror = res; document.body.appendChild(l);
+    l.onload = res;
+    // jsDelivr на свежей версии иногда отвечает 403 — тогда стили берутся с GitHub текстом (raw отдает css как text/plain, link его не применит)
+    l.onerror = () => fetch('https://raw.githubusercontent.com/kupdasha/my-site/main/vosk.css').then(r => r.text()).then(t => {
+      const st = document.createElement('style'); st.textContent = t; document.body.appendChild(st);
+    }).catch(() => {}).finally(res);
+    document.body.appendChild(l);
   });
   return cssReady;
 }
