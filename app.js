@@ -728,7 +728,7 @@ function setMode(mode, toTop){
     if (mode !== 'dark') { $('#toasts').innerHTML = ''; pendingJokes.length = 0; }   // шутки остаются в дружеской версии
     renderTexts(); renderLists();
     if (caseIndex != null) renderCase(caseIndex, true);
-    try { localStorage.setItem('kd-mode', mode); } catch (e) {}
+    try { sessionStorage.setItem('kd-mode', mode); } catch (e) {}   // только на эту вкладку: новый визит всегда начинается с серьезной версии
     dispatchEvent(new CustomEvent('theme:apply'));   // перелив первого экрана перерисовывается сразу
     setTimeout(() => root.classList.remove('switching'), 900);
   };
@@ -1228,6 +1228,8 @@ function shotHTML(src){
   return `<div class="case-shot frame ${m.type}" data-reveal><iframe src="${embedURL(m, false).replace('&autoplay=1', '').replace('autoplay=1&', '')}" allow="${FRAME_ALLOW}" allowfullscreen loading="lazy"></iframe></div>`;
 }
 function heroHTML(p){
+  // heroBlank — шапка есть, но пустая: ее рисует модуль кейса (знак Воскресенска); обложку зря не грузим
+  if (p.heroBlank) return '';
   // heroVideo — тихий ролик в шапке вместо основного (основной тогда стоит в галерее, см. Ростех)
   // heroImage без heroVideo — в шапке картинка, даже если у проекта есть ролик (он тогда в галерее и задает пропорции карточки, см. Ростех)
   const m = p.heroImage && !p.heroVideo ? null : parseMedia(p.heroVideo || legacyVideo(p));
@@ -3392,7 +3394,9 @@ const OIL = {
    ЗАПУСК
    ================================================================ */
 let saved = 'light';
-try { saved = localStorage.getItem('kd-mode') || 'light'; } catch (e) {}
+// сайт всегда открывается серьезным; дружеская держится, пока человек ходит по страницам в этой вкладке (просьба 14.11).
+// Раньше выбор жил в localStorage и на телефоне сайт открывался сразу дружеским — старую запись убираем
+try { localStorage.removeItem('kd-mode'); saved = sessionStorage.getItem('kd-mode') || 'light'; } catch (e) {}
 /* страница спикера только серьезная: из дружеской версии остаются черный фон и белый текст (data-ink, цвета — в style.css) */
 if (isSpeakerPage) { root.dataset.ink = saved === 'dark' ? 'black' : 'white'; saved = 'light'; }
 root.dataset.theme = saved;

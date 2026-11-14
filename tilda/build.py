@@ -198,7 +198,7 @@ def css_block():
     return ('<!-- ОФОРМЛЕНИЕ САЙТА: стили, шрифты и загрузчик файлов с GitHub. Это код, тексты здесь не правятся. -->\n'
             '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>\n'
             '<!-- версия (серьезная или дружеская) выставляется сразу, чтобы страница не мигала -->\n'
-            "<script>try{document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'}catch(e){}</script>\n"
+            "<script>try{document.documentElement.dataset.theme=sessionStorage.getItem('kd-mode')||'light'}catch(e){}</script>\n"
             f"{LOADER}\n"
             "<script>KUP.css('style.css')</script>")
 
@@ -290,7 +290,7 @@ def taplink_block():
             "<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',\n"
             "G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
             "['https://cdn.jsdelivr.net'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});\n"
-            "try{if(localStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}\n"
+            "try{if(sessionStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}\n"
             "try{c=JSON.parse(localStorage.getItem(K))}catch(e){}\n"
             "function get(u,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);x.timeout=ms;x.onload=function(){cb(x.status==200?x.responseText:null)};x.onerror=x.ontimeout=function(){cb(null)};x.send()}\n"
             "function save(s,h){try{localStorage.setItem(K,JSON.stringify({s:s,h:h}))}catch(e){}}\n"
@@ -360,8 +360,8 @@ BLOCKS = {
     '7 страница спикера': [
         ('0 в head страницы', speaker_head),
         ('1 страница спикера целиком', '\n\n'.join([
-            css_block().replace("document.documentElement.dataset.theme=localStorage.getItem('kd-mode')||'light'",
-                                "var r=document.documentElement;r.dataset.ink=localStorage.getItem('kd-mode')==='dark'?'black':'white';r.dataset.theme='light'"),
+            css_block().replace("document.documentElement.dataset.theme=sessionStorage.getItem('kd-mode')||'light'",
+                                "var r=document.documentElement;r.dataset.ink=sessionStorage.getItem('kd-mode')==='dark'?'black':'white';r.dataset.theme='light'"),
             shared_block(), speaker_sections,
             f'<!-- Кнопки «связаться» и «наверх», сообщения -->\n{speaker_service_html}',
             js_block(['app.js'], 'КОД САЙТА.')])),

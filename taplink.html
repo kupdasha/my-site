@@ -267,9 +267,9 @@ h1{margin:0;font-weight:600;font-size:max(30px,calc(clamp(30px,8.6vw,40px)*var(-
   function setMode(on) {
     fun = on; root.dataset.mode = on ? 'fun' : 'serious';
     sw.setAttribute('aria-checked', on);
-    try { localStorage.setItem('tl-mode', on ? 'fun' : 'serious'); } catch (e) {}
+    try { sessionStorage.setItem('tl-mode', on ? 'fun' : 'serious'); } catch (e) {}   // новый визит — всегда серьезная
   }
-  let saved = null; try { saved = localStorage.getItem('tl-mode'); } catch (e) {}
+  let saved = null; try { localStorage.removeItem('tl-mode'); saved = sessionStorage.getItem('tl-mode'); } catch (e) {}
   setMode(saved === 'fun');
 
   /* ================================================================
