@@ -267,3 +267,18 @@ button.vo-pic{cursor:zoom-in}
   .vo-next{right:0}
   .vo-dots{min-height:44px;align-items:center;margin-top:16px}
 }
+
+/* гербы: одна картинка, цикл 9 с — цветные гербы, фон сереет, круги проявляются по очереди, держатся, все возвращается */
+.vo-arms .vo-pic{aspect-ratio:1493/840;background:#fafafa}
+.vo-ch figure.vo-arms{margin-top:clamp(32px,4vw,56px)}   /* .vo-ch figure{margin:0} перебивал отступ */
+/* заголовок слева, текст справа (просьба 14.11); на телефоне — друг под другом */
+.vo-arms-head{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,48px);align-items:start}
+.vo-arms-head .vo-text{margin-top:0}
+@media (max-width:760px){.vo-arms-head{grid-template-columns:1fr;gap:10px}}
+.vo-arms svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.vo-arms circle{fill:#F5D301;transform-box:fill-box;transform-origin:center;transform:scale(0)}
+.vo-is-arms.in .vo-arms img{animation:vo-arms-grey 9s ease-in-out infinite}
+.vo-is-arms.in .vo-arms circle{animation:vo-arms-dot 9s cubic-bezier(.3,1.4,.5,1) infinite;animation-delay:calc(var(--i) * .18s)}
+@keyframes vo-arms-grey{0%,22%{filter:grayscale(0);opacity:1}36%,84%{filter:grayscale(1);opacity:.16}96%,100%{filter:grayscale(0);opacity:1}}
+@keyframes vo-arms-dot{0%,32%{transform:scale(0)}42%,82%{transform:scale(1)}90%,100%{transform:scale(0)}}
+@media (prefers-reduced-motion:reduce){.vo-is-arms.in .vo-arms img{animation:none;filter:grayscale(1);opacity:.16}.vo-is-arms.in .vo-arms circle{animation:none;transform:none}}

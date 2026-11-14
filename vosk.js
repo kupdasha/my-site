@@ -409,7 +409,14 @@ function logosHTML(b){
   return `${b.title ? `<h3 class="vo-title">${tx(b.title)}</h3>` : ''}<div class="vo-logos">${b.rows.map(r =>
     `<div class="vo-logo-row">${r.map(it => `<img src="${it.img}" alt="" loading="lazy" style="height:calc(var(--s) * ${it.h})">`).join('')}</div>`).join('')}</div>`;
 }
-const RENDER = { logos: logosHTML, tiles: tilesHTML, cards: cardsHTML, letter: letterHTML, patterns: patternsHTML, social: socialHTML };
+// гербы: одна картинка, фон сереет, поверх по очереди проявляются желтые круги — общий знак всех гербов (просьба 14.11)
+function armsHTML(b){
+  const s = b.img.replace(/\.webp$/, '-s.webp');
+  return `<div class="vo-arms-head"><h3 class="vo-title">${tx(b.title)}</h3><p class="vo-text">${tx(b.text)}</p></div>
+    <figure class="vo-arms"><button class="vo-pic" aria-label="Увеличить"><img src="${b.img}" srcset="${s} 900w, ${b.img} 1600w" sizes="(max-width:760px) 92vw, 80vw" alt="Гербы Воскресенска с 1781 по 2019 год" loading="lazy" decoding="async">
+      <svg viewBox="0 0 1493 840" aria-hidden="true">${b.circles.map(([x, y, r], i) => `<circle cx="${x}" cy="${y}" r="${r}" style="--i:${i}"/>`).join('')}</svg></button></figure>`;
+}
+const RENDER = { arms: armsHTML, logos: logosHTML, tiles: tilesHTML, cards: cardsHTML, letter: letterHTML, patterns: patternsHTML, social: socialHTML };
 const reveal = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { e.target.classList.add('in'); reveal.unobserve(e.target); }
 }), { rootMargin: '0px 0px -12% 0px' });
@@ -422,8 +429,8 @@ function mountBlocks(root, p){
     reveal.observe(el);
     if (b.vosk === 'social') liveSocial(el, b);
     // крупно по нажатию — все картинки блока листаются
-    const imgs = [...el.querySelectorAll('.vo-card img')];
-    el.querySelectorAll('.vo-card .vo-pic').forEach((btn, j) => btn.addEventListener('click', () =>
+    const imgs = [...el.querySelectorAll('.vo-card img, .vo-arms img')];
+    el.querySelectorAll('.vo-card .vo-pic, .vo-arms .vo-pic').forEach((btn, j) => btn.addEventListener('click', () =>
       H.openViewer && H.openViewer(imgs.map(im => im.currentSrc || im.src), j, imgs)));
   });
 }
