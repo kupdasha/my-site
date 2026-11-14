@@ -2204,6 +2204,7 @@ function stepsHTML(x){
 // legend — правила, которые на фото не покажешь, значком и парой слов (icon: 'color' | 'time')
 const PIN_ICONS = {
   color: '<svg viewBox="0 0 64 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="6" fill="#E3311D"/><rect x="34" y="2" width="28" height="28" rx="6" fill="#F4A7B9"/><path d="M38 6l20 20M58 6L38 26" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>',
+  sun: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="16" cy="16" r="6"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M7 7l3 3M22 22l3 3M7 25l3-3M22 10l3-3"/></svg>',
   time: '<svg viewBox="0 0 112 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="16" r="6"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M7 7l3 3M22 22l3 3M7 25l3-3M22 10l3-3"/><path d="M58 5a11 11 0 1 0 10 16 9 9 0 0 1-10-16z"/><path d="M96 4v24M86 10l20 12M86 22l20-12M92 6l4 3 4-3M92 26l4-3 4 3"/></svg>',
 };
 function pinsHTML(x){
