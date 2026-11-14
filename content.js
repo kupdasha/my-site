@@ -4339,7 +4339,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             rows: [
               [{ img: 'img/voskresensk/candles.webp', ar: 1.77, cap: ['церковные свечи в научных колбах и пробирках', 'церковные свечи в пробирках'] },
                { img: 'img/voskresensk/candle-petri.webp', cap: ['свет в чашке Петри, вокруг — электроны', 'огонь среди электронов'] }],
-              [{ img: 'img/voskresensk/keychain.webp', cap: ['вода, ставшая вином: H₂O на обороте', 'вода, ставшая вином'] },
+              [{ img: 'img/voskresensk/keychain.webp', cap: ['вода, ставшая вином', 'вода, ставшая вином'] },
                { img: 'img/voskresensk/ornament.webp', cap: ['научная колба стала елочным шаром', 'колба на елку'] },
                { img: 'img/voskresensk/merch.webp', light: true, cap: ['В, С, К в трех кругах-нимбах', 'В, С, К в трех нимбах'] }],
               [{ img: 'img/voskresensk/rings.webp', ar: 1.77, cap: ['Золото очищает воду — его часто кладут в воду, чтобы обеззаразить. Форма — три нимба «Троицы»', 'золото очищает воду, а форма — нимбы «Троицы»'] },
