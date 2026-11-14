@@ -97,7 +97,7 @@ function tilesHTML(b){
 }
 function cardsHTML(b){
   return `${b.title ? `<h3 class="vo-title">${tx(b.title)}</h3>` : ''}${b.text ? `<p class="vo-text">${tx(b.text)}</p>` : ''}
-    ${b.rows.map(r => `<div class="vo-row">${r.map(it => `<figure class="vo-card" style="--ar:${it.ar || 1}"><button class="vo-pic${it.light ? ' vo-light' : ''}${it.pad ? ' vo-pad' : ''}" aria-label="Увеличить"><img src="${it.img}" srcset="${it.img.replace(/\.webp$/, '-s.webp')} 900w, ${it.img} 1600w" sizes="(max-width:760px) 92vw, 50vw" alt="" loading="lazy"></button>${it.cap ? `<figcaption>${tx(it.cap)}</figcaption>` : ''}</figure>`).join('')}</div>`).join('')}
+    ${b.rows.map(r => `<div class="vo-row">${r.map(it => `<figure class="vo-card" style="--ar:${it.ar || 1}"><button class="vo-pic${it.light ? ' vo-light' : ''}${it.pad ? ' vo-pad' : ''}" aria-label="Увеличить"><img src="${it.img}" srcset="${it.img.replace(/\.webp$/, '-s.webp')} 900w, ${it.img} 1600w" sizes="(max-width:760px) 92vw, ${Math.round(100 * (it.ar || 1) / r.reduce((a, x) => a + (x.ar || 1), 0))}vw" alt="" loading="lazy" decoding="async"></button>${it.cap ? `<figcaption>${tx(it.cap)}</figcaption>` : ''}</figure>`).join('')}</div>`).join('')}
     ${b.credit ? `<p class="vo-credit">${tx(b.credit)}</p>` : ''}`;
 }
 
