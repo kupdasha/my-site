@@ -72,8 +72,14 @@ addEventListener('error', e => {
     if (el.tagName === 'SOURCE') { el.src = next; el.parentElement?.load?.(); }
     else { if (el.srcset) el.removeAttribute('srcset');   // иначе браузер снова берет вариант из srcset, а не новый src
       el.src = next; if (el.tagName === 'VIDEO') el.load(); }
+    // ролик уже запускали (нажали «плей» в плеере) — после смены адреса он играет дальше сам, а не ждет второго нажатия
+    const v = el.tagName === 'VIDEO' ? el : el.parentElement;
+    if (v && v.dataset && v.dataset.wantPlay) v.play().catch(() => {});
   }, n === 0 && raster ? 0 : 1500);
 }, true);
+// нажатие «плей» запоминается — страховка выше по нему понимает, что ролик надо запустить заново
+document.addEventListener('play', e => { if (e.target.tagName === 'VIDEO') e.target.dataset.wantPlay = '1'; }, true);
+document.addEventListener('pause', e => { if (e.target.tagName === 'VIDEO' && !e.target.error && e.target.readyState > 1) delete e.target.dataset.wantPlay; }, true);
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
@@ -2328,10 +2334,10 @@ function galleryItem(x){
   // read: true — подпись набрана как текст кейса: с засечками, черная (у bigTitle — так же sub; см. Alia Alive)
   if (x && x.screen) return screenHTML(x);
   if (x && x.collage) return campCollage(x);
-  // { film: 'img/….mp4', poster, caption, ratio } — ролик для просмотра (ratio — пропорции, если не 16:9): со звуком и плеером, сам не запускается, грузится по нажатию;
+  // { film: 'img/….mp4', poster, caption, ratio } — ролик для просмотра (ratio — пропорции, если не 16:9): со звуком и плеером, сам не запускается; заранее грузится только длительность (если адрес сбоит — страховка успеет сменить его до нажатия); ролик держать меньше 10 МБ — больше jsDelivr иногда обрывает;
   // film: 'kinescope:ID' и другие плееры — встраиваются окном, с теми же отступами
   // film: 'vimeo:ID' с poster — сначала легкая картинка с кнопкой, плеер грузится только по нажатию (Vimeo в России тянется долго)
-  if (x && x.film) return `<div class="wrap case-film">${/\.mp4$/.test(x.film) ? `<div class="case-shot" data-reveal><video src="${x.film}" style="aspect-ratio:${x.ratio || '16/9'}"${x.poster ? ` poster="${x.poster}"` : ''} controls playsinline preload="none"></video></div>` : x.poster ? filmCoverHTML(x.film, x.poster) : shotHTML(x.film)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
+  if (x && x.film) return `<div class="wrap case-film">${/\.mp4$/.test(x.film) ? `<div class="case-shot" data-reveal><video src="${x.film}" style="aspect-ratio:${x.ratio || '16/9'}"${x.poster ? ` poster="${x.poster}"` : ''} controls playsinline preload="metadata"></video></div>` : x.poster ? filmCoverHTML(x.film, x.poster) : shotHTML(x.film)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   // { src: 'kinescope:ID', caption: 'подпись' } — ролик или картинка с подписью под ней
   if (x && x.src) return `<div class="wrap">${shotHTML(x.src)}${x.caption ? `<p class="case-note shot-note">${T(x.caption)}</p>` : ''}</div>`;
   return `<div class="wrap">${shotHTML(x)}</div>`;
