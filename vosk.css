@@ -208,7 +208,8 @@ button.vo-pic{cursor:zoom-in}
 .vo-logos{--s:clamp(44px,6.4vw,100px);margin-top:clamp(24px,3vw,44px);display:flex;flex-direction:column;gap:clamp(48px,6vw,96px)}
 .vo-logo-row{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
 /* на телефоне — две строки: полные версии, под ними короткие; знак того же размера */
-@media (max-width:560px){.vo-logos{--s:34px}.vo-logo-row{flex-wrap:wrap;row-gap:28px}.vo-logo-row img:nth-child(2){margin-right:auto}}
+/* на телефоне — сетка 2 × 2: слева полные версии, справа короткие; квадраты знака на одних линиях */
+@media (max-width:560px){.vo-logos{--s:32px}.vo-logo-row{display:grid;grid-template-rows:auto auto;grid-auto-flow:column;grid-auto-columns:max-content;justify-content:space-between;align-items:start;row-gap:32px;column-gap:24px}}
 .vo-logo-row img{display:block;width:auto;opacity:0;transform:translateY(14px);transition:opacity .7s,transform .9s cubic-bezier(.22,1,.36,1)}
 .vo-ch.in .vo-logo-row img{opacity:1;transform:none}
 .vo-ch.in .vo-logo-row img+img{transition-delay:.12s}
@@ -256,3 +257,13 @@ button.vo-pic{cursor:zoom-in}
 .vo-sh-2{animation-delay:.2s}
 @keyframes vo-shc{0%,100%{opacity:.15;transform:translateY(-3px)}50%{opacity:1;transform:translateY(3px)}}
 @media (prefers-reduced-motion:reduce){.vo-sh-wheel,.vo-sh-ch{animation:none}}
+
+/* телефон и планшет: подсказка «ленту можно листать» — над телефоном; стрелки карусели — под постом, по бокам от кружков */
+@media (max-width:860px){
+  .vo-phone-col{display:flex;flex-direction:column}
+  .vo-scrollhint{order:-1;margin:0 0 16px}
+  .vo-arrow{top:auto;bottom:0;width:44px;height:44px}
+  .vo-prev{left:0}
+  .vo-next{right:0}
+  .vo-dots{min-height:44px;align-items:center;margin-top:16px}
+}
