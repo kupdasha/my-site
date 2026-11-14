@@ -2113,10 +2113,9 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         short: ['Ролик для строящейся в Москве резиденции Armani/Casa. Из-за ковида снимали в Дубае, в том числе в Бурдж-Халифе, куда специально везли ткани.',
                 'Ролик для Armani/Casa: Дубай, Бурдж-Халифа и ткани, которые летели с нами специально.'],
         image: 'img/armani/film.jpg',
-        // ролик на Vimeo удалили (14.11) — теперь свой файл: сжатая копия «Armani Casa Moscow Dir 0407.mp4» из Портфолио
-        video: 'img/armani/film.mp4',
-        heroSound: true,
-        preview: 'img/armani/preview.mp4',   // тихий кусок ролика для сетки
+        // ролик на Vimeo удалили (14.11) — теперь Kinescope, в полном качестве
+        video: 'kinescope:qbrei5m4a1vJs14wBQeL2t',
+        preview: 'img/armani/preview.mp4',   // для сетки: первые 15 с ролика без звука, по кругу (из «Armani Casa Moscow Dir 0407.mp4»)
         frost: true,
         link:  'https://kupdasha.ru/video',
         links: [],
@@ -2219,7 +2218,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             title: ['что получилось', 'кино целиком'],
             text: ['Ролик сдали в феврале 2023 года.',
                    'Сдали в феврале 2023 года.'],
-            film: 'img/armani/film.mp4' },
+            film: 'kinescope:qbrei5m4a1vJs14wBQeL2t' },
         ],
       },
       {
