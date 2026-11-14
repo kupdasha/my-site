@@ -2112,8 +2112,11 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
                 'ролик смотрел сам Джорджо Армани'],
         short: ['Ролик для строящейся в Москве резиденции Armani/Casa. Из-за ковида снимали в Дубае, в том числе в Бурдж-Халифе, куда специально везли ткани.',
                 'Ролик для Armani/Casa: Дубай, Бурдж-Халифа и ткани, которые летели с нами специально.'],
-        image: 'https://i.vimeocdn.com/video/1446376155-bcb2441464481833b5e8d0e4ccc5828b4f13f7b51f975545dcaa458132592b22-d_1280',
-        video: 'vimeo:717830135',
+        image: 'img/armani/film.jpg',
+        // ролик на Vimeo удалили (14.11) — теперь свой файл: сжатая копия «Armani Casa Moscow Dir 0407.mp4» из Портфолио
+        video: 'img/armani/film.mp4',
+        heroSound: true,
+        preview: 'img/armani/preview.mp4',   // тихий кусок ролика для сетки
         frost: true,
         link:  'https://kupdasha.ru/video',
         links: [],
@@ -2216,7 +2219,7 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
             title: ['что получилось', 'кино целиком'],
             text: ['Ролик сдали в феврале 2023 года.',
                    'Сдали в феврале 2023 года.'],
-            film: 'vimeo:717830135' },
+            film: 'img/armani/film.mp4' },
         ],
       },
       {

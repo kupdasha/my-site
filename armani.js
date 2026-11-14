@@ -213,12 +213,14 @@ function liveLight(box){
 
 /* ---------- полный ролик в конце ---------- */
 function filmHTML(src){
+  // свой файл — обычный проигрыватель со звуком; ссылка vimeo:ID — окно Vimeo
+  if (/\.mp4(\?|$)/.test(src)) return `<div class="ac-final"><video data-src="${src}" controls playsinline preload="none" title="Ролик Armani/Casa"></video></div>`;
   const [kind, id] = String(src).split(':');
   const url = kind === 'vimeo' ? `https://player.vimeo.com/video/${id}?dnt=1&title=0&byline=0&portrait=0` : src;
   return `<div class="ac-final"><iframe data-src="${url}" title="Ролик Armani/Casa" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
 }
 function liveFilm(box){
-  const f = box.querySelector('iframe');
+  const f = box.querySelector('iframe, video');
   onScreen(box, v => { if (v && !f.src) f.src = f.dataset.src; }, '400px 0px');
 }
 
