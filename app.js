@@ -728,7 +728,9 @@ function setMode(mode, toTop){
     if (mode !== 'dark') { $('#toasts').innerHTML = ''; pendingJokes.length = 0; }   // шутки остаются в дружеской версии
     renderTexts(); renderLists();
     if (caseIndex != null) renderCase(caseIndex, true);
-    try { sessionStorage.setItem('kd-mode', mode); } catch (e) {}   // только на эту вкладку: новый визит всегда начинается с серьезной версии
+    // выбор живет, пока человек ходит по страницам сайта в этой вкладке (sessionStorage); копия в localStorage — для старых
+    // блоков Тильды, которые ставят версию до загрузки кода: без нее при переходе мелькала серьезная. Уходя с сайта, копию стираем
+    try { sessionStorage.setItem('kd-mode', mode); localStorage.setItem('kd-mode', mode); } catch (e) {}
     dispatchEvent(new CustomEvent('theme:apply'));   // перелив первого экрана перерисовывается сразу
     setTimeout(() => root.classList.remove('switching'), 900);
   };
@@ -3396,7 +3398,12 @@ const OIL = {
 let saved = 'light';
 // сайт всегда открывается серьезным; дружеская держится, пока человек ходит по страницам в этой вкладке (просьба 14.11).
 // Раньше выбор жил в localStorage и на телефоне сайт открывался сразу дружеским — старую запись убираем
-try { localStorage.removeItem('kd-mode'); saved = sessionStorage.getItem('kd-mode') || 'light'; } catch (e) {}
+try { saved = sessionStorage.getItem('kd-mode') || 'light'; if (saved !== 'dark') localStorage.removeItem('kd-mode'); } catch (e) {}
+// уход с сайта (закрыли вкладку, ушли по внешней ссылке) — копию выбора стираем, чтобы новый визит начался с серьезной;
+// переход по ссылке на свою страницу — оставляем, чтобы следующая страница сразу открылась в нужной версии
+let kdInternal = false;
+document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a[href]'); if (a && a.origin === location.origin && !a.target) kdInternal = true; }, true);
+addEventListener('pagehide', () => { if (!kdInternal) try { localStorage.removeItem('kd-mode'); } catch (e) {} kdInternal = false; });
 /* страница спикера только серьезная: из дружеской версии остаются черный фон и белый текст (data-ink, цвета — в style.css) */
 if (isSpeakerPage) { root.dataset.ink = saved === 'dark' ? 'black' : 'white'; saved = 'light'; }
 root.dataset.theme = saved;
