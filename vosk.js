@@ -83,10 +83,10 @@ function formulaSVG(k, cx, cy, sc, i0){
 const GOLD = () => `<defs>${FOIL_DEF('vo-tile-gold')}</defs>`;
 const DRAW = {
   // круг из герба — ядро атома: золотой круг с буквой, вокруг орбита и электроны
-  nucleus: () => `<svg viewBox="-100 -100 200 200" aria-hidden="true">${GOLD()}
+  nucleus: () => `<svg viewBox="-100 -100 200 200" aria-hidden="true">
     <g class="vo-spin"><circle class="vo-orb" r="66"/><circle class="vo-e" cx="0" cy="-66" r="7"/><circle class="vo-e" cx="0" cy="66" r="7"/>
     <circle class="vo-orb" r="86"/><circle class="vo-e" cx="-86" cy="0" r="7"/><circle class="vo-e" cx="86" cy="0" r="7"/><circle class="vo-e" cx="61" cy="-61" r="7"/><circle class="vo-e" cx="-61" cy="61" r="7"/></g>
-    <circle r="42" fill="url(#vo-tile-gold)" data-gold data-ls="${.66 / 42}" data-lt="${2.5 / 42}" data-ly="-.02"/><path fill="#fff" fill-rule="evenodd" transform="translate(2.5 0) scale(.66)" d="${LETTER}"/></svg>`,
+    <circle r="42" fill="${YELLOW}"/><path fill="#141414" fill-rule="evenodd" transform="translate(1.6 0) scale(.55)" d="${LETTER}"/></svg>`,   // желтый, как в иконке, а не золото (просьба 14.11)
   // калий, азот, фосфор — три формулы удобрений в ряд, каждая в своем светлом круге; черные точки без контура, без ядра (просьба 13.11)
   atoms: () => `<svg viewBox="0 0 200 200" aria-hidden="true">${formulaSVG('K', 36, 100, .062, 0)}${formulaSVG('N', 100, 100, .062, .5)}${formulaSVG('P', 164, 100, .062, .8)}</svg>`,
 };
@@ -95,8 +95,11 @@ function tilesHTML(b){
     <div class="vo-tiles" style="--n:${b.items.length}">${b.items.map(it => `<figure class="vo-tile"><div class="vo-pic${it.light ? ' vo-light' : ''}${it.draw ? ' vo-draw' : ''}">${
       it.draw ? DRAW[it.draw]() : `<img src="${it.img}" srcset="${it.img.replace(/\.webp$/, '-s.webp')} 900w, ${it.img} 1600w" sizes="(max-width:760px) 46vw, 25vw" alt="" loading="lazy" style="object-position:${it.pos || 'center'}">`}</div><figcaption>${tx(it.cap)}</figcaption></figure>`).join('')}</div>`;
 }
+// side: true — заголовок слева, текст справа (как у гербов)
+const headHTML = b => b.side ? `<div class="vo-arms-head"><h3 class="vo-title">${tx(b.title)}</h3><p class="vo-text">${tx(b.text)}</p></div>`
+  : `${b.title ? `<h3 class="vo-title">${tx(b.title)}</h3>` : ''}${b.text ? `<p class="vo-text">${tx(b.text)}</p>` : ''}`;
 function cardsHTML(b){
-  return `${b.title ? `<h3 class="vo-title">${tx(b.title)}</h3>` : ''}${b.text ? `<p class="vo-text">${tx(b.text)}</p>` : ''}
+  return `${headHTML(b)}
     ${b.rows.map(r => `<div class="vo-row">${r.map(it => `<figure class="vo-card" style="--ar:${it.ar || 1}"><button class="vo-pic${it.light ? ' vo-light' : ''}${it.pad ? ' vo-pad' : ''}" aria-label="Увеличить"><img src="${it.img}" srcset="${it.img.replace(/\.webp$/, '-s.webp')} 900w, ${it.img} 1600w" sizes="(max-width:760px) 92vw, ${Math.round(100 * (it.ar || 1) / r.reduce((a, x) => a + (x.ar || 1), 0))}vw" alt="" loading="lazy" decoding="async"></button>${it.cap ? `<figcaption>${tx(it.cap)}</figcaption>` : ''}</figure>`).join('')}</div>`).join('')}
     ${b.credit ? `<p class="vo-credit">${tx(b.credit)}</p>` : ''}`;
 }
@@ -110,14 +113,14 @@ let uid = 0;
 function letterHTML(b){
   const g = () => 'vo-g' + (uid++);
   const sizes = [48, 32, 24, 16];
-  return `${b.title ? `<h3 class="vo-title">${tx(b.title)}</h3>` : ''}
+  return `${headHTML(b)}
   <div class="vo-letter-grid">
-    <figure class="vo-lt"><div class="vo-stage vo-stage-icon">${iconSVG(g(), 200)}</div><figcaption>${tx(b.caps[0])}</figcaption></figure>
+    <figure class="vo-lt"><div class="vo-stage vo-stage-icon">${iconSVG(g(), 200)}</div>${b.caps ? `<figcaption>${tx(b.caps[0])}</figcaption>` : ''}</figure>
     <figure class="vo-lt"><div class="vo-stage vo-stage-tab">
       <div class="vo-tabbar"><div class="vo-tab">${iconSVG(g(), 16)}<span>Воскресенск</span></div></div>
       <div class="vo-addr"></div>
       <div class="vo-sizes">${sizes.map((n, i) => `<div class="vo-size" style="--i:${i}">${iconSVG(g(), Math.round(n * 1.6))}<span>${n}</span></div>`).join('')}</div>
-    </div><figcaption>${tx(b.caps[1])}</figcaption></figure>
+    </div>${b.caps ? `<figcaption>${tx(b.caps[1])}</figcaption>` : ''}</figure>
     <figure class="vo-lt"><div class="vo-stage vo-stage-map">
       <svg class="vo-map" viewBox="0 0 300 300" aria-hidden="true">
         <path class="vo-river" d="M-10 238 C 60 212, 110 262, 170 236 S 270 196, 320 214"/>
@@ -134,7 +137,7 @@ function letterHTML(b){
         </g>
         <text class="vo-place" x="160" y="150">Главная площадь</text>
       </svg>
-    </div><figcaption>${tx(b.caps[2])}</figcaption></figure>
+    </div>${b.caps ? `<figcaption>${tx(b.caps[2])}</figcaption>` : ''}</figure>
   </div>`;
 }
 
@@ -374,7 +377,7 @@ function liveSocial(el, b){
     if (vis) {
       if (!was) { step = 0; goStep(now); }                 // телефон появился на экране — с начала
       else if (now > fhold && now > next) {
-        if (fhold) { fhold = 0; step = postEls.reduce((b, p, i) => Math.abs(p.offsetTop - feed.scrollTop) < Math.abs(postEls[b].offsetTop - feed.scrollTop) ? i : b, 0); }
+        if (fhold) { fhold = 0; step = postEls.reduce((b, p, i) => Math.abs(p.offsetTop - feed.scrollTop) < Math.abs(postEls[b].offsetTop - feed.scrollTop) ? i : b, 0) + 1; }   // шаг = номер поста + 1 (шаг 0 — шапка)
         step = (step + 1) % (postEls.length + 1); goStep(now);
       }
       ups.forEach((u, i) => u && u(reduce ? 4.5 : Math.max(0, now - t0[i])));
@@ -414,7 +417,7 @@ function armsHTML(b){
   const s = b.img.replace(/\.webp$/, '-s.webp');
   return `<div class="vo-arms-head"><h3 class="vo-title">${tx(b.title)}</h3><p class="vo-text">${tx(b.text)}</p></div>
     <figure class="vo-arms"><button class="vo-pic" aria-label="Увеличить"><img src="${b.img}" srcset="${s} 900w, ${b.img} 1600w" sizes="(max-width:760px) 92vw, 80vw" alt="Гербы Воскресенска с 1781 по 2019 год" loading="lazy" decoding="async">
-      <svg viewBox="0 0 1493 840" aria-hidden="true">${b.circles.map(([x, y, r], i) => `<circle cx="${x}" cy="${y}" r="${r}" style="--i:${i}"/>`).join('')}</svg></button></figure>`;
+      <svg viewBox="0 160 1493 605" aria-hidden="true">${b.circles.map(([x, y, r], i) => `<circle cx="${x}" cy="${y}" r="${r}" style="--i:${i}"/>`).join('')}</svg></button></figure>`;
 }
 const RENDER = { arms: armsHTML, logos: logosHTML, tiles: tilesHTML, cards: cardsHTML, letter: letterHTML, patterns: patternsHTML, social: socialHTML };
 const reveal = new IntersectionObserver(es => es.forEach(e => {
