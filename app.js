@@ -2194,10 +2194,27 @@ const ysReveal = new IntersectionObserver(es => es.forEach(e => {
 // { steps: { items: [{ tag, title, text }] } } — процесс цепочкой: шаги появляются по очереди, между ними стрелки
 function stepsHTML(x){
   const arrow = '<svg class="yst-arrow" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h40M33 3l10 9-10 9"/></svg>';
-  return `<div class="wrap"><div class="yst" style="--n:${x.items.length}">${x.items.map((s, i) => `${i ? arrow : ''}
+  // tool — один инструмент на всю цепочку: пометка над шагами вместо тега у каждого
+  return `<div class="wrap">${x.tool ? `<span class="yst-tag yst-tool">${T(x.tool)}</span>` : ''}<div class="yst" style="--n:${x.items.length}">${x.items.map((s, i) => `${i ? arrow : ''}
     <div class="yst-step" style="--i:${i}">${s.tag ? `<span class="yst-tag">${T(s.tag)}</span>` : ''}<b>${T(s.title)}</b><p>${T(s.text)}</p></div>`).join('')}</div></div>`;
 }
 // { rules: { cols, items: [{ key, text }] } } — короткие правила сеткой: крупное слово и строка пояснения
+// { pins: { items: [{ img, spots: [{ x, y, label, side }] }], legend: [{ icon, text }] } } — правила прямо на кадре:
+// точки на фото, к каждой короткая подпись (side: 'l' — подпись слева от точки); появляются по очереди.
+// legend — правила, которые на фото не покажешь, значком и парой слов (icon: 'color' | 'time')
+const PIN_ICONS = {
+  color: '<svg viewBox="0 0 64 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="6" fill="#E3311D"/><rect x="34" y="2" width="28" height="28" rx="6" fill="#F4A7B9"/><path d="M38 6l20 20M58 6L38 26" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>',
+  time: '<svg viewBox="0 0 112 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="16" r="6"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M7 7l3 3M22 22l3 3M7 25l3-3M22 10l3-3"/><path d="M58 5a11 11 0 1 0 10 16 9 9 0 0 1-10-16z"/><path d="M96 4v24M86 10l20 12M86 22l20-12M92 6l4 3 4-3M92 26l4-3 4 3"/></svg>',
+};
+function pinsHTML(x){
+  let k = 0;
+  return `<div class="wrap"><div class="ypn">
+    <div class="ypn-row">${x.items.map(it => `<figure class="ypn-fig"><div class="ypn-pic"><button class="camp-shot ypn-shot" style="--ar:${it.ratio || 1.5}" aria-label="Увеличить"><img src="${it.img}" alt="" loading="lazy"></button>${
+      it.spots.map(s => `<span class="ypn-spot${s.side === 'l' ? ' l' : ''}" style="--x:${s.x * 100}%;--y:${s.y * 100}%;--k:${k++}"><i></i><b>${T(s.label)}</b></span>`).join('')}</div><ul class="ypn-list">${
+      it.spots.map(s => `<li>${T(s.label)}</li>`).join('')}</ul></figure>`).join('')}</div>
+    ${x.legend ? `<div class="ypn-legend">${x.legend.map(l => `<div class="ypn-leg" style="--k:${k++}">${PIN_ICONS[l.icon] || ''}<span>${T(l.text)}</span></div>`).join('')}</div>` : ''}
+  </div></div>`;
+}
 function rulesHTML(x){
   return `<div class="wrap"><div class="yru" style="--cols:${x.cols || 3}">${x.items.map((r, i) =>
     `<div class="yru-item" style="--i:${i}"><b>${T(r.key)}</b><p>${T(r.text)}</p></div>`).join('')}</div></div>`;
@@ -2311,6 +2328,7 @@ function galleryItem(x){
   if (x && x.zoom) return zoomHTML(x.zoom);
   if (x && x.steps) return stepsHTML(x.steps);
   if (x && x.rules) return rulesHTML(x.rules);
+  if (x && x.pins) return pinsHTML(x.pins);
   // { bigTitle, sub } — крупный заголовок блока и строка пояснения под ним
   if (x && x.bigTitle) return `<div class="wrap"><h2 class="deck-title big-title">${T(x.bigTitle)}</h2>${x.sub ? `<p class="case-sub big-sub${x.read ? ' read' : ''}">${T(x.sub)}</p>` : ''}</div>`;
   if (x && x.sizes) return sizesHTML(x.sizes);
@@ -2717,7 +2735,7 @@ function renderCase(k, keepScroll){
   caseContent.querySelectorAll('.pano').forEach(watchPano);
   caseContent.querySelectorAll('.gd-sizes').forEach(fitSizes);
   caseContent.querySelectorAll('.ui-papers, .ui-login, .ui-mail, .ui-laptop').forEach(el => gdReveal.observe(el));
-  caseContent.querySelectorAll('.ys, .zm, .yst, .yru').forEach(el => ysReveal.observe(el));
+  caseContent.querySelectorAll('.ys, .zm, .yst, .yru, .ypn').forEach(el => ysReveal.observe(el));
   caseContent.querySelectorAll('.clip video, .camp-row video').forEach(v => clipPlayer.observe(v));   // ролики играют только на экране
   phonesInit(caseContent);   // ролики в телефонах — по наведению
   filmInit(caseContent);     // плееры по нажатию
