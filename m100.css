@@ -1,0 +1,287 @@
+/* ================================================================
+   КЕЙС «РЕБРЕНДИНГ М100» (m100.js, поле m100 у проекта)
+   Внутри иллюстраций — цвета палитры VK в обеих версиях сайта:
+   синий #0077FF, темно-синий #005EFF, черный, белый; в вариантах
+   знака — бирюзовый #00D3E6 и голубой #77BEFF со слайдов.
+   ================================================================ */
+.mh{overflow-x:clip;--mh-gap:clamp(72px,9vw,144px);--mh-blue:#0077FF;--mh-dark:#005EFF;--mh-paper:#F2F4F7;--mh-frame:#E3E4E8}
+.mh-ch{margin-bottom:var(--mh-gap)}
+.mh-light{box-shadow:0 0 0 1px var(--mh-frame)}
+
+/* ---------- раскладка: картинка 7 колонок, текст 4; rev — картинка справа ---------- */
+.mh-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:32px;align-items:center}
+.mh-split > .mh-viz{grid-column:1 / span 7}
+.mh-split > .mh-col{grid-column:9 / -1}
+.mh-split.rev > .mh-viz{grid-column:6 / -1;order:2}
+.mh-split.rev > .mh-col{grid-column:1 / span 4;order:1}
+@media (max-width:900px){
+  .mh-split > .mh-viz,.mh-split > .mh-col,.mh-split.rev > .mh-viz,.mh-split.rev > .mh-col{grid-column:1 / -1}
+  .mh-split > .mh-col,.mh-split.rev > .mh-col{order:-1}
+  .mh-split{row-gap:28px}
+}
+.mh-col{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.mh-title{font-weight:500;font-size:clamp(30px,3.2vw,48px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
+.mh-text{font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;max-width:38ch}
+.mh-head{margin-bottom:clamp(28px,3.5vw,48px)}
+.mh-head .mh-col{max-width:760px}
+.mh-cap{font-size:16px;line-height:1.35;margin-top:10px;color:color-mix(in srgb,currentColor 62%,transparent);text-wrap:balance}
+
+/* появление */
+.mh-col > *{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.mh-col > :nth-child(2){transition-delay:.08s}.mh-col > :nth-child(n+3){transition-delay:.16s}
+.mh-viz,.mh-ch > .wrap:not(.mh-head),.mh-pat{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .1s,transform 1.1s var(--ease) .1s}
+.mh-ch.in .mh-col > *,.mh-ch.in .mh-viz,.mh-ch.in > .wrap:not(.mh-head),.mh-ch.in .mh-pat{opacity:1;transform:none}
+
+/* ---------- строка надписей: текущая темная, под ней — полоска таймера ---------- */
+.mh-tabs{display:flex;flex-wrap:wrap;column-gap:clamp(20px,2.6vw,40px);row-gap:4px;border-bottom:1.5px solid color-mix(in srgb,currentColor 14%,transparent);margin-bottom:clamp(20px,2.6vw,36px)}
+.mh-tab{position:relative;padding:0 0 14px;margin-bottom:-1.5px;font-size:clamp(20px,1.7vw,26px);font-weight:500;line-height:1.15;white-space:nowrap;color:inherit;
+  background:none;border:0;opacity:.38;cursor:pointer;transition:opacity .35s}
+.mh-tab:hover{opacity:.75}
+.mh-tab[aria-selected="true"]{opacity:1}
+.mh-tick{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;transition:opacity .3s}
+.mh-tick::after{content:"";position:absolute;inset:0;background:currentColor;transform-origin:0 50%}
+.mh-tab[aria-selected="true"] .mh-tick,.mh-th.on .mh-tick{opacity:1}
+.mh-tab.run .mh-tick::after,.mh-th.run .mh-tick::after{animation:mhTick var(--ms) linear both}
+@keyframes mhTick{from{transform:scaleX(0)}to{transform:none}}
+@media (max-width:760px){
+  .mh-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad)}
+  .mh-tabs::-webkit-scrollbar{display:none}
+  .mh-tab{flex:none}
+}
+
+/* ---------- build: узор слетается в знак (синяя полоса во всю ширину) ---------- */
+.mh-top{margin-bottom:clamp(48px,6vw,96px)}
+.mh-build{position:relative;height:clamp(360px,44vw,700px);background:var(--mh-blue);cursor:pointer;overflow:hidden}
+.mh-bd{display:block;width:100%;height:100%}
+.mh-bd-sq{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.2s var(--ease)}
+.mh-bd-pills{opacity:0;transition:opacity .6s ease .35s}
+.mh-bd-word{opacity:0;transform:translateX(-20px);transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
+.mh-build.lock .mh-bd-sq{stroke-dashoffset:0}
+.mh-build.lock .mh-bd-pills{opacity:1}
+.mh-build.word .mh-bd-word{opacity:1;transform:none}
+/* долетевшие в вырезы панелей становятся цветом фона — это и есть вырез */
+.mh-bd-fly rect{transition:fill .5s ease .45s}
+.mh-build.lock .mh-bd-fly rect{fill:var(--mh-blue)}
+.mh-blink{animation:mhBlink 6s ease-in-out infinite}
+@keyframes mhBlink{0%,100%{opacity:1}50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.mh-blink{animation:none}}
+
+/* ---------- before: шторка «было / стало», под ней наброски заказчика ---------- */
+.mh-cmp{position:relative;aspect-ratio:1257/750;border-radius:var(--r-img);overflow:hidden;cursor:ew-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none;box-shadow:0 0 0 1px var(--mh-frame)}
+.mh-cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.mh-cmp-a{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.mh-cmp-bar{position:absolute;top:0;bottom:0;left:var(--p);width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.08);pointer-events:none}
+.mh-cmp-bar b{position:absolute;top:50%;left:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.mh-cmp-bar b::before,.mh-cmp-bar b::after{content:"";position:absolute;top:50%;width:0;height:0;border:6px solid transparent;margin-top:-6px}
+.mh-cmp-bar b::before{left:5px;border-right-color:#111}
+.mh-cmp-bar b::after{right:5px;border-left-color:#111}
+.mh-cmp-l{position:absolute;top:14px;padding:5px 12px;border-radius:999px;background:rgba(0,0,0,.66);color:#fff;font-size:16px;line-height:1.2;pointer-events:none}
+.mh-cmp-from{left:14px}.mh-cmp-to{right:14px}
+.mh-old{margin-top:clamp(40px,5vw,72px)}
+.mh-old-t{margin:0 0 clamp(14px,1.6vw,22px)}
+/* одна строка: 16 иконок и две надписи на синем той же высоты (у надписи ширина 1,42 высоты) */
+.mh-old-in{display:grid;grid-template-columns:repeat(16,minmax(0,1fr)) repeat(2,minmax(0,1.42fr));gap:clamp(5px,.9vw,14px);align-items:center;max-width:1100px}
+.mh-old-ic,.mh-old-lk{display:contents}
+.mh-old-ic img{width:100%;aspect-ratio:1;height:auto;display:block}
+.mh-old-lk img{width:100%;height:auto;display:block;border-radius:3px}
+@media (max-width:600px){
+  .mh-old-in{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+  .mh-old-lk img{grid-column:span 2}
+}
+.mh-old img{opacity:0;transform:translateY(12px);transition:opacity .6s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--d) * 40ms)}
+.mh-ch.in .mh-old img{opacity:1;transform:none}
+.mh-zoom{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;border-radius:var(--r-img)}
+.mh-zoom img{width:100%;height:auto;display:block;border-radius:var(--r-img);transition:opacity .4s}
+.mh-zoom:hover img{opacity:.88}
+
+/* ---------- family: иконки VK в цвете и ряд монохромных на одном экране ---------- */
+.mh-famw{background:#fff;border-radius:calc(var(--r-img) * 2);color:#111}
+:root[data-theme="dark"] .mh-famw{padding:clamp(16px,2.4vw,36px)}
+.mh-fam-t{margin:0 0 clamp(12px,1.4vw,18px)}
+.mh-fam + .mh-fam-t{margin-top:clamp(28px,3.4vw,48px)}
+.mh-fam{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:clamp(10px,1.6vw,24px)}
+.mh-ic{order:var(--o);position:relative;aspect-ratio:1;opacity:0;transform:scale(.85);transition:opacity .6s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--d) * 20ms)}
+.mh-ch.in .mh-ic{opacity:1;transform:none}
+.mh-ic > *{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mh-ic.me{color:#000}
+/* монохромный ряд сдвинут на колонку: М100 стоит ровно под цветным М100 */
+@media (min-width:601px){.mh-fam-mono .mh-ic:first-child{grid-column-start:2}}
+/* М100 приземляется в сетку последним, с пружиной */
+.mh-ch.in .mh-fam:not(.mh-fam-mono) .mh-ic.me{animation:mhDrop 1s cubic-bezier(.3,1.5,.5,1) .9s both}
+@keyframes mhDrop{from{opacity:0;transform:translateY(-40%) scale(.4)}to{opacity:1;transform:none}}
+@media (max-width:600px){
+  .mh-fam{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .mh-ic.x{display:none}
+  .mh-fam:not(.mh-fam-mono) .mh-ic.me{order:23}
+  .mh-fam-mono{grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}   /* семь монохромных — одной строкой */
+}
+
+/* ---------- search: шесть вариантов прямо на странице, без подложек ---------- */
+.mh-sg{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px)}
+.mh-sg-t{margin:0 0 clamp(14px,1.6vw,22px)}
+.mh-sg-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6vw,24px)}
+.mh-var{display:block;opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease),transform .7s var(--ease);transition-delay:calc(.15s + var(--d) * 110ms)}
+.mh-var svg{width:100%;height:auto;display:block}
+.mh-ch.in .mh-var{opacity:1;transform:none}
+@media (max-width:600px){.mh-sg{grid-template-columns:1fr}}
+
+/* ---------- motion: ролик ---------- */
+.mh-mv{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.mh-video{display:block;width:100%;aspect-ratio:16/9;border-radius:var(--r-img);background:#fff;box-shadow:0 0 0 1px var(--mh-frame);object-fit:cover}
+.mh-snd{border:0;border-radius:999px;padding:12px 22px;background:var(--ink,#111);color:var(--bg,#fff);font:inherit;font-size:18px;line-height:1.1;cursor:pointer}
+
+/* ---------- versions: знак на всех фонах сразу ---------- */
+.mh-bgs{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.2vw,16px)}
+.mh-bg{display:grid;place-items:center;aspect-ratio:16/10;border-radius:var(--r-img);
+  opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease),transform .7s var(--ease);transition-delay:calc(.15s + var(--d) * 110ms)}
+.mh-ch.in .mh-bg{opacity:1;transform:none}
+.mh-bg .mh-lock{width:58%;height:auto}
+.mh-bg-white{background:#fff;color:#000;box-shadow:0 0 0 1px var(--mh-frame)}
+.mh-bg-blue{background:var(--mh-blue);color:#fff}
+.mh-bg-grey{background:#6A6B6F;color:#fff}
+.mh-bg-black{background:#000;color:#fff}
+:root[data-theme="dark"] .mh-bg-black{box-shadow:0 0 0 1px #2A2C33}
+.mh-vers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,28px);margin-top:clamp(36px,4.5vw,64px)}
+.mh-ver-pic{display:flex;align-items:center;min-height:clamp(70px,7vw,110px);color:var(--ink,#000)}
+.mh-ver-pic .mh-lock{width:min(80%,280px);height:auto}
+:root[data-theme="dark"] .mh-ver-pic{background:#fff;color:#000;justify-content:center;border-radius:var(--r-img)}
+.mh-ver-t{margin-top:16px;font-weight:500;font-size:clamp(20px,1.7vw,24px);line-height:1.2}
+.mh-ver .mh-cap{margin-top:6px}
+@media (max-width:700px){.mh-vers{grid-template-columns:1fr}}
+
+/* ---------- space: охранное поле, оба поля сразу ---------- */
+.mh-field{color:#000}
+:root[data-theme="dark"] .mh-field{background:#fff;border-radius:var(--r-img);padding:clamp(16px,3vw,40px)}
+.mh-field svg{display:block;width:100%;height:auto;overflow:visible}
+.mh-gh{fill:#EFF0F2}
+.mh-f{fill:transparent;stroke-dasharray:5 5;vector-effect:non-scaling-stroke}
+.mh-f-in{stroke:#B6B9C1;stroke-width:1.2;opacity:.7}
+.mh-f-half{stroke:var(--mh-blue);stroke-width:2;fill:rgba(0,119,255,.05)}
+.mh-f-full{stroke:#8E929B;stroke-width:1.5}
+.mh-legend{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:16px;line-height:1.35}
+.mh-legend li{display:flex;align-items:flex-start;gap:12px}
+.mh-lg{flex:none;width:34px;height:0;border-top:2px dashed;margin-top:.68em}
+.mh-lg-half{border-color:var(--mh-blue)}
+.mh-lg-full{border-color:#8E929B}
+
+/* ---------- pattern: три панели рядом во всю ширину сайта — синий, белый, черный ---------- */
+.mh-pats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));height:clamp(340px,40vw,620px)}
+.mh-pat{position:relative;background:var(--mh-blue);cursor:crosshair;touch-action:pan-y;overflow:hidden}
+.mh-pat svg{display:block;width:100%;height:100%}
+.mh-pat rect{fill:var(--mh-dark);transition:opacity .45s ease}
+.mh-pat[data-k="white"]{background:#fff;box-shadow:inset 0 1px 0 var(--mh-frame),inset 0 -1px 0 var(--mh-frame)}
+.mh-pat[data-k="black"]{background:#000}
+.mh-pat:is([data-k="white"],[data-k="black"]) rect{fill:var(--mh-blue)}
+.mh-pat rect.off{opacity:0}
+.mh-pat rect.dim{opacity:.4}
+.mh-pat rect.pop{opacity:.6;transition-duration:.12s}
+/* панели открываются по очереди сверху вниз */
+.mh-pat{clip-path:inset(0 0 100% 0);transition:clip-path 1.1s var(--ease)}
+.mh-pat:nth-child(2){transition-delay:.15s}.mh-pat:nth-child(3){transition-delay:.3s}
+.mh-ch.in .mh-pat{clip-path:inset(0)}
+@media (max-width:700px){.mh-pats{grid-template-columns:1fr;height:auto}.mh-pat{height:clamp(220px,60vw,320px)}}
+
+/* ---------- pattern: референсы решеток над узором ---------- */
+.mh-refs-w{margin-bottom:clamp(36px,4.5vw,64px)}
+.mh-refs{display:flex;gap:clamp(10px,1.4vw,20px)}
+.mh-ref{min-width:0}
+.mh-ref img{width:100%;height:auto}
+@media (max-width:600px){.mh-refs{gap:8px}}
+
+/* ---------- palette: полосы в долях, подписи вертикально ---------- */
+.mh-pal{display:flex;height:clamp(320px,34vw,520px);border-radius:var(--r-img);overflow:hidden;box-shadow:0 0 0 1px var(--mh-frame)}
+.mh-sw{position:relative;flex:var(--w) 1 0;background:var(--c);color:#fff;transition:flex-grow .6s var(--ease)}
+.mh-sw:hover{flex-grow:calc(var(--w) + .7)}
+.mh-sw.white{color:#000}
+.mh-sw-t{position:absolute;left:clamp(10px,1.2vw,18px);bottom:clamp(14px,1.6vw,22px);display:flex;flex-direction:column;gap:2px;font-size:16px;line-height:1.3;
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+.mh-sw-t b{font-weight:500}
+@media (max-width:600px){
+  .mh-pal{flex-direction:column;height:auto}
+  .mh-sw{flex:none;height:calc(var(--w) * 64px);min-height:96px}
+  .mh-sw:hover{flex-grow:0}
+  .mh-sw-t{writing-mode:horizontal-tb;transform:none;left:16px;bottom:14px}
+}
+
+/* ---------- заголовок слева, длинный текст справа в две колонки (паттерн, носители) ---------- */
+.mh-wide{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:20px;margin-bottom:clamp(28px,3.5vw,48px);align-items:start}
+.mh-wide > .mh-col:first-child{grid-column:1 / span 5}
+/* текст начинается вровень с заголовком, под подписью главы */
+.mh-wide > .mh-col:last-child{grid-column:6 / -1;padding-top:calc(19px * 1.3 + 18px)}
+.mh-cols{max-width:none;columns:2;column-gap:clamp(20px,2.6vw,40px)}
+@media (max-width:900px){
+  .mh-wide > .mh-col:first-child,.mh-wide > .mh-col:last-child{grid-column:1 / -1;padding-top:0}
+}
+@media (max-width:640px){.mh-cols{columns:1}}
+
+/* ---------- merch: журнальная сетка по референсам Даши ---------- */
+.mh-ed{display:flex;flex-direction:column;gap:clamp(56px,7vw,112px)}
+.mh-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);row-gap:18px;
+  align-items:start}
+.mh-mt{display:flex;flex-direction:column;gap:6px}
+.mh-mt-n{font-weight:500;font-size:clamp(24px,2.3vw,34px);line-height:1.05;letter-spacing:-.01em}
+.mh-mt-c{font-size:16px;line-height:1.4;color:color-mix(in srgb,currentColor 62%,transparent);max-width:30ch;text-wrap:balance}
+.mh-mp img{width:100%;height:auto;display:block}
+/* во всю ширину: подпись в правых колонках над кадром */
+.mh-row-full > .mh-mt{grid-column:1 / span 5;grid-row:1}
+.mh-row-full > .mh-rowpic{grid-column:1 / -1;grid-row:2}
+/* подпись слева, кадр справа */
+.mh-row-r > .mh-mt{grid-column:1 / span 3}
+.mh-row-r > .mh-rowpic{grid-column:4 / -1}
+/* кадр слева, подпись справа внизу */
+.mh-row-l > .mh-rowpic{grid-column:1 / span 9;grid-row:1}
+.mh-row-l > .mh-mt{grid-column:10 / -1;grid-row:1;align-self:end}
+/* два кадра разной ширины, подписи под каждым */
+.mh-row-pair{column-gap:clamp(16px,2vw,28px)}
+.mh-row-pair > .mh-cell{margin:0;display:flex;flex-direction:column;gap:14px}
+.mh-row-pair > .mh-cell:first-child{grid-column:1 / span 7}
+.mh-row-pair > .mh-cell:last-child{grid-column:8 / -1;margin-top:clamp(40px,8vw,140px)}
+/* ежедневник: вырезки прямо на странице, обложка и крупный план со сдвигом */
+.mh-row-diary > .mh-mt{grid-column:1 / span 3}
+.mh-row-diary > .mh-dc{grid-column:4 / -1;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);align-items:start}
+.mh-dc-0{grid-column:1 / span 4}
+.mh-dc-1{grid-column:5 / -1;margin-top:clamp(60px,12vw,220px)}
+/* ланьярд: вырезка, подпись слева */
+.mh-row-cut > .mh-mt{grid-column:1 / span 3}
+.mh-row-cut > .mh-cutpic{grid-column:4 / -1}
+/* планшет: строки в одну колонку, пары остаются рядом */
+@media (max-width:900px){
+  .mh-row > *:not(.mh-cell){grid-column:1 / -1 !important;grid-row:auto !important}
+  .mh-row-pair > .mh-cell:first-child{grid-column:1 / span 6}
+  .mh-row-pair > .mh-cell:last-child{grid-column:7 / -1;margin-top:clamp(32px,6vw,56px)}
+  .mh-dc-1{margin-top:clamp(40px,10vw,90px)}
+  .mh-row-l > .mh-mt{align-self:start}
+  .mh-row-l > .mh-mt,.mh-row-full > .mh-mt{order:-1}
+}
+/* телефон: пары тоже друг под другом */
+@media (max-width:600px){
+  .mh-row-pair{row-gap:clamp(40px,10vw,56px)}
+  .mh-row-pair > .mh-cell:first-child,.mh-row-pair > .mh-cell:last-child{grid-column:1 / -1;margin-top:0}
+}
+
+/* ---------- носители: появление ----------
+   кадр открывается шторкой снизу вверх, внутри картинка приезжает из легкого увеличения;
+   сайт раскрывается от центра, ланьярд — слева направо, у ежедневника обложка и крупный план
+   выезжают навстречу друг другу; подпись появляется следом */
+.mh-mp{clip-path:inset(100% 0 0 0);transition:clip-path 1.2s cubic-bezier(.7,0,.2,1)}
+.mh-mp img{transform:scale(1.12);transition:transform 1.8s cubic-bezier(.2,.8,.2,1)}
+.mh-row .mh-mt{opacity:0;transform:translateY(18px);transition:opacity .8s var(--ease) .45s,transform .9s var(--ease) .45s}
+.mh-row.in .mh-mp{clip-path:inset(-2px)}
+.mh-row.in .mh-mp img{transform:none}
+.mh-row.in .mh-mt{opacity:1;transform:none}
+.mh-row-full .mh-mp{clip-path:inset(0 50% 0 50%)}
+.mh-row-pair > .mh-cell:last-child .mh-mp,.mh-row-pair > .mh-cell:last-child .mh-mt{transition-delay:.2s}
+.mh-row-pair > .mh-cell:last-child .mh-mt{transition-delay:.65s}
+.mh-row-cut .mh-mp{clip-path:inset(0 100% 0 0);transition-duration:1.5s}
+.mh-row-cut .mh-mp img{transform:translateX(-4%)}
+.mh-row-diary .mh-mp{clip-path:none;transition:none}
+.mh-dc-0,.mh-dc-1{opacity:0;transition:opacity .9s var(--ease),transform 1.3s cubic-bezier(.2,.8,.2,1)}
+.mh-dc-0{transform:translateX(-60px) rotate(-3deg)}
+.mh-dc-1{transform:translateX(60px) translateY(40px) rotate(3deg);transition-delay:.2s}
+.mh-row-diary .mh-mp img{transform:none}
+.mh-row-diary.in .mh-dc-0,.mh-row-diary.in .mh-dc-1{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .mh-mp,.mh-row .mh-mt,.mh-dc-0,.mh-dc-1{clip-path:none !important;opacity:1 !important;transform:none !important;transition:none !important}
+  .mh-mp img{transform:none !important}
+}
+.mh-family .mh-cols{columns:1;max-width:44ch}   /* короткий текст — одной колонкой */

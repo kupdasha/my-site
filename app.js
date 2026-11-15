@@ -83,7 +83,19 @@ document.addEventListener('pause', e => { if (e.target.tagName === 'VIDEO' && !e
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'rosmedia', 'checkup', 'speaker', 'vosk'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'rosmedia', 'checkup', 'speaker', 'vosk', 'm100'];
+// комментарии прямо на странице — только на локальном превью: ?comments включает (помнится во вкладке), ?comments=off выключает; см. comments.js
+(function(){
+  if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+  const m = location.search.match(/[?&]comments(=([^&]*))?/);
+  try {
+    if (m) sessionStorage.setItem('kd-comments', m[2] === 'off' ? '' : '1');
+    if (!sessionStorage.getItem('kd-comments')) return;
+  } catch (e) { if (!m) return; }
+  const s = document.createElement('script'); s.src = SCRIPT_BASE + 'comments.js?v=' + Date.now(); s.defer = true;
+  (document.body || document.head).appendChild(s);
+})();
+
 function caseImport(n){
   if (CASE_CSS.includes(n) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const href = SCRIPT_BASE + n + '.css?v=' + VER;
@@ -2685,6 +2697,8 @@ function renderCase(k, keepScroll){
   if (p.rosmedia) body += `<div class="dc dc-mount"></div>`;
   // checkup — аудит внутренних систем Росатома: одиннадцать систем, общие болезни, рабочий стол с Марком, баннеры, кабинет в мессенджере, чаты, иконки, беклог; рисует checkup.js
   if (p.checkup) body += `<div class="ck ck-mount"></div>`;
+  // m100 — ребрендинг М100: знак собирается из узора, было / стало, свой в семье VK, поиск знака, версии на фонах, охранное поле, паттерн, цвет, копирайт, носители; рисует m100.js
+  if (p.m100) body += `<div class="mh mh-mount"></div>`;
   if (p.galleryEnd) while (g < gallery.length) body += galleryItem(gallery[g++]);
   // heroEnd — ролик из шапки уходит в самый конец кейса, после живых глав (см. интерактивные презентации)
   if (p.heroEnd) body += `<div class="wrap case-hero-end"><div class="case-hero"${p.ratio ? ` style="aspect-ratio:${p.ratio}"` : ''}>${heroHTML(p)}</div></div>`;
@@ -2873,6 +2887,10 @@ function renderCase(k, keepScroll){
   if (dcm) caseImport('rosmedia')
     .then(m => m.mountRosMedia(dcm, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс сообщества дизайнеров Росатома не загрузился', err));
+  const mhm = caseContent.querySelector('.mh-mount');
+  if (mhm) caseImport('m100')
+    .then(m => m.mountM100(mhm, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс М100 не загрузился', err));
   const ckm = caseContent.querySelector('.ck-mount');
   if (ckm) caseImport('checkup')
     .then(m => m.mountCheckup(ckm, p, { T, pick, openViewer, base: SCRIPT_BASE }))
