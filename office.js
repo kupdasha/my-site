@@ -365,6 +365,17 @@ function liveHtml(box){
 }
 
 /* ---------- демо: справа под текстом последней главы ---------- */
+/* ---------- результат — свидетельство Роспатента: картинка слева, текст рядом; картинка крупно по нажатию ---------- */
+const certHTML = c => `<section class="ro-ch ro-cert wrap">
+  <button class="ro-cert-btn" type="button" aria-label="${esc(H.pick(c.alt))} — открыть крупно">
+    <img src="${esc(c.small)}" width="${c.w}" height="${c.h}" alt="${esc(H.pick(c.alt))}" decoding="async"></button>
+  <div class="ro-cert-side">
+    <span class="case-label ro-label">${H.T(c.label)}</span>
+    <h2 class="ro-title">${H.T(c.title)}</h2>
+    <p class="ro-text">${H.T(c.text)}</p>
+  </div>
+</section>`;
+
 const tryHTML = t => t ? `<div class="ro-try">
   <h3 class="ro-try-title">${H.T(t.title)}</h3>
   ${H.pick(t.text) ? `<p class="ro-try-text">${H.T(t.text)}</p>` : ''}
@@ -456,6 +467,12 @@ export async function mountOffice(mount, p, helpers){
     : `<section class="ro-ch wrap ro-${k}-ch ro-split${lay === 'right' ? ' rev' : ''}"><div class="ro-viz">${html(o[k])}</div>${
         side(o[k], lastSplit && lastSplit[0] === k ? tryHTML(o.try) : '')}</section>`).join('');
   if (o.shots && o.shots.length) mount.insertAdjacentHTML('beforeend', shotsHTML(o.shots, o.shotsLabel));
+  // свидетельство — первым, сразу после задачи и решения
+  if (o.cert) {
+    mount.insertAdjacentHTML('afterbegin', certHTML(o.cert));
+    const b = mount.querySelector('.ro-cert-btn');
+    b.addEventListener('click', () => H.openViewer([o.cert.src], 0, [b.querySelector('img')]));
+  }
   mount.querySelectorAll('.ro-title').forEach(splitWords);
   mount.querySelectorAll('.ro-ch').forEach(s => reveal.observe(s));
   list.forEach(([k, , live]) => live(mount.querySelector(`.ro-${k}-ch`), o[k]));
