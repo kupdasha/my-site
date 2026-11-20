@@ -123,6 +123,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 
 /* Какая версия включена: 0 — формальная (светлая), 1 — дружеская (темная) */
 const isFun = () => root.dataset.theme === 'dark';
+const pageTitle = () => pick(isNdaPage ? SITE.ndaPage.pageTitle : isSpeakerPage ? SITE.speaker.pageTitle : isAboutPage ? SITE.about.pageTitle : SITE.pageTitle);
 /* Какая это страница: в прототипе — класс у body, на Тильде — атрибут data-page у раздела */
 const isAboutPage = document.body.classList.contains('page-about') || !!document.querySelector('[data-page="about"]');
 const isSpeakerPage = document.body.classList.contains('page-speaker') || !!document.querySelector('[data-page="speaker"]');
@@ -269,7 +270,7 @@ function renderTexts(){
       el.innerHTML = el.innerHTML.replace(SITE.hero.iris, `<span class="iris" data-t="${SITE.hero.iris}">${SITE.hero.iris}</span>`);
   });
   $$('[data-href]').forEach(el => el.href = get(el.dataset.href));
-  document.title = pick(isNdaPage ? SITE.ndaPage.pageTitle : isSpeakerPage ? SITE.speaker.pageTitle : isAboutPage ? SITE.about.pageTitle : SITE.pageTitle);
+  document.title = pageTitle();
   if (SITE.about.photo && $('#photo')) { const ph = pick(SITE.about.photo); if ($('#photo').getAttribute('src') !== ph) $('#photo').src = ph; }
 }
 
@@ -3180,7 +3181,7 @@ addEventListener('resize', () => {
 document.addEventListener('visibilitychange', () => {
   if (!isFun()) return;
   if (document.hidden) document.title = SITE.jokes.away;
-  else { document.title = pick(SITE.pageTitle); joke('back'); }
+  else { document.title = pageTitle(); joke('back'); }   // вернули название своей страницы, а не главной
 });
 
 
