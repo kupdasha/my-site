@@ -364,7 +364,7 @@ function spellOut(scope = document){
       const glue = document.createElement('span'); glue.className = 'wd-glue';
       prev.before(glue); glue.append(prev, w);
     });
-    el.setAttribute('aria-label', label);
+    if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', label);   // свой aria-label (название шрифтом Брайля) не перетираем
   });
 }
 
@@ -700,7 +700,7 @@ function renderNdaPage(){
     const ratio = p.ratio || '16/9';
     const inner = `
       <span class="media" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
-      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
+      <span class="meta"><span class="ttl">${cardTitle(p)}${yearHTML(p)}</span>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}`;
     const cls = 'work';
     // page: '' — отдельной страницы еще нет: карточка видна, но никуда не ведет
@@ -977,6 +977,9 @@ function tagRepeatsTitle(tag, title){
   return ws.length > 0 && ws.every(w => w.length < 4 ? t.includes(' ' + w + ' ') : t.includes(w.slice(0, Math.max(4, w.length - 2))));
 }
 const shownTag = p => p.tag && !tagRepeatsTitle(p.tag, p.title) ? p.tag : '';
+/* название на карточке; funTitle — свое название для дружеской версии (у VK Инклюзии — шрифт Брайля),
+   экранный диктор читает обычное название из aria-label */
+const cardTitle = p => isFun() && p.funTitle ? `<h3 aria-label="${uesc(pick(p.title))}">${p.funTitle}</h3>` : `<h3>${T(p.title)}</h3>`;
 /* год проекта — маленькой цифрой рядом с названием */
 const yearHTML = p => p.year ? `<sup class="yr">${T(p.year)}</sup>` : '';
 function renderWorks(){
@@ -1002,7 +1005,7 @@ function renderWorks(){
     return `
     <button class="work ${SIZE[size] || 'm'} ${side === 'справа' ? 'right' : ''}" data-k="${k}" data-reveal${p.cardWidth ? ` style="--cw:${p.cardWidth}"` : ''}>
       <span class="media${p.cardRatio ? ' whole' : ''}" style="aspect-ratio:${ratio}">${mediaHTML(p)}${p.cardTint ? `<span class="media-tint" style="background:${p.cardTint}"></span>` : ''}${p.wip ? `<span class="work-wip">${T(W.wip)}</span>` : ''}</span>
-      <span class="meta"><span class="ttl"><h3>${T(p.title)}</h3>${yearHTML(p)}</span>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
+      <span class="meta"><span class="ttl">${cardTitle(p)}${yearHTML(p)}</span>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}
     </button>`;
   }).join('');
@@ -3453,6 +3456,31 @@ root.dataset.theme = saved;
 document.querySelectorAll('.switch').forEach(s => s.setAttribute('aria-checked', saved === 'dark'));
 renderTexts();
 renderLists();
+/* Телефон и планшет: заголовки разделов и названия кейсов — в одну строку. Если строка не влезает, шрифт
+   немного уменьшается (не мельче min); если и так не влезает — остается как было и переносится словами */
+function fitLines(){
+  const small = innerWidth < 1024;
+  document.querySelectorAll('.h2, .work .ttl h3, .nda-item h3').forEach(el => {
+    el.style.fontSize = ''; el.style.maxWidth = '';
+    if (!small || !el.offsetParent) return;
+    const ttl = el.closest('.ttl'), box = ttl ? ttl.parentElement : el.parentElement;
+    const min = el.matches('.h2') ? 26 : 16, fs = parseFloat(getComputedStyle(el).fontSize);
+    const yr = ttl && ttl.querySelector('.yr, sup'), avail = (el.matches('.h2') ? el.parentElement.clientWidth : box.clientWidth) - (yr ? yr.getBoundingClientRect().width + 8 : 0);   // рядом с названием — год
+    el.style.whiteSpace = 'nowrap'; el.style.maxWidth = 'none';
+    const rg = document.createRange(); rg.selectNodeContents(el);
+    const need = rg.getBoundingClientRect().width;   // у названия кейса h3 строчный — scrollWidth у него 0
+    el.style.whiteSpace = '';
+    if (need <= avail) return;
+    const to = Math.floor(fs * avail / need * 0.98);
+    if (to >= min) el.style.fontSize = to + 'px'; else el.style.maxWidth = '';
+  });
+}
+const refit = () => requestAnimationFrame(fitLines);
+refit();
+addEventListener('resize', refit);
+addEventListener('theme:apply', () => setTimeout(refit, 50));
+addEventListener('works:rendered', refit);
+document.fonts?.ready?.then(refit);
 // разделы с заранее вписанным текстом (для поисковиков, tilda/prerender.js) уже перерисованы — снимаем пометку
 document.querySelectorAll('[data-pre]').forEach(el => el.removeAttribute('data-pre'));
 /* плавающей кнопки «связаться» нет: для этого есть пункт меню. В блоках Тильды она еще в разметке */

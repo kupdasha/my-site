@@ -216,6 +216,8 @@ img,video{display:block;max-width:100%}
 .switch-hint{position:absolute;top:calc(100% + 12px);right:0;padding:6px 14px 8px;border-radius:99px;background:var(--ink);color:var(--bg);font-weight:500;font-size:16px;line-height:1.2;white-space:nowrap;pointer-events:none;opacity:0;transform:translateY(-6px) scale(.9);transform-origin:80% 0;transition:opacity .4s var(--ease),transform .5s var(--ease)}
 .switch-hint::before{content:"";position:absolute;top:-5px;right:28px;width:10px;height:10px;background:inherit;transform:rotate(45deg);border-radius:2px}
 .switch.nudge .switch-hint{opacity:1;transform:none}
+/* в дружеской версии подсказка у тумблера — своя («если начальник рядом, жми»), видна при наведении */
+:root[data-theme="dark"] .switch:hover .switch-hint{opacity:1;transform:none}
 
 /* ================================================================
    ПЕРВЫЙ ЭКРАН
