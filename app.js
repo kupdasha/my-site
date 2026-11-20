@@ -879,9 +879,9 @@ function feelStrings(x, y){
 addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; srcOf('mouse'); pointerX = e.clientX; pointerY = e.clientY; feelStrings(pointerX, pointerY); }, { passive: true });
 // при прокрутке струна сама проезжает под курсором — и тоже цепляется
 addEventListener('scroll', () => {
-  // на телефоне и планшете курсора нет: струна цепляется за середину экрана, когда проезжает ее при прокрутке
-  // (пока палец лежит на экране — за палец)
-  if (touchUI && performance.now() - lastTouch > 120) { srcOf('screen'); feelStrings(innerWidth / 2, innerHeight * 0.55); return; }
+  // на телефоне и планшете курсора нет: струна цепляется за середину экрана, когда проезжает ее при прокрутке —
+  // всегда, даже когда страницу листают пальцем и палец не попадает на струну (просьба 20.11)
+  if (touchUI) { srcOf('screen'); feelStrings(innerWidth / 2, innerHeight * 0.55); return; }
   feelStrings(pointerX, pointerY);
 }, { passive: true });
 // пальцем: провел по строке — струна дернулась
@@ -889,7 +889,8 @@ const touchUI = matchMedia('(pointer: coarse)').matches;
 let lastTouch = 0, feelSrc = '';
 // сменился источник (мышь, палец, середина экрана) — забываем прошлое положение, иначе струна «заденется» сама
 function srcOf(src){ if (feelSrc !== src) { feelSrc = src; strings.forEach(s => { s.prev = null; }); } }
-const onTouch = e => { const t = e.touches[0]; if (!t) return; lastTouch = performance.now(); srcOf('finger'); pointerX = t.clientX; pointerY = t.clientY; feelStrings(pointerX, pointerY); };
+// палец на телефоне струны не дергает: их задевает середина экрана при прокрутке (иначе два источника сбивали бы друг друга)
+const onTouch = () => { lastTouch = performance.now(); };
 addEventListener('touchstart', onTouch, { passive: true });
 addEventListener('touchmove', onTouch, { passive: true });
 // палец оторвали, пока струна натянута, — она срывается и звучит
@@ -1139,6 +1140,8 @@ document.body.appendChild(clientPreview);
 // listPreview — свое превью для строки «других работ» (картинка или тихий ролик mp4); иначе легкая копия обложки
 const previewOf = w => { const m = parseMedia(legacyVideo(w)); return w.listPreview || w.thumb || w.image || (m && m.type === 'drive' ? `https://drive.google.com/thumbnail?id=${m.id}&sz=w800` : ''); };
 function showPreviewImage(img, focus){
+  // на телефоне и планшете наведения нет: от касания превью появлялось и висело весь скролл (20.11) — не показываем
+  if (img && matchMedia('(hover: none)').matches) img = '';
   clientPreview.classList.toggle('show', !!img);
   if (img && clientPreview.dataset.src !== img) {
     clientPreview.dataset.src = img;
