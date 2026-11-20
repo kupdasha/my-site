@@ -217,7 +217,7 @@ img,video{display:block;max-width:100%}
 .switch-hint::before{content:"";position:absolute;top:-5px;right:28px;width:10px;height:10px;background:inherit;transform:rotate(45deg);border-radius:2px}
 .switch.nudge .switch-hint{opacity:1;transform:none}
 /* в дружеской версии подсказка у тумблера — своя («если начальник рядом, жми»), видна при наведении */
-:root[data-theme="dark"] .switch:hover .switch-hint{opacity:1;transform:none}
+@media (hover: hover){:root[data-theme="dark"] .switch:hover .switch-hint{opacity:1;transform:none}}   /* на телефоне от касания «наведение» залипало — подсказка висела
 
 /* ================================================================
    ПЕРВЫЙ ЭКРАН
@@ -1156,7 +1156,7 @@ button.article{width:100%;text-align:left;font:inherit;color:inherit;background:
   .nda-item .meta{flex-wrap:wrap;row-gap:8px}   /* длинное название и тег не распирают карточку на узком телефоне */
   .pod-player,.pod-list{grid-column:1 / -1}
   .pod-list{max-height:none;margin-top:24px}
-  .switch-hint{right:auto;left:0;transform-origin:20% 0}
+  .switch-hint{right:auto;left:0;transform-origin:20% 0;white-space:normal;width:max-content;max-width:160px;text-wrap:balance}   /* длинная подсказка («если начальник рядом, жми») — в две строки, не за край экрана */
   .switch-hint::before{right:auto;left:28px}
   .case-label{grid-column:1 / -1;margin-bottom:16px;padding:0}
   .case-text p,.case-more{grid-column:1 / -1}

@@ -150,7 +150,7 @@ const CLEAN = ids => `(() => {
   for (const id of ${JSON.stringify(ids)}) {
     const el = document.getElementById(id); if (!el) continue;
     const c = el.cloneNode(true);
-    c.querySelectorAll('script,video,iframe,audio,source,object,embed,.legs,.zzz').forEach(n => n.remove());
+    c.querySelectorAll('script,video,iframe,audio,source,object,embed,.legs,.zzz,#menuBtn').forEach(n => n.remove());
     // буквы заголовков app.js раскладывает по span.ch для анимации — роботу нужно целое слово
     c.querySelectorAll('.ch').forEach(n => n.replaceWith(n.textContent));
     c.normalize();

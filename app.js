@@ -3428,12 +3428,13 @@ const OIL = {
    ================================================================ */
 {
   const head = document.querySelector('.head'), nav = document.getElementById('nav');
-  if (head && nav && !document.getElementById('menuBtn')) {
-    const b = document.createElement('button');
+  if (head && nav) {
+    // кнопка может уже стоять в разметке шапки (текст для поисковиков, tilda/prerender.js) — тогда берем ее, а не пропускаем
+    const b = document.getElementById('menuBtn') || document.createElement('button');
     b.type = 'button'; b.id = 'menuBtn'; b.className = 'menu-btn';
     b.setAttribute('aria-controls', 'nav'); b.setAttribute('aria-expanded', 'false');
     b.textContent = 'меню';
-    nav.after(b);
+    if (!b.isConnected) nav.after(b);
     const set = open => { head.classList.toggle('menu-open', open); b.setAttribute('aria-expanded', open); b.textContent = open ? 'закрыть' : 'меню'; };
     b.addEventListener('click', () => set(!head.classList.contains('menu-open')));
     nav.addEventListener('click', e => { if (e.target.closest('a')) set(false); });
