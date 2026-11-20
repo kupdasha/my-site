@@ -80,6 +80,31 @@
 .ab-chip{display:inline-block;font-size:16px;line-height:1;padding:8px 14px 10px;border:1.5px solid currentColor;border-radius:999px;opacity:1}
 .ab-pick figcaption{opacity:1}
 
+/* ---------- каталог: все варианты сразу; строка на группу — слева название и мысль, справа предметы ---------- */
+.ab-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);align-items:center;
+  padding:clamp(20px,2.2vw,32px) 0;border-top:1.5px solid color-mix(in srgb,currentColor 14%,transparent)}
+.ab-row:last-child{border-bottom:1.5px solid color-mix(in srgb,currentColor 14%,transparent)}
+.ab-row-head{grid-column:1 / span 4;display:flex;flex-direction:column;gap:12px;padding-right:clamp(8px,2vw,32px)}
+.ab-row-name{font-weight:500;font-size:clamp(22px,2vw,30px);line-height:1.1;margin:0}
+.ab-cat .ab-row-head .ab-about{text-align:left;align-self:auto;max-width:34ch;opacity:.8}
+.ab-row-items{grid-column:5 / -1;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:clamp(8px,1.4vw,24px);align-items:start;--h:clamp(96px,10vw,140px)}
+.ab-tall .ab-row-items{--h:clamp(140px,15vw,210px)}
+.ab-cat .ab-piece{flex:none;max-width:none;opacity:1;transform:none;gap:10px}
+/* тег «пошла дальше» — под подписью, чтобы медали в ряду стояли на одной линии */
+.ab-cat .ab-piece figcaption{flex-direction:column-reverse}
+/* в каталоге предметы стоят спокойно: без покачивания и тени, при наведении чуть приподнимаются */
+.ab-cat .ab-coin{animation:none;transition:transform .5s var(--ease)}
+.ab-cat .ab-coin::after{display:none}
+.ab-cat .ab-coin:hover{transform:translateY(-6px)}
+@media (max-width:860px){
+  .ab-row-head,.ab-row-items{grid-column:1 / -1}
+  .ab-row-items{margin-top:20px;grid-template-columns:repeat(min(var(--n),4),minmax(0,1fr));--h:clamp(110px,17vw,150px)}
+}
+/* телефон: варианты по два в ряд, подписи помещаются */
+@media (max-width:560px){
+  .ab-row-items{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:24px;column-gap:16px;--h:clamp(120px,36vw,160px)}
+}
+
 /* ---------- идеи ---------- */
 .ab-ideas .ab-about,.ab-rounds .ab-about{align-self:center;text-align:center}
 /* фокус с клавиатуры — рамкой вокруг надписи; после нажатия мышью рамки нет */
@@ -183,19 +208,19 @@
 .ab-open{display:grid;place-items:center;padding:clamp(20px,3vw,48px);cursor:zoom-in}
 .ab-open img{width:100%;height:auto;max-height:560px;object-fit:contain;display:block;transition:transform 1s var(--ease)}
 .ab-open:hover img{transform:scale(1.03)}
-.ab-foil{display:flex;flex-direction:column;gap:clamp(18px,2vw,28px);padding:clamp(20px,3vw,40px)}
-.ab-lids{position:relative;display:grid;place-items:center;flex:1;min-height:260px;overflow:hidden}
-.ab-lid{grid-area:1 / 1;width:min(100%,380px);padding:0;cursor:zoom-in;opacity:0;transform:translateY(10px) scale(.97);transition:opacity .5s,transform .7s var(--ease);pointer-events:none}
-.ab-lid.on{opacity:1;transform:none;pointer-events:auto}
+.ab-foil{display:flex;flex-direction:column;justify-content:center;gap:clamp(18px,2vw,28px);padding:0 0 0 clamp(8px,2vw,32px);min-width:0}
+/* три коробки рядом: текущая впереди, остальные по бокам мельче и бледнее; меняются местами по кругу */
+.ab-lids{position:relative;display:grid;place-items:center;padding:clamp(8px,2vw,24px) 0}
+.ab-lid{grid-area:1 / 1;width:52%;padding:0;cursor:pointer;transition:transform 1.1s cubic-bezier(.65,0,.25,1),opacity .9s ease,filter .9s}
 .ab-lid img{width:100%;height:auto;display:block}
-/* полоска света по фольге после смены */
-.ab-sweep{position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;opacity:0;
-  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.9) 50%,transparent 65%);background-size:250% 100%;background-position:120% 0}
-.ab-sweep.go{animation:abSweep 1.3s var(--ease) .15s both}
-@keyframes abSweep{0%{opacity:1;background-position:120% 0}100%{opacity:1;background-position:-20% 0}}
-.ab-foil .ab-tabs{margin-bottom:0}
-@media (max-width:760px){.ab-box{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:560px){.ab-lids{min-height:0}.ab-lid{width:min(70%,260px)}}
+.ab-lid[data-p="0"]{z-index:2;cursor:zoom-in}
+.ab-lid[data-p="1"]{transform:translateX(62%) scale(.66);opacity:.5;z-index:1}
+.ab-lid[data-p="2"]{transform:translateX(-62%) scale(.66);opacity:.5;z-index:1}
+.ab-lid:not([data-p="0"]):hover{opacity:.8}
+.ab-foil .ab-about{text-align:center;align-self:center}
+.ab-foil-note{font-size:16px;line-height:1.35;opacity:.6;text-align:center;margin:0;text-wrap:balance}
+@media (max-width:760px){.ab-box{grid-template-columns:minmax(0,1fr)}.ab-foil{padding:0}}
+
 
 /* ---------- витрина: лампа ходит за курсором, медали поворачиваются к свету ---------- */
 .ab-show{padding:clamp(28px,5vw,80px) clamp(16px,3vw,48px);cursor:crosshair}

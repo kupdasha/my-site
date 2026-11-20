@@ -70,7 +70,7 @@ function cycle(box, n, show, ms){
   return { set: i => { touched = true; set(i, true); } };
 }
 
-/* ---------- идеи: концепции на подставках, медали покачиваются ---------- */
+/* ---------- идеи: каталог концепций, все видны сразу ---------- */
 // предмет витрины: картинка, у которой может быть оборот (back) — тогда он переворачивается
 const piece = (it, i) => {
   const o = typeof it === 'string' ? { img: it } : it;
@@ -83,38 +83,33 @@ const piece = (it, i) => {
 };
 const shelf = (items, c = '') => `<div class="ab-shelf${c}" style="--n:${items.length}">${items.map(piece).join('')}</div>`;
 
+// каталог: все варианты видны сразу — строка на группу: слева название и мысль, справа предметы в ряд
+// tall у строки — предметы вытянутые (медаль на колодке), им нужна высота побольше
+const catalog = rows => `<div class="ab-cat">${rows.map(r => `<section class="ab-row${r.tall ? ' ab-tall' : ''}">
+    <div class="ab-row-head"><h3 class="ab-row-name">${H.T(r.name)}</h3>${r.text ? `<p class="ab-about">${H.T(r.text)}</p>` : ''}</div>
+    <div class="ab-row-items" style="--n:${Math.max(4, r.items.length)}">${r.items.map(piece).join('')}</div>
+  </section>`).join('')}</div>`;
+
 function ideasHTML(c){
-  return `<div class="ab-ideas">
-    ${tabs(c.groups.map(g => g.name))}
-    <div class="ab-stage">${c.groups.map((g, i) => `<div class="ab-scene${i ? '' : ' on'}">
-        ${shelf(g.items, g.items.length === 1 ? ' ab-solo' : '')}
-        <p class="ab-about">${H.T(g.text)}</p>
-      </div>`).join('')}</div>
-  </div>${cap(c.hint)}`;
+  return `<div class="ab-ideas">${catalog(c.groups)}</div>${cap(c.hint)}`;
 }
-// у предметов с оборотом: сами переворачиваются по очереди, когда сцена показалась; наведение — тоже
-function turner(box){
-  let flips = [];
-  box.querySelectorAll('.ab-two').forEach(f => {
+// каталог живет сам: предметы с оборотом по очереди показывают вторую сторону, пока блок на экране
+function liveCatalog(box){
+  const two = [...box.querySelectorAll('.ab-two')];
+  two.forEach(f => {
     f.addEventListener('pointerenter', () => f.classList.add('flip'));
     f.addEventListener('pointerleave', () => f.classList.remove('flip'));
   });
-  return scene => {
-    flips.forEach(clearTimeout); flips = [];
-    box.querySelectorAll('.ab-two').forEach(f => f.classList.remove('flip'));
-    if (still()) return;
-    scene.querySelectorAll('.ab-two').forEach((f, k) => {
-      flips.push(setTimeout(() => f.classList.add('flip'), 1400 + k * 260));
-      flips.push(setTimeout(() => f.classList.remove('flip'), 3600 + k * 260));
-    });
+  let k = 0, t = 0;
+  const step = () => {
+    const f = two[k++ % two.length];
+    if (!f || f.matches(':hover')) return;
+    f.classList.add('flip'); setTimeout(() => f.classList.remove('flip'), 2200);
   };
-}
-function scenes(box, c, ms){
-  const list = [...box.querySelectorAll('.ab-scene')], turn = turner(box);
-  cycle(box, list.length, i => { list.forEach((s, j) => s.classList.toggle('on', i === j)); turn(list[i]); }, c.ms || ms);
+  if (two.length && !still()) onScreen(box, v => { clearInterval(t); if (v) t = setInterval(step, 2800); }, '-10% 0px');
   zoomable(box);
 }
-function liveIdeas(box, c){ scenes(box, c, 5600); }
+function liveIdeas(box){ liveCatalog(box); }
 
 /* ---------- поиски: этапы строкой сверху, на полке — варианты; ниже всегда видна строка крупных планов на костюме ---------- */
 function roundsHTML(c){
@@ -133,7 +128,26 @@ function roundsHTML(c){
     </div>` : ''}
   </div>${cap(c.hint)}`;
 }
-function liveRounds(box, c){ scenes(box, c, 6000); }
+// этапы сменяются сами; у медалей с оборотом он показывается, когда этап открылся, и при наведении
+function liveRounds(box, c){
+  const list = [...box.querySelectorAll('.ab-scene')];
+  let flips = [];
+  box.querySelectorAll('.ab-two').forEach(f => {
+    f.addEventListener('pointerenter', () => f.classList.add('flip'));
+    f.addEventListener('pointerleave', () => f.classList.remove('flip'));
+  });
+  cycle(box, list.length, i => {
+    list.forEach((s, j) => s.classList.toggle('on', i === j));
+    flips.forEach(clearTimeout); flips = [];
+    box.querySelectorAll('.ab-two').forEach(f => f.classList.remove('flip'));
+    if (still()) return;
+    list[i].querySelectorAll('.ab-two').forEach((f, k) => {
+      flips.push(setTimeout(() => f.classList.add('flip'), 1400 + k * 260));
+      flips.push(setTimeout(() => f.classList.remove('flip'), 3600 + k * 260));
+    });
+  }, c.ms || 6000);
+  zoomable(box);
+}
 
 /* ---------- три уровня: три медали рядом, переключается отделка ---------- */
 // рендеры небольшие, поэтому медали не крупно по одной, а втроем, с подписями
@@ -242,20 +256,26 @@ function liveStand(box, c){
 function boxHTML(c){
   return `<div class="ab-box">
     <button class="ab-night ab-open" data-zoom="${c.open}" aria-label="Увеличить">${img(c.open)}</button>
-    <div class="ab-paper ab-foil">
-      ${tabs(c.foils.map(f => f.name))}
-      <div class="ab-lids">${c.foils.map((f, i) => `<button class="ab-lid${i ? '' : ' on'}" data-zoom="${f.img}" aria-label="Увеличить">${img(f.img)}</button>`).join('')}<i class="ab-sweep"></i></div>
+    <div class="ab-foil">
+      <div class="ab-lids">${c.foils.map((f, i) => `<button class="ab-lid" data-p="${i}" data-i="${i}" data-zoom="${f.img}" aria-label="${H.T(f.name)}">${img(f.img)}</button>`).join('')}</div>
+      ${c.note ? `<p class="ab-foil-note">${H.T(c.note)}</p>` : ''}
       ${c.inside ? `<p class="ab-about">${H.T(c.inside)}</p>` : ''}
     </div>
   </div>${cap(c.hint)}`;
 }
+// три коробки рядом: текущая впереди и крупнее, две другие по бокам; сами по кругу меняются местами,
+// пока блок на экране; по нажатию боковая выходит вперед, передняя открывается крупно
 function liveBox(box, c){
-  const foil = box.querySelector('.ab-foil'), lids = [...box.querySelectorAll('.ab-lid')], sweep = box.querySelector('.ab-sweep');
-  cycle(foil, lids.length, i => {
-    lids.forEach((l, j) => l.classList.toggle('on', i === j));
-    // по фольге пробегает полоска света
-    sweep.classList.remove('go'); void sweep.offsetWidth; if (!still()) sweep.classList.add('go');
-  }, c.ms || 3000);
+  const lids = [...box.querySelectorAll('.ab-lid')], n = lids.length;
+  let cur = 0, t = 0, seen = false;
+  const set = i => { cur = (i + n) % n; lids.forEach((l, j) => { l.dataset.p = (j - cur + n) % n; }); };
+  const run = () => { clearInterval(t); if (seen && !still()) t = setInterval(() => set(cur + 1), c.ms || 2600); };
+  box.querySelector('.ab-lids').addEventListener('click', e => {
+    const l = e.target.closest('.ab-lid');
+    if (l && l.dataset.p !== '0') { e.stopPropagation(); set(+l.dataset.i); run(); }
+  }, true);
+  onScreen(box, v => { seen = v; run(); }, '-10% 0px');
+  set(0);
   zoomable(box);
 }
 
