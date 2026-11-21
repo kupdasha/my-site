@@ -1231,9 +1231,8 @@ function refresh(){
   if (!on) { ctx.clearRect(0, 0, W, H); clearAll(); }
   if (on && !was) {
     bug.nextVisit = performance.now() + rand(4, 8) * 1000; lastScroll = scrollY;
-    // стартует на правом крае, на трети высоты: сюда рука на первом экране дотягивается сразу
-    const R = C.corner, i = C.inset, a = W - 2 * i - 2 * R, b = H - 2 * i - 2 * R;
-    bug.s = a + Math.PI * R / 2 + b * 0.35; bug.dir = 1;
+    // каждый раз стартует в случайном месте рамки и ползет в случайную сторону (рука найдет ее с любой стороны)
+    bug.s = Math.random() * L; bug.dir = Math.random() < 0.5 ? 1 : -1;
     resetTrail();
   }
   setupRunners();
