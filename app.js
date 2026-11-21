@@ -702,6 +702,7 @@ function setupDeck(){
    page: 'адрес' — карточка ведет на отдельную страницу вместо кейса
    ================================================================ */
 function renderNdaPage(){
+  // теги у карточек NDA не показываем (просьба 21.11); поле tag в content.js остается — оно нужно подписям в кейсах
   const N = SITE.ndaPage;
   if (!N || !isNdaPage) return;
   $('#ndaProjects').innerHTML = (N.items || []).map((p, k) => {
@@ -709,7 +710,7 @@ function renderNdaPage(){
     const ratio = p.ratio || '16/9';
     const inner = `
       <span class="media" style="aspect-ratio:${ratio}">${mediaHTML(p)}</span>
-      <span class="meta"><span class="ttl">${cardTitle(p)}${yearHTML(p)}</span>${shownTag(p) ? `<span class="tag">${T(shownTag(p))}</span>` : ''}</span>
+      <span class="meta"><span class="ttl">${cardTitle(p)}${yearHTML(p)}</span></span>
       ${p.short ? `<p>${T(p.short)}</p>` : ''}`;
     const cls = 'work';
     // page: '' — отдельной страницы еще нет: карточка видна, но никуда не ведет
