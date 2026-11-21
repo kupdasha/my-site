@@ -9,7 +9,7 @@
 <header class="head" id="head" data-pre="">
   <div class="wrap">
     <span class="logo" data-text="name">Дарья Купцова</span>
-    <nav class="nav" id="nav"><a class="link" href="/#works">работы</a><a class="link" href="/i">обо мне</a><a class="link" href="#contact">контакт</a></nav><button type="button" id="menuBtn" class="menu-btn" aria-controls="nav" aria-expanded="false">меню</button>
+    <nav class="nav" id="nav"><a class="link" href="/#works">работы</a><a class="link" href="/i">обо мне</a><a class="link" href="#contact">контакт</a></nav>
     <button class="switch unseen nudge" id="switch" role="switch" aria-checked="false" aria-label="Переключить версию сайта">
       <span data-text="switchLeft">серьезно</span><i></i><span data-text="switchRight">повеселее</span>
       <b class="switch-hint" data-text="switchHint" aria-hidden="true">попробуй</b>
@@ -32,7 +32,7 @@
         <p class="sp-lead" data-text="speaker.lead"><span class="nobr">Арт-директор</span> коммуникационного дизайна, <span class="nobr">ex-лид</span> <span class="nobr">дизайн-команды</span> <span class="caps">VK</span>. Говорю о&nbsp;том, как&nbsp;нейросети меняют профессию, из&nbsp;чего складывается вкус и&nbsp;как&nbsp;вести креативную команду&nbsp;— на&nbsp;опыте работы с&nbsp;крупными&nbsp;брендами.</p>
         <div class="sp-side">
           <p class="sp-lead" data-text="speaker.podcast">Веду видеоподкаст о&nbsp;дизайне <a class="link" href="https://vkvideo.ru/playlist/-226119573_2" target="_blank" rel="noopener">«Одна кавычка»</a>, в&nbsp;гостях&nbsp;— Студия Артемия Лебедева, Depot, Супрематика, <span class="caps">DDVB</span> и&nbsp;другие.</p>
-          <p class="sp-lead" data-text="speaker.jury">Член жюри <span class="nobr">дизайн-премий</span>.</p>
+          <p class="sp-lead" data-text="speaker.jury">Член жюри <span class="nobr">дизайн-премий</span> и&nbsp;член&nbsp;клуба <a class="link" href="https://style.rbc.ru/culture/67f93ec79a794752d61e8f35" target="_blank" rel="noopener">Noôdome</a>.</p>
         </div>
       </div>
     </div>
@@ -75,7 +75,7 @@
         <span class="sp-plus" aria-hidden="true"></span>
       </button>
       <div class="sp-topic-body"><div><div class="sp-topic-in">
-        <p>Как&nbsp;ставить задачи так, чтобы&nbsp;не&nbsp;переделывать; как&nbsp;защищать концепции перед&nbsp;<span class="nobr">топ-менеджментом</span> и&nbsp;не&nbsp;сливаться; как&nbsp;давать обратную связь, которая растит, а&nbsp;не&nbsp;убивает; как&nbsp;собрать процесс в&nbsp;удалённой команде; где&nbsp;граница между&nbsp;«<span class="nobr">арт-директор</span>» и&nbsp;«нянька»</p>
+        <p>Как&nbsp;ставить задачи так, чтобы&nbsp;не&nbsp;переделывать; как&nbsp;защищать концепции перед&nbsp;<span class="nobr">топ-менеджментом</span> и&nbsp;не&nbsp;сливаться; как&nbsp;давать обратную связь, которая растит, а&nbsp;не&nbsp;убивает; как&nbsp;собрать процесс в&nbsp;удаленной команде; где&nbsp;граница между&nbsp;«<span class="nobr">арт-директор</span>» и&nbsp;«нянька»</p>
         <p class="sp-who"><span>Для&nbsp;кого:</span> тимлиды, <span class="nobr">арт-директора</span>, руководители</p>
       </div></div></div>
     </article>
@@ -110,7 +110,7 @@
   <section class="sp-sec" id="talks" data-pre="">
     <div class="wrap">
       <h2 class="h2 sp-h2" data-reveal="" data-text="speaker.talksTitle" aria-label="где&nbsp;уже&nbsp;была спикером"><span class="wd">где&nbsp;уже&nbsp;была</span> <span class="wd">спикером</span></h2>
-      <div class="sp-talks" id="talkList"><div class="sp-talk" data-reveal="" style="--d:0.00s"><b>Кайференция Pragmatica</b><span>доклад</span></div><div class="sp-talk" data-reveal="" style="--d:0.04s"><b>Росконгресс</b><span>участница дискуссии</span></div><div class="sp-talk" data-reveal="" style="--d:0.08s"><b>Форум «<span class="caps">ШУМ</span>», Росмолодежь</b><span>спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.12s"><b>Telling&nbsp;Stories, <span class="caps">HSE</span>&nbsp;Creative&nbsp;Hub</b><span>спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.16s"><b>Школа <span class="caps">IKRA</span></b><span>вебинар</span></div><div class="sp-talk" data-reveal="" style="--d:0.20s"><b>Конференция «Дизайн коммуникации»,&nbsp;IThub</b><span>организатор и&nbsp;доклад об&nbsp;истории коммуникационного&nbsp;дизайна</span></div><div class="sp-talk" data-reveal="" style="--d:0.24s"><b>Митапы «С&nbsp;любовью, дизайн»</b><span>организатор и&nbsp;спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.28s"><b><span class="nobr">Дизайн-стендап</span> «Профдеформация», StandUp&nbsp;Cafe</b><span>ведущая и&nbsp;организатор</span></div><div class="sp-talk" data-reveal="" style="--d:0.32s"><b>Жюри премий</b><span>Russian&nbsp;Design&nbsp;Cup, <span class="caps">WDA</span>, Айда, Основа, Таврида&nbsp;х&nbsp;Dprofile и&nbsp;других</span></div></div>
+      <div class="sp-talks" id="talkList"><div class="sp-talk" data-reveal="" style="--d:0.00s"><b>Кайференция Pragmatica</b><span>доклад</span></div><div class="sp-talk" data-reveal="" style="--d:0.04s"><b>Росконгресс</b><span>участница дискуссии</span></div><div class="sp-talk" data-reveal="" style="--d:0.08s"><b>Форум «<span class="caps">ШУМ</span>», Росмолодёжь</b><span>спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.12s"><b>Telling&nbsp;Stories, <span class="caps">HSE</span>&nbsp;Creative&nbsp;Hub</b><span>спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.16s"><b>Школа <span class="caps">IKRA</span></b><span>вебинар</span></div><div class="sp-talk" data-reveal="" style="--d:0.20s"><b>Конференция «Дизайн коммуникации»,&nbsp;IThub</b><span>организатор и&nbsp;доклад об&nbsp;истории коммуникационного&nbsp;дизайна</span></div><div class="sp-talk" data-reveal="" style="--d:0.24s"><b>Митапы «С&nbsp;любовью, дизайн»</b><span>организатор и&nbsp;спикер</span></div><div class="sp-talk" data-reveal="" style="--d:0.28s"><b><span class="nobr">Дизайн-стендап</span> «Профдеформация», StandUp&nbsp;Cafe</b><span>ведущая и&nbsp;организатор</span></div><div class="sp-talk" data-reveal="" style="--d:0.32s"><b>Жюри премий</b><span>Russian&nbsp;Design&nbsp;Cup, <span class="caps">WDA</span>, Айда, Основа, Таврида&nbsp;х&nbsp;Dprofile и&nbsp;других</span></div></div>
       <div class="ctas sp-talks-btn" data-reveal=""><a class="btn btn-line" data-href="speaker.talksLink" href="https://vkvideo.ru/playlist/-226119573_3"><span data-text="speaker.talksButton" aria-label="смотреть записи"><span class="wd">смотреть</span> <span class="wd">записи</span></span><span class="arr">→</span></a></div>
     </div>
   </section>
