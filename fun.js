@@ -767,6 +767,54 @@ function drawBug(){
   ctx.restore();
 }
 
+/* РУКА НА ПЕРВОМ ЭКРАНЕ: вскоре после загрузки, а потом время от времени вылезает рука в лаймовом рукаве,
+   тычет пальцем в голову многоножки — та замирает и перекрашивается — и уезжает обратно.
+   Рука всегда выходит с противоположной стороны экрана (многоножка слева — рука справа, сверху — снизу)
+   и идет по диагонали. Рука собрана из кисти (img/hand-tip.webp) и рукава, который тянется на нужную длину
+   (img/hand-sleeve.webp растягивается вдоль: складки удлиняются, но не повторяются), поэтому толщина у нее всегда одна */
+const HAND = { h: 42, tip: 426 / 145, tipY: 0.25, first: [1000, 2000], every: [25000, 40000], dur: 3600 };
+let hand = null, handNext = performance.now() + rand(...HAND.first);
+function stepHand(now){
+  if (hand || now < handNext) return;
+  if (scrollY > innerHeight * 0.3 || (bug.mode !== 'frame' && bug.mode !== 'edge')) { handNext = now + 2000; return; }
+  const hx = bug.x, hy = bug.y - scrollY;
+  if (hx < 0 || hx > innerWidth || hy < 0 || hy > innerHeight) { handNext = now + 500; return; }   // голова должна быть на экране
+  // куда уходит рукав: к стороне экрана, противоположной ближайшему к многоножке краю, плюс наклон 22–34°
+  const d = [hx, innerWidth - hx, hy, innerHeight - hy], near = d.indexOf(Math.min(...d));   // 0 — слева, 1 — справа, 2 — сверху, 3 — снизу
+  const away = [0, 180, 90, -90][near], tilt = (Math.random() < 0.5 ? 1 : -1) * rand(22, 34);
+  let deg = away + tilt;
+  // наклон — в сторону середины экрана, чтобы рука шла через экран, а не вдоль края
+  if (near < 2) deg = away + (hy < innerHeight / 2 ? 1 : -1) * (near === 0 ? 1 : -1) * Math.abs(tilt);
+  else deg = away + (hx < innerWidth / 2 ? -1 : 1) * (near === 2 ? 1 : -1) * Math.abs(tilt);
+  const rad = deg * Math.PI / 180, ux = Math.cos(rad), uy = Math.sin(rad);
+  // кончик пальца — у головы, со стороны руки
+  const tipX = hx + ux * C.size * 1.3, tipY = hy + uy * C.size * 1.3;
+  // длина руки: от кончика до выхода за край экрана
+  const exit = Math.min(ux > 0.01 ? (innerWidth - tipX) / ux : ux < -0.01 ? -tipX / ux : 1e9, uy > 0.01 ? (innerHeight - tipY) / uy : uy < -0.01 ? -tipY / uy : 1e9);
+  const len = exit + 60, h = HAND.h, tw = h * HAND.tip;
+  bug.pauseUntil = now + HAND.dur;   // замирает, пока рука тянется
+  const el = hand = document.createElement('div');
+  el.className = 'fun-hand'; el.setAttribute('aria-hidden', 'true');
+  // рука влево от кончика (по умолчанию палец смотрит влево, рукав вправо); слева направо — зеркально, чтобы большой палец был сверху
+  const flip = Math.abs(((deg % 360) + 540) % 360 - 180) > 90 ? -1 : 1;   // рукав «смотрит» влево — переворачиваем по вертикали
+  el.style.cssText = `position:fixed;left:${tipX.toFixed(1)}px;top:${(tipY - h * HAND.tipY).toFixed(1)}px;width:${Math.max(len, tw).toFixed(0)}px;height:${h}px;` +
+    `z-index:88;pointer-events:none;display:flex;transform-origin:0 ${(h * HAND.tipY).toFixed(1)}px`;
+  el.innerHTML = `<img src="${FUN_BASE}img/hand-tip.webp" alt="" style="height:${h}px;width:${tw.toFixed(1)}px;flex:none;max-width:none;display:block">` +
+    `<span style="flex:1;margin-left:-1px;background:url('${FUN_BASE}img/hand-sleeve.webp') left top/100% 100% no-repeat"></span>`;
+  document.body.appendChild(el);
+  const pose = t => ({ transform: `rotate(${deg.toFixed(1)}deg) scaleY(${flip}) translateX(${t}px)` });
+  const a = el.animate([
+    { ...pose(len), easing: 'cubic-bezier(.25,.6,.3,1)' },   // выезжает и мягко подходит
+    { ...pose(0), offset: 0.45, easing: 'ease-in' },
+    { ...pose(-7), offset: 0.52, easing: 'ease-out' },   // тычок
+    { ...pose(0), offset: 0.6 },
+    { ...pose(0), offset: 0.68, easing: 'cubic-bezier(.5,0,.8,.6)' },   // уезжает
+    pose(len),
+  ], { duration: HAND.dur });
+  setTimeout(() => { if (on) bug.scheme++; }, HAND.dur * 0.52);
+  a.onfinish = a.oncancel = () => { el.remove(); hand = null; handNext = performance.now() + rand(...HAND.every); };
+}
+
 /* клик по многоножке: первый — перекрашивается, второй — убегает */
 addEventListener('click', e => {
   if (!on || !bugZone()) return;
@@ -1165,6 +1213,7 @@ function frame(now){
   stepHeadings(now);
   stepRain();
   updateBug(dt, now);
+  stepHand(now);
   ctx.clearRect(0, 0, W, H);
   drawBug();
   updateUfo(dt, now);
@@ -1180,7 +1229,13 @@ function refresh(){
   root.classList.toggle('fun-on', on);
   sizeCanvas();
   if (!on) { ctx.clearRect(0, 0, W, H); clearAll(); }
-  if (on && !was) { bug.nextVisit = performance.now() + rand(4, 8) * 1000; lastScroll = scrollY; resetTrail(); }
+  if (on && !was) {
+    bug.nextVisit = performance.now() + rand(4, 8) * 1000; lastScroll = scrollY;
+    // стартует на правом крае, на трети высоты: сюда рука на первом экране дотягивается сразу
+    const R = C.corner, i = C.inset, a = W - 2 * i - 2 * R, b = H - 2 * i - 2 * R;
+    bug.s = a + Math.PI * R / 2 + b * 0.35; bug.dir = 1;
+    resetTrail();
+  }
   setupRunners();
   setupHeadings();
   if (on) addNotes();

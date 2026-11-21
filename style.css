@@ -870,7 +870,7 @@ a.client:hover::after{height:.09em}
 /* дружеская версия: фон из текучих волн разгорается при прокрутке (fun.js + waves.js) */
 .glows{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .glows{opacity:0;transition:opacity .3s linear}
-:root:not([data-theme="dark"]) :is(.toasts,.glows,.centipede,.legs,.zzz,.ufo,.ufo-beam,.fog,.dossier){display:none!important}
+:root:not([data-theme="dark"]) :is(.toasts,.glows,.centipede,.legs,.zzz,.ufo,.ufo-beam,.fog,.dossier,.fun-hand){display:none!important}
 /* в момент смены версии ничего не плывет — снимок новой версии сразу чистый */
 .switching *,.switching *::before,.switching *::after,.switching body{transition:none!important}
 /* холст волн внутри блока растягивается на весь блок */
