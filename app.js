@@ -375,6 +375,14 @@ function spellOut(scope = document){
    ================================================================ */
 const photo = v => typeof v === 'string' ? { src: v, pos: '50% 50%' } : { pos: '50% 50%', ...v };
 function renderAboutExtras(){
+  // «польза» — подборка сервисов для дизайнеров: строка с кнопкой под статьями и подкастом
+  const comm = document.querySelector('#community .comm'), P = SITE.polza;   // $ без находки отдает пустой div — здесь нужен настоящий null
+  if (comm && P) {
+    let box = document.getElementById('polza');
+    if (!box) { box = document.createElement('div'); box.id = 'polza'; box.className = 'polza'; box.setAttribute('data-reveal', ''); comm.after(box); }
+    box.innerHTML = `<div><h3 class="comm-title">${T(P.title)}</h3><p class="polza-note">${T(P.note)}</p></div>` +
+      `<a class="btn btn-accent" href="${P.link}" target="_blank" rel="noopener"><span>${T(P.button)}</span><span class="arr">→</span></a>`;
+  }
   if (SITE.photos) {
     const strip = $('#photoStrip');
     const E = SITE.photos.events;

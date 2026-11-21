@@ -94,7 +94,7 @@ def data(group, note):
 SHARED = ['name', 'pageTitle', 'telegram', 'switchLeft', 'switchRight', 'switchHint', 'contactButton', 'nav',
           'contact', 'game', 'footer', 'legal', 'secret', 'chat', 'jokes']
 missing = [k for _, k in keys if k not in SHARED + ['hero', 'directions', 'works', 'nda', 'about', 'photos',
-           'community', 'articles', 'clients', 'podcast', 'speaker', 'ndaPage']]
+           'community', 'polza', 'articles', 'clients', 'podcast', 'speaker', 'ndaPage']]
 assert not missing, f'новые разделы в content.js, их надо распределить по блокам: {missing}'
 
 
