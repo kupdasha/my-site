@@ -1,0 +1,86 @@
+/* ================================================================
+   КЕЙС «ИМИДЖЕВЫЙ БУКЛЕТ», каталог цветов (booklet.js, поле booklet у проекта)
+   ================================================================ */
+.ib{overflow-x:clip;--ib-gap:clamp(80px,9vw,152px);--ib-in:clamp(8px,1vw,16px);--ib-ar:1920/1088}
+.ib-ch{margin-bottom:var(--ib-gap)}
+
+/* ---------- текст ---------- */
+.ib-col{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.ib-col .case-label{margin:0}
+.ib-title{font-weight:500;font-size:clamp(30px,3.2vw,48px);line-height:1.06;letter-spacing:-.01em;text-wrap:balance}
+.ib-text{font-family:var(--font-read);font-size:clamp(19px,1.5vw,22px);line-height:1.4;max-width:40ch}
+.ib-head{margin-bottom:clamp(28px,3.5vw,48px)}
+.ib-head .ib-col{max-width:760px}
+
+/* ---------- кадр ---------- */
+.ib-shot{position:relative;display:block;width:100%;padding:0;border:0;background:#5c0a0a;border-radius:var(--r-img);overflow:hidden;cursor:zoom-in;aspect-ratio:var(--ib-ar)}
+/* у части кадров белая бумага уходит за край — тонкая серая рамка, чтобы не сливалась со страницей */
+.ib-shot{box-shadow:0 0 0 1px rgba(0,0,0,.1)}
+.ib-shot img,.ib-shot video{width:100%;height:100%;object-fit:cover;display:block}
+.ib-bleed{border-radius:0;box-shadow:none;aspect-ratio:2400/1340;max-height:100vh}
+
+div.ib-shot{cursor:default}
+/* ---------- перетекание: кадр стоит, потом за 0,7 с сменяется другим (долгий переход двоил картинку, просьба 22.11) ---------- */
+.ib-fade img:last-child{position:absolute;inset:0;opacity:0}
+.ib-fade.ready img:last-child{animation:ibFade 5.6s linear infinite paused}
+.ib-fade.ready.on img:last-child{animation-play-state:running}
+@keyframes ibFade{
+  0%,37%{opacity:0;animation-timing-function:ease-in-out}
+  50%,87%{opacity:1;animation-timing-function:ease-in-out}
+  100%{opacity:0}
+}
+/* шапка — быстрее, вырубка — не в такт с большой обложкой */
+.ib-hero .ib-fade img:last-child{animation-duration:4.2s}
+.ib-low.ib-fade img:last-child{animation-duration:4.8s}
+/* книга веером и ароматы — линейное проявление: второй кадр открывается мягкой волной слева направо и так же уходит,
+   будто меняется свет (просьба 22.11). Маска в пять раз шире кадра: пусто, край, видно, край, пусто */
+.ib-sweep.ready img:last-child{opacity:1;animation:ibSweep 5.6s linear infinite paused;
+  -webkit-mask:linear-gradient(100deg,transparent 22%,#000 38%,#000 62%,transparent 78%) 100% 0/500% 100% no-repeat;
+  mask:linear-gradient(100deg,transparent 22%,#000 38%,#000 62%,transparent 78%) 100% 0/500% 100% no-repeat}
+@keyframes ibSweep{
+  0%,20%{-webkit-mask-position:100% 0;mask-position:100% 0}
+  50%,70%{-webkit-mask-position:50% 0;mask-position:50% 0}
+  100%{-webkit-mask-position:0 0;mask-position:0 0}
+}
+.ib-hero{position:relative;overflow:hidden;background:#5c0a0a}
+.ib-hero .ib-fade{position:absolute;inset:0}
+/* в светлой версии сайт умножает картинки шапки на фон — два кадра умножались друг на друга */
+.ib-hero.ib-hero img{mix-blend-mode:normal!important}
+.ib-hero img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ---------- бейдж премии: цвета «Среды» (медный — исключение из «без оранжевого») ---------- */
+.ib-award{display:block;width:min(100%,232px);height:auto;margin-top:20px}
+@media (min-width:761px) and (max-width:1100px){.scheme-cols.tab-rows>.camp-col .ib-award{grid-column:4 / span 4}}
+
+/* ---------- раскладка ---------- */
+.ib-duo{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr auto;column-gap:clamp(20px,2.4vw,36px);row-gap:var(--ib-in)}
+.ib-duo .ib-big{grid-column:1;grid-row:1 / span 2;aspect-ratio:auto;height:100%;min-height:0}
+.ib-duo .ib-col{grid-column:2;grid-row:1;padding-bottom:clamp(24px,3vw,48px)}
+.ib-duo .ib-low{grid-column:2;grid-row:2}
+.ib-split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);align-items:center}
+.ib-split .ib-col{grid-column:1 / span 4}
+.ib-split .ib-shot{grid-column:5 / -1}
+.ib-split.rev .ib-shot{grid-column:1 / span 8}
+.ib-split.rev .ib-col{grid-column:9 / -1}
+.ib-farm .ib-split{margin-top:clamp(28px,4vw,64px)}
+.ib-pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--ib-in)}
+.ib-trio{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:var(--ib-in)}
+.ib-trio .ib-shot:first-child{grid-row:1 / span 2;aspect-ratio:auto}
+
+/* ---------- появление ---------- */
+.ib-col > *{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .9s var(--ease)}
+.ib-col > :nth-child(2){transition-delay:.08s}.ib-col > :nth-child(n+3){transition-delay:.16s}
+.ib-shot{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease) .1s,transform 1.1s var(--ease) .1s}
+.ib-shot + .ib-shot{transition-delay:.2s}
+.ib-ch.in .ib-col > *,.ib-ch.in .ib-shot{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.ib-fade.ready img:last-child{animation:none;opacity:0}}
+
+/* ---------- планшет и телефон ---------- */
+@media (max-width:900px){
+  .ib-duo,.ib-pair,.ib-trio{grid-template-columns:1fr;grid-template-rows:none}
+  .ib-duo > *,.ib-duo .ib-big,.ib-duo .ib-col,.ib-duo .ib-low,.ib-trio .ib-shot:first-child{grid-column:1;grid-row:auto}
+  .ib-duo .ib-big,.ib-trio .ib-shot:first-child{aspect-ratio:var(--ib-ar);height:auto}
+  .ib-duo .ib-col{order:-1}
+  .ib-split{row-gap:28px}
+  .ib-split .ib-col,.ib-split .ib-shot,.ib-split.rev .ib-col,.ib-split.rev .ib-shot{grid-column:1 / -1}
+}

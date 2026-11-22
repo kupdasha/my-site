@@ -83,7 +83,7 @@ document.addEventListener('pause', e => { if (e.target.tagName === 'VIDEO' && !e
 // живые главы кейса: стили начинают грузиться вместе со скриптом, а не после него, — у нового посетителя кейс
 // открывается на один запрос быстрее. Адрес тот же, что потом запросит сам модуль (?v= — номер часа), поэтому
 // его link берет файл из кеша. На локальном превью модули ставят ?v= по миллисекундам — там не подгружаем
-const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'rosmedia', 'checkup', 'speaker', 'vosk', 'm100'];
+const CASE_CSS = ['audit', 'adhd', 'fleet', 'clip', 'armani', 'kav', 'cartoon', 'akbars', 'suit', 'ventures', 'vector', 'navi', 'anon', 'poll', 'office', 'vkplay', 'fix', 'kidz', 'ball', 'tele', 'isle', 'maket', 'stickers', 'egg', 'showreel', 'rosatom', 'sport', 'life', 'atomid', 'rosmedia', 'checkup', 'speaker', 'vosk', 'm100', 'booklet'];
 // комментарии прямо на странице — только на локальном превью: ?comments включает (помнится во вкладке), ?comments=off выключает; см. comments.js
 (function(){
   if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
@@ -2707,6 +2707,8 @@ function renderCase(k, keepScroll){
   if (p.sport) body += `<div class="vs vs-mount"></div>`;
   // life — буклет LIFE Варшавская: свет по тиснению обложки, карта из прозрачных листов, развороты, наружка; рисует life.js
   if (p.life) body += `<div class="lf lf-mount"></div>`;
+  // booklet — имиджевый буклет, каталог цветов: пары рендеров перетекают цветом и светом; рисует booklet.js
+  if (p.booklet) body += `<div class="ib ib-mount"></div>`;
   // atomid — редизайн логотипа Атом ID: путь по раундам, отказ, «ID» в букве «О», четыре идеи, проверка именем, финалисты, Росатом ID; рисует atomid.js
   if (p.atomid) body += `<div class="ri ri-mount"></div>`;
   // rosmedia — сообщество дизайнеров Росатома: оформление, форматы, спикеры, редакция, карусели, свои тексты, площадки, план статей; рисует rosmedia.js
@@ -2895,6 +2897,10 @@ function renderCase(k, keepScroll){
   if (lf) caseImport('life')
     .then(m => m.mountLife(lf, p, { T, pick, openViewer, base: SCRIPT_BASE }))
     .catch(err => console.warn('кейс буклета LIFE Варшавская не загрузился', err));
+  const ib = caseContent.querySelector('.ib-mount');
+  if (ib) caseImport('booklet')
+    .then(m => m.mountBooklet(ib, p, { T, pick, openViewer, base: SCRIPT_BASE }))
+    .catch(err => console.warn('кейс имиджевого буклета не загрузился', err));
   const ri = caseContent.querySelector('.ri-mount');
   if (ri) caseImport('atomid')
     .then(m => m.mountAtomId(ri, p, { T, pick, openViewer, base: SCRIPT_BASE }))
