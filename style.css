@@ -237,6 +237,17 @@ img,video{display:block;max-width:100%}
 .h1.heat .w{padding-bottom:.22em;margin-bottom:-.22em}
 .hero-sub{font-weight:500;font-size:clamp(26px,3.3vw,50px);line-height:1.1;max-width:20ch;margin-top:clamp(16px,2vw,28px)}
 .hero-sub[hidden]{display:none}
+/* дружеская версия: текст первого экрана стоит по центру высоты и крупнее (в серьезной — внизу, как был) */
+:root[data-theme="dark"] .hero{align-items:center;padding:88px 0 72px}
+/* кнопки отодвинуты от текста, но весь блок помещается на первый экран без прокрутки: отступ и размеры считаются от высоты окна */
+:root[data-theme="dark"] .hero-row{margin-top:clamp(40px,9svh,104px)}
+:root[data-theme="dark"] .hero .eyebrow{font-size:clamp(18px,1.6vw,24px)}
+:root[data-theme="dark"] .hero .h1{font-size:clamp(84px,min(11.5vw,18.4svh),190px)}
+:root[data-theme="dark"] .hero-sub{font-size:clamp(32px,min(4.6vw,7.2svh),76px)}
+:root[data-theme="dark"] .hero .lead:empty{display:none}
+@media (max-width:1100px) and (orientation:portrait){:root[data-theme="dark"] .hero .h1{font-size:15vw}:root[data-theme="dark"] .hero-sub{font-size:6vw}}
+@media (max-width:760px){:root[data-theme="dark"] .hero-sub{font-size:min(7.6vw,48px)}:root[data-theme="dark"] .hero .h1{font-size:min(23vw,120px)}:root[data-theme="dark"] .hero{padding:84px 0 40px}:root[data-theme="dark"] .hero-row{margin-top:clamp(28px,7svh,64px)}}
+@media (max-height:520px){:root[data-theme="dark"] .hero{padding:72px 0 24px}:root[data-theme="dark"] .hero .eyebrow{margin-bottom:8px}:root[data-theme="dark"] .hero .h1{font-size:min(56px,23vw)}:root[data-theme="dark"] .hero-sub{font-size:min(26px,7.6vw);margin-top:8px}:root[data-theme="dark"] .hero-row{margin-top:20px}}
 /* «переливаюсь»: белый текст, по которому течет полупрозрачная радуга.
    Оба слоя внутри самих букв — никакой второй копии текста и белых краев */
 .iris{-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
