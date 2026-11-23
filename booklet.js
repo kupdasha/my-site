@@ -2,11 +2,12 @@
    КЕЙС «ИМИДЖЕВЫЙ БУКЛЕТ», каталог цветов для оптовиков (поле booklet у проекта)
    Везде настоящие рендеры. Пары кадров (одна сцена в разном цвете или
    свете) перетекают друг в друга через прозрачность по кругу — fade().
-   hero   — в шапке кейса объемная страница, свет меняется;
+   hero   — в шапке кейса ролик open.mp4: обложка, книга открывается, поднимается ферма;
    symbol — круг: обложка меняет цвет, рядом вырубка, тоже меняет цвет;
-   pages  — каталог: разворот с тюльпанами, свет меняется;
-   farm   — объемная страница во всю ширину сайта, ниже — как она складывается
-            (книга веером, свет меняется);
+   pages  — в конце главы конструктора: абзац без подписи и заголовка, под ним разворот с тюльпанами (просьба 23.11);
+   farm   — объемная страница во всю ширину сайта, ниже ролик: обложка, книга открывается,
+            поднимается ферма (open.mp4, имя на страницах заретушировано по кадрам),
+            рядом текст и книга веером (свет проходит волной);
    scent  — ароматизированная страница: по бумаге проходит луч, рядом разворот;
    wheel  — круговой конструктор букета коллажом.
    Кадр крупно по нажатию. Картинки — img/booklet, -s — копия 900 px.
@@ -41,13 +42,12 @@ const VIEW = {
   // круг: обложка меняет цвет, справа текст и вырубка
   symbol: c => `<div class="wrap ib-duo">${shot(c.fade, WIDE, 'ib-big')}${block(c)}${shot(c.img, SIDE, 'ib-low')}</div>`,
   // каталог: текст слева, разворот справа
-  pages:  c => `<div class="wrap ib-split">${block(c)}${shot(c.fade, WIDE)}</div>`,
   // объемная страница: во всю ширину сайта, ниже — как складывается, и текст
-  farm:   c => `${shot(c.fade, FULL, 'ib-bleed')}<div class="wrap ib-split rev">${shot(c.img, WIDE, 'ib-sweep')}${block(c)}</div>`,
+  farm:   c => `${shot(c.fade, FULL, 'ib-bleed')}<div class="wrap ib-duo ib-open">${shot(c.big, WIDE, 'ib-big')}${block(c)}${shot(c.img, SIDE, 'ib-low ib-sweep')}</div>`,
   // ароматы: заголовок, под ним два кадра поровну
   scent:  c => `<div class="wrap ib-head">${block(c)}</div><div class="wrap ib-pair">${shot(c.fade, HALF, 'ib-sweep')}${shot(c.img, HALF)}</div>`,
   // конструктор: большой круг, рядом он же в книге
-  wheel:  c => `<div class="wrap ib-head">${block(c)}</div><div class="wrap ib-trio">${c.imgs.map((n, i) => shot(n, i ? SIDE : WIDE)).join('')}</div>`,
+  wheel:  (c, s) => `<div class="wrap ib-head">${block(c)}</div><div class="wrap ib-trio">${c.imgs.map((n, i) => shot(n, i ? SIDE : WIDE)).join('')}</div>${s.pages ? `<div class="wrap ib-after">${s.pages.text ? `<div class="ib-col"><p class="ib-text">${H.T(s.pages.text)}</p></div>` : ''}${shot(s.pages.fade, FULL)}</div>` : ''}`,
 };
 
 /* ---------- стили и запуск ---------- */
@@ -85,13 +85,18 @@ export async function mountBooklet(mount, p, helpers){
   if (!mount.isConnected) return;   // кейс успели закрыть
   const s = p.booklet;
   if (s.open) OPEN = s.open;
-  mount.innerHTML = ['symbol', 'pages', 'farm', 'scent', 'wheel']
-    .filter(k => s[k]).map(k => `<section class="ib-ch ib-${k}">${VIEW[k](s[k])}</section>`).join('');
+  mount.innerHTML = ['symbol', 'farm', 'scent', 'wheel']
+    .filter(k => s[k]).map(k => `<section class="ib-ch ib-${k}">${VIEW[k](s[k], s)}</section>`).join('');
   const hero = mount.closest('.case-body')?.parentElement.querySelector('.case-hero');
   if (hero && s.hero) {
     hero.classList.add('ib-hero');
-    hero.innerHTML = `<div class="ib-fade">${s.hero.map(n => pic(n, FULL).replace('loading="lazy"', 'fetchpriority="high"')).join('')}</div>`;
-    watchFade(hero.firstElementChild);
+    if (typeof s.hero === 'string') {   // ролик: играет сам без звука, пока шапка на экране
+      hero.innerHTML = `<video class="ib-hero-v" muted loop playsinline autoplay preload="auto" poster="${img(s.hero.replace('.mp4', '.webp'))}" src="${img(s.hero)}"></video>`;
+      const v = hero.firstElementChild; v.muted = true; roll.observe(v);
+    } else {
+      hero.innerHTML = `<div class="ib-fade">${s.hero.map(n => pic(n, FULL).replace('loading="lazy"', 'fetchpriority="high"')).join('')}</div>`;
+      watchFade(hero.firstElementChild);
+    }
   }
   // бейдж премии — под текстом результата
   const last = mount.closest('.case-body')?.querySelector('.scheme-cols > .camp-col:last-child');

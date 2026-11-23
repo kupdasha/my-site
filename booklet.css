@@ -45,7 +45,11 @@ div.ib-shot{cursor:default}
 .ib-hero{position:relative;overflow:hidden;background:#5c0a0a}
 .ib-hero .ib-fade{position:absolute;inset:0}
 /* в светлой версии сайт умножает картинки шапки на фон — два кадра умножались друг на друга */
-.ib-hero.ib-hero img{mix-blend-mode:normal!important}
+.ib-hero.ib-hero :is(img,video){mix-blend-mode:normal!important}
+.ib-hero-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* разворот с тюльпанами — под картинками конструктора */
+.ib-after{margin-top:clamp(40px,5vw,72px)}
+.ib-after .ib-col{margin-bottom:clamp(24px,3vw,40px)}
 .ib-hero img{width:100%;height:100%;object-fit:cover;display:block}
 
 /* ---------- бейдж премии: цвета «Среды» (медный — исключение из «без оранжевого») ---------- */
@@ -62,7 +66,7 @@ div.ib-shot{cursor:default}
 .ib-split .ib-shot{grid-column:5 / -1}
 .ib-split.rev .ib-shot{grid-column:1 / span 8}
 .ib-split.rev .ib-col{grid-column:9 / -1}
-.ib-farm .ib-split{margin-top:clamp(28px,4vw,64px)}
+.ib-farm .ib-split,.ib-farm .ib-duo{margin-top:clamp(28px,4vw,64px)}
 .ib-pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--ib-in)}
 .ib-trio{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:var(--ib-in)}
 .ib-trio .ib-shot:first-child{grid-row:1 / span 2;aspect-ratio:auto}
