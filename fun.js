@@ -803,7 +803,7 @@ function stepHand(now){
   el.innerHTML = `<img src="${FUN_BASE}img/hand-tip.webp" alt="" style="height:${h}px;width:${tw.toFixed(1)}px;flex:none;max-width:none;display:block">` +
     `<img src="${FUN_BASE}img/hand-sleeve.webp" alt="" style="height:${h}px;flex:1 1 0;min-width:0;width:0;max-width:none;margin-left:-1px;object-fit:fill;display:block">`;
   el.querySelectorAll('img').forEach(im => im.onerror = () => {
-    const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/main/' + im.src.split('/img/').pop().replace(/^/, 'img/');
+    const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/live/' + im.src.split('/img/').pop().replace(/^/, 'img/');
     if (im.src !== raw) im.src = raw;
   });
   document.body.appendChild(el);

@@ -83,7 +83,7 @@ window.TAPLINK = {
   <p class="legal" data-text="">*Instagram&nbsp;— продукт Meta Platforms Inc., деятельность которой запрещена на&nbsp;территории Российской Федерации</p>
 </main></div></div>
 <script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',
-G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;
+G='https://raw.githubusercontent.com/kupdasha/my-site/live/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;
 ['https://cdn.jsdelivr.net'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});
 try{if(sessionStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}
 try{c=JSON.parse(localStorage.getItem(K))}catch(e){}
@@ -105,7 +105,7 @@ function show(h){if(shown||!h)return;shown=1;root.innerHTML='';var doc=new DOMPa
 apply(root);
 [].slice.call(root.querySelectorAll('script')).forEach(function(s){var x=document.createElement('script');x.textContent=s.textContent;s.parentNode.replaceChild(x,s)});
 root.style.minHeight='';root.style.background=''}
-var V=['https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t='+Date.now(),'https://api.github.com/repos/kupdasha/my-site/commits/main'],got=0,left=3;
+var V=['https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t='+Date.now(),'https://api.github.com/repos/kupdasha/my-site/commits/live'],got=0,left=3;
 function sha(t){t=(t||'').trim();return /^[0-9a-f]{40}$/.test(t)?t:''}
 function ask(u,h){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=2500;
 x.onload=function(){done(x.status==200?sha(x.responseText):'')};x.onerror=x.ontimeout=function(){done('')};x.send()}

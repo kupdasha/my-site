@@ -1,6 +1,7 @@
 #!/bin/zsh
-# ПУБЛИКАЦИЯ: пересобрать блоки, отправить файлы на GitHub и сбросить кеш jsDelivr,
-# чтобы сайт на Тильде сразу получил новую версию кода, стилей и картинок.
+# ОТПРАВКА ПРАВОК: пересобрать блоки, отправить файлы на GitHub (main) и прогреть их на jsDelivr.
+# На сайт это НЕ выходит: сайт показывает утвержденную ветку live, ее двигает ./tilda/approve.sh
+# (только когда Даша сама сказала «публикуй»).
 # Сайт берет файлы по номеру последней версии (см. LOADER в build.py), сброс кеша main нужен только как запасной путь;
 # в конце файлы новой версии прогреваются на jsDelivr (tilda/warm.sh).
 cd "$(dirname "$0")/.." || exit 1
@@ -12,4 +13,4 @@ for f in content.js style.css app.js waves.js fun.js shimmer.js world.js mark3d.
   curl -s -o /dev/null "https://purge.jsdelivr.net/gh/kupdasha/my-site@main/$f"
 done
 ./tilda/warm.sh
-echo "опубликовано"
+echo "отправлено в GitHub; на сайт выйдет после ./tilda/approve.sh"

@@ -40,22 +40,22 @@ const VER = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? Date.now() : 
 const SCRIPT_BASE = (document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/app\.js(\?|$)/.test(s)) || '').replace(/app\.js(\?.*)?$/, '');
 
 /* СТРАХОВКА ДЛЯ КАРТИНОК: jsDelivr по новому номеру версии иногда отдает файл с ошибкой (403/503), пока не заберет его
-   у GitHub. Картинка или ролик не загрузились — пробуем еще раз: растровую картинку сразу с GitHub (raw, ветка main),
+   у GitHub. Картинка или ролик не загрузились — пробуем еще раз: растровую картинку сразу с GitHub (raw, утвержденная ветка live),
    остальное — снова с jsDelivr через пару секунд, потом с GitHub */
 addEventListener('error', e => {
   const el = e.target;
   if (!el || !/^(IMG|VIDEO|SOURCE)$/.test(el.tagName)) return;
   const src = el.currentSrc || el.getAttribute('src') || '';
   const m = /^https:\/\/cdn\.jsdelivr\.net\/gh\/kupdasha\/my-site@[^/]+\/(.+?)(\?.*)?$/.exec(src)
-         || /^https:\/\/raw\.githubusercontent\.com\/kupdasha\/my-site\/main\/(.+?)(\?.*)?$/.exec(src);
+         || /^https:\/\/raw\.githubusercontent\.com\/kupdasha\/my-site\/(?:main|live)\/(.+?)(\?.*)?$/.exec(src);
   if (!m) return;
   const n = +(el.dataset.retry || 0);
   if (n >= 3) return;
   el.dataset.retry = n + 1;
   const path = m[1], raster = /\.(jpe?g|png|webp|gif|avif)$/i.test(path);
   // ролики: на свежем коммите jsDelivr иногда не отдает крупные файлы («Failed to fetch the requested commit»)
-  // или обрывает их на 10 МБ — после второй неудачи ролик берется прямо с GitHub (raw, ветка main)
-  const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/main/' + path;
+  // или обрывает их на 10 МБ — после второй неудачи ролик берется прямо с GitHub (raw, утвержденная ветка live)
+  const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/live/' + path;
   // SVG: GitHub отдает его как текст, и картинка с raw не рисуется — берем текст и показываем его как svg
   if (el.tagName === 'IMG' && /\.svg$/i.test(path)) {
     if (n) return;

@@ -1,5 +1,7 @@
-// НОМЕР СВЕЖЕЙ ВЕРСИИ САЙТА для загрузчика на Тильде (LOADER в tilda/build.py).
-// Читает ветку main прямо из git на GitHub (адрес, которым пользуется сам git): без лимита GitHub API
+// НОМЕР УТВЕРЖДЕННОЙ ВЕРСИИ САЙТА для загрузчика на Тильде (LOADER в tilda/build.py).
+// Для сайта (my-site) читает ветку live — ее двигает только tilda/approve.sh, когда Даша сказала «публикуй»;
+// правки в main на сайт сами не попадают. Для других репозиториев («Армия спорта», alfa) — ветку main.
+// Читает ветку прямо из git на GitHub (адрес, которым пользуется сам git): без лимита GitHub API
 // и без кешей raw.githubusercontent и jsDelivr. Ответ — 40 знаков номера коммита, держится 5 секунд.
 //
 // /f/<номер коммита>/img/<путь> — РОЛИКИ И КАРТИНКИ С GITHUB для тех файлов, которые jsDelivr не отдает
@@ -45,25 +47,26 @@ async function rangeAsset(req, env) {
   return new Response(buf.slice(a, b + 1), { status: 206, headers: { ...h, 'Content-Range': `bytes ${a}-${b}/${size}`, 'Content-Length': b - a + 1 } });
 }
 
-// последний коммит main репозитория kupdasha/<repo>: читается из git на GitHub, держится в кеше узла 5 секунд.
+// последний коммит ветки (live у сайта, main у остальных) репозитория kupdasha/<repo>: читается из git на GitHub, держится в кеше узла 5 секунд.
 // GitHub иногда не отвечает узлу Cloudflare — тогда второй путь (GitHub API), а если и он молчит — последний удачный номер
 // (хранится в кеше узла год). Без этого страница уходила на jsDelivr @main, а там застряла старая копия (репозиторий > 50 МБ),
 // и открывалась давняя версия. null — номера не знает никто.
 async function latestSha(repo, ctx) {
-  const cache = caches.default, key = new Request('https://kup-version.cache/' + repo), last = new Request('https://kup-version.cache/last/' + repo);
+  const branch = repo === 'my-site' ? 'live' : 'main';
+  const cache = caches.default, key = new Request('https://kup-version.cache/' + repo + '@' + branch), last = new Request('https://kup-version.cache/last/' + repo + '@' + branch);
   const hit = await cache.match(key);
   if (hit) return hit.text();
   let sha = null;
   for (let i = 0; i < 2 && !sha; i++) {
     try {
       const r = await fetch(`https://github.com/kupdasha/${repo}.git/info/refs?service=git-upload-pack`, { headers: { 'User-Agent': 'git/2.40 kup-version' } });
-      const m = r.ok && (await r.text()).match(/([0-9a-f]{40}) refs\/heads\/main\b/);
+      const m = r.ok && (await r.text()).match(new RegExp('([0-9a-f]{40}) refs/heads/' + branch + '\\b'));
       if (m) sha = m[1];
     } catch (e) {}
   }
   if (!sha) {
     try {
-      const r = await fetch(`https://api.github.com/repos/kupdasha/${repo}/commits/main`, { headers: { 'User-Agent': 'kup-version', 'Accept': 'application/vnd.github.sha' } });
+      const r = await fetch(`https://api.github.com/repos/kupdasha/${repo}/commits/${branch}`, { headers: { 'User-Agent': 'kup-version', 'Accept': 'application/vnd.github.sha' } });
       const t = r.ok ? (await r.text()).trim() : '';
       if (/^[0-9a-f]{40}$/.test(t)) sha = t;
     } catch (e) {}
@@ -124,13 +127,13 @@ export default {
     if (env.ASSETS && u.pathname.endsWith('.mp4')) return rangeAsset(req, env);
     // /armysport — свежая сборка презентации «Армия спорта» прямо с GitHub, без Тильды:
     // index.html по последнему коммиту, файлы (as.css, as.js, img, fonts) — с jsDelivr по тому же номеру;
-    // /armysport2 — второй этап (stage2.html), /armysport3 — третья доработка (stage3.html), /armysport4 — четвертая (stage4.html), /armysport5 — презентация для руководства (stage5.html); прошлые остаются по своим ссылкам
+    // /armysport2 — второй этап (stage2.html), /armysport3 — третья доработка (stage3.html), /armysport4 — четвертая (stage4.html), /armysport5 — презентация для руководства (stage5.html), /armysport6 — новые подходы к знаку (stage6.html); прошлые остаются по своим ссылкам
     // Страницы, у которых HTML берется с GitHub по последнему коммиту main, а файлы (css, js, img, fonts) — с jsDelivr
     // по номеру того же коммита: /armysport, /armysport2, /armysport3, /armysport4 и /armysport5 — «Армия спорта», /alfa — тестовое в Альфа-Банк.
     // Так файлы не идут через workers.dev: в России его часто душат, а jsDelivr проходит.
     // /alfa/check — диагностика с телефона: какие каналы (workers.dev, jsDelivr, GitHub) доходят из сети посетителя
     if (u.pathname === '/alfa/check') return checkPage(req, ctx);
-    const PAGES = { '/armysport': ['army-sport', 'index.html'], '/armysport2': ['army-sport', 'stage2.html'], '/armysport3': ['army-sport', 'stage3.html'], '/armysport4': ['army-sport', 'stage4.html'], '/armysport5': ['army-sport', 'stage5.html'], '/alfa': ['alfa', 'index.html'] };
+    const PAGES = { '/armysport': ['army-sport', 'index.html'], '/armysport2': ['army-sport', 'stage2.html'], '/armysport3': ['army-sport', 'stage3.html'], '/armysport4': ['army-sport', 'stage4.html'], '/armysport5': ['army-sport', 'stage5.html'], '/armysport6': ['army-sport', 'stage6.html'], '/armysport8': ['army-sport', 'stage8.html'], '/alfa': ['alfa', 'index.html'] };
     const pg = PAGES[u.pathname.replace(/\/$/, '')];
     if (pg) {
       const [repo, file] = pg;

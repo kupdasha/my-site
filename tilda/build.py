@@ -173,10 +173,10 @@ LOADER = ("<script>(function(){if(window.KUP)return;"
           "function get(u,h,ms,cb){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=ms;"
           "x.onload=function(){var s=(x.status==200&&x.responseText||'').trim();cb(/^[0-9a-f]{40}$/.test(s)?s:null)};"
           "x.onerror=x.ontimeout=function(){cb(null)};x.send()}"
-          # номер свежей версии: 1) воркер kup-version (tilda/version-worker) — читает main прямо из git, мгновенно и без лимита;
+          # номер утвержденной версии (ветка live, ее двигает tilda/approve.sh): 1) воркер kup-version (tilda/version-worker) — читает live прямо из git, мгновенно и без лимита;
           # 2) GitHub API — мгновенно, но 60 запросов в час с адреса; 3) служебная ветка version на raw.githubusercontent
           # (пишет tilda/warm.sh) — без лимита, но с задержкой до 5 минут
-          "function ask(ms,cb){get(W,0,ms,function(s){s?cb(s):get('https://api.github.com/repos/kupdasha/my-site/commits/main','application/vnd.github.sha',ms,function(s){s?cb(s):get(V+now,0,ms,cb)})})}"
+          "function ask(ms,cb){get(W,0,ms,function(s){s?cb(s):get('https://api.github.com/repos/kupdasha/my-site/commits/live','application/vnd.github.sha',ms,function(s){s?cb(s):get(V+now,0,ms,cb)})})}"
           "function put(f){var s=document.createElement('script');s.src=base+f;s.async=false;document.head.appendChild(s)}"
           "function go(s){if(done)return;done=1;"
           "if(s){keep(s);if(!(c&&c.s===s)){var old=base;base=K.base=R+s+'/';"
@@ -288,7 +288,7 @@ def taplink_block():
             '<div id="taplink-root" style="min-height:100vh;background:#FFFFFF">'
             + (f'<div data-pre style="visibility:hidden">{PRE["tap"]}</div>' if PRE.get('tap') else '') + '</div>\n'
             "<script>(function(){var R='https://cdn.jsdelivr.net/gh/kupdasha/my-site@',W='https://kup-version.kupdaria26.workers.dev/',\n"
-            "G='https://raw.githubusercontent.com/kupdasha/my-site/main/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
+            "G='https://raw.githubusercontent.com/kupdasha/my-site/live/taplink.html',K='tl-page',root=document.getElementById('taplink-root'),c=null,shown=0;\n"
             "['https://cdn.jsdelivr.net'].forEach(function(h){var l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)});\n"
             "try{if(sessionStorage.getItem('tl-mode')==='fun')root.style.background='#0E0F12'}catch(e){}\n"
             "try{c=JSON.parse(localStorage.getItem(K))}catch(e){}\n"
@@ -314,7 +314,7 @@ def taplink_block():
             "root.style.minHeight='';root.style.background=''}\n"
             # номер свежей версии спрашиваем сразу у трех источников, берем первый ответ: воркер kup-version
             # (в России *.workers.dev бывает закрыт), служебная ветка version на GitHub и GitHub API
-            "var V=['https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t='+Date.now(),'https://api.github.com/repos/kupdasha/my-site/commits/main'],got=0,left=3;\n"
+            "var V=['https://raw.githubusercontent.com/kupdasha/my-site/version/version.txt?t='+Date.now(),'https://api.github.com/repos/kupdasha/my-site/commits/live'],got=0,left=3;\n"
             "function sha(t){t=(t||'').trim();return /^[0-9a-f]{40}$/.test(t)?t:''}\n"
             "function ask(u,h){var x=new XMLHttpRequest();x.open('GET',u);if(h)x.setRequestHeader('Accept',h);x.timeout=2500;\n"
             "x.onload=function(){done(x.status==200?sha(x.responseText):'')};x.onerror=x.ontimeout=function(){done('')};x.send()}\n"

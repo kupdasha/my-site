@@ -245,7 +245,7 @@ let svgCache = {};
 async function inlineLogo(host, name){
   // jsDelivr по свежему номеру версии иногда отвечает 403 — тогда текст знака берется с GitHub
   if (!svgCache[name]) svgCache[name] = fetch(img(name + '.svg')).then(r => r.ok ? r.text() : Promise.reject())
-    .catch(() => fetch('https://raw.githubusercontent.com/kupdasha/my-site/main/img/atom-id/' + name + '.svg').then(r => r.text()));
+    .catch(() => fetch('https://raw.githubusercontent.com/kupdasha/my-site/live/img/atom-id/' + name + '.svg').then(r => r.text()));
   let txt = await svgCache[name];
   if (!host.isConnected) return;
   // у каждого вставленного вектора свои id, иначе обтравки разных знаков перепутаются
