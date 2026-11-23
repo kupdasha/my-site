@@ -2084,7 +2084,8 @@ p,li,figcaption,dd,dt,blockquote{text-wrap:pretty}
 .ttt-consent input{flex:none;width:22px;height:22px;margin:0;accent-color:var(--accent,#E2FB5A);cursor:pointer}
 .ttt-consent a{color:inherit;text-decoration:underline;text-underline-offset:.2em}
 /* спрятанная форма Тильды, через которую уходит контакт из игры (поле kd_contact): на странице ее не видно */
-.t-rec.kd-hidden-form,.t-rec:has(input[name="kd_contact"]){position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;pointer-events:none}
+/* скрытая форма Тильды для игры: без отступов блока (t-rec_pt/pb по 105 px) и прижата к началу страницы — иначе под подвалом оставалось пустое место */
+.t-rec.kd-hidden-form,.t-rec:has(input[name="kd_contact"]){position:absolute!important;top:0!important;left:0!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;overflow:hidden!important;clip-path:inset(50%)!important;pointer-events:none}
 
 /* ссылки на политику и согласие в подвале каждой страницы */
 .foot-legal{display:flex;flex-wrap:wrap;gap:8px 24px}

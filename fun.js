@@ -1013,7 +1013,9 @@ const FOG = { brush: 48, clearAt: 0.55, hint: 'протри', light: 0.3, alpha:
 /* иней — фото морозных узоров (img/frost); у каждого кейса свой вариант: одно из двух фото
    и одно из четырех отражений, варианты не повторяются, пока не пройдут все восемь */
 const FUN_BASE = (document.currentScript?.src || [...document.scripts].map(s => s.src).find(s => /\/fun\.js(\?|$)/.test(s)) || '').replace(/fun\.js(\?.*)?$/, '');
-const FROST = ['img/frost/frost-1.webp', 'img/frost/frost-2.webp'].map(src => { const i = new Image(); i.decoding = 'async'; i.src = FUN_BASE + src; return i; });
+const FROST = ['img/frost/frost-1.webp', 'img/frost/frost-2.webp'].map(src => { const i = new Image(); i.decoding = 'async';
+  i.onerror = () => { const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/live/' + src; if (i.src !== raw) i.src = raw; };   // запасной адрес, если jsDelivr ответил 403
+  i.src = FUN_BASE + src; return i; });
 let frostLeft = [];
 function frostPick(){
   if (!frostLeft.length) { for (let i = 0; i < 2; i++) for (let m = 0; m < 4; m++) frostLeft.push([i, m & 1, m >> 1]); frostLeft.sort(() => Math.random() - 0.5); }
@@ -1143,7 +1145,12 @@ function makeSecret(media, k){
   // пластина: тот же кусок картинки досье (с надписью «сотри монеткой»); пока картинка грузится — ровное серебро
   g.fillStyle = '#C3C8D0'; g.fillRect(0, 0, r.width, r.height);
   const img = new Image();
-  img.onload = () => { if (!f.cleared && !f.done) { const W = img.naturalWidth, H = img.naturalHeight; g.drawImage(img, px * W, py * H, pw * W, ph * H, 0, 0, r.width, r.height); } };
+  img.onload = () => {
+    d.firstElementChild.style.backgroundImage = `url('${img.src}')`;   // бумага — с того адреса, откуда картинка реально пришла
+    if (!f.cleared && !f.done) { const W = img.naturalWidth, H = img.naturalHeight; g.drawImage(img, px * W, py * H, pw * W, ph * H, 0, 0, r.width, r.height); }
+  };
+  // jsDelivr иногда отвечает 403 на файл свежей версии — тогда досье берется с raw.githubusercontent (утвержденная ветка live)
+  img.onerror = () => { const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/live/' + D.src; if (img.src !== raw) img.src = raw; };
   img.src = FUN_BASE + D.src;
   const cols = 14, rows = 5;
   const f = { d, c, g, w: r.width, h: r.height, grid: new Uint8Array(cols * rows), cols, rows, cleared: 0, last: null };
