@@ -771,7 +771,7 @@ function drawBug(){
    тычет пальцем в голову многоножки — та замирает и перекрашивается — и уезжает обратно.
    Рука всегда выходит с противоположной стороны экрана (многоножка слева — рука справа, сверху — снизу)
    и идет по диагонали. Рука собрана из кисти (img/hand-tip.webp) и рукава, который тянется на нужную длину
-   (img/hand-sleeve.webp растягивается вдоль: складки удлиняются, но не повторяются), поэтому толщина у нее всегда одна */
+   (img/hand-sleeve.webp растягивается вдоль: складки удлиняются, но не повторяются; обе части — <img> с запасным адресом), поэтому толщина у нее всегда одна */
 const HAND = { h: 42, tip: 426 / 145, tipY: 0.25, first: [1000, 2000], every: [25000, 40000], dur: 3600 };
 let hand = null, handNext = performance.now() + rand(...HAND.first);
 function stepHand(now){
@@ -799,8 +799,13 @@ function stepHand(now){
   const flip = Math.abs(((deg % 360) + 540) % 360 - 180) > 90 ? -1 : 1;   // рукав «смотрит» влево — переворачиваем по вертикали
   el.style.cssText = `position:fixed;left:${tipX.toFixed(1)}px;top:${(tipY - h * HAND.tipY).toFixed(1)}px;width:${Math.max(len, tw).toFixed(0)}px;height:${h}px;` +
     `z-index:88;pointer-events:none;display:flex;transform-origin:0 ${(h * HAND.tipY).toFixed(1)}px`;
+  // обе части — картинки (не фон): если jsDelivr отвечает 403 на свежий файл, берем его с raw.githubusercontent
   el.innerHTML = `<img src="${FUN_BASE}img/hand-tip.webp" alt="" style="height:${h}px;width:${tw.toFixed(1)}px;flex:none;max-width:none;display:block">` +
-    `<span style="flex:1;margin-left:-1px;background:url('${FUN_BASE}img/hand-sleeve.webp') left top/100% 100% no-repeat"></span>`;
+    `<img src="${FUN_BASE}img/hand-sleeve.webp" alt="" style="height:${h}px;flex:1 1 0;min-width:0;width:0;max-width:none;margin-left:-1px;object-fit:fill;display:block">`;
+  el.querySelectorAll('img').forEach(im => im.onerror = () => {
+    const raw = 'https://raw.githubusercontent.com/kupdasha/my-site/main/' + im.src.split('/img/').pop().replace(/^/, 'img/');
+    if (im.src !== raw) im.src = raw;
+  });
   document.body.appendChild(el);
   const pose = t => ({ transform: `rotate(${deg.toFixed(1)}deg) scaleY(${flip}) translateX(${t}px)` });
   const a = el.animate([
