@@ -61,7 +61,15 @@ function loadCSS(base){
   return cssReady;
 }
 // кадры перетекают, только пока на экране и пока обе картинки загружены
-const player = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('on', e.isIntersecting)), { threshold: .15 });
+// все перетекания идут по общим часам страницы: кадр, который заехал на экран позже (на телефоне блоки друг
+// под другом), не отстает от соседа — смена цвета у пар в одном блоке одновременная (просьба 23.11)
+const syncFade = el => el.querySelectorAll('img:last-child').forEach(im => im.getAnimations().forEach(a => {
+  const d = a.effect.getTiming().duration; if (d > 0) a.currentTime = performance.now() % d;
+}));
+const player = new IntersectionObserver(es => es.forEach(e => {
+  e.target.classList.toggle('on', e.isIntersecting);
+  if (e.isIntersecting) syncFade(e.target);
+}), { threshold: .15 });
 // ролик грузится и играет, только пока на экране
 const roll = new IntersectionObserver(es => es.forEach(e => { e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause(); }), { threshold: .15 });
 const reveal = new IntersectionObserver(es => es.forEach(e => {
@@ -81,20 +89,15 @@ const shown = im => {
 
 export async function mountBooklet(mount, p, helpers){
   H = helpers;
-  // версия «вау» — по адресу с ?wow (booklet-wow.js); без него — версия 1 (метка git booklet-v1)
-  if (p.booklet.wow && /[?&]wow\b/.test(location.search)) {
-    const m = await import(H.base + 'booklet-wow.js?v=' + VERS);
-    return m.mountWow(mount, p, helpers, loadCSS(H.base));
-  }
   await loadCSS(H.base);
   if (!mount.isConnected) return;   // кейс успели закрыть
   const s = p.booklet;
   if (s.open) OPEN = s.open;
   mount.innerHTML = ['symbol', 'farm', 'scent', 'wheel']
     .filter(k => s[k]).map(k => `<section class="ib-ch ib-${k}">${VIEW[k](s[k], s)}</section>`).join('');
-  // живой конструктор и венок вокруг бейджа — из booklet-wow.js (выбраны Дашей из версии «вау» 23.11)
-  if (s.wow) try {
-    const m = await import(H.base + 'booklet-wow.js?v=' + VERS);
+  // живой конструктор и венок вокруг бейджа — booklet-wheel.js
+  if (s.live) try {
+    const m = await import(H.base + 'booklet-wheel.js?v=' + VERS);
     await m.mountParts(mount, p, helpers);
   } catch (e) { console.warn('конструктор буклета не загрузился', e); }
   if (!mount.isConnected) return;

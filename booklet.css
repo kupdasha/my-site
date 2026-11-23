@@ -31,7 +31,6 @@ div.ib-shot{cursor:default}
 }
 /* шапка — быстрее, вырубка — не в такт с большой обложкой */
 .ib-hero .ib-fade img:last-child{animation-duration:4.2s}
-.ib-low.ib-fade img:last-child{animation-duration:4.8s}
 /* книга веером и ароматы — линейное проявление: второй кадр открывается мягкой волной слева направо и так же уходит,
    будто меняется свет (просьба 22.11). Маска в пять раз шире кадра: пусто, край, видно, край, пусто */
 .ib-sweep.ready img:last-child{opacity:1;animation:ibSweep 5.6s linear infinite paused;
