@@ -81,12 +81,23 @@ const shown = im => {
 
 export async function mountBooklet(mount, p, helpers){
   H = helpers;
+  // версия «вау» — по адресу с ?wow (booklet-wow.js); без него — версия 1 (метка git booklet-v1)
+  if (p.booklet.wow && /[?&]wow\b/.test(location.search)) {
+    const m = await import(H.base + 'booklet-wow.js?v=' + VERS);
+    return m.mountWow(mount, p, helpers, loadCSS(H.base));
+  }
   await loadCSS(H.base);
   if (!mount.isConnected) return;   // кейс успели закрыть
   const s = p.booklet;
   if (s.open) OPEN = s.open;
   mount.innerHTML = ['symbol', 'farm', 'scent', 'wheel']
     .filter(k => s[k]).map(k => `<section class="ib-ch ib-${k}">${VIEW[k](s[k], s)}</section>`).join('');
+  // живой конструктор и венок вокруг бейджа — из booklet-wow.js (выбраны Дашей из версии «вау» 23.11)
+  if (s.wow) try {
+    const m = await import(H.base + 'booklet-wow.js?v=' + VERS);
+    await m.mountParts(mount, p, helpers);
+  } catch (e) { console.warn('конструктор буклета не загрузился', e); }
+  if (!mount.isConnected) return;
   const hero = mount.closest('.case-body')?.parentElement.querySelector('.case-hero');
   if (hero && s.hero) {
     hero.classList.add('ib-hero');
@@ -98,9 +109,9 @@ export async function mountBooklet(mount, p, helpers){
       watchFade(hero.firstElementChild);
     }
   }
-  // бейдж премии — под текстом результата
+  // бейдж премии — под текстом результата; если в конце кейса есть венок с бейджем, второй раз не ставим
   const last = mount.closest('.case-body')?.querySelector('.scheme-cols > .camp-col:last-child');
-  if (last && s.award) last.insertAdjacentHTML('beforeend', `<img class="ib-award" src="${img(s.award.img)}" alt="${esc(s.award.alt)}" width="249" height="84">`);
+  if (last && s.award && !mount.querySelector('.bw-fin')) last.insertAdjacentHTML('beforeend', `<img class="ib-award" src="${img(s.award.img)}" alt="${esc(s.award.alt)}" width="249" height="84">`);
   mount.querySelectorAll('.ib-fade').forEach(watchFade);
   mount.querySelectorAll('video').forEach(v => { v.muted = true; roll.observe(v); });
   mount.querySelectorAll('.ib-ch').forEach(el => reveal.observe(el));
