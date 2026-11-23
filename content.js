@@ -4450,8 +4450,8 @@ var SITE = window.SITE = {   // var, а не const: так тексты не л�
         note:  ['Имя компании убрано по просьбе заказчика', 'Имя компании убрали: заказчик попросил'],
         image: 'img/booklet/cover-1.webp',
         thumb: 'img/thumbs/booklet.webp',
-        preview: 'img/booklet/card.mp4',   // в сетке крутится круговой конструктор — легкая копия wheel-spin.mp4 (960 px, 430 КБ)
-        cardRatio: 960 / 544,
+        preview: 'img/booklet/card.mp4',   // в сетке — ролик из шапки: книга открывается, поднимается ферма; легкая копия open.mp4 (960 px, 450 КБ), по кругу
+        cardRatio: 16 / 9,
         cardTint: 'transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)',   // бумага уходит за край — тонкая серая рамка
         heroBlank: true,   // шапку рисует booklet.js — ролик open.mp4 (книга открывается, поднимается ферма)
         heroRatio: 16 / 9,
