@@ -3,16 +3,16 @@
    paper   — в начале: рендеры с калькой коллажем (большой — листы
              перелистываются, рядом разворот и крупный план карты),
              крупно по нажатию;
-   cover   — обложка: свет скользит по конгревному тиснению за курсором,
-             без касания ходит сам; под текстом — макро тиснения, крупно
-             по нажатию;
+   cover   — обложка сверху, под текстом макро тиснения; обе крупно
+             по нажатию (свет за курсором убран 23.11);
    layers  — карта первого разворота стопкой листов: белый лист с картой
              и три прозрачных (дети, спорт, паркинги). «Вместе» — листы
              сложены, карта целиком; слой — стопка раскрывается, нужный
              лист поднимается. Переключатели — строка надписей с полоской
              таймера, листается само, пока не тронули; стопка наклоняется
              за курсором;
-   spreads — развороты коллажем, крупно по нажатию;
+   spreads — развороты коллажем, крупно по нажатию (кроме noZoom);
+   крупно — без масштабирования внутри просмотра (NOZOOM, просьба 23.11);
    outdoor — наружная реклама, вторая концепция: щит на трассе и форматы,
              «плашка / градиент» сменяются сами.
    Картинки — img/life. Тексты — в content.js, оформление — life.css.
@@ -26,6 +26,8 @@ const onScreen = (el, cb, threshold = .3) =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { threshold }).observe(el);
 const img = n => H.base + 'img/life/' + n;
 // картинка с легкой копией для телефона
+// крупно — без масштабирования внутри просмотра (просьба 23.11)
+const NOZOOM = { noZoom: true };
 const pic = (n, sizes = '(max-width: 900px) 100vw, 58vw') =>
   `src="${img(n + '.webp')}" srcset="${img(n + '-s.webp')} 900w, ${img(n + '.webp')} 1800w" sizes="${sizes}"`;
 
@@ -70,41 +72,22 @@ function autoTabs(box, tabsEl, ms, set){
    ================================================================ */
 function paperHTML(c){
   return `<div class="lf-paper">${c.imgs.map((n, i) =>
-    `<button type="button" class="lf-cell lf-pp${i + 1}" data-i="${i}" aria-label="${esc(H.pick(c.open))}"><img ${pic(n, i ? '(max-width: 900px) 100vw, 32vw' : '(max-width: 900px) 100vw, 64vw')} alt="" decoding="async"></button>`).join('')}</div>`;
+    `<button type="button" class="lf-cell lf-pp${i + 1}" data-n="${n}" aria-label="${esc(H.pick(c.open))}"><img ${pic(n, i ? '(max-width: 900px) 100vw, 32vw' : '(max-width: 900px) 100vw, 64vw')} alt="" decoding="async"></button>`).join('')}</div>`;
 }
 
 /* ================================================================
-   cover — свет по тиснению
+   cover — обложка сверху и макро тиснения, обе крупно по нажатию
+   (свет за курсором убран 23.11: картинка от него становилась грязной)
    ================================================================ */
 function coverHTML(c){
-  return `<div class="lf-lit" style="--x:40%;--y:45%" role="img" aria-label="${esc(H.pick(c.aria))}">
-    <img ${pic(c.img)} alt="" loading="lazy" decoding="async">
-    <span class="lf-shade" aria-hidden="true"></span><span class="lf-glow" aria-hidden="true"></span>
-  </div>`;
+  return `<button type="button" class="lf-lit" aria-label="${esc(H.pick(c.aria))}"><img ${pic(c.img)} alt="" loading="lazy" decoding="async"></button>`;
 }
 const coverExtra = c => `<p class="lf-text">${H.T(c.more)}</p>
   <button type="button" class="lf-macro" aria-label="${esc(H.pick(c.title))}"><img ${pic(c.macro, '(max-width: 900px) 100vw, 30vw')} alt="" loading="lazy" decoding="async"></button>`;
 function liveCover(box, c){
-  const lit = box.querySelector('.lf-lit');
-  let raf = 0, on = false, user = 0, t0 = performance.now();
-  const set = (x, y) => { lit.style.setProperty('--x', (x * 100).toFixed(2) + '%'); lit.style.setProperty('--y', (y * 100).toFixed(2) + '%'); };
-  const move = e => {
-    const r = lit.getBoundingClientRect();
-    set((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); user = performance.now();
-  };
-  lit.addEventListener('pointermove', move);
-  lit.addEventListener('pointerdown', move);
-  // без касания свет обходит лист по восьмерке
-  const loop = now => {
-    if (now - user > 2500) {
-      const s = (now - t0) / 2600;
-      set(.48 + Math.sin(s) * .16, .5 + Math.sin(s * 2) * .3);
-    }
-    if (on) raf = requestAnimationFrame(loop);
-  };
-  onScreen(lit, v => { on = v; cancelAnimationFrame(raf); if (v && !still()) raf = requestAnimationFrame(loop); }, .2);
-  const m = box.querySelector('.lf-macro');
-  m.addEventListener('click', () => H.openViewer([img(c.macro + '.webp'), img(c.img + '.webp')], 0, [m.querySelector('img')]));
+  const btns = [box.querySelector('.lf-lit'), box.querySelector('.lf-macro')];
+  const list = [img(c.img + '.webp'), img(c.macro + '.webp')];
+  btns.forEach((b, i) => b.addEventListener('click', () => H.openViewer(list, i, btns.map(x => x.querySelector('img')), null, NOZOOM)));
 }
 
 /* ================================================================
@@ -135,15 +118,22 @@ function liveLayers(box, c){
 /* ================================================================
    spreads — развороты коллажем
    ================================================================ */
+// noZoom — картинки, которые крупно не открываются (просто ячейка, не кнопка)
 function spreadsHTML(c){
-  return `<div class="lf-grid">${c.imgs.map((n, i) =>
-    `<button type="button" class="lf-cell lf-cell${i + 1}" data-i="${i}" aria-label="${esc(H.pick(c.open))}"><img ${pic(n, i ? '(max-width: 600px) 100vw, 45vw' : '(max-width: 900px) 100vw, 90vw')} alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`;
+  const fixed = c.noZoom || [];
+  return `<div class="lf-grid">${c.imgs.map((n, i) => {
+    const pic1 = `<img ${pic(n, i ? '(max-width: 600px) 100vw, 45vw' : '(max-width: 900px) 100vw, 90vw')} alt="" loading="lazy" decoding="async">`;
+    return fixed.includes(n)
+      ? `<div class="lf-cell lf-cell${i + 1} lf-still">${pic1}</div>`
+      : `<button type="button" class="lf-cell lf-cell${i + 1}" data-n="${n}" aria-label="${esc(H.pick(c.open))}">${pic1}</button>`;
+  }).join('')}</div>`;
 }
-// коллаж: нажатие — крупно, листается по всем картинкам главы
+// коллаж: нажатие — крупно, листается по картинкам главы, которые можно открыть
 function liveSpreads(box, c){
-  const cells = [...box.querySelectorAll('.lf-cell')];
-  const list = c.imgs.map(n => img(n + '.webp'));
-  cells.forEach(b => b.addEventListener('click', () => H.openViewer(list, +b.dataset.i, cells.map(x => x.querySelector('img')))));
+  const cells = [...box.querySelectorAll('button.lf-cell')];
+  const names = cells.map(b => b.dataset.n);
+  const list = names.map(n => img(n + '.webp'));
+  cells.forEach((b, i) => b.addEventListener('click', () => H.openViewer(list, i, cells.map(x => x.querySelector('img')), null, NOZOOM)));
 }
 
 /* ================================================================
@@ -166,7 +156,7 @@ function liveOutdoor(box, c){
   const btns = [...fmts.querySelectorAll('.lf-fmt')];
   btns.forEach((b, i) => b.addEventListener('click', () => {
     const k = fmts.dataset.k;
-    H.openViewer(FORMATS.map(([f]) => img(k + '-' + f + '.webp')), i, btns.map(x => x.querySelector('.lf-b-' + k)));
+    H.openViewer(FORMATS.map(([f]) => img(k + '-' + f + '.webp')), i, btns.map(x => x.querySelector('.lf-b-' + k)), null, NOZOOM);
   }));
 }
 

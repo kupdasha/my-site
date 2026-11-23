@@ -30,15 +30,12 @@
 .lf-ch.in .lf-col > *,.lf-ch.in .lf-viz,.lf-ch.in .lf-grid,.lf-ch.in .lf-paper,.lf-ch.in .lf-fmts{opacity:1;transform:none}
 
 /* ---------- cover: свет по тиснению ---------- */
-.lf-lit{position:relative;overflow:hidden;border-radius:var(--r-img);aspect-ratio:1800/1024;background:var(--lf-desk);cursor:crosshair;touch-action:pan-y}
+.lf-lit{position:relative;display:block;width:100%;padding:0;border:0;overflow:hidden;border-radius:var(--r-img);aspect-ratio:1800/1024;background:var(--lf-desk);cursor:zoom-in}
 .lf-lit img{width:100%;height:100%;object-fit:cover;display:block}
-.lf-lit span{position:absolute;inset:0;pointer-events:none}
-/* вокруг света чуть темнее, у курсора — блик: рельеф листа становится резче */
-.lf-shade{background:radial-gradient(circle at var(--x) var(--y),transparent 0,transparent 14%,rgba(10,30,20,.34) 58%);mix-blend-mode:multiply}
-.lf-glow{background:radial-gradient(circle at var(--x) var(--y),rgba(255,255,255,.75) 0,rgba(255,255,255,.22) 16%,transparent 36%);mix-blend-mode:soft-light}
 .lf-macro{display:block;width:100%;max-width:360px;padding:0;border:0;background:none;border-radius:calc(var(--r-img) * .7);overflow:hidden;cursor:zoom-in}
 .lf-macro img{width:100%;aspect-ratio:1800/1024;object-fit:cover;display:block;transition:transform .8s var(--ease)}
-.lf-macro:hover img{transform:scale(1.05)}
+.lf-macro:hover img,.lf-lit:hover img{transform:scale(1.03)}
+.lf-lit img{transition:transform .8s var(--ease)}
 
 /* ---------- строка надписей: текущая темная, под ней — полоска таймера ---------- */
 .lf-tabs{display:flex;flex-wrap:wrap;column-gap:clamp(20px,2.6vw,40px);row-gap:4px;border-bottom:1.5px solid color-mix(in srgb,currentColor 14%,transparent);margin-bottom:clamp(20px,2.6vw,36px)}
@@ -87,6 +84,8 @@
 .lf-cell1{grid-column:1 / -1}
 .lf-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s var(--ease)}
 .lf-cell:hover img{transform:scale(1.04)}
+.lf-cell.lf-still{cursor:auto}
+.lf-cell.lf-still:hover img{transform:none}
 @media (max-width:600px){.lf-grid{grid-template-columns:1fr}}
 
 /* ---------- outdoor: щит и форматы, «плашка / градиент» ---------- */
@@ -114,7 +113,6 @@
   .lf-cover .lf-col > *{grid-column:1 / -1;justify-self:start}
   .lf-cover .lf-viz{order:1;margin-top:10px}
   .lf-cover .lf-macro{order:2;max-width:none}
-  .lf-lit{cursor:auto}
 }
 @media (max-width:600px){
   .lf-tabs{column-gap:16px}

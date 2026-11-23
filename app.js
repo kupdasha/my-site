@@ -590,8 +590,10 @@ function viewSet(k){
   } else viewImg.src = full;
   [1, -1].forEach(d => { if (viewList.length > 1) new Image().src = viewList[(k + d + viewList.length) % viewList.length]; });
 }
-function openViewer(list, k, from, caps){
+// opts.noZoom — внутри просмотра картинку нельзя масштабировать (щипок, Ctrl + колесо, Ctrl + плюс)
+function openViewer(list, k, from, caps, opts){
   viewCaps = caps || [];
+  viewer.classList.toggle('nozoom', !!(opts && opts.noZoom));
   viewList = list; viewAt = k; viewFrom = from || [];
   viewSet(k); viewShow();
   const src = viewFrom[k];
@@ -625,6 +627,11 @@ function stepViewer(d){
   viewSet(viewAt); viewShow();
   viewImg.animate([{ opacity: 0, transform: `translateX(${d * 40}px)` }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' });
 }
+const viewNoZoom = () => viewer.classList.contains('open') && viewer.classList.contains('nozoom');
+addEventListener('wheel', e => { if (e.ctrlKey && viewNoZoom()) e.preventDefault(); }, { passive: false });
+['gesturestart', 'gesturechange'].forEach(t => addEventListener(t, e => { if (viewNoZoom()) e.preventDefault(); }, { passive: false }));
+addEventListener('touchmove', e => { if (e.touches.length > 1 && viewNoZoom()) e.preventDefault(); }, { passive: false });
+addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && /^[=+\-0]$/.test(e.key) && viewNoZoom()) e.preventDefault(); });
 viewer.addEventListener('click', e => {
   const nav = e.target.closest('.viewer-nav');
   if (nav) return stepViewer(nav.classList.contains('next') ? 1 : -1);
