@@ -261,7 +261,7 @@ window.TAPLINK = {
   socials: [
     [ 'LinkedIn',    'https://www.linkedin.com/in/kup-daria/' ],
     [ 'VK',          'https://vk.com/odnakavychka' ],
-    [ 'MAX',         'https://max.ru/u/f9LHodD0cOJU0rsI79k2icd0oYLCiFJlULG1l3wRQRuGZlC1gIwtl1G3eF4' ],
+    [ 'MAX',         'https://max.ru/channel_onekav' ],
     [ 'Telegram',    'https://t.me/kupdasha' ],
     [ 'TikTok',      'https://www.tiktok.com/@odnakav' ],
     [ 'YouTube',     'https://www.youtube.com/@kupyasha26' ],
